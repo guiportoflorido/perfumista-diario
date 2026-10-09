@@ -2,6 +2,7 @@
 import { FAIXAS } from "../engine/index.js";
 import { esc, ROT_OC, OCAS_TODAS, pinta, faixaHTML, nf, tierHTML, slotNome, md } from "./util.js";
 import { daGrade, contagens, agrupar, esquecidos, usoVsJanelas, calibracao } from "./estatisticas.js";
+import { arqIcone, corArq, ARQ_PATHS } from "./icones.js";
 
 const TIERS = ["S", "A", "B", "C"];
 const EIXOS = { P: "P · seco-mineral", S: "S · ambarado-doce", F: "F · fora do eixo" };
@@ -148,6 +149,8 @@ export function telaHistorico({ frascos, hist: histTodo, hoje, fila: filaToda, a
     <div class="kpi"><span class="v">${usados.length}/${c.por.size}</span><span class="l">frascos usados ao menos 1×</span></div>
   </div>
   ${!doPeriodo && c.cobertura < 90 ? `<p class="nota">Diário com menos de 90 dias: não serve ainda para conclusões de desbaste sobre os B.</p>` : ""}
+  ${calendario(histTodo, frascos, ate, de)}
+  ${passaporte(c.por, hist, frascos)}
   <div class="bloco"><h3>Mais usados</h3>${usados.length ? barras(usados.slice(0, 15).map(x => [`<button class="nome-inline" data-ficha="${esc(x.f.nome)}">${esc(x.f.nome)}</button>`, x.n]), usados[0].n) : `<p class="nota">Nenhum.</p>`}</div>
   <div class="duas">
     <div class="bloco"><h3>Por slot</h3>${barras(slots, Math.max(...slots.map(s => s[1])))}</div>
@@ -178,4 +181,49 @@ export function telaHistorico({ frascos, hist: histTodo, hoje, fila: filaToda, a
     <div class="linha-flex"><button class="btn peq" data-acao="salvar-spr">Salvar ajuste</button>${cal.n ? `<button class="btn sec peq" data-acao="spr-sugerir">Usar o desvio medido</button>` : ""}</div>
   </div>
   <div class="bloco"><h3>Registros ${doPeriodo ? "do período" : "recentes"}</h3><div class="lista">${hist.slice(-30).reverse().map(r => `<article class="card compacto"><span class="pos">${esc(r.slot)}</span><div style="min-width:0"><b>${esc(r.perfume)}</b><div class="casa">${esc(r.data)} · ${slotNome(r.slot)}${r.sprays ? ` · ${esc(r.sprays)} sprays` : ""}${r.pendente ? " · na fila" : ""}</div></div><span></span></article>`).join("")}</div></div>`;
+}
+
+// ───────────────────────── calendário de cheiros ─────────────────────────
+/** Grade estilo GitHub: colunas = semanas, linhas = seg→dom; cada dia tem metade de cima (Dia) e de baixo (Noite)
+ *  na cor do arquétipo usado. Mostra as últimas 16 semanas até o fim do período. */
+export function calendario(hist, frascos, ate, de) {
+  const arqDe = new Map(frascos.map(f => [f.nome, f.arquetipo]));
+  const porDia = new Map();
+  for (const r of hist) { if (!porDia.has(r.data)) porDia.set(r.data, {}); porDia.get(r.data)[r.slot] = r.perfume; }
+  const fim = new Date(ate + "T12:00:00");
+  const iso = x => `${x.getFullYear()}-${String(x.getMonth() + 1).padStart(2, "0")}-${String(x.getDate()).padStart(2, "0")}`;
+  const semanas = 16, ini = new Date(fim); ini.setDate(ini.getDate() - ((fim.getDay() + 6) % 7) - (semanas - 1) * 7);
+  const cel = (nome) => (nome ? `background:${arqDe.has(nome) ? corArq(arqDe.get(nome)) : "var(--leve)"}` : "");
+  const meses = ["jan", "fev", "mar", "abr", "mai", "jun", "jul", "ago", "set", "out", "nov", "dez"];
+  let cols = "", rotMes = "", mesAnt = -1;
+  for (let w = 0; w < semanas; w++) {
+    let dias = "";
+    for (let d = 0; d < 7; d++) {
+      const dt = new Date(ini); dt.setDate(ini.getDate() + w * 7 + d);
+      const k = iso(dt), u = porDia.get(k) || {}, futuro = dt > fim, fora = de && k < de;
+      const info = `<b>${dt.toLocaleDateString("pt-BR", { weekday: "short", day: "2-digit", month: "2-digit" })}</b> · ☀︎ ${esc(u.M || "—")} · ☾ ${esc(u.N || "—")}`;
+      dias += futuro ? `<span class="dia vazio"></span>` : `<button class="dia ${fora ? "fora" : ""} ${u.M || u.N ? "usado" : ""}" data-dia="${k}" data-info="${esc(info)}" aria-label="${esc(k)}"><span style="${cel(u.M)}"></span><span style="${cel(u.N)}"></span></button>`;
+    }
+    const mesW = new Date(ini); mesW.setDate(ini.getDate() + w * 7);
+    rotMes += `<span>${mesW.getMonth() !== mesAnt ? meses[mesW.getMonth()] : ""}</span>`; mesAnt = mesW.getMonth();
+    cols += `<div class="sem">${dias}</div>`;
+  }
+  return `<div class="bloco"><h3>Calendário de cheiros</h3>
+    <div class="cal-wrap"><div class="cal-meses">${rotMes}</div><div class="cal">${cols}</div></div>
+    <p class="nota" id="calInfo">Cada quadrado é um dia: metade de cima = Dia, de baixo = Noite, na cor do arquétipo. Toque num dia.</p></div>`;
+}
+
+// ───────────────────────── passaporte de arquétipos ─────────────────────────
+export function passaporte(por, hist, frascos) {
+  const usos = new Map();
+  for (const c of por.values()) if (c.n) usos.set(c.f.arquetipo, (usos.get(c.f.arquetipo) || 0) + c.n);
+  const nomes = Object.keys(ARQ_PATHS);
+  const feitos = nomes.filter(n => usos.get(n));
+  return `<div class="bloco"><div class="linha-flex"><h3>Passaporte de arquétipos</h3><span class="esp"></span><span class="selo manual">${feitos.length}/16 carimbados</span></div>
+    <div class="passaporte">${nomes.map((n, i) => {
+      const u = usos.get(n) || 0;
+      return `<div class="carimbo ${u ? "ok" : ""}" style="--cor:${corArq(n)};--rot:${((i * 37) % 13) - 6}deg">
+        ${arqIcone(n, 26)}<span class="cn">${esc(n)}</span>${u ? `<span class="cu">${u}×</span>` : ""}</div>`;
+    }).join("")}</div>
+    ${feitos.length < 16 ? `<p class="nota">Faltam: ${nomes.filter(n => !usos.get(n)).map(esc).join(", ")}.</p>` : `<p class="nota">Passaporte completo no período. 🎉</p>`}</div>`;
 }

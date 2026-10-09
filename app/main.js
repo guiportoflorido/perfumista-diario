@@ -9,13 +9,13 @@ import { lerTiers, lerDiario, aplicarTiers, diarioUnificado, nomesRegistraveis }
 import { janelasPorFrasco, ajustarSprays } from "./estatisticas.js";
 import { telaColecao, telaPlaybook, telaHistorico } from "./telas.js";
 import { telaRoda } from "./roda.js";
-import { definirCores, arqTag, arqIcone } from "./icones.js";
+import { definirCores, arqTag, arqIcone, corArq } from "./icones.js";
 import { ceuHTML, abrirRoleta, animarSpray } from "./diversao.js";
 import { telaMercado, fichaEditavel, camposAlterados, baseComTiers, deLinhas, linhasParaCriar, cachePlanilha, baixarMercado, criarNaPlanilha, editarNaPlanilha } from "./mercado.js";
 import { contagens } from "./estatisticas.js";
 import { ler, gravar } from "./store.js";
 
-export const APP_VERSAO = "5.1";  // sobe a cada publicação: confere no topo da tela se o celular pegou a versão nova
+export const APP_VERSAO = "5.2";  // sobe a cada publicação: confere no topo da tela se o celular pegou a versão nova
 const S = { aba: "hoje", frascos: [], frascosAtivos: [], avisosTiers: null, fichas: {}, versao: {}, prev: null, prevOffline: false,
   prevErro: null, metar: null, metarMotivo: null, clima: null, resultado: null, erroMotor: null, entrada: "", carregandoClima: true,
   sync: { estado: "ocioso", msg: "" }, hr: ler("hr", { preset: "tudo" }), tokenNovo: null, playbook: null, janelas: new Map(),
@@ -100,12 +100,14 @@ function render() {
     if (b.dataset.aba === S.aba) b.setAttribute("aria-current", "page"); else b.removeAttribute("aria-current");
   });
   const foco = document.activeElement?.id;
+  const trocouAba = S.abaRenderizada !== S.aba; S.abaRenderizada = S.aba;
   const arqDe = new Map(S.frascos.map(f => [f.nome, f.arquetipo]));
   const ctx = { fichas: S.fichas, arqTag, arqIcone, arqDe, hr: S.hr,
     frascos: S.frascosAtivos, hist: historico(), hoje: hojeISO(), janelas: S.janelas, filtro: S.filtro, playbook: S.playbook,
     faixaSel: S.pbFaixa ?? S.clima?.faixaDia?.idx ?? 2, fila: fila(), ajSpray: ajSpray() };
   $("#tela").innerHTML = ({ hoje: telaHoje, registrar: telaRegistrar, ajustes: telaAjustes,
     colecao: () => telaColecaoTudo(ctx), mercado: telaMercadoAba, playbook: () => telaPlaybook(ctx), historico: () => telaHistorico(ctx) }[S.aba])();
+  if (trocouAba) { const t = $("#tela"); t.classList.remove("entra"); void t.offsetWidth; t.classList.add("entra"); }
   if (foco && document.getElementById(foco) && S.aba !== "hoje") {
     const el = document.getElementById(foco); el.focus();
     if (el.type === "search") { const n = el.value.length; try { el.setSelectionRange(n, n); } catch { /* sem seleção */ } }
@@ -210,8 +212,9 @@ function blocoSlot(s) {
   const usado = historico().filter(r => r.data === dia.data && r.slot === slotCod).at(-1);
   const card = (t, i, custo = false) => {
     const ja = usado && usado.perfume === t.nome;
-    return `<article class="card ${i === 0 && !custo ? "top1" : ""}">
-      <span class="pos">${i + 1}</span>
+    const hero = i === 0 && !custo;
+    return `<article class="card ${hero ? "top1" : ""}" style="--i:${i};--cor:${corArq(t.arquetipo)}">
+      ${hero ? `<span class="pos pos-hero">${arqIcone(t.arquetipo, 30)}<span class="n1">1</span></span>` : `<span class="pos">${i + 1}</span>`}
       <div style="min-width:0"><button class="nome" data-ficha="${esc(t.nome)}">${esc(t.nome)}</button>${tierHTML(t.tier)}<div class="casa">${esc(t.casa)} · ${arqTag(t.arquetipo, 13)}</div></div>
       <span class="score" title="Score">${t.score.toFixed(0)}</span>
       <div class="meta">${spraysHTML(t)}<span>vivo até <b>${t.vivo_fim ? "o fim" : "~" + fmtH(t.vivo_ate)}</b></span></div>
@@ -479,6 +482,7 @@ document.addEventListener("click", async e => {
   if (b.dataset.ficha) { abrirFicha(b.dataset.ficha); return; }
   if (b.dataset.colmodo) { S.colModo = b.dataset.colmodo; gravar("colModo", S.colModo); render(); return; }
   if (b.dataset.colOrd) { const k = b.dataset.colOrd; S.filtro = { ...S.filtro, ord: k, dir: (S.filtro.ord || "tier") === k && (S.filtro.dir || "asc") === "asc" ? "desc" : "asc" }; gravar("filtro", S.filtro); render(); return; }
+  if (b.dataset.dia) { const el = $("#calInfo"); if (el) el.innerHTML = b.dataset.info; document.querySelectorAll(".cal .dia.sel").forEach(x => x.classList.remove("sel")); b.classList.add("sel"); return; }
   if (b.dataset.hr) { S.hr = { ...S.hr, preset: b.dataset.hr }; gravar("hr", S.hr); render(); return; }
   if (b.dataset.merc) { abrirMercado(b.dataset.merc); return; }
   if (b.dataset.mfOrd) { const k = b.dataset.mfOrd; S.mf = { ...S.mf, ord: k, dir: (S.mf.ord || "tier") === k && (S.mf.dir || "asc") === "asc" ? "desc" : "asc" }; gravar("mf", S.mf); render(); return; }

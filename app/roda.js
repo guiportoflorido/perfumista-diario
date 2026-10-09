@@ -54,7 +54,7 @@ export function rodaSVG({ frascos, arquetipos, gaps, verGaps, usosPor }) {
         const usos = usosPor?.get(f.nome) || 0;
         partes.push(`<g class="r-fr" data-fr="${esc(f.nome)}" style="transform-origin:${f1(x)}px ${f1(y)}px" role="button" tabindex="0" aria-label="${esc(f.nome)}, tier ${f.tier}">
           <circle class="r-hit" cx="${f1(x)}" cy="${f1(y)}" r="26"/>
-          <circle cx="${f1(x)}" cy="${f1(y)}" r="${12 + Math.min(usos, 6)}" fill="${a.cor}" class="r-ponto"/></g>`);
+          <circle cx="${f1(x)}" cy="${f1(y)}" r="${12 + Math.min(usos, 6)}" fill="${a.cor}" class="r-ponto" style="--d:${(i * 40 + TIERS.indexOf(t) * 90 + k * 25)}ms"/></g>`);
       });
     }
   }
