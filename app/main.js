@@ -10,11 +10,12 @@ import { janelasPorFrasco, ajustarSprays } from "./estatisticas.js";
 import { telaColecao, telaPlaybook, telaHistorico } from "./telas.js";
 import { telaRoda } from "./roda.js";
 import { definirCores, arqTag, arqIcone } from "./icones.js";
+import { ceuHTML, abrirRoleta, animarSpray } from "./diversao.js";
 import { telaMercado, fichaEditavel, camposAlterados, baseComTiers, deLinhas, linhasParaCriar, cachePlanilha, baixarMercado, criarNaPlanilha, editarNaPlanilha } from "./mercado.js";
 import { contagens } from "./estatisticas.js";
 import { ler, gravar } from "./store.js";
 
-export const APP_VERSAO = "5.0";  // sobe a cada publicação: confere no topo da tela se o celular pegou a versão nova
+export const APP_VERSAO = "5.1";  // sobe a cada publicação: confere no topo da tela se o celular pegou a versão nova
 const S = { aba: "hoje", frascos: [], frascosAtivos: [], avisosTiers: null, fichas: {}, versao: {}, prev: null, prevOffline: false,
   prevErro: null, metar: null, metarMotivo: null, clima: null, resultado: null, erroMotor: null, entrada: "", carregandoClima: true,
   sync: { estado: "ocioso", msg: "" }, hr: ler("hr", { preset: "tudo" }), tokenNovo: null, playbook: null, janelas: new Map(),
@@ -154,11 +155,11 @@ function telaHoje() {
 
 function blocoClima(c, dia) {
   if (!c) return "";
-  const fx = (f, rot) => `<div class="faixa-slot" ${f ? `data-f="${f.idx}"` : ""}><span class="rot">${rot}</span>${f ? `<span class="graus">${nf(f.T)}°</span><span class="fx">${FAIXAS[f.idx]}</span><span class="t">${esc(f.fonte)}</span>` : `<span class="graus">—</span><span class="t">sem dado</span>`}</div>`;
+  const fx = (f, rot, tipo) => `<div class="faixa-slot" ${f ? `data-f="${f.idx}"` : ""}>${ceuHTML(tipo, c.chuva?.v ?? 0, f?.idx ?? 2)}<span class="rot">${rot}</span>${f ? `<span class="graus">${nf(f.T)}°</span><span class="fx">${FAIXAS[f.idx]}</span><span class="t">${esc(f.fonte)}</span>` : `<span class="graus">—</span><span class="t">sem dado</span>`}</div>`;
   const sel = f => (f.fonte.startsWith("manual") ? `<span class="selo manual">manual</span>` : f.tipo === "previsto" ? `<span class="selo">previsto</span>` : f.tipo === "observado" ? `<span class="selo">observado</span>` : "");
   const td = c.Td;
   return `<section class="bloco" aria-label="Clima">
-    <div class="clima-faixas">${fx(c.faixaDia, "☀︎ Slot Dia")}${dia.soUm ? "" : fx(c.faixaNoite, "☾ Slot Noite")}</div>
+    <div class="clima-faixas">${fx(c.faixaDia, "☀︎ Slot Dia", "dia")}${dia.soUm ? "" : fx(c.faixaNoite, "☾ Slot Noite", "noite")}</div>
     <dl class="fontes">
       <dt>Temperatura</dt><dd>${c.Tmin ? `${nf(c.Tmin.v)}→${nf(c.Tmax.v)} °C, pico ${c.pico?.v ?? "—"}h${c.noite23 ? `, 23h ${nf(c.noite23.v)} °C` : ""} <span class="nota">· ${esc(c.Tmax.fonte)}</span>${c.Tmax.fonte === "manual" ? `<span class="selo manual">manual</span>` : ""}` : `<span class="erro-txt">sem dado</span>`}</dd>
       <dt>Ponto de orvalho</dt><dd>${td.v == null ? "indisponível — sem modificador de Td" : `${nf(td.v)} °C · ar ${td.banda}`} ${td.fonte === "manual" ? "" : `<span class="nota">· ${esc(td.fonte)}</span>`}${sel(td)}</dd>
@@ -221,7 +222,7 @@ function blocoSlot(s) {
   const segs = (S.resultado.segs || []).filter(g => g.fim > s.ini && g.ini < s.fim).map(g => `${fmtH(Math.max(g.ini, s.ini))}–${fmtH(Math.min(g.fim, s.fim))} ${ROT_OC[g.ocas]} (${AMB[g.amb]}${g.fechado ? ", fechado" : ""})`);
   const estadoUso = u => (u.pendente ? (u.estado === "conflito" ? " · conflito na planilha" : " · na fila para a planilha") : " · na planilha");
   return `<section class="grupo" aria-label="Slot ${s.nome}">
-    <div class="slot-cab"><h2>${s.nome === "Dia" ? "☀︎ Slot Dia" : "☾ Slot Noite"}</h2><span class="t">${fmtH(s.ini)}→${fmtH(s.fim)}</span></div>
+    <div class="slot-cab"><h2>${s.nome === "Dia" ? "☀︎ Slot Dia" : "☾ Slot Noite"}</h2><span class="t">${fmtH(s.ini)}→${fmtH(s.fim)}</span><span class="esp"></span>${s.top.length > 1 && !usado ? `<button class="btn sec peq roleta-btn" data-roleta-slot="${slotCod}">🎰 Me surpreenda</button>` : ""}</div>
     ${s.nome === "Dia" ? chips("ocDia", OCAS_DIA, dia.ocDia) + chips("ambDia", AMBIENTES, dia.ambDia) : chips("ocNoite", OCAS_NOITE, dia.ocNoite) + chips("ambNoite", AMBIENTES, dia.ambNoite)}
     <p class="nota">${esc(segs.join(" · "))}</p>
     ${usado ? `<p class="nota">Registrado hoje: <b>${esc(usado.perfume)}</b>${estadoUso(usado)}.${usado.pendente && usado.estado !== "enviado" ? ` <button class="btn sec peq" data-descartar="${esc(usado.id)}">Desfazer</button>` : ""}</p>` : ""}
@@ -350,6 +351,8 @@ async function salvarRegistro() {
     temp: hoje && f ? virg(f.T) : "", td: hoje && c && (c.Td.tipo === "observado" || c.Td.tipo === "manual") && c.Td.v != null ? virg(c.Td.v) : "" };
   adicionar(reg);
   fecharFolha();
+  const arq = S.frascos.find(f => f.nome === perfume)?.arquetipo || (listaMercado().lista || []).find(p => p.nome === perfume)?.arquetipo || "";
+  await animarSpray({ sprays: reg.sprays || reg.sugerido || 1, nome: perfume, arquetipo: arq });
   toast(`Registrado: ${perfume} · ${data} · ${slotNome(slot)}${configurado() ? "" : " (só no aparelho)"}.`);
   recalcular();
   if (configurado()) await sincronizar({ silencioso: true });
@@ -486,6 +489,11 @@ document.addEventListener("click", async e => {
   if (b.dataset.pbfaixa) { S.pbFaixa = Number(b.dataset.pbfaixa); render(); return; }
   if (b.dataset.chip) { const k = b.dataset.chip, v = b.dataset.v; mudarDia(d => { d[k] = v; }); return; }
   if (b.dataset.extra) { const v = b.dataset.extra; mudarDia(d => { d.extras = d.extras.includes(v) ? d.extras.filter(x => x !== v) : [...d.extras, v]; }); return; }
+  if (b.dataset.roletaSlot) {
+    const slot = b.dataset.roletaSlot, so = S.resultado.slots.find(x => (x.nome === "Dia" ? "M" : "N") === slot);
+    abrirRoleta($("#folha"), so.nome, so.top, t => abrirRegistro({ perfume: t.nome, slot, sprays: ajustarSprays(t.r.f, t.sprays, ajSpray()), sugerido: t.sprays, ocasiao: ocasiaoDominante(so) }));
+    return;
+  }
   if (b.dataset.usei) {
     const so = S.resultado.slots.find(s => (s.nome === "Dia" ? "M" : "N") === b.dataset.slot);
     abrirRegistro({ perfume: b.dataset.usei, slot: b.dataset.slot, sprays: b.dataset.ajustado, sugerido: b.dataset.sprays, ocasiao: ocasiaoDominante(so) });
