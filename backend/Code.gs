@@ -1,3 +1,4 @@
+/** @OnlyCurrentDoc */
 /**
  * Perfumista Diário — backend em Google Apps Script, vinculado à planilha "Diário de Uso — Perfumes".
  *
