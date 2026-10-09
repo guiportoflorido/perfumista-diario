@@ -75,7 +75,7 @@ export function filtrar(lista, f) {
 }
 
 // colunas da tabela (formato do TABELAO): chave do objeto, rótulo, ordenável
-export const COLUNAS = [["tier", "Tier"], ["posse", "Posse"], ["arquetipo", "Arquétipo"],
+export const COLUNAS = [["posse", "Posse"], ["tier", "Tier"], ["arquetipo", "Arquétipo"],
   ["resumo", "Resumo"], ["topo", "Topo"], ["coracao", "Coração"], ["base", "Base"]];
 const ordemPosse = p => ({ "Frasco Gui": 0, "Frasco Bia": 1, "Amostra": 2, "Amostra Bia": 3, "Avaliado": 4 }[p] ?? (p ? 5 : 6));
 function comparador(ord = "tier", dir = "asc") {
@@ -139,12 +139,13 @@ function tabela(linhas, f) {
   const tx = (k, v) => `<td class="c-${k}"><div class="clamp">${esc(v || "")}</div></td>`;
   const btnOrd = (k, r) => `<button data-mf-ord="${k}" aria-sort="${ord === k ? (dir === "asc" ? "ascending" : "descending") : "none"}">${r}${ord === k ? (dir === "asc" ? " ↑" : " ↓") : ""}</button>`;
   return `<div class="tabelao" role="region" aria-label="Tabela do mercado" tabindex="0"><table>
-    <thead><tr><th class="c-n" scope="col">#</th><th class="c-nome" scope="col"><span class="dupla">${btnOrd("nome", "Perfume")}<span class="sep">·</span>${btnOrd("casa", "Casa")}</span></th>${COLUNAS.map(th).join("")}</tr></thead>
+    <thead><tr><th class="c-n" scope="col">#</th><th class="c-casa" scope="col">${btnOrd("casa", "Casa")}</th><th class="c-nome" scope="col">${btnOrd("nome", "Perfume")}</th>${COLUNAS.map(th).join("")}</tr></thead>
     <tbody>${linhas.map((p, i) => `<tr data-merc="${esc(p.casa + "||" + p.nome)}" tabindex="0" class="${p.posse === "Frasco Gui" ? "minha" : ""}">
       ${td("n", i + 1)}
-      ${td("nome", `<span class="pn">${esc(p.nome)}</span>${p.wish ? ` <span class="estrela" title="Wishlist">★</span>` : ""}<span class="pc">${esc(p.casa)}</span>`)}
-      ${td("tier", p.tier ? tierHTML(p.tier) : `<span class="tier sem">–</span>`)}
+      ${td("casa", esc(p.casa))}
+      ${td("nome", `${esc(p.nome)}${p.wish ? ` <span class="estrela" title="Wishlist">★</span>` : ""}`)}
       ${td("posse", esc(posseRot(p.posse) || "—"))}
+      ${td("tier", p.tier ? tierHTML(p.tier) : `<span class="tier sem">–</span>`)}
       ${td("arquetipo", esc(p.arquetipo || "—"))}
       ${tx("resumo", p.resumo)}${tx("topo", p.topo)}${tx("coracao", p.coracao)}${tx("base", p.base)}
     </tr>`).join("")}</tbody></table></div>

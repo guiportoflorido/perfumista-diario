@@ -290,7 +290,7 @@ select[disabled], input[readonly], textarea[readonly] { opacity: .75; }
 /* ── tabelão do mercado ── */
 .tabelao { overflow: auto; max-height: 72vh; background: var(--sup); border-radius: var(--r); box-shadow: var(--sombra); -webkit-overflow-scrolling: touch; overscroll-behavior: contain; }
 .tabelao:focus-visible { outline: 2px solid var(--acento); }
-.tabelao table { border-collapse: separate; border-spacing: 0; font-size: 13px; line-height: 1.4; min-width: 1100px; }
+.tabelao table { border-collapse: separate; border-spacing: 0; font-size: 13px; line-height: 1.4; min-width: 1220px; }
 .tabelao thead th { position: sticky; top: 0; z-index: 2; background: var(--sup2); text-align: left; padding: 0; border-bottom: .5px solid var(--linha); white-space: nowrap; }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .tabelao thead th { background: var(--afund); } }
 :root[data-theme="dark"] .tabelao thead th { background: var(--afund); }
@@ -307,7 +307,7 @@ select[disabled], input[readonly], textarea[readonly] { opacity: .75; }
 .tabelao .c-n { position: sticky; left: 0; z-index: 1; width: 38px; min-width: 38px; text-align: right; color: var(--leve); font: 500 12px var(--f-num); }
 .tabelao .c-nome { position: sticky; left: 38px; z-index: 1; min-width: 140px; max-width: 150px; font-weight: 650; box-shadow: 1px 0 0 var(--linha); }
 .tabelao thead .c-n, .tabelao thead .c-nome { z-index: 3; }
-.tabelao td.c-nome .pn { display: block; }
+.tabelao .c-casa { min-width: 110px; max-width: 130px; color: var(--suave); }
 .tabelao td.c-nome .pc { display: block; font-weight: 400; font-size: 12px; color: var(--suave); margin-top: 1px; }
 .tabelao th.c-nome .dupla { display: flex; align-items: center; }
 .tabelao th.c-nome .dupla button { padding-right: 4px; }
