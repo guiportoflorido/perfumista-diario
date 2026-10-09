@@ -1,6 +1,6 @@
 // sw.js — service worker: rede primeiro (sempre a versão publicada mais nova quando há internet),
 // cache como reserva (o app abre sem sinal). Chamadas a outros domínios (Open-Meteo, Apps Script) passam direto.
-const CACHE = "perfumista-v5";
+const CACHE = "perfumista-v6";
 const BASE = new URL("./", self.location).pathname;
 const ARQUIVOS = ["", "index.html", "manifest.webmanifest", "app/estilo.css", "app/main.js", "app/store.js", "app/clima.js",
   "app/entrada.js", "app/api.js", "app/registro.js", "app/planilha.js", "app/estatisticas.js", "app/telas.js", "app/util.js",
@@ -20,7 +20,8 @@ self.addEventListener("fetch", e => {
   if (req.method !== "GET" || new URL(req.url).origin !== self.location.origin) return;
   e.respondWith((async () => {
     try {
-      const r = await fetch(req, { cache: "no-store" });
+      // nova Request só com a URL: passar opções junto de um pedido de navegação faz o Safari recusar o fetch
+      const r = await fetch(new Request(req.url, { cache: "no-store", credentials: "same-origin" }));
       if (r.ok) { const c = await caches.open(CACHE); c.put(req, r.clone()); }
       return r;
     } catch {

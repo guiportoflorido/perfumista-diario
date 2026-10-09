@@ -10,7 +10,7 @@ import { janelasPorFrasco, ajustarSprays } from "./estatisticas.js";
 import { telaColecao, telaPlaybook, telaHistorico } from "./telas.js";
 import { ler, gravar } from "./store.js";
 
-export const APP_VERSAO = "4.5";  // sobe a cada publicação: confere no topo da tela se o celular pegou a versão nova
+export const APP_VERSAO = "4.6";  // sobe a cada publicação: confere no topo da tela se o celular pegou a versão nova
 const S = { aba: "hoje", frascos: [], frascosAtivos: [], avisosTiers: null, fichas: {}, versao: {}, prev: null, prevOffline: false,
   prevErro: null, metar: null, metarMotivo: null, clima: null, resultado: null, erroMotor: null, entrada: "", carregandoClima: true,
   sync: { estado: "ocioso", msg: "" }, tokenNovo: null, playbook: null, janelas: new Map(),
