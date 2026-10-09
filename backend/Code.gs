@@ -8,12 +8,16 @@
  * token para colar em Ajustes do app.
  *
  * Toda chamada é POST com corpo JSON em text/plain (evita preflight de CORS) e precisa do TOKEN.
- * Ações: ping · metar · dados (Tiers + Diário + Frascos) · registrar (linhas no formato da aba Diário).
+ * Ações: ping · metar · dados (Tiers + Diário + Frascos) · registrar (linhas no formato da aba Diário) ·
+ *        mercado (lê a aba Mercado) · criarMercado (cria a aba uma vez) · editarMercado (edita um perfume;
+ *        tier e posse também vão para a aba Tiers).
  * Regras da planilha: data como texto AAAA-MM-DD; campo vazio = ""; nunca editar ou apagar linhas existentes;
  * aba Frascos é só fórmula (nunca escrita aqui).
  */
 
-var ABA_TIERS = 'Tiers', ABA_DIARIO = 'Diário', ABA_FRASCOS = 'Frascos';
+var ABA_TIERS = 'Tiers', ABA_DIARIO = 'Diário', ABA_FRASCOS = 'Frascos', ABA_MERCADO = 'Mercado';
+var COLS_MERCADO = ['Casa', 'Perfume', 'Tier', 'Posse', 'Arquétipo', 'Resumo', 'Topo', 'Coração', 'Base', 'Nariz', 'Wishlist', 'Atualizado em'];
+var EDITAVEIS = ['Tier', 'Posse', 'Arquétipo', 'Resumo', 'Topo', 'Coração', 'Base', 'Nariz', 'Wishlist'];
 var COLS_DIARIO = ['Data', 'Slot', 'Perfume', 'Ocasião', 'Temp (°C)', 'Td (°C)', 'Sprays', 'NotaDia', 'Obs'];
 var OCASIOES = ['Lazer', 'T.Inf', 'T.For', 'N.Inf', 'N.For', 'Cozy D', 'Cozy N'];
 
@@ -28,6 +32,9 @@ function doPost(e) {
       case 'metar': return saida_({ ok: true, metar: metar_() });
       case 'dados': return saida_({ ok: true, dados: dados_() });
       case 'registrar': return saida_(registrar_(req.linhas || [], !!req.forcar));
+      case 'mercado': return saida_({ ok: true, mercado: lerMercado_() });
+      case 'criarMercado': return saida_(criarMercado_(req.linhas || []));
+      case 'editarMercado': return saida_(editarMercado_(req.casa, req.perfume, req.campos || {}));
       default: return saida_({ ok: false, erro: 'ação desconhecida' });
     }
   } catch (err) {
@@ -139,4 +146,87 @@ function registrar_(linhas, forcar) {
   } finally {
     lock.releaseLock();
   }
+}
+
+// ───────────────────────── mercado ─────────────────────────
+function chave_(casa, perfume) {
+  return (String(casa) + '|' + String(perfume)).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/\s+/g, ' ').trim();
+}
+function hoje_() { return Utilities.formatDate(new Date(), 'America/Sao_Paulo', 'yyyy-MM-dd'); }
+
+function lerMercado_() {
+  var aba = SpreadsheetApp.getActive().getSheetByName(ABA_MERCADO);
+  if (!aba) return { existe: false };
+  return { existe: true, linhas: aba.getDataRange().getDisplayValues(), lido: new Date().toISOString() };
+}
+
+/** Cria a aba Mercado com as linhas enviadas pelo app (base da avaliação + tier/posse da aba Tiers). Só uma vez. */
+function criarMercado_(linhas) {
+  var lock = LockService.getScriptLock(); lock.waitLock(20000);
+  try {
+    var ss = SpreadsheetApp.getActive();
+    if (ss.getSheetByName(ABA_MERCADO)) return { ok: false, erro: 'a aba Mercado já existe' };
+    if (!linhas.length) return { ok: false, erro: 'nenhuma linha enviada' };
+    var vals = linhas.map(function (l) {
+      if (l.length !== COLS_MERCADO.length) throw new Error('linha com ' + l.length + ' colunas');
+      return l.map(function (v) { return v === null || v === undefined ? '' : String(v); });
+    });
+    var aba = ss.insertSheet(ABA_MERCADO);
+    aba.getRange(1, 1, 1, COLS_MERCADO.length).setValues([COLS_MERCADO]).setFontWeight('bold');
+    var rg = aba.getRange(2, 1, vals.length, COLS_MERCADO.length);
+    rg.setNumberFormat('@');                 // tudo texto: nada de autoformatação de datas ou números
+    rg.setValues(vals);
+    aba.setFrozenRows(1);
+    SpreadsheetApp.flush();
+    return { ok: true, linhas: vals.length };
+  } finally { lock.releaseLock(); }
+}
+
+/** Edita um perfume da aba Mercado. Tier e Posse também são gravados na aba Tiers (fonte única de tier). */
+function editarMercado_(casa, perfume, campos) {
+  if (!casa || !perfume) throw new Error('casa e perfume são obrigatórios');
+  if (campos.Tier !== undefined && ['', 'S', 'A', 'B', 'C', 'D'].indexOf(String(campos.Tier)) === -1) throw new Error('tier inválido: ' + campos.Tier);
+  var lock = LockService.getScriptLock(); lock.waitLock(20000);
+  try {
+    var ss = SpreadsheetApp.getActive();
+    var aba = ss.getSheetByName(ABA_MERCADO);
+    if (!aba) throw new Error('a aba Mercado ainda não existe');
+    var vals = aba.getDataRange().getDisplayValues(), cab = vals[0];
+    var k = chave_(casa, perfume), linha = -1;
+    for (var i = 1; i < vals.length; i++) if (chave_(vals[i][0], vals[i][1]) === k) { linha = i + 1; break; }
+    if (linha === -1) throw new Error('perfume não encontrado na aba Mercado: ' + casa + ' — ' + perfume);
+    var mudou = [];
+    EDITAVEIS.forEach(function (c) {
+      if (campos[c] === undefined) return;
+      var col = cab.indexOf(c) + 1;
+      if (col < 1) return;
+      aba.getRange(linha, col).setNumberFormat('@').setValue(String(campos[c]));
+      mudou.push(c);
+    });
+    aba.getRange(linha, cab.indexOf('Atualizado em') + 1).setNumberFormat('@').setValue(hoje_());
+    var tiers = null;
+    if (campos.Tier !== undefined || campos.Posse !== undefined) tiers = gravarTiers_(ss, casa, perfume, campos);
+    SpreadsheetApp.flush();
+    return { ok: true, linha: linha, mudou: mudou, tiers: tiers };
+  } finally { lock.releaseLock(); }
+}
+
+function gravarTiers_(ss, casa, perfume, campos) {
+  var aba = ss.getSheetByName(ABA_TIERS), vals = aba.getDataRange().getDisplayValues(), cab = vals[0];
+  var iCasa = cab.indexOf('Casa'), iPerf = cab.indexOf('Perfume'), iPosse = cab.indexOf('Posse'), iTier = cab.indexOf('Tier'), iAt = cab.indexOf('Atualizado em');
+  var k = chave_(casa, perfume);
+  for (var i = 1; i < vals.length; i++) {
+    if (chave_(vals[i][iCasa], vals[i][iPerf]) !== k) continue;
+    if (campos.Posse !== undefined) aba.getRange(i + 1, iPosse + 1).setValue(String(campos.Posse));
+    if (campos.Tier !== undefined) aba.getRange(i + 1, iTier + 1).setValue(String(campos.Tier));
+    if (iAt >= 0) aba.getRange(i + 1, iAt + 1).setNumberFormat('@').setValue(hoje_());
+    return { linha: i + 1, nova: false };
+  }
+  var nova = cab.map(function () { return ''; });
+  nova[iCasa] = casa; nova[iPerf] = perfume;
+  nova[iPosse] = campos.Posse !== undefined ? String(campos.Posse) : '';
+  nova[iTier] = campos.Tier !== undefined ? String(campos.Tier) : '';
+  if (iAt >= 0) nova[iAt] = hoje_();
+  aba.appendRow(nova);
+  return { linha: aba.getLastRow(), nova: true };
 }

@@ -1,9 +1,9 @@
 // sw.js — service worker: rede primeiro (sempre a versão publicada mais nova quando há internet),
 // cache como reserva (o app abre sem sinal). Chamadas a outros domínios (Open-Meteo, Apps Script) passam direto.
-const CACHE = "perfumista-v8";
+const CACHE = "perfumista-v9";
 const BASE = new URL("./", self.location).pathname;
 const ARQUIVOS = ["", "index.html", "manifest.webmanifest", "app/estilo.css", "app/main.js", "app/store.js", "app/clima.js",
-  "app/entrada.js", "app/api.js", "app/registro.js", "app/planilha.js", "app/estatisticas.js", "app/telas.js", "app/util.js", "app/roda.js",
+  "app/entrada.js", "app/api.js", "app/registro.js", "app/planilha.js", "app/estatisticas.js", "app/telas.js", "app/util.js", "app/roda.js", "app/mercado.js",
   "engine/index.js", "engine/config.js", "engine/modelo.js", "data/frascos.json", "data/fichas.json", "data/playbook.json", "data/arquetipos.json",
   "app/icones/icone-180.png", "app/icones/icone-192.png", "app/icones/icone-512.png"].map(a => BASE + a);
 

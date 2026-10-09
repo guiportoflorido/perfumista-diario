@@ -167,7 +167,8 @@ h3 { font: 600 13px/1.3 var(--f); letter-spacing: .01em; color: var(--suave); ma
 .campos .largo { grid-column: 1 / -1; }
 input, select, textarea { background: var(--afund); border: 0; border-radius: var(--r-p); padding: 11px 12px; font: 16px var(--f-texto); min-width: 0; width: 100%; color: var(--tinta); }
 input[type="checkbox"] { width: auto; accent-color: var(--acento); transform: scale(1.2); }
-textarea { font: 13px/1.5 ui-monospace, "SF Mono", Menlo, monospace; }
+textarea { font: 15px/1.45 var(--f-texto); resize: vertical; }
+#entrada, #spr-por { font: 13px/1.5 ui-monospace, "SF Mono", Menlo, monospace; }
 input:focus, select:focus, textarea:focus { outline: 2px solid var(--acento); outline-offset: 0; }
 select { -webkit-appearance: none; appearance: none; background-image: linear-gradient(45deg, transparent 50%, var(--suave) 50%), linear-gradient(135deg, var(--suave) 50%, transparent 50%);
   background-position: calc(100% - 17px) 52%, calc(100% - 12px) 52%; background-size: 5px 5px; background-repeat: no-repeat; padding-right: 30px; }
@@ -272,3 +273,16 @@ details.fora > summary { font: 500 13.5px var(--f); color: var(--suave); }
 .mxc-l:focus-visible { outline: 2px solid var(--acento); border-radius: 6px; }
 .tier.sem { background: var(--afund); color: var(--leve); }
 .roda .r-rot.longo { font-size: 20px; letter-spacing: 0; }
+
+/* ── mercado: itens com resumo e pirâmide ── */
+.card.merc { cursor: pointer; }
+.card.merc:active { background: var(--afund); }
+.card.merc:focus-visible { outline: 2px solid var(--acento); outline-offset: -2px; }
+.card.merc .nome { pointer-events: none; }
+.card .minha { color: var(--ok); font-weight: 600; }
+.card .resumo { grid-column: 2 / 4; margin: 4px 0 0; font-size: 13.5px; line-height: 1.45; color: var(--tinta); }
+.card .pir { grid-column: 2 / 4; margin: 4px 0 0; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 2px 8px; font-size: 12.5px; color: var(--suave); }
+.card .pir dt { font: 700 10.5px/1.6 var(--f); color: var(--leve); }
+.card .pir dd { margin: 0; }
+.bloco.destaque { background: var(--acento-suave); box-shadow: none; }
+select[disabled], input[readonly], textarea[readonly] { opacity: .75; }

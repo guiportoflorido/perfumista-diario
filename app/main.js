@@ -8,16 +8,17 @@ import { fila, adicionar, descartar, enviar, planilhaCache, baixarPlanilha } fro
 import { lerTiers, lerDiario, aplicarTiers, diarioUnificado, nomesRegistraveis } from "./planilha.js";
 import { janelasPorFrasco, ajustarSprays } from "./estatisticas.js";
 import { telaColecao, telaPlaybook, telaHistorico } from "./telas.js";
-import { telaRoda, telaMercado, fichaMercado, mercadoComPlanilha } from "./roda.js";
+import { telaRoda } from "./roda.js";
+import { telaMercado, fichaEditavel, camposAlterados, baseComTiers, deLinhas, linhasParaCriar, cachePlanilha, baixarMercado, criarNaPlanilha, editarNaPlanilha } from "./mercado.js";
 import { contagens } from "./estatisticas.js";
 import { ler, gravar } from "./store.js";
 
-export const APP_VERSAO = "4.8";  // sobe a cada publicação: confere no topo da tela se o celular pegou a versão nova
+export const APP_VERSAO = "4.9";  // sobe a cada publicação: confere no topo da tela se o celular pegou a versão nova
 const S = { aba: "hoje", frascos: [], frascosAtivos: [], avisosTiers: null, fichas: {}, versao: {}, prev: null, prevOffline: false,
   prevErro: null, metar: null, metarMotivo: null, clima: null, resultado: null, erroMotor: null, entrada: "", carregandoClima: true,
   sync: { estado: "ocioso", msg: "" }, tokenNovo: null, playbook: null, janelas: new Map(),
   filtro: ler("filtro", {}), pbFaixa: null, arquetipos: [], gaps: [], colModo: ler("colModo", "roda") === "lista" ? "lista" : "roda", sim: null, verGaps: false,
-  mercadoBase: null, mercadoErro: null, mf: ler("mf", {}), mfLimite: 60 };
+  mercadoBase: null, mercadoErro: null, mf: ler("mf", {}), mfLimite: 60, mercadoBaixado: false, criandoMercado: false, salvandoMercado: false };
 const ajSpray = () => ler("sprays_ajuste", { ativo: false, geral: 0, por: {} });
 const $ = (s, el = document) => el.querySelector(s);
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
@@ -259,12 +260,23 @@ function telaColecaoTudo(ctx) {
   ${corpo}`;
 }
 
+function listaMercado() {
+  const c = cachePlanilha(), tiers = planilha().tiers;
+  if (c?.existe) return { lista: deLinhas(c.linhas, tiers), fonte: "planilha" };
+  return { lista: S.mercadoBase && baseComTiers(S.mercadoBase, tiers), fonte: "app" };
+}
+
 function telaMercadoAba() {
   if (!S.mercadoBase && !S.mercadoErro) carregarMercado();
+  if (configurado() && !S.mercadoBaixado) {
+    S.mercadoBaixado = true;
+    baixarMercado().then(() => { if (S.aba === "mercado") render(); }).catch(e => { S.mercadoBaixado = false; toast(`Aba Mercado: ${e.message}`); });
+  }
+  const { lista, fonte } = listaMercado();
   return `<h2>Mercado</h2>
-  <p class="nota">Base da avaliação v51: 1.205 perfumes, inclusive os da sua coleção (marcados “na coleção”).</p>
-  ${S.mercadoErro ? `<div class="bloco"><p class="erro-txt">Não consegui carregar a base: ${esc(S.mercadoErro)}</p></div>`
-    : telaMercado({ mercado: S.mercadoBase && mercadoComPlanilha(S.mercadoBase, planilha().tiers), arquetipos: S.arquetipos, filtro: S.mf, limite: S.mfLimite })}`;
+  ${S.mercadoErro && !lista ? `<div class="bloco"><p class="erro-txt">Não consegui carregar a base: ${esc(S.mercadoErro)}</p></div>`
+    : telaMercado({ lista, fonte, arquetipos: S.arquetipos, filtro: S.mf, limite: S.mfLimite,
+      podeCriar: configurado() && cachePlanilha()?.existe === false, criando: S.criandoMercado })}`;
 }
 
 async function carregarMercado() {
@@ -416,10 +428,37 @@ function janelasHTML(nome) {
 }
 function abrirMercado(id) {
   const [casa, nome] = id.split("||");
-  const p = mercadoComPlanilha(S.mercadoBase || [], planilha().tiers).find(x => x.casa === casa && x.nome === nome);
+  const p = (listaMercado().lista || []).find(x => x.casa === casa && x.nome === nome);
   if (!p) return;
-  $("#folha").innerHTML = `<div class="veu" data-fechar><div class="folha" role="dialog" aria-modal="true" aria-labelledby="fichaT">${fichaMercado(p)}</div></div>`;
+  S.mercadoAberto = p;
+  $("#folha").innerHTML = `<div class="veu" data-fechar><div class="folha" role="dialog" aria-modal="true" aria-labelledby="fichaT">${fichaEditavel(p, { arquetipos: S.arquetipos, editavel: Boolean(cachePlanilha()?.existe) && configurado() })}</div></div>`;
   $("#folha .folha button[data-fechar]").focus();
+}
+
+async function salvarMercado(form) {
+  const p = S.mercadoAberto;
+  const v = id => form.querySelector("#" + id);
+  const campos = camposAlterados(p, { "me-tier": v("me-tier").value, "me-posse": v("me-posse").value, "me-arq": v("me-arq").value, "me-nariz": v("me-nariz").value,
+    "me-resumo": v("me-resumo").value, "me-topo": v("me-topo").value, "me-coracao": v("me-coracao").value, "me-base": v("me-base").value, "me-wish": v("me-wish").checked });
+  if (!Object.keys(campos).length) { toast("Nada mudou."); return; }
+  const btn = form.querySelector("button[type=submit]"); btn.disabled = true; btn.textContent = "Salvando…";
+  try {
+    const r = await editarNaPlanilha(p.casa, p.nome, campos);
+    fecharFolha();
+    toast(`Salvo na planilha: ${Object.keys(campos).join(", ")}${r.tiers ? (r.tiers.nova ? " (linha nova na aba Tiers)" : " (aba Tiers atualizada)") : ""}.`);
+    if (r.tiers) { await baixarPlanilha().catch(() => {}); aplicarPlanilha(); recalcular(); } else render();
+  } catch (e) { btn.disabled = false; btn.textContent = "Salvar na planilha"; toast(`Não salvou: ${e.message}`); }
+}
+
+async function criarMercado() {
+  if (!S.mercadoBase) { toast("A base ainda está carregando; tente de novo em instantes."); return; }
+  S.criandoMercado = true; render();
+  try {
+    const n = await criarNaPlanilha(linhasParaCriar(S.mercadoBase, planilha().tiers));
+    await baixarMercado();
+    toast(`Aba Mercado criada na planilha com ${n} perfumes.`);
+  } catch (e) { toast(`Não criei a aba: ${e.message}`); }
+  S.criandoMercado = false; render();
 }
 
 function fecharFolha() { $("#folha").innerHTML = ""; }
@@ -428,7 +467,7 @@ function fecharFolha() { $("#folha").innerHTML = ""; }
 function mudarDia(fn) { const d = estadoDia(); fn(d); salvarDia(d); recalcular(); }
 
 document.addEventListener("click", async e => {
-  const b = e.target.closest("button, [data-fechar], [data-ficha]");
+  const b = e.target.closest("button, [data-fechar], [data-ficha], [data-merc]");
   if (!b) return;
   if (b.closest("#abas")) { S.aba = b.dataset.aba; render(); window.scrollTo(0, 0); return; }
   if (b.hasAttribute("data-fechar") && (e.target === b || b.tagName === "BUTTON")) { fecharFolha(); return; }
@@ -468,6 +507,7 @@ document.addEventListener("click", async e => {
   else if (acao === "sim-limpar") { S.sim = null; render(); }
   else if (acao === "ver-gaps") { S.verGaps = !S.verGaps; render(); }
   else if (acao === "mf-mais") { S.mfLimite += 120; render(); }
+  else if (acao === "criar-mercado") criarMercado();
   else if (acao === "ler-planilha") {
     const m = $("#lerMsg"); m.textContent = "Lendo a planilha…";
     try {
@@ -514,6 +554,7 @@ document.addEventListener("input", e => {
 document.addEventListener("submit", e => {
   e.preventDefault();
   if (e.target.id === "formRegistro") { salvarRegistro(); return; }
+  if (e.target.id === "formMercado") { salvarMercado(e.target); return; }
   if (e.target.id !== "formAjustes") return;
   const a = {};
   for (const k of Object.keys(AJUSTES_PADRAO)) {
@@ -532,6 +573,7 @@ document.addEventListener("submit", e => {
 document.addEventListener("keydown", e => {
   if (e.key === "Escape") fecharFolha();
   if ((e.key === "Enter" || e.key === " ") && e.target.matches?.("g[data-ficha]")) { e.preventDefault(); abrirFicha(e.target.dataset.ficha); }
+  if ((e.key === "Enter" || e.key === " ") && e.target.matches?.(".card[data-merc]")) { e.preventDefault(); abrirMercado(e.target.dataset.merc); }
 });
 window.addEventListener("online", () => sincronizar({ silencioso: true }));
 

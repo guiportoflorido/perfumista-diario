@@ -1,10 +1,9 @@
 // roda.js — Coleção visual (roda dos 16 arquétipos × tier, como no observatório) e Mercado (avaliação v51).
 import { FAIXAS } from "../engine/index.js";
-import { esc, ROT_OC, OCAS_TODAS, pinta, tierHTML, nf } from "./util.js";
+import { esc, ROT_OC, OCAS_TODAS, pinta } from "./util.js";
 import { daGrade } from "./estatisticas.js";
 
 const TIERS = ["S", "A", "B", "C"];
-const norm = s => String(s || "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().replace(/\s+/g, " ").trim();
 
 // ───────────────────────── roda ─────────────────────────
 const CX = 450, CY = 450, R_IN = 150, R_OUT = 385, R_LBL = 418;
@@ -96,91 +95,3 @@ export function telaRoda({ frascos, arquetipos, gaps, playbook, sim, verGaps, us
   </div>`;
 }
 
-// ───────────────────────── mercado ─────────────────────────
-/** Junta a avaliação v51 com a aba Tiers (tier e posse da planilha vencem). */
-export function mercadoComPlanilha(perfumes, tiers) {
-  if (!tiers?.length) return perfumes;
-  const m = new Map(tiers.map(t => [norm(t.casa) + "|" + norm(t.perfume), t]));
-  return perfumes.map(p => {
-    const t = m.get(norm(p.casa) + "|" + norm(p.nome));
-    return t ? { ...p, tier: t.tier || p.tier, posse: t.posse || p.posse, daPlanilha: true } : p;
-  });
-}
-
-const POSSES = [["", "Toda posse"], ["Frasco Gui", "Na coleção"], ["Frasco Bia", "Frasco Bia"], ["amostra", "Amostras"], ["nao", "Não tenho"]];
-
-export function filtrarMercado(lista, f) {
-  const q = norm(f.q);
-  return lista.filter(p => {
-    if (f.tier === "sem" ? p.tier : f.tier && p.tier !== f.tier) return false;
-    if (f.posse === "amostra" ? !/amostra/i.test(p.posse) : f.posse === "nao" ? /frasco/i.test(p.posse) : f.posse && p.posse !== f.posse) return false;
-    if (f.arq && p.arquetipo !== f.arq) return false;
-    if (f.wish && !p.wish) return false;
-    if (q && !norm(`${p.nome} ${p.casa} ${p.nariz} ${p.topo} ${p.coracao} ${p.base}`).includes(q)) return false;
-    return true;
-  }).sort((a, b) => ("SABCD".indexOf(a.tier) + 1 || 9) - ("SABCD".indexOf(b.tier) + 1 || 9) || a.casa.localeCompare(b.casa) || a.nome.localeCompare(b.nome));
-}
-
-export function telaMercado({ mercado, arquetipos, filtro, limite }) {
-  if (!mercado) return `<div class="bloco"><p class="nota">Carregando a base de 1.205 perfumes…</p></div>`;
-  const total = mercado.length, comTier = mercado.filter(p => p.tier).length, wish = mercado.filter(p => p.wish).length;
-  const meus = mercado.filter(p => p.posse === "Frasco Gui").length;
-  const lista = filtrarMercado(mercado, filtro);
-  const oport = mercado.filter(p => (p.tier === "S" || p.tier === "A") && !/frasco/i.test(p.posse));
-  const porArq = arquetipos.map(a => ({ a, merc: mercado.filter(p => p.arquetipo === a.nome).length, meus: mercado.filter(p => p.arquetipo === a.nome && p.posse === "Frasco Gui").length }));
-  const maxM = Math.max(...porArq.map(x => x.merc), 1);
-  const op = (v, r, at) => `<option value="${esc(v)}" ${String(at ?? "") === String(v) ? "selected" : ""}>${esc(r)}</option>`;
-  return `
-  <div class="kpis">
-    <div class="kpi"><span class="v">${nf(total, 0)}</span><span class="l">perfumes na base</span></div>
-    <div class="kpi"><span class="v">${comTier}</span><span class="l">com tier seu</span></div>
-    <div class="kpi"><span class="v">${meus}</span><span class="l">na sua coleção</span></div>
-  </div>
-  <div class="bloco"><h3>Mercado × coleção por arquétipo</h3>
-    <div class="mxc">${porArq.sort((x, y) => y.merc - x.merc).map(x => `<button class="mxc-l" data-mf-arq="${esc(x.a.nome)}">
-      <span class="t"><span class="pinta" style="background:${x.a.cor}"></span>${esc(x.a.nome)}</span>
-      <span class="trilho"><span style="width:${(x.merc / maxM) * 100}%;background:${x.a.cor};opacity:.35"></span><span class="meus" style="width:${(x.meus / maxM) * 100}%;background:${x.a.cor}"></span></span>
-      <span class="n">${x.meus}/${x.merc}</span></button>`).join("")}</div>
-    <p class="nota">Barra clara = perfumes da base naquele arquétipo; barra cheia = seus frascos. Toque para filtrar.</p>
-  </div>
-  <details class="bloco"><summary>S ou A que você não tem como frasco · ${oport.length}</summary>
-    <p class="nota">Ponto de partida para wishlist, não recomendação de compra: compra passa pelos 5 gates.</p>
-    <div class="lista">${oport.sort((a, b) => a.tier.localeCompare(b.tier) || a.nome.localeCompare(b.nome)).map(itemMercado).join("")}</div>
-  </details>
-  <div class="bloco">
-    <input type="search" id="mf-q" placeholder="Buscar perfume, casa, nariz ou nota" value="${esc(filtro.q || "")}" aria-label="Buscar no mercado">
-    <div class="chips rolagem">${[["", "Todo tier"], ...["S", "A", "B", "C", "D"].map(t => [t, `Tier ${t}`]), ["sem", "Sem tier"]].map(([v, r]) => `<button class="chip" data-mf="tier" data-v="${v}" aria-pressed="${(filtro.tier || "") === v}">${r}</button>`).join("")}
-      <button class="chip" data-mf="wish" data-v="${filtro.wish ? "" : "1"}" aria-pressed="${Boolean(filtro.wish)}">★ Wishlist (${wish})</button></div>
-    <div class="campos">
-      <label>Posse<select id="mf-posse">${POSSES.map(([v, r]) => op(v, r, filtro.posse)).join("")}</select></label>
-      <label>Arquétipo<select id="mf-arq">${op("", "Todos", filtro.arq)}${arquetipos.map(a => op(a.nome, a.nome, filtro.arq)).join("")}</select></label>
-    </div>
-    <p class="nota">${lista.length} perfume${lista.length === 1 ? "" : "s"}. Tier e posse vêm da aba Tiers quando o perfume está lá; o resto, da avaliação v51.</p>
-  </div>
-  <div class="lista">${lista.slice(0, limite).map(itemMercado).join("") || `<p class="vazio">Nada com esses filtros.</p>`}</div>
-  ${lista.length > limite ? `<button class="btn sec" data-acao="mf-mais">Mostrar mais (${lista.length - limite})</button>` : ""}`;
-}
-
-function itemMercado(p) {
-  const id = `${p.casa}||${p.nome}`;
-  return `<article class="card compacto"><span class="pos">${p.tier ? tierHTML(p.tier) : `<span class="tier sem">–</span>`}</span>
-    <div style="min-width:0"><button class="nome" data-merc="${esc(id)}">${esc(p.nome)}</button>${p.wish ? ` <span class="selo manual">★</span>` : ""}
-      <div class="casa">${esc(p.casa)}${p.arquetipo ? ` · ${esc(p.arquetipo)}` : ""}${p.posse ? ` · <b>${esc(p.posse === "Frasco Gui" ? "na coleção" : p.posse)}</b>` : ""}</div></div><span></span></article>`;
-}
-
-export function fichaMercado(p) {
-  const barra = (rot, v) => `<div class="barra"><span class="t">${rot}</span><span class="trilho"><span style="width:${(v / 9) * 100}%"></span></span><span class="n">${v}/9</span></div>`;
-  return `<div class="linha-flex"><h2 id="fichaT">${esc(p.nome)}</h2>${p.tier ? tierHTML(p.tier) : ""}<span class="esp"></span><button class="btn sec peq" data-fechar>Fechar</button></div>
-    <p class="nota">${esc(p.casa)}${p.nariz ? ` · ${esc(p.nariz)}` : ""}${p.arquetipo ? ` · ${esc(p.arquetipo)}` : ""}</p>
-    <dl class="kv">
-      <dt>Posse</dt><dd>${esc(p.posse || "não tem")}${p.wish ? ` · <span class="selo manual">★ wishlist</span>` : ""}</dd>
-      <dt>Tier</dt><dd>${p.tier ? `${esc(p.tier)}${p.daPlanilha ? ` <span class="nota">(aba Tiers)</span>` : ""}` : "sem tier seu"}</dd>
-      ${p.resumo ? `<dt>Perfil</dt><dd>${esc(p.resumo)}</dd>` : ""}
-      <dt>Topo</dt><dd>${esc(p.topo || "—")}</dd>
-      <dt>Coração</dt><dd>${esc(p.coracao || "—")}</dd>
-      <dt>Base</dt><dd>${esc(p.base || "—")}</dd>
-      ${p.gap ? `<dt>Gap</dt><dd>${esc(p.gap)}</dd>` : ""}
-    </dl>
-    <div class="bloco"><h3>Clima <span class="selo aviso">estimativa da avaliação v51</span></h3>${barra("Calor", p.calor)}${barra("Ameno", p.ameno)}${barra("Frio", p.frio)}</div>
-    <p class="nota">Fonte: avaliacao_perfumes_v51. Pirâmide e perfil como estão na base; para compra, os 5 gates.</p>`;
-}
