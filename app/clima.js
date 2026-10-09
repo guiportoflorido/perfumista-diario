@@ -1,6 +1,7 @@
 // clima.js — previsão (Open-Meteo), Td observado (METAR SBSP via Apps Script) e override manual.
 // Regra: cada número carrega a fonte; nada ausente é preenchido em silêncio.
 import { ler, gravar } from "./store.js";
+import { chamar, configurado } from "./api.js";
 import { faixaIdx, bandaTd } from "../engine/index.js";
 
 const TZ = "America/Sao_Paulo";
@@ -28,16 +29,10 @@ export async function buscarPrevisao(lat, lon) {
 }
 
 // METAR via backend (Apps Script). Sem backend configurado → null, e o Td vem da previsão.
-export async function buscarMetar(backend, token) {
-  if (!backend) return { metar: null, motivo: "Apps Script não configurado" };
-  try {
-    const u = new URL(backend);
-    u.searchParams.set("acao", "metar"); u.searchParams.set("token", token || "");
-    const r = await fetch(u, { cache: "no-store" });
-    const j = await r.json();
-    if (!j.ok) throw new Error(j.erro || "falha no METAR");
-    return { metar: j.metar };  // {T, Td, obs (ISO UTC), raw}
-  } catch (e) { return { metar: null, motivo: e.message }; }
+export async function buscarMetar() {
+  if (!configurado()) return { metar: null, motivo: "planilha (Apps Script) não configurada em Ajustes" };
+  try { const j = await chamar("metar", {}, { timeoutMs: 12000 }); return { metar: j.metar }; }
+  catch (e) { return { metar: null, motivo: e.message }; }
 }
 
 const r1 = x => Math.round(x * 10) / 10;
@@ -88,8 +83,8 @@ export function derivarClima({ prev, metar, override = {}, data, aplico, noite, 
     const ref = porHora(hLocal);
     const dif = ref ? Math.abs(ref.T - metar.T) : null;
     const hora = obs.toLocaleTimeString("pt-BR", { timeZone: TZ, hour: "2-digit", minute: "2-digit" });
-    if (idadeH > metarHoras) q.avisos.push(`METAR das ${hora} tem ${idadeH.toFixed(1)} h (limite ${metarHoras} h): descartado.`);
-    else if (dif !== null && dif > metarTol) q.avisos.push(`METAR das ${hora} marca ${metar.T} °C e a previsão ${r1(ref.T)} °C (diferença > ${metarTol} °C): descartado.`);
+    if (idadeH > metarHoras) q.avisos.push(`METAR das ${hora} tem ${idadeH.toFixed(1).replace(".", ",")} h (limite ${metarHoras} h): descartado.`);
+    else if (dif !== null && dif > metarTol) q.avisos.push(`METAR das ${hora} marca ${metar.T} °C e a previsão ${String(r1(ref.T)).replace(".", ",")} °C (diferença > ${metarTol} °C): descartado.`);
     else td = { v: metar.Td, fonte: `METAR SBSP ${hora}`, tipo: "observado" };
   }
   if (!td && horasJanela.length) {
