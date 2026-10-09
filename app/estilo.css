@@ -68,7 +68,7 @@ h3 { font-size: 11.5px; letter-spacing: .09em; text-transform: uppercase; color:
 .faixa-slot .rot { font-size: 11.5px; color: var(--suave); text-transform: uppercase; letter-spacing: .08em; font-weight: 700; }
 .faixa-slot .fx { display: flex; align-items: center; gap: 6px; font: 600 17px/1.2 var(--f-titulo); }
 .faixa-slot .t { font: 13px var(--f-num); color: var(--suave); }
-.pinta { width: 11px; height: 11px; border-radius: 50%; flex: none; }
+.pinta { display: inline-block; width: 11px; height: 11px; border-radius: 50%; flex: none; vertical-align: -1px; margin-right: 4px; }
 .f0 { background: var(--fMQ); } .f1 { background: var(--fQ); } .f2 { background: var(--fA); }
 .f3 { background: var(--fF); } .f4 { background: var(--fFr); } .f5 { background: var(--fMF); }
 .fontes { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 4px 12px; font-size: 13px; margin: 0; }
@@ -149,3 +149,31 @@ details > summary::-webkit-details-marker { display: none; }
   background: var(--tinta); color: var(--bg); padding: 10px 14px; border-radius: 10px; font-size: 14px; max-width: calc(100% - 32px); }
 .vazio { color: var(--suave); text-align: center; padding: 20px 12px; }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+
+/* fase 4: coleção, playbook, histórico */
+.nome-inline { all: unset; cursor: pointer; color: var(--acento); font-weight: 600; }
+.nome-inline:focus-visible { outline: 2px solid var(--acento); }
+.papel { display: inline-block; min-width: 58px; font-size: 10.5px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--suave); }
+.celula p { margin: 0; font-size: 14px; line-height: 1.5; }
+.celula.vazia { opacity: .6; }
+.kpis { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.kpi { background: var(--sup); border: 1px solid var(--linha); border-radius: var(--r); padding: 10px 12px; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.kpi .v { font: 600 24px/1.1 var(--f-titulo); font-variant-numeric: tabular-nums; }
+.kpi .l { font-size: 11.5px; color: var(--suave); }
+.duas { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; }
+.barras { display: flex; flex-direction: column; gap: 6px; }
+.barra { display: grid; grid-template-columns: minmax(0, 9.5em) minmax(0, 1fr) 2.2em; gap: 8px; align-items: center; font-size: 13px; }
+.barra .t { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.barra .trilho { height: 9px; background: var(--afund); border-radius: 3px; overflow: hidden; }
+.barra .trilho span { display: block; height: 100%; background: var(--acento); border-radius: 3px; }
+.barra .n { text-align: right; font: 12px var(--f-num); color: var(--suave); }
+.tabela { overflow-x: auto; }
+.tabela table { border-collapse: collapse; width: 100%; font-size: 13px; font-variant-numeric: tabular-nums; }
+.tabela th, .tabela td { padding: 6px 8px; border-bottom: 1px solid var(--linha); text-align: left; }
+.tabela th { font-size: 11px; color: var(--suave); text-transform: uppercase; letter-spacing: .05em; }
+.md { font-size: 13.5px; display: flex; flex-direction: column; gap: 8px; }
+.md p, .md ul, .md ol { margin: 0; }
+.md ul, .md ol { padding-left: 18px; }
+.card.compacto { padding: 8px 12px; align-items: center; }
+.janelas { margin: 6px 0 0; padding-left: 0; list-style: none; font-size: 12.5px; display: flex; flex-direction: column; gap: 3px; }
+.celula .nota .nome-inline { font-weight: 500; color: var(--tinta); }

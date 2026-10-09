@@ -6,10 +6,15 @@ import { montarEntrada, OCAS_DIA, OCAS_NOITE, AMBIENTES, EXTRAS } from "./entrad
 import { configurado, chamar, gerarToken } from "./api.js";
 import { fila, adicionar, descartar, enviar, planilhaCache, baixarPlanilha } from "./registro.js";
 import { lerTiers, lerDiario, aplicarTiers, diarioUnificado, nomesRegistraveis } from "./planilha.js";
+import { janelasPorFrasco, ajustarSprays } from "./estatisticas.js";
+import { telaColecao, telaPlaybook, telaHistorico } from "./telas.js";
+import { ler, gravar } from "./store.js";
 
 const S = { aba: "hoje", frascos: [], frascosAtivos: [], avisosTiers: null, fichas: {}, versao: {}, prev: null, prevOffline: false,
   prevErro: null, metar: null, metarMotivo: null, clima: null, resultado: null, erroMotor: null, entrada: "", carregandoClima: true,
-  sync: { estado: "ocioso", msg: "" }, tokenNovo: null };
+  sync: { estado: "ocioso", msg: "" }, tokenNovo: null, playbook: null, janelas: new Map(),
+  filtro: ler("filtro", {}), pbFaixa: null };
+const ajSpray = () => ler("sprays_ajuste", { ativo: false, geral: 0, por: {} });
 const $ = (s, el = document) => el.querySelector(s);
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 const ROT_OC = { Lazer: "Lazer", "T.Inf": "Trab. Informal", "T.For": "Trab. Formal", "N.Inf": "Noite Informal", "N.For": "Noite Formal", "Cozy D": "Cozy Dia", "Cozy N": "Cozy Noite" };
@@ -28,8 +33,8 @@ const slotNome = s => (s === "M" ? "Dia" : s === "N" ? "Noite" : "?");
 
 // ───────────────────────── dados ─────────────────────────
 async function carregarDados() {
-  const [fr, fi] = await Promise.all([fetch("data/frascos.json").then(r => r.json()), fetch("data/fichas.json").then(r => r.json())]);
-  S.frascos = fr.frascos; S.versao = fr.versao; S.fichas = fi.fichas;
+  const [fr, fi, pb] = await Promise.all(["frascos", "fichas", "playbook"].map(n => fetch(`data/${n}.json`).then(r => r.json())));
+  S.frascos = fr.frascos; S.versao = fr.versao; S.fichas = fi.fichas; S.playbook = pb; S.janelas = janelasPorFrasco(pb);
   $("#versao").textContent = fr.versao.playbook.replace("playbook_", "").replace(".md", "");
   aplicarPlanilha();
 }
@@ -87,8 +92,14 @@ function render() {
     if (b.dataset.aba === S.aba) b.setAttribute("aria-current", "page"); else b.removeAttribute("aria-current");
   });
   const foco = document.activeElement?.id;
-  $("#tela").innerHTML = ({ hoje: telaHoje, registrar: telaRegistrar, ajustes: telaAjustes }[S.aba] || telaEmBreve)();
-  if (foco && document.getElementById(foco) && S.aba !== "hoje") document.getElementById(foco).focus();
+  const ctx = { frascos: S.frascosAtivos, hist: historico(), hoje: hojeISO(), janelas: S.janelas, filtro: S.filtro, playbook: S.playbook,
+    faixaSel: S.pbFaixa ?? S.clima?.faixaDia?.idx ?? 2, fila: fila(), ajSpray: ajSpray() };
+  $("#tela").innerHTML = ({ hoje: telaHoje, registrar: telaRegistrar, ajustes: telaAjustes,
+    colecao: () => telaColecao(ctx), playbook: () => telaPlaybook(ctx), historico: () => telaHistorico(ctx) }[S.aba])();
+  if (foco && document.getElementById(foco) && S.aba !== "hoje") {
+    const el = document.getElementById(foco); el.focus();
+    if (el.type === "search") { const n = el.value.length; try { el.setSelectionRange(n, n); } catch { /* sem seleção */ } }
+  }
 }
 
 function blocoSync() {
@@ -176,6 +187,13 @@ function ocasiaoDominante(so) {
   return [...horas.entries()].sort((a, b) => b[1] - a[1])[0]?.[0] || "";
 }
 
+function spraysHTML(t) {
+  const adj = ajustarSprays(t.r.f, t.sprays, ajSpray());
+  const nota = t.nota ? ` <span class="nota">(${esc(t.nota)})</span>` : "";
+  if (adj === t.sprays) return `<span><b>${t.sprays}</b> spray${t.sprays > 1 ? "s" : ""}${nota}</span>`;
+  return `<span><b>${adj}</b> sprays <span class="selo manual">seu ajuste</span> <span class="nota">modelo ${t.sprays}${t.nota ? `, ${esc(t.nota)}` : ""}</span></span>`;
+}
+
 function blocoSlot(s) {
   const dia = estadoDia();
   const slotCod = s.nome === "Dia" ? "M" : "N";
@@ -186,9 +204,9 @@ function blocoSlot(s) {
       <span class="pos">${i + 1}</span>
       <div style="min-width:0"><button class="nome" data-ficha="${esc(t.nome)}">${esc(t.nome)}</button>${tierHTML(t.tier)}<div class="casa">${esc(t.casa)} · ${esc(t.arquetipo)}</div></div>
       <span class="score" title="Score">${t.score.toFixed(0)}</span>
-      <div class="meta"><span><b>${t.sprays}</b> spray${t.sprays > 1 ? "s" : ""}${t.nota ? ` <span class="nota">(${esc(t.nota)})</span>` : ""}</span><span>vivo até <b>${t.vivo_fim ? "o fim" : "~" + fmtH(t.vivo_ate)}</b></span></div>
+      <div class="meta">${spraysHTML(t)}<span>vivo até <b>${t.vivo_fim ? "o fim" : "~" + fmtH(t.vivo_ate)}</b></span></div>
       <div class="pq">${esc(t.porque)}</div>
-      <div class="acoes"><span class="esp"></span><button class="btn peq ${ja ? "feito" : "sec"}" data-usei="${esc(t.nome)}" data-slot="${slotCod}" data-sprays="${t.sprays}" ${usado ? "disabled" : ""}>${ja ? "✓ Registrado" : "Usei este"}</button></div>
+      <div class="acoes"><span class="esp"></span><button class="btn peq ${ja ? "feito" : "sec"}" data-usei="${esc(t.nome)}" data-slot="${slotCod}" data-sprays="${t.sprays}" data-ajustado="${ajustarSprays(t.r.f, t.sprays, ajSpray())}" ${usado ? "disabled" : ""}>${ja ? "✓ Registrado" : "Usei este"}</button></div>
     </article>`;
   };
   const segs = (S.resultado.segs || []).filter(g => g.fim > s.ini && g.ini < s.fim).map(g => `${fmtH(Math.max(g.ini, s.ini))}–${fmtH(Math.min(g.fim, s.fim))} ${ROT_OC[g.ocas]} (${AMB[g.amb]}${g.fechado ? ", fechado" : ""})`);
@@ -264,6 +282,12 @@ function abrirRegistro(p) {
   $("#rg-sprays").focus();
 }
 
+function sugeridoHoje(slot, perfume) {
+  const so = S.resultado?.slots.find(x => (x.nome === "Dia" ? "M" : "N") === slot);
+  const t = so && [...so.top, ...(so.custo || [])].find(x => x.nome === perfume);
+  return t ? String(t.sprays) : "";
+}
+
 async function salvarRegistro() {
   const data = $("#rg-data").value, slot = $("#rg-slot").value, perfume = $("#rg-perfume").value.trim();
   if (!data || !perfume) { toast("Preencha data e perfume."); return; }
@@ -273,7 +297,7 @@ async function salvarRegistro() {
   const hoje = data === hojeISO(), c = S.clima;
   const f = !c ? null : slot === "M" ? c.faixaDia : c.faixaNoite;
   const reg = { data, slot, perfume, ocasiao: $("#rg-ocasiao").value, sprays: $("#rg-sprays").value.trim(),
-    notaDia: virg($("#rg-nota").value.trim()), obs: $("#rg-obs").value.trim(), sugerido: $("#rg-sugerido").value || "",
+    notaDia: virg($("#rg-nota").value.trim()), obs: $("#rg-obs").value.trim(), sugerido: $("#rg-sugerido").value || (hoje ? sugeridoHoje(slot, perfume) : ""),
     temp: hoje && f ? virg(f.T) : "", td: hoje && c && (c.Td.tipo === "observado" || c.Td.tipo === "manual") && c.Td.v != null ? virg(c.Td.v) : "" };
   adicionar(reg);
   fecharFolha();
@@ -320,11 +344,6 @@ function telaAjustes() {
   </dl></div>`;
 }
 
-function telaEmBreve() {
-  const nomes = { colecao: "Coleção", playbook: "Playbook", historico: "Histórico" };
-  return `<h2>${nomes[S.aba]}</h2><div class="bloco"><p class="nota">Esta tela ainda está em construção.</p></div>`;
-}
-
 // ───────────────────────── ficha ─────────────────────────
 function abrirFicha(nome) {
   const f = S.frascosAtivos.find(x => x.nome === nome) || S.frascos.find(x => x.nome === nome), fi = S.fichas[nome];
@@ -341,7 +360,7 @@ function abrirFicha(nome) {
       <dt>Eixo · doçura · peso</dt><dd>${esc(fi.eixo)} · ${esc(fi.doc)} · ${esc(fi.peso)}</dd>
       <dt>Td</dt><dd>${{ C: "sobe no ar carregado", S: "sobe no ar seco", N: "indiferente" }[f.td]}</dd>
       <dt>Sprays-base</dt><dd>${esc(fi.sprays_base)}</dd>
-      <dt>Janelas</dt><dd>${esc(fi.janelas)}${f.janelas_estimadas ? `<span class="selo aviso">estimado</span>` : ""}</dd>
+      <dt>Janelas</dt><dd>${esc(fi.janelas)}${f.janelas_estimadas ? `<span class="selo aviso">estimado</span>` : ""}${janelasHTML(nome)}</dd>
       <dt>Performance</dt><dd>~${f.longev} h · projeção ${f.proj}/5 · curva ${{ S: "saída manda", L: "linear", F: "fundo manda" }[f.curva]}${f.perf_estimada ? `<span class="selo aviso">estimado por regra</span>` : `<span class="selo">da leitura da ficha</span>`}</dd>
       <dt>Vizinhos</dt><dd>${esc(fi.vizinhos)}</dd>
       <dt>Leitura</dt><dd>${esc(fi.leitura)}</dd>
@@ -349,6 +368,12 @@ function abrirFicha(nome) {
     </dl>
   </div></div>`;
   $("#folha .folha button[data-fechar]").focus();
+}
+function janelasHTML(nome) {
+  const js = S.janelas.get(nome) || [];
+  if (!js.length) return "";
+  const porFaixa = new Map(); for (const j of js) { if (!porFaixa.has(j.faixaIdx)) porFaixa.set(j.faixaIdx, []); porFaixa.get(j.faixaIdx).push(j); }
+  return `<ul class="janelas">${[...porFaixa.entries()].sort((a, b) => a[0] - b[0]).map(([i, l]) => `<li>${faixaHTML(i)}: ${l.map(j => `${ROT_OC[j.ocasiao]}${j.papel !== "Também" ? ` <b>(${j.papel})</b>` : ""}`).join(", ")}</li>`).join("")}</ul>`;
 }
 function fecharFolha() { $("#folha").innerHTML = ""; }
 
@@ -361,11 +386,13 @@ document.addEventListener("click", async e => {
   if (b.closest("#abas")) { S.aba = b.dataset.aba; render(); window.scrollTo(0, 0); return; }
   if (b.hasAttribute("data-fechar") && (e.target === b || b.tagName === "BUTTON")) { fecharFolha(); return; }
   if (b.dataset.ficha) { abrirFicha(b.dataset.ficha); return; }
+  if (b.dataset.filtro) { S.filtro = { ...S.filtro, [b.dataset.filtro]: b.dataset.v }; gravar("filtro", S.filtro); render(); return; }
+  if (b.dataset.pbfaixa) { S.pbFaixa = Number(b.dataset.pbfaixa); render(); return; }
   if (b.dataset.chip) { const k = b.dataset.chip, v = b.dataset.v; mudarDia(d => { d[k] = v; }); return; }
   if (b.dataset.extra) { const v = b.dataset.extra; mudarDia(d => { d.extras = d.extras.includes(v) ? d.extras.filter(x => x !== v) : [...d.extras, v]; }); return; }
   if (b.dataset.usei) {
     const so = S.resultado.slots.find(s => (s.nome === "Dia" ? "M" : "N") === b.dataset.slot);
-    abrirRegistro({ perfume: b.dataset.usei, slot: b.dataset.slot, sprays: b.dataset.sprays, sugerido: b.dataset.sprays, ocasiao: ocasiaoDominante(so) });
+    abrirRegistro({ perfume: b.dataset.usei, slot: b.dataset.slot, sprays: b.dataset.ajustado, sugerido: b.dataset.sprays, ocasiao: ocasiaoDominante(so) });
     return;
   }
   if (b.dataset.descartar) { descartar(b.dataset.descartar); toast("Registro descartado."); recalcular(); return; }
@@ -383,6 +410,18 @@ document.addEventListener("click", async e => {
   else if (acao === "soltar-texto") mudarDia(d => { d.textoManual = null; });
   else if (acao === "restaurar") { salvarAjustes({}); toast("Ajustes restaurados."); render(); atualizarClima(); }
   else if (acao === "sync") sincronizar();
+  else if (acao === "salvar-spr") {
+    const por = {};
+    for (const l of $("#spr-por").value.split("\n")) { const m = l.match(/^(.+?)\s*=\s*([+-]?\d+)\s*$/); if (m) por[m[1].trim()] = Number(m[2]); }
+    gravar("sprays_ajuste", { ativo: $("#spr-ativo").checked, geral: Number($("#spr-geral").value) || 0, por });
+    toast($("#spr-ativo").checked ? "Ajuste de sprays ligado." : "Ajuste de sprays salvo (desligado)."); recalcular();
+  } else if (acao === "spr-sugerir") {
+    const { calibracao } = await import("./estatisticas.js");
+    const cal = calibracao(fila());
+    $("#spr-geral").value = String(Math.round(cal.geral));
+    $("#spr-por").value = cal.por.filter(p => p.n >= 3 && Math.round(p.media) !== Math.round(cal.geral)).map(p => `${p.nome} = ${Math.round(p.media)}`).join("\n");
+    toast("Preenchido com o desvio medido (frascos com 3+ registros). Revise e salve.");
+  }
   else if (acao === "gerar-token") { S.tokenNovo = gerarToken(); render(); $("#aj-token").value = S.tokenNovo; $("#aj-token").type = "text"; }
   else if (acao === "copiar-token") {
     try { await navigator.clipboard.writeText(S.tokenNovo); toast("Token copiado."); }
@@ -397,8 +436,15 @@ document.addEventListener("click", async e => {
 document.addEventListener("change", e => {
   const el = e.target;
   if (el.dataset.ov) { const k = el.dataset.ov, v = el.value.trim().replace(",", "."); mudarDia(d => { if (v === "") delete d.override[k]; else d.override[k] = v.toLowerCase() === "nd" ? "nd" : v; }); return; }
+  if (el.id === "col-arq" || el.id === "col-faixa" || el.id === "col-oc") {
+    S.filtro = { ...S.filtro, [{ "col-arq": "arq", "col-faixa": "faixa", "col-oc": "oc" }[el.id]]: el.value }; gravar("filtro", S.filtro); render(); return;
+  }
   if (el.id === "testar") mudarDia(d => { d.testar = el.value.trim(); });
   if (el.id === "roupa") mudarDia(d => { d.roupa = el.value.trim(); });
+});
+
+document.addEventListener("input", e => {
+  if (e.target.id === "col-q") { S.filtro = { ...S.filtro, q: e.target.value }; gravar("filtro", S.filtro); render(); }
 });
 
 document.addEventListener("submit", e => {
