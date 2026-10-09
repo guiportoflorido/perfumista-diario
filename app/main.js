@@ -3,14 +3,14 @@ import { rodar, FAIXAS, fmtH } from "../engine/index.js";
 import { ajustes, salvarAjustes, AJUSTES_PADRAO, estadoDia, salvarDia, hojeISO } from "./store.js";
 import { buscarPrevisao, buscarMetar, derivarClima } from "./clima.js";
 import { montarEntrada, OCAS_DIA, OCAS_NOITE, AMBIENTES, EXTRAS } from "./entrada.js";
-import { configurado, chamar, gerarToken } from "./api.js";
+import { configurado, chamar } from "./api.js";
 import { fila, adicionar, descartar, enviar, planilhaCache, baixarPlanilha } from "./registro.js";
 import { lerTiers, lerDiario, aplicarTiers, diarioUnificado, nomesRegistraveis } from "./planilha.js";
 import { janelasPorFrasco, ajustarSprays } from "./estatisticas.js";
 import { telaColecao, telaPlaybook, telaHistorico } from "./telas.js";
 import { ler, gravar } from "./store.js";
 
-export const APP_VERSAO = "4.3";  // sobe a cada publicação: confere no topo da tela se o celular pegou a versão nova
+export const APP_VERSAO = "4.4";  // sobe a cada publicação: confere no topo da tela se o celular pegou a versão nova
 const S = { aba: "hoje", frascos: [], frascosAtivos: [], avisosTiers: null, fichas: {}, versao: {}, prev: null, prevOffline: false,
   prevErro: null, metar: null, metarMotivo: null, clima: null, resultado: null, erroMotor: null, entrada: "", carregandoClima: true,
   sync: { estado: "ocioso", msg: "" }, tokenNovo: null, playbook: null, janelas: new Map(),
@@ -321,11 +321,10 @@ function telaAjustes() {
     <div class="campos">${c("metar_horas", "Validade (horas)", 'inputmode="decimal"')}${c("metar_tol", "Tolerância vs previsão °C", 'inputmode="decimal"')}</div>
     <h3>Planilha (Apps Script)</h3>
     <div class="campos"><label class="largo">URL do App da Web<input id="aj-backend" type="url" value="${esc(a.backend)}" placeholder="https://script.google.com/macros/s/…/exec" autocomplete="off"></label>
-      <label class="largo">Token<input id="aj-token" type="password" value="${esc(a.token)}" autocomplete="off"></label></div>
-    ${S.tokenNovo ? `<div class="onde"><b>Token novo:</b> <code style="overflow-wrap:anywhere">${esc(S.tokenNovo)}</code><br>Copie e cole em Propriedades do script → TOKEN. Ele já foi colocado no campo acima; toque em Salvar.
-      <div class="linha-flex" style="margin-top:6px"><button class="btn sec peq" type="button" data-acao="copiar-token">Copiar</button></div></div>` : ""}
+      <label class="largo">Token<input id="aj-token" type="password" value="${esc(a.token)}" autocomplete="off" autocapitalize="off" spellcheck="false"></label></div>
+    <div class="linha-flex"><button class="btn sec peq" type="button" data-acao="ver-token">Mostrar token</button><span class="nota">${a.token ? `${a.token.length} caracteres, termina em …${esc(a.token.slice(-4))}` : "sem token"}</span></div>
     <p class="nota">O token fica só neste aparelho e vai no corpo da chamada, nunca na URL.</p>
-    <div class="linha-flex"><button class="btn" type="submit">Salvar</button><button class="btn sec" type="button" data-acao="gerar-token">Gerar token</button><button class="btn sec" type="button" data-acao="testar">Testar conexão</button></div>
+    <div class="linha-flex"><button class="btn" type="submit">Salvar</button><button class="btn sec" type="button" data-acao="testar">Testar conexão</button></div>
     <p class="nota" id="testeMsg"></p>
   </form>
   <details class="bloco"><summary>Como instalar o Apps Script na planilha</summary>
@@ -334,7 +333,7 @@ function telaAjustes() {
       <li>Apague o conteúdo de <code>Code.gs</code>, cole o código de <a href="https://raw.githubusercontent.com/guiportoflorido/perfumista-diario/main/backend/Code.gs" target="_blank" rel="noopener">backend/Code.gs</a> e salve (⌘S).</li>
       <li><b>Implantar → Nova implantação</b> → engrenagem → <b>App da Web</b> · Executar como <b>Eu</b> · Quem pode acessar <b>Qualquer pessoa</b> → Implantar e autorizar com sua conta.</li>
       <li>No topo do editor, escolha a função <b>configurar</b> e clique em <b>Executar</b>. O registro de execução mostra a <b>URL</b> e o <b>Token</b>.</li>
-      <li>Copie cada um no Mac e cole aqui no iPhone (mesmo Apple ID: a área de transferência é compartilhada). Salvar → <b>Testar conexão</b>.</li>
+      <li>Copie cada linha no Mac e cole aqui no iPhone (pode colar a linha inteira, com “Token:”; o app limpa). Salvar → <b>Testar conexão</b>.</li>
     </ol>
   </details>
   <div class="bloco"><h3>Dados</h3><dl class="kv">
@@ -432,11 +431,8 @@ document.addEventListener("click", async e => {
     $("#spr-por").value = cal.por.filter(p => p.n >= 3 && Math.round(p.media) !== Math.round(cal.geral)).map(p => `${p.nome} = ${Math.round(p.media)}`).join("\n");
     toast("Preenchido com o desvio medido (frascos com 3+ registros). Revise e salve.");
   }
-  else if (acao === "gerar-token") { S.tokenNovo = gerarToken(); render(); $("#aj-token").value = S.tokenNovo; $("#aj-token").type = "text"; }
-  else if (acao === "copiar-token") {
-    try { await navigator.clipboard.writeText(S.tokenNovo); toast("Token copiado."); }
-    catch { const el = $("#aj-token"); el.type = "text"; el.select(); toast("Selecionei o token: copie manualmente."); }
-  } else if (acao === "testar") {
+  else if (acao === "ver-token") { const el = $("#aj-token"); el.type = el.type === "password" ? "text" : "password"; b.textContent = el.type === "password" ? "Mostrar token" : "Esconder token"; }
+  else if (acao === "testar") {
     const m = $("#testeMsg"); m.textContent = "Testando…";
     try { const j = await chamar("ping"); toast(`Conectado à planilha “${j.planilha}”.`); sincronizar({ silencioso: true }); atualizarClima(); }
     catch (err) { m.innerHTML = `<span class="erro-txt">Falhou: ${esc(err.message)}</span>`; }
@@ -467,7 +463,11 @@ document.addEventListener("submit", e => {
     const v = el.value.trim();
     a[k] = typeof AJUSTES_PADRAO[k] === "number" ? Number(v.replace(",", ".")) : v;
   }
-  salvarAjustes(a); S.tokenNovo = S.tokenNovo && a.token === S.tokenNovo ? S.tokenNovo : null;
+  // aceita a linha inteira copiada do registro de execução ("Token: …", "URL do App da Web: …")
+  a.token = (a.token || "").replace(/^\s*token\s*:\s*/i, "").replace(/\s+/g, "");
+  const u = (a.backend || "").match(/https:\/\/script\.google(?:usercontent)?\.com\/\S+?\/exec/);
+  if (u) a.backend = u[0];
+  salvarAjustes(a);
   toast("Ajustes salvos."); render(); sincronizar({ silencioso: true }); atualizarClima();
 });
 
