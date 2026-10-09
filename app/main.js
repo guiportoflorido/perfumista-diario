@@ -13,7 +13,7 @@ import { telaMercado, fichaEditavel, camposAlterados, baseComTiers, deLinhas, li
 import { contagens } from "./estatisticas.js";
 import { ler, gravar } from "./store.js";
 
-export const APP_VERSAO = "4.9";  // sobe a cada publicação: confere no topo da tela se o celular pegou a versão nova
+export const APP_VERSAO = "4.10";  // sobe a cada publicação: confere no topo da tela se o celular pegou a versão nova
 const S = { aba: "hoje", frascos: [], frascosAtivos: [], avisosTiers: null, fichas: {}, versao: {}, prev: null, prevOffline: false,
   prevErro: null, metar: null, metarMotivo: null, clima: null, resultado: null, erroMotor: null, entrada: "", carregandoClima: true,
   sync: { estado: "ocioso", msg: "" }, tokenNovo: null, playbook: null, janelas: new Map(),
@@ -476,6 +476,7 @@ document.addEventListener("click", async e => {
   if (b.dataset.simFaixa) { const i = Number(b.dataset.simFaixa); S.sim = { faixa: i, oc: S.sim?.oc && S.playbook.grade[S.playbook.faixas[i]].celulas[S.sim.oc] ? S.sim.oc : null }; render(); return; }
   if (b.dataset.simOc) { S.sim = { faixa: S.sim?.faixa ?? (S.clima?.faixaDia?.idx ?? 2), oc: b.dataset.simOc }; render(); return; }
   if (b.dataset.merc) { abrirMercado(b.dataset.merc); return; }
+  if (b.dataset.mfOrd) { const k = b.dataset.mfOrd; S.mf = { ...S.mf, ord: k, dir: (S.mf.ord || "tier") === k && (S.mf.dir || "asc") === "asc" ? "desc" : "asc" }; gravar("mf", S.mf); render(); return; }
   if (b.dataset.mf) { S.mf = { ...S.mf, [b.dataset.mf]: b.dataset.v }; S.mfLimite = 60; gravar("mf", S.mf); render(); return; }
   if (b.dataset.mfArq) { S.mf = { ...S.mf, arq: S.mf.arq === b.dataset.mfArq ? "" : b.dataset.mfArq }; S.mfLimite = 60; gravar("mf", S.mf); render(); $("#mf-q")?.scrollIntoView({ block: "center" }); return; }
   if (b.dataset.tema) { gravar("tema", b.dataset.tema); aplicarTema(); render(); return; }
@@ -573,7 +574,7 @@ document.addEventListener("submit", e => {
 document.addEventListener("keydown", e => {
   if (e.key === "Escape") fecharFolha();
   if ((e.key === "Enter" || e.key === " ") && e.target.matches?.("g[data-ficha]")) { e.preventDefault(); abrirFicha(e.target.dataset.ficha); }
-  if ((e.key === "Enter" || e.key === " ") && e.target.matches?.(".card[data-merc]")) { e.preventDefault(); abrirMercado(e.target.dataset.merc); }
+  if ((e.key === "Enter" || e.key === " ") && e.target.matches?.("[data-merc]")) { e.preventDefault(); abrirMercado(e.target.dataset.merc); }
 });
 window.addEventListener("online", () => sincronizar({ silencioso: true }));
 

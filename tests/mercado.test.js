@@ -35,3 +35,11 @@ test("só os campos que mudaram vão para a planilha", () => {
   const f = { "me-tier": "S", "me-posse": "Frasco Gui", "me-arq": "Monge", "me-nariz": "", "me-resumo": "incenso seco ", "me-topo": "a", "me-coracao": "b", "me-base": "c", "me-wish": true };
   assert.deepEqual(camposAlterados(p, f), { Resumo: "incenso seco", Wishlist: "✓" });
 });
+
+test("ordenação por coluna (TABELAO): casa, posse, tier asc/desc; vazios no fim", () => {
+  const m = baseComTiers(base, tiers);
+  assert.deepEqual(filtrar(m, { ord: "casa", dir: "desc" }).map(p => p.nome), ["Gypsy Water", "Decision", "Search"]);
+  assert.deepEqual(filtrar(m, { ord: "posse" }).map(p => p.nome), ["Decision", "Gypsy Water", "Search"]);
+  assert.deepEqual(filtrar(m, { ord: "tier", dir: "desc" }).map(p => p.nome), ["Search", "Gypsy Water", "Decision"]);
+  assert.deepEqual(filtrar(m, { ord: "resumo" }).map(p => p.nome), ["Decision", "Gypsy Water", "Search"]);
+});

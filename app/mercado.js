@@ -71,7 +71,23 @@ export function filtrar(lista, f) {
     if (f.wish && !p.wish) return false;
     if (q && !norm(`${p.nome} ${p.casa} ${p.nariz} ${p.resumo} ${p.topo} ${p.coracao} ${p.base}`).includes(q)) return false;
     return true;
-  }).sort((a, b) => ordemTier(a.tier) - ordemTier(b.tier) || a.casa.localeCompare(b.casa) || a.nome.localeCompare(b.nome));
+  }).sort(comparador(f.ord, f.dir));
+}
+
+// colunas da tabela (formato do TABELAO): chave do objeto, rótulo, ordenável
+export const COLUNAS = [["tier", "Tier"], ["posse", "Posse"], ["arquetipo", "Arquétipo"],
+  ["resumo", "Resumo"], ["topo", "Topo"], ["coracao", "Coração"], ["base", "Base"]];
+const ordemPosse = p => ({ "Frasco Gui": 0, "Frasco Bia": 1, "Amostra": 2, "Amostra Bia": 3, "Avaliado": 4 }[p] ?? (p ? 5 : 6));
+function comparador(ord = "tier", dir = "asc") {
+  const s = dir === "desc" ? -1 : 1;
+  const padrao = (a, b) => ordemTier(a.tier) - ordemTier(b.tier) || a.casa.localeCompare(b.casa, "pt") || a.nome.localeCompare(b.nome, "pt");
+  const chaveDe = { tier: p => ordemTier(p.tier), posse: p => ordemPosse(p.posse) }[ord];
+  return (a, b) => {
+    let c;
+    if (chaveDe) c = chaveDe(a) - chaveDe(b);
+    else { const x = a[ord] || "", y = b[ord] || ""; c = (!x && y) ? 1 : (x && !y) ? -1 : x.localeCompare(y, "pt"); if (!x || !y) return c || padrao(a, b); }
+    return s * c || padrao(a, b);
+  };
 }
 
 // ───────────────────────── tela ─────────────────────────
@@ -103,7 +119,7 @@ export function telaMercado({ lista, fonte, arquetipos, filtro, limite, podeCria
     </div>
     <p class="nota">${res.length} perfume${res.length === 1 ? "" : "s"}.</p>
   </div>
-  <div class="lista">${res.slice(0, limite).map(item).join("") || `<p class="vazio">Nada com esses filtros.</p>`}</div>
+  ${res.length ? tabela(res.slice(0, limite), filtro) : `<div class="bloco"><p class="vazio">Nada com esses filtros.</p></div>`}
   ${res.length > limite ? `<button class="btn sec" data-acao="mf-mais">Mostrar mais (${res.length - limite})</button>` : ""}
   <details class="bloco"><summary>Mercado × coleção por arquétipo</summary>
     <div class="mxc">${porArq.sort((x, y) => y.merc - x.merc).map(x => `<button class="mxc-l" data-mf-arq="${esc(x.a.nome)}">
@@ -116,15 +132,23 @@ export function telaMercado({ lista, fonte, arquetipos, filtro, limite, podeCria
 
 const posseRot = p => (p === "Frasco Gui" ? "na coleção" : p);
 
-function item(p) {
-  const pir = [["T", p.topo], ["C", p.coracao], ["B", p.base]].filter(([, v]) => v);
-  return `<article class="card merc" data-merc="${esc(p.casa + "||" + p.nome)}" role="button" tabindex="0">
-    <span class="pos">${p.tier ? tierHTML(p.tier) : `<span class="tier sem">–</span>`}</span>
-    <div style="min-width:0"><span class="nome">${esc(p.nome)}</span>${p.wish ? ` <span class="selo manual">★</span>` : ""}
-      <div class="casa">${esc(p.casa)}${p.posse ? ` · <b class="${p.posse === "Frasco Gui" ? "minha" : ""}">${esc(posseRot(p.posse))}</b>` : ""}</div></div><span></span>
-    ${p.resumo ? `<p class="resumo">${esc(p.resumo)}</p>` : ""}
-    ${pir.length ? `<dl class="pir">${pir.map(([k, v]) => `<dt>${k}</dt><dd>${esc(v)}</dd>`).join("")}</dl>` : ""}
-  </article>`;
+function tabela(linhas, f) {
+  const ord = f.ord || "tier", dir = f.dir || "asc";
+  const th = ([k, r]) => `<th class="c-${k}" scope="col"><button data-mf-ord="${k}" aria-sort="${ord === k ? (dir === "asc" ? "ascending" : "descending") : "none"}">${r}${ord === k ? (dir === "asc" ? " ↑" : " ↓") : ""}</button></th>`;
+  const td = (k, v, extra = "") => `<td class="c-${k}${extra}">${v}</td>`;
+  const tx = (k, v) => `<td class="c-${k}"><div class="clamp">${esc(v || "")}</div></td>`;
+  const btnOrd = (k, r) => `<button data-mf-ord="${k}" aria-sort="${ord === k ? (dir === "asc" ? "ascending" : "descending") : "none"}">${r}${ord === k ? (dir === "asc" ? " ↑" : " ↓") : ""}</button>`;
+  return `<div class="tabelao" role="region" aria-label="Tabela do mercado" tabindex="0"><table>
+    <thead><tr><th class="c-n" scope="col">#</th><th class="c-nome" scope="col"><span class="dupla">${btnOrd("nome", "Perfume")}<span class="sep">·</span>${btnOrd("casa", "Casa")}</span></th>${COLUNAS.map(th).join("")}</tr></thead>
+    <tbody>${linhas.map((p, i) => `<tr data-merc="${esc(p.casa + "||" + p.nome)}" tabindex="0" class="${p.posse === "Frasco Gui" ? "minha" : ""}">
+      ${td("n", i + 1)}
+      ${td("nome", `<span class="pn">${esc(p.nome)}</span>${p.wish ? ` <span class="estrela" title="Wishlist">★</span>` : ""}<span class="pc">${esc(p.casa)}</span>`)}
+      ${td("tier", p.tier ? tierHTML(p.tier) : `<span class="tier sem">–</span>`)}
+      ${td("posse", esc(posseRot(p.posse) || "—"))}
+      ${td("arquetipo", esc(p.arquetipo || "—"))}
+      ${tx("resumo", p.resumo)}${tx("topo", p.topo)}${tx("coracao", p.coracao)}${tx("base", p.base)}
+    </tr>`).join("")}</tbody></table></div>
+  <p class="nota">Arraste para o lado para ver todas as colunas. Toque no cabeçalho para ordenar e na linha para editar.</p>`;
 }
 
 export function fichaEditavel(p, { arquetipos, editavel, salvando }) {

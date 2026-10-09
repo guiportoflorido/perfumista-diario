@@ -286,3 +286,37 @@ details.fora > summary { font: 500 13.5px var(--f); color: var(--suave); }
 .card .pir dd { margin: 0; }
 .bloco.destaque { background: var(--acento-suave); box-shadow: none; }
 select[disabled], input[readonly], textarea[readonly] { opacity: .75; }
+
+/* ── tabelão do mercado ── */
+.tabelao { overflow: auto; max-height: 72vh; background: var(--sup); border-radius: var(--r); box-shadow: var(--sombra); -webkit-overflow-scrolling: touch; overscroll-behavior: contain; }
+.tabelao:focus-visible { outline: 2px solid var(--acento); }
+.tabelao table { border-collapse: separate; border-spacing: 0; font-size: 13px; line-height: 1.4; min-width: 1100px; }
+.tabelao thead th { position: sticky; top: 0; z-index: 2; background: var(--sup2); text-align: left; padding: 0; border-bottom: .5px solid var(--linha); white-space: nowrap; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .tabelao thead th { background: var(--afund); } }
+:root[data-theme="dark"] .tabelao thead th { background: var(--afund); }
+.tabelao thead th button { all: unset; cursor: pointer; display: block; padding: 9px 10px; font: 600 12px var(--f); color: var(--suave); }
+.tabelao thead th button[aria-sort="ascending"], .tabelao thead th button[aria-sort="descending"] { color: var(--acento); }
+.tabelao thead th button:focus-visible { outline: 2px solid var(--acento); outline-offset: -2px; }
+.tabelao th.c-n { padding: 9px 8px; font: 600 12px var(--f); color: var(--leve); }
+.tabelao td { padding: 9px 10px; border-bottom: .5px solid var(--linha); vertical-align: top; background: var(--sup); }
+.tabelao tbody tr { cursor: pointer; }
+.tabelao tbody tr:active td, .tabelao tbody tr:focus-visible td { background: var(--afund); }
+.tabelao tbody tr:focus-visible { outline: none; }
+.tabelao tr.minha td.c-posse { color: var(--ok); font-weight: 600; }
+/* # e Perfume fixos ao rolar para o lado */
+.tabelao .c-n { position: sticky; left: 0; z-index: 1; width: 38px; min-width: 38px; text-align: right; color: var(--leve); font: 500 12px var(--f-num); }
+.tabelao .c-nome { position: sticky; left: 38px; z-index: 1; min-width: 140px; max-width: 150px; font-weight: 650; box-shadow: 1px 0 0 var(--linha); }
+.tabelao thead .c-n, .tabelao thead .c-nome { z-index: 3; }
+.tabelao td.c-nome .pn { display: block; }
+.tabelao td.c-nome .pc { display: block; font-weight: 400; font-size: 12px; color: var(--suave); margin-top: 1px; }
+.tabelao th.c-nome .dupla { display: flex; align-items: center; }
+.tabelao th.c-nome .dupla button { padding-right: 4px; }
+.tabelao th.c-nome .sep { color: var(--leve); }
+.tabelao .clamp { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.tabelao .c-posse { min-width: 90px; white-space: nowrap; }
+.tabelao .c-tier { min-width: 48px; text-align: center; }
+.tabelao td.c-tier .tier { margin: 0; }
+.tabelao .c-arquetipo { min-width: 100px; white-space: nowrap; color: var(--suave); }
+.tabelao .c-resumo { min-width: 280px; max-width: 320px; }
+.tabelao .c-topo, .tabelao .c-coracao, .tabelao .c-base { min-width: 170px; max-width: 200px; color: var(--suave); }
+.tabelao .estrela { color: var(--acento); font-size: 11px; }
