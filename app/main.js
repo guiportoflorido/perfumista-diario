@@ -12,11 +12,11 @@ import { telaRoda, telaMercado, fichaMercado, mercadoComPlanilha } from "./roda.
 import { contagens } from "./estatisticas.js";
 import { ler, gravar } from "./store.js";
 
-export const APP_VERSAO = "4.7";  // sobe a cada publicação: confere no topo da tela se o celular pegou a versão nova
+export const APP_VERSAO = "4.8";  // sobe a cada publicação: confere no topo da tela se o celular pegou a versão nova
 const S = { aba: "hoje", frascos: [], frascosAtivos: [], avisosTiers: null, fichas: {}, versao: {}, prev: null, prevOffline: false,
   prevErro: null, metar: null, metarMotivo: null, clima: null, resultado: null, erroMotor: null, entrada: "", carregandoClima: true,
   sync: { estado: "ocioso", msg: "" }, tokenNovo: null, playbook: null, janelas: new Map(),
-  filtro: ler("filtro", {}), pbFaixa: null, arquetipos: [], gaps: [], colModo: ler("colModo", "roda"), sim: null, verGaps: false,
+  filtro: ler("filtro", {}), pbFaixa: null, arquetipos: [], gaps: [], colModo: ler("colModo", "roda") === "lista" ? "lista" : "roda", sim: null, verGaps: false,
   mercadoBase: null, mercadoErro: null, mf: ler("mf", {}), mfLimite: 60 };
 const ajSpray = () => ler("sprays_ajuste", { ativo: false, geral: 0, por: {} });
 const $ = (s, el = document) => el.querySelector(s);
@@ -100,7 +100,7 @@ function render() {
   const ctx = { frascos: S.frascosAtivos, hist: historico(), hoje: hojeISO(), janelas: S.janelas, filtro: S.filtro, playbook: S.playbook,
     faixaSel: S.pbFaixa ?? S.clima?.faixaDia?.idx ?? 2, fila: fila(), ajSpray: ajSpray() };
   $("#tela").innerHTML = ({ hoje: telaHoje, registrar: telaRegistrar, ajustes: telaAjustes,
-    colecao: () => telaColecaoTudo(ctx), playbook: () => telaPlaybook(ctx), historico: () => telaHistorico(ctx) }[S.aba])();
+    colecao: () => telaColecaoTudo(ctx), mercado: telaMercadoAba, playbook: () => telaPlaybook(ctx), historico: () => telaHistorico(ctx) }[S.aba])();
   if (foco && document.getElementById(foco) && S.aba !== "hoje") {
     const el = document.getElementById(foco); el.focus();
     if (el.type === "search") { const n = el.value.length; try { el.setSelectionRange(n, n); } catch { /* sem seleção */ } }
@@ -245,14 +245,10 @@ function blocoAvancado(dia) {
 
 // ───────────────────────── coleção: roda · lista · mercado ─────────────────────────
 function telaColecaoTudo(ctx) {
-  const modos = [["roda", "Roda"], ["lista", "Lista"], ["mercado", "Mercado"]];
+  const modos = [["roda", "Roda"], ["lista", "Lista"]];
   let corpo;
   if (S.colModo === "lista") corpo = telaColecao(ctx);
-  else if (S.colModo === "mercado") {
-    if (!S.mercadoBase && !S.mercadoErro) carregarMercado();
-    corpo = S.mercadoErro ? `<div class="bloco"><p class="erro-txt">Não consegui carregar a base: ${esc(S.mercadoErro)}</p></div>`
-      : telaMercado({ mercado: S.mercadoBase && mercadoComPlanilha(S.mercadoBase, planilha().tiers), arquetipos: S.arquetipos, filtro: S.mf, limite: S.mfLimite });
-  } else {
+  else {
     const usosPor = new Map([...contagens(ctx.hist, ctx.frascos, ctx.hoje).por.values()].map(c => [c.f.nome, c.n30]));
     const dia = S.resultado?.slots[0];
     corpo = telaRoda({ frascos: ctx.frascos, arquetipos: S.arquetipos, gaps: S.gaps, playbook: S.playbook, sim: S.sim, verGaps: S.verGaps, usosPor,
@@ -263,10 +259,18 @@ function telaColecaoTudo(ctx) {
   ${corpo}`;
 }
 
+function telaMercadoAba() {
+  if (!S.mercadoBase && !S.mercadoErro) carregarMercado();
+  return `<h2>Mercado</h2>
+  <p class="nota">Base da avaliação v51: 1.205 perfumes, inclusive os da sua coleção (marcados “na coleção”).</p>
+  ${S.mercadoErro ? `<div class="bloco"><p class="erro-txt">Não consegui carregar a base: ${esc(S.mercadoErro)}</p></div>`
+    : telaMercado({ mercado: S.mercadoBase && mercadoComPlanilha(S.mercadoBase, planilha().tiers), arquetipos: S.arquetipos, filtro: S.mf, limite: S.mfLimite })}`;
+}
+
 async function carregarMercado() {
   try { const j = await fetch("data/mercado.json").then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); }); S.mercadoBase = j.perfumes; }
   catch (e) { S.mercadoErro = e.message; }
-  if (S.aba === "colecao") render();
+  if (S.aba === "mercado") render();
 }
 
 // ───────────────────────── registrar ─────────────────────────

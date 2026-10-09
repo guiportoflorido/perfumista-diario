@@ -52,12 +52,12 @@ h1 span:not(.marca) { color: var(--suave); font-weight: 500; }
 .marca::before { content: ""; position: absolute; left: 9px; right: 9px; top: 4px; height: 3px; border-radius: 1px; background: rgba(255, 255, 255, .92); }
 .versao { font: 500 11px var(--f-num); color: var(--leve); background: var(--afund); padding: 3px 8px; border-radius: 99px; }
 
-.abas { position: fixed; left: 0; right: 0; bottom: 0; z-index: 20; display: grid; grid-template-columns: repeat(6, 1fr);
+.abas { position: fixed; left: 0; right: 0; bottom: 0; z-index: 20; display: grid; grid-template-columns: repeat(7, 1fr);
   background: var(--vidro); -webkit-backdrop-filter: saturate(180%) blur(20px); backdrop-filter: saturate(180%) blur(20px);
   border-top: .5px solid var(--linha); padding: 6px 4px env(safe-area-inset-bottom, 0px); }
 .abas button { all: unset; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 4px 2px 6px;
-  font: 500 10px/1 var(--f); color: var(--leve); text-align: center; }
-.abas svg { width: 25px; height: 25px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+  font: 500 9.5px/1 var(--f); color: var(--leve); text-align: center; letter-spacing: -.01em; }
+.abas svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
 .abas button[aria-current="page"] { color: var(--acento); }
 .abas button[aria-current="page"] svg { stroke-width: 2.1; }
 .abas button:focus-visible { outline: 2px solid var(--acento); outline-offset: -2px; border-radius: 10px; }
