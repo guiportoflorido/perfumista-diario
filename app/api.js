@@ -12,7 +12,16 @@ export async function chamar(acao, extra = {}, { timeoutMs = 20000 } = {}) {
     const r = await fetch(a.backend, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" },
       body: JSON.stringify({ token: a.token, acao, ...extra }), signal: ctl.signal, redirect: "follow", cache: "no-store" });
     if (!r.ok) throw Object.assign(new Error(`Apps Script respondeu ${r.status}`), { codigo: "rede" });
-    const j = await r.json();
+    const txt = await r.text();
+    let j;
+    try { j = JSON.parse(txt); }
+    catch {
+      // o Apps Script devolve uma página HTML (não JSON) quando falta autorização ou a implantação está errada
+      const limpo = txt.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim().slice(0, 160);
+      const auth = /autoriz|authoriz|permiss|login|sign in|fazer login/i.test(txt);
+      throw Object.assign(new Error(auth ? "O Apps Script pede autorização: no editor, rode “configurar”, autorize e implante uma nova versão."
+        : `Resposta inesperada do Apps Script: ${limpo || "(vazia)"}`), { codigo: "recusado" });
+    }
     if (!j.ok) throw Object.assign(new Error(j.erro || "erro no Apps Script"), { codigo: "recusado" });
     return j;
   } catch (e) {

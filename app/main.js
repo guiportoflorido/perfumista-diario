@@ -10,7 +10,7 @@ import { janelasPorFrasco, ajustarSprays } from "./estatisticas.js";
 import { telaColecao, telaPlaybook, telaHistorico } from "./telas.js";
 import { ler, gravar } from "./store.js";
 
-export const APP_VERSAO = "4.2";  // sobe a cada publicação: confere no topo da tela se o celular pegou a versão nova
+export const APP_VERSAO = "4.3";  // sobe a cada publicação: confere no topo da tela se o celular pegou a versão nova
 const S = { aba: "hoje", frascos: [], frascosAtivos: [], avisosTiers: null, fichas: {}, versao: {}, prev: null, prevOffline: false,
   prevErro: null, metar: null, metarMotivo: null, clima: null, resultado: null, erroMotor: null, entrada: "", carregandoClima: true,
   sync: { estado: "ocioso", msg: "" }, tokenNovo: null, playbook: null, janelas: new Map(),
@@ -340,8 +340,11 @@ function telaAjustes() {
   <div class="bloco"><h3>Dados</h3><dl class="kv">
     <dt>Frascos</dt><dd>${S.frascos.length} (grade ${S.frascos.filter(f => f.camada === "grade" && f.tier !== "D").length}) · ativos agora ${S.frascosAtivos.length}</dd>
     ${Object.entries(S.versao).map(([k, v]) => `<dt>${esc(k)}</dt><dd>${esc(v)}</dd>`).join("")}
-    <dt>Planilha</dt><dd>${planilha().lido ? `lida em ${new Date(planilha().lido).toLocaleString("pt-BR")} · ${planilha().tiers.length} linhas em Tiers · ${planilha().diario.length} no Diário` : "ainda não lida"}</dd>
-  </dl></div>`;
+    <dt>Planilha</dt><dd>${planilha().lido ? `lida em ${new Date(planilha().lido).toLocaleString("pt-BR")} · ${planilha().tiers.length} linhas em Tiers · ${planilha().diario.length} no Diário` : "ainda não lida"}
+      ${S.sync.estado === "erro" ? `<br><span class="erro-txt">Última tentativa falhou: ${esc(S.sync.msg)}</span>` : ""}</dd>
+  </dl>
+  <div class="linha-flex"><button class="btn sec peq" data-acao="ler-planilha">Ler planilha agora</button></div>
+  <p class="nota" id="lerMsg"></p></div>`;
 }
 
 // ───────────────────────── ficha ─────────────────────────
@@ -410,6 +413,13 @@ document.addEventListener("click", async e => {
   else if (acao === "soltar-texto") mudarDia(d => { d.textoManual = null; });
   else if (acao === "restaurar") { salvarAjustes({}); toast("Ajustes restaurados."); render(); atualizarClima(); }
   else if (acao === "sync") sincronizar();
+  else if (acao === "ler-planilha") {
+    const m = $("#lerMsg"); m.textContent = "Lendo a planilha…";
+    try {
+      const d = await baixarPlanilha(); aplicarPlanilha(); S.sync = { estado: "ok", msg: "" };
+      toast(`Planilha lida: ${lerTiers(d.tiers).length} linhas em Tiers, ${lerDiario(d.diario).length} no Diário.`); recalcular();
+    } catch (err) { S.sync = { estado: "erro", msg: err.message }; m.innerHTML = `<span class="erro-txt">Falhou: ${esc(err.message)}</span>`; }
+  }
   else if (acao === "salvar-spr") {
     const por = {};
     for (const l of $("#spr-por").value.split("\n")) { const m = l.match(/^(.+?)\s*=\s*([+-]?\d+)\s*$/); if (m) por[m[1].trim()] = Number(m[2]); }
