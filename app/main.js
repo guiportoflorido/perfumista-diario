@@ -15,7 +15,7 @@ import { telaMercado, fichaEditavel, camposAlterados, baseComTiers, deLinhas, li
 import { contagens } from "./estatisticas.js";
 import { ler, gravar } from "./store.js";
 
-export const APP_VERSAO = "5.2";  // sobe a cada publicação: confere no topo da tela se o celular pegou a versão nova
+export const APP_VERSAO = "5.3";  // sobe a cada publicação: confere no topo da tela se o celular pegou a versão nova
 const S = { aba: "hoje", frascos: [], frascosAtivos: [], avisosTiers: null, fichas: {}, versao: {}, prev: null, prevOffline: false,
   prevErro: null, metar: null, metarMotivo: null, clima: null, resultado: null, erroMotor: null, entrada: "", carregandoClima: true,
   sync: { estado: "ocioso", msg: "" }, hr: ler("hr", { preset: "tudo" }), tokenNovo: null, playbook: null, janelas: new Map(),
@@ -95,6 +95,16 @@ function recalcular() {
 }
 
 // ───────────────────────── telas ─────────────────────────
+// erro numa tela aparece na própria tela (com versão e navegador) em vez de deixá-la em branco
+function erroHTML(e, onde) {
+  const linha = String(e?.stack || "").split("\n").find(l => /\.js/.test(l)) || "";
+  return `<h2>Ops</h2><div class="bloco"><p class="erro-txt"><b>Erro na tela ${esc(onde)}:</b> ${esc(e?.message || e)}</p>
+    <p class="nota">${esc(linha.trim())}<br>app ${APP_VERSAO} · ${esc(navigator.userAgent.match(/OS [\d_]+/)?.[0]?.replace(/_/g, ".") || navigator.userAgent.slice(0, 80))}</p>
+    <p class="nota">Mande um print desta tela.</p></div>`;
+}
+window.addEventListener("error", e => toast(`Erro: ${e.message}`));
+window.addEventListener("unhandledrejection", e => toast(`Erro: ${e.reason?.message || e.reason}`));
+
 function render() {
   document.querySelectorAll("#abas button").forEach(b => {
     if (b.dataset.aba === S.aba) b.setAttribute("aria-current", "page"); else b.removeAttribute("aria-current");
@@ -105,8 +115,10 @@ function render() {
   const ctx = { fichas: S.fichas, arqTag, arqIcone, arqDe, hr: S.hr,
     frascos: S.frascosAtivos, hist: historico(), hoje: hojeISO(), janelas: S.janelas, filtro: S.filtro, playbook: S.playbook,
     faixaSel: S.pbFaixa ?? S.clima?.faixaDia?.idx ?? 2, fila: fila(), ajSpray: ajSpray() };
-  $("#tela").innerHTML = ({ hoje: telaHoje, registrar: telaRegistrar, ajustes: telaAjustes,
-    colecao: () => telaColecaoTudo(ctx), mercado: telaMercadoAba, playbook: () => telaPlaybook(ctx), historico: () => telaHistorico(ctx) }[S.aba])();
+  try {
+    $("#tela").innerHTML = ({ hoje: telaHoje, registrar: telaRegistrar, ajustes: telaAjustes,
+      colecao: () => telaColecaoTudo(ctx), mercado: telaMercadoAba, playbook: () => telaPlaybook(ctx), historico: () => telaHistorico(ctx) }[S.aba])();
+  } catch (e) { $("#tela").innerHTML = erroHTML(e, S.aba); console.error(e); }
   if (trocouAba) { const t = $("#tela"); t.classList.remove("entra"); void t.offsetWidth; t.classList.add("entra"); }
   if (foco && document.getElementById(foco) && S.aba !== "hoje") {
     const el = document.getElementById(foco); el.focus();
