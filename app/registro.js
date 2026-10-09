@@ -22,12 +22,14 @@ export function descartar(id) { atualizar(id, { estado: "descartado" }); }
 const paraPlanilha = r => ({ id: r.id, data: r.data, slot: r.slot, perfume: r.perfume, ocasiao: r.ocasiao, temp: r.temp, td: r.td,
   sprays: r.sprays, notaDia: r.notaDia, obs: r.obs });
 
-/** Envia os pendentes (e os com erro). Com `trocaId`, regrava aquele registro como troca (forcar). */
-export async function enviar({ trocaId = null } = {}) {
+/** Envia os pendentes (e os com erro). Com `trocaId`, grava aquele registro mesmo com o slot ocupado:
+ *  tipo "troca" (trocou de perfume) ou "segunda" (2ª aplicação no mesmo slot, como já aparece no diário). */
+export async function enviar({ trocaId = null, tipo = "troca" } = {}) {
   if (!configurado()) return { enviadas: 0, semConfig: true };
   let alvo = fila().filter(r => (trocaId ? r.id === trocaId : r.estado === "pendente" || r.estado === "erro"));
   if (!alvo.length) return { enviadas: 0 };
-  if (trocaId) alvo = alvo.map(r => ({ ...r, obs: r.obs ? `${r.obs}; troca` : "troca" }));
+  const marca = r => (tipo === "segunda" ? `2ª aplicação do slot ${r.slot === "M" ? "Dia" : "Noite"}; ${r.existente} antes` : "troca");
+  if (trocaId) alvo = alvo.map(r => ({ ...r, obs: r.obs ? `${r.obs}; ${marca(r)}` : marca(r) }));
   try {
     const j = await chamar("registrar", { linhas: alvo.map(paraPlanilha), forcar: Boolean(trocaId) });
     const ok = new Set(j.gravadas.map(g => g.id)), conf = new Map(j.conflitos.map(c => [c.id, c.existente]));

@@ -1,9 +1,10 @@
 /**
  * Perfumista Diário — backend em Google Apps Script, vinculado à planilha "Diário de Uso — Perfumes".
  *
- * Instalação (uma vez): Extensões → Apps Script → colar este arquivo → Configurações do projeto →
- * Propriedades do script → TOKEN = <token gerado em Ajustes do app> → Implantar → Nova implantação →
- * Tipo "App da Web", Executar como "Eu", Quem pode acessar "Qualquer pessoa" → copiar a URL para Ajustes do app.
+ * Instalação (uma vez): Extensões → Apps Script → colar este arquivo → Salvar → Implantar → Nova implantação →
+ * tipo "App da Web", Executar como "Eu", Quem pode acessar "Qualquer pessoa" → Implantar (autorizar) →
+ * no editor, escolher a função "configurar" e clicar em Executar → o registro de execução mostra a URL e o
+ * token para colar em Ajustes do app.
  *
  * Toda chamada é POST com corpo JSON em text/plain (evita preflight de CORS) e precisa do TOKEN.
  * Ações: ping · metar · dados (Tiers + Diário + Frascos) · registrar (linhas no formato da aba Diário).
@@ -31,6 +32,20 @@ function doPost(e) {
   } catch (err) {
     return saida_({ ok: false, erro: String(err && err.message || err) });
   }
+}
+
+/** Rode uma vez no editor (Executar ▶ configurar): cria o TOKEN se não existir e mostra URL + token. */
+function configurar() {
+  var props = PropertiesService.getScriptProperties();
+  var token = props.getProperty('TOKEN');
+  if (!token) {
+    token = (Utilities.getUuid() + Utilities.getUuid()).replace(/-/g, '');
+    props.setProperty('TOKEN', token);
+  }
+  var url = ScriptApp.getService().getUrl();
+  Logger.log('URL do App da Web: ' + (url || '(implante primeiro: Implantar → Nova implantação → App da Web)'));
+  Logger.log('Token: ' + token);
+  return { url: url, token: token };
 }
 
 function doGet() { return saida_({ ok: false, erro: 'use POST' }); }

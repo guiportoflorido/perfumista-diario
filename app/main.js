@@ -10,7 +10,7 @@ import { janelasPorFrasco, ajustarSprays } from "./estatisticas.js";
 import { telaColecao, telaPlaybook, telaHistorico } from "./telas.js";
 import { ler, gravar } from "./store.js";
 
-export const APP_VERSAO = "4.1";  // sobe a cada publicação: confere no topo da tela se o celular pegou a versão nova
+export const APP_VERSAO = "4.2";  // sobe a cada publicação: confere no topo da tela se o celular pegou a versão nova
 const S = { aba: "hoje", frascos: [], frascosAtivos: [], avisosTiers: null, fichas: {}, versao: {}, prev: null, prevOffline: false,
   prevErro: null, metar: null, metarMotivo: null, clima: null, resultado: null, erroMotor: null, entrada: "", carregandoClima: true,
   sync: { estado: "ocioso", msg: "" }, tokenNovo: null, playbook: null, janelas: new Map(),
@@ -270,8 +270,8 @@ function telaRegistrar() {
   ${formRegistro()}
   ${abertos.length ? `<div class="bloco"><h3>Na fila · ${abertos.length}</h3><div class="lista">${abertos.map(r => `
     <div class="card"><span class="pos">${r.slot}</span><div style="min-width:0"><b>${esc(r.perfume)}</b><div class="casa">${esc(r.data)} · ${slotNome(r.slot)}${r.sprays ? ` · ${esc(r.sprays)} sprays` : ""}</div></div><span></span>
-      <div class="pq">${r.estado === "conflito" ? `Na planilha já existe <b>${esc(r.existente)}</b> neste slot.` : r.estado === "erro" ? `<span class="erro-txt">${esc(r.erro)}</span>` : configurado() ? "Aguardando envio." : "Configure a planilha em Ajustes para enviar."}</div>
-      <div class="acoes"><span class="esp"></span>${r.estado === "conflito" ? `<button class="btn peq" data-troca="${esc(r.id)}">Gravar como troca</button>` : ""}<button class="btn sec peq" data-descartar="${esc(r.id)}">Descartar</button></div>
+      <div class="pq">${r.estado === "conflito" ? `Na planilha já existe <b>${esc(r.existente)}</b> neste slot. Foi uma 2ª aplicação ou uma troca?` : r.estado === "erro" ? `<span class="erro-txt">${esc(r.erro)}</span>` : configurado() ? "Aguardando envio." : "Configure a planilha em Ajustes para enviar."}</div>
+      <div class="acoes"><span class="esp"></span>${r.estado === "conflito" ? `<button class="btn peq" data-troca="${esc(r.id)}" data-tipo="segunda">2ª aplicação</button><button class="btn peq" data-troca="${esc(r.id)}" data-tipo="troca">Troca</button>` : ""}<button class="btn sec peq" data-descartar="${esc(r.id)}">Descartar</button></div>
     </div>`).join("")}</div></div>` : ""}
   <div class="bloco"><h3>Últimos registros</h3>${h.length ? `<div class="lista">${h.map(r => `
     <div class="card"><span class="pos">${esc(r.slot)}</span><div style="min-width:0"><b>${esc(r.perfume)}</b><div class="casa">${esc(r.data)}${r.ocasiao ? ` · ${esc(ROT_OC[r.ocasiao] || r.ocasiao)}` : ""}${r.sprays ? ` · ${esc(r.sprays)} sprays` : ""}${r.pendente ? " · na fila" : ""}</div></div><span></span></div>`).join("")}</div>` : `<p class="vazio">Nenhum registro ainda.</p>`}</div>`;
@@ -330,12 +330,11 @@ function telaAjustes() {
   </form>
   <details class="bloco"><summary>Como instalar o Apps Script na planilha</summary>
     <ol class="nota" style="padding-left:18px;margin:0">
-      <li>Toque em <b>Gerar token</b> acima, depois em <b>Salvar</b>, e copie o token.</li>
       <li>No computador, abra a planilha “Diário de Uso — Perfumes” → <b>Extensões → Apps Script</b>.</li>
-      <li>Apague o conteúdo de <code>Code.gs</code> e cole o arquivo <code>backend/Code.gs</code> do projeto. Salve.</li>
-      <li><b>Configurações do projeto</b> (engrenagem) → <b>Propriedades do script</b> → adicionar <code>TOKEN</code> com o token copiado.</li>
-      <li><b>Implantar → Nova implantação</b> → tipo <b>App da Web</b> · Executar como <b>Eu</b> · Quem pode acessar <b>Qualquer pessoa</b> → Implantar e autorizar.</li>
-      <li>Copie a URL que termina em <code>/exec</code>, cole acima em <b>URL do App da Web</b>, Salvar, e <b>Testar conexão</b>.</li>
+      <li>Apague o conteúdo de <code>Code.gs</code>, cole o código de <a href="https://raw.githubusercontent.com/guiportoflorido/perfumista-diario/main/backend/Code.gs" target="_blank" rel="noopener">backend/Code.gs</a> e salve (⌘S).</li>
+      <li><b>Implantar → Nova implantação</b> → engrenagem → <b>App da Web</b> · Executar como <b>Eu</b> · Quem pode acessar <b>Qualquer pessoa</b> → Implantar e autorizar com sua conta.</li>
+      <li>No topo do editor, escolha a função <b>configurar</b> e clique em <b>Executar</b>. O registro de execução mostra a <b>URL</b> e o <b>Token</b>.</li>
+      <li>Copie cada um no Mac e cole aqui no iPhone (mesmo Apple ID: a área de transferência é compartilhada). Salvar → <b>Testar conexão</b>.</li>
     </ol>
   </details>
   <div class="bloco"><h3>Dados</h3><dl class="kv">
@@ -399,8 +398,8 @@ document.addEventListener("click", async e => {
   if (b.dataset.descartar) { descartar(b.dataset.descartar); toast("Registro descartado."); recalcular(); return; }
   if (b.dataset.troca) {
     b.disabled = true;
-    const r = await enviar({ trocaId: b.dataset.troca });
-    toast(r.enviadas ? "Troca gravada na planilha (Obs: troca)." : `Não gravou: ${r.erro || "sem resposta"}`);
+    const r = await enviar({ trocaId: b.dataset.troca, tipo: b.dataset.tipo });
+    toast(r.enviadas ? (b.dataset.tipo === "segunda" ? "Gravado como 2ª aplicação." : "Gravado como troca.") : `Não gravou: ${r.erro || "sem resposta"}`);
     await sincronizar({ silencioso: true }); return;
   }
   const acao = b.dataset.acao;

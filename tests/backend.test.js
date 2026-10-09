@@ -83,3 +83,15 @@ test("METAR: Td, T e hora da observação em ISO", () => {
   const r = post({ token: "segredo", acao: "metar" });
   assert.deepEqual(r.metar, { T: 28, Td: 19, obs: "2026-10-09T13:00:00.000Z", raw: "METAR SBSP 091300Z" });
 });
+
+test("configurar: cria TOKEN uma vez e devolve a URL do App da Web", () => {
+  const props = {}, logs = [];
+  const ctx = { PropertiesService: { getScriptProperties: () => ({ getProperty: k => props[k] ?? null, setProperty: (k, v) => (props[k] = v) }) },
+    Utilities: { getUuid: () => "1234-abcd" }, ScriptApp: { getService: () => ({ getUrl: () => "https://script.google.com/macros/s/X/exec" }) },
+    Logger: { log: m => logs.push(m) } };
+  vm.createContext(ctx); vm.runInContext(codigo, ctx);
+  const r1 = ctx.configurar(), r2 = ctx.configurar();
+  assert.equal(r1.token, "1234abcd1234abcd"); assert.equal(r2.token, r1.token);
+  assert.equal(r1.url, "https://script.google.com/macros/s/X/exec");
+  assert.ok(logs.some(l => l.includes("Token: 1234abcd1234abcd")));
+});
