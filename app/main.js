@@ -10,6 +10,7 @@ import { janelasPorFrasco, ajustarSprays } from "./estatisticas.js";
 import { telaColecao, telaPlaybook, telaHistorico } from "./telas.js";
 import { ler, gravar } from "./store.js";
 
+export const APP_VERSAO = "4.1";  // sobe a cada publicação: confere no topo da tela se o celular pegou a versão nova
 const S = { aba: "hoje", frascos: [], frascosAtivos: [], avisosTiers: null, fichas: {}, versao: {}, prev: null, prevOffline: false,
   prevErro: null, metar: null, metarMotivo: null, clima: null, resultado: null, erroMotor: null, entrada: "", carregandoClima: true,
   sync: { estado: "ocioso", msg: "" }, tokenNovo: null, playbook: null, janelas: new Map(),
@@ -35,7 +36,7 @@ const slotNome = s => (s === "M" ? "Dia" : s === "N" ? "Noite" : "?");
 async function carregarDados() {
   const [fr, fi, pb] = await Promise.all(["frascos", "fichas", "playbook"].map(n => fetch(`data/${n}.json`).then(r => r.json())));
   S.frascos = fr.frascos; S.versao = fr.versao; S.fichas = fi.fichas; S.playbook = pb; S.janelas = janelasPorFrasco(pb);
-  $("#versao").textContent = fr.versao.playbook.replace("playbook_", "").replace(".md", "");
+  $("#versao").textContent = `${fr.versao.playbook.replace("playbook_", "").replace(".md", "")} · app ${APP_VERSAO}`;
   aplicarPlanilha();
 }
 
@@ -465,6 +466,12 @@ document.addEventListener("keydown", e => { if (e.key === "Escape") fecharFolha(
 window.addEventListener("online", () => sincronizar({ silencioso: true }));
 
 // ───────────────────────── início ─────────────────────────
+if ("serviceWorker" in navigator) {
+  const jaControlado = Boolean(navigator.serviceWorker.controller);
+  navigator.serviceWorker.register("sw.js").catch(() => { /* sem service worker: app funciona online */ });
+  // quando um service worker novo assume, recarrega uma vez para rodar o código novo
+  navigator.serviceWorker.addEventListener("controllerchange", () => { if (jaControlado && !sessionStorage.getItem("pd.recarregou")) { sessionStorage.setItem("pd.recarregou", "1"); location.reload(); } });
+}
 (async () => {
   try { await carregarDados(); }
   catch (e) { $("#tela").innerHTML = `<p class="erro-txt">Não consegui carregar os dados da coleção (${esc(e.message)}).</p>`; return; }
