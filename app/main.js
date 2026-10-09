@@ -10,7 +10,7 @@ import { janelasPorFrasco, ajustarSprays } from "./estatisticas.js";
 import { telaColecao, telaPlaybook, telaHistorico } from "./telas.js";
 import { ler, gravar } from "./store.js";
 
-export const APP_VERSAO = "4.4";  // sobe a cada publicação: confere no topo da tela se o celular pegou a versão nova
+export const APP_VERSAO = "4.5";  // sobe a cada publicação: confere no topo da tela se o celular pegou a versão nova
 const S = { aba: "hoje", frascos: [], frascosAtivos: [], avisosTiers: null, fichas: {}, versao: {}, prev: null, prevOffline: false,
   prevErro: null, metar: null, metarMotivo: null, clima: null, resultado: null, erroMotor: null, entrada: "", carregandoClima: true,
   sync: { estado: "ocioso", msg: "" }, tokenNovo: null, playbook: null, janelas: new Map(),
@@ -146,7 +146,7 @@ function telaHoje() {
 
 function blocoClima(c, dia) {
   if (!c) return "";
-  const fx = (f, rot) => `<div class="faixa-slot"><span class="rot">${rot}</span>${f ? `<span class="fx">${faixaHTML(f.idx)}</span><span class="t">${nf(f.T)} °C · ${esc(f.fonte)}</span>` : `<span class="t">sem dado</span>`}</div>`;
+  const fx = (f, rot) => `<div class="faixa-slot" ${f ? `data-f="${f.idx}"` : ""}><span class="rot">${rot}</span>${f ? `<span class="graus">${nf(f.T)}°</span><span class="fx">${FAIXAS[f.idx]}</span><span class="t">${esc(f.fonte)}</span>` : `<span class="graus">—</span><span class="t">sem dado</span>`}</div>`;
   const sel = f => (f.fonte.startsWith("manual") ? `<span class="selo manual">manual</span>` : f.tipo === "previsto" ? `<span class="selo">previsto</span>` : f.tipo === "observado" ? `<span class="selo">observado</span>` : "");
   const td = c.Td;
   return `<section class="bloco" aria-label="Clima">
