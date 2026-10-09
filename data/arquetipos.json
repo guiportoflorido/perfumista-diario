@@ -1,0 +1,111 @@
+{
+ "fonte": "observatorio_colecao_v4_6.html",
+ "arquetipos": [
+  {
+   "nome": "Mediterrâneo",
+   "rotulo": "O Mediterrâneo",
+   "cor": "#D9B24A"
+  },
+  {
+   "nome": "Marinho",
+   "rotulo": "O Marinho",
+   "cor": "#5F9EA8"
+  },
+  {
+   "nome": "Minimalista",
+   "rotulo": "O Minimalista",
+   "cor": "#AEB3B0"
+  },
+  {
+   "nome": "Botânico",
+   "rotulo": "O Botânico",
+   "cor": "#7C9A5E"
+  },
+  {
+   "nome": "Barbeiro",
+   "rotulo": "O Barbeiro",
+   "cor": "#8F8FBF"
+  },
+  {
+   "nome": "Geólogo",
+   "rotulo": "O Geólogo",
+   "cor": "#7E8B93"
+  },
+  {
+   "nome": "Chiprista",
+   "rotulo": "O Chiprista",
+   "cor": "#A9985A"
+  },
+  {
+   "nome": "Florista Branco",
+   "rotulo": "O Florista Branco",
+   "cor": "#D8D2C4"
+  },
+  {
+   "nome": "Rosal",
+   "rotulo": "O Rosal",
+   "cor": "#B56A78"
+  },
+  {
+   "nome": "Empoado",
+   "rotulo": "O Empoado",
+   "cor": "#C1A9B8"
+  },
+  {
+   "nome": "Marceneiro",
+   "rotulo": "O Marceneiro",
+   "cor": "#A87B4F"
+  },
+  {
+   "nome": "Monge",
+   "rotulo": "O Monge",
+   "cor": "#8C8478"
+  },
+  {
+   "nome": "Curtidor",
+   "rotulo": "O Curtidor",
+   "cor": "#8A5A3C"
+  },
+  {
+   "nome": "Sultão",
+   "rotulo": "O Sultão",
+   "cor": "#6E4A63"
+  },
+  {
+   "nome": "Lareira",
+   "rotulo": "A Lareira",
+   "cor": "#C07A3A"
+  },
+  {
+   "nome": "Confeiteiro",
+   "rotulo": "O Confeiteiro",
+   "cor": "#C98A8A"
+  }
+ ],
+ "gaps": [
+  {
+   "n": 1,
+   "gap": "Vetiver seco/mineral protagonista",
+   "arquetipo": "Geólogo",
+   "status": "aberto"
+  },
+  {
+   "n": 2,
+   "gap": "Chypre verde aromático",
+   "arquetipo": "Botânico",
+   "status": "aberto"
+  },
+  {
+   "n": 4,
+   "gap": "Sândalo cremoso protagonista (gap de dia/cozy)",
+   "arquetipo": "Marceneiro",
+   "status": "aberto — Santal 33 e Wood Whisper não fecham"
+  },
+  {
+   "n": 5,
+   "gap": "Leather raw birch-tar",
+   "arquetipo": "Curtidor",
+   "status": "aberto, baixa prioridade"
+  }
+ ]
+}

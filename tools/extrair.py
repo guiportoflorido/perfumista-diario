@@ -140,6 +140,53 @@ def extrair_playbook(frascos):
             "total_alocacoes": total, "celulas": n_cel}
 
 
+# ───────────────────────── arquétipos (cores da roda do observatório) ─────────────────────────
+def sem_artigo(n):
+    return re.sub(r"^(O|A) ", "", n.strip())
+
+
+def extrair_arquetipos(frascos):
+    path = achar("observatorio_colecao_v")
+    txt = open(path, encoding="utf-8").read()
+    bloco = txt[txt.index("const ARCH = ["):]
+    bloco = bloco[:bloco.index("];")]
+    arqs = [{"nome": sem_artigo(n), "rotulo": n, "cor": c} for n, c in re.findall(r'\{n:"([^"]+)",\s*c:"(#[0-9A-Fa-f]{6})"', bloco)]
+    assert len(arqs) == 16, len(arqs)
+    nomes = {a["nome"] for a in arqs}
+    falta = {f["arquetipo"] for f in frascos} - nomes
+    assert not falta, falta
+    # gaps abertos: tabela da seção 6 do 00_LEIA_PRIMEIRO.md
+    leia = open(os.path.join(SPEC, "00_LEIA_PRIMEIRO.md"), encoding="utf-8").read()
+    sec = leia[leia.index("## 6. Gaps"):]
+    sec = sec[:sec.index("\n## ", 5)]
+    gaps = []
+    for n, nome, arq, status in re.findall(r"^\| (\d) \| ([^|]+?) \| ([^|]+?) \| ([^|]+?) \|$", sec, flags=re.M):
+        if "fechado" in status.lower() or arq.strip() in ("—", ""):
+            continue
+        gaps.append({"n": int(n), "gap": nome.strip(), "arquetipo": arq.strip(), "status": status.replace("*", "").strip()})
+    assert gaps and all(g["arquetipo"] in nomes for g in gaps), gaps
+    return {"fonte": os.path.basename(path), "arquetipos": arqs, "gaps": gaps}
+
+
+# ───────────────────────── mercado (avaliação v51) ─────────────────────────
+# Só campos descritivos. Ficam de fora, por regra do projeto: veredicto histórico (PASSAR/MONITORAR/…),
+# coluna Observação (histórico com "PASSAR por default") e a escala "Agrega".
+def extrair_mercado():
+    path = achar("avaliacao_perfumes_v")
+    txt = open(path, encoding="utf-8").read()
+    i = txt.index("const D = /*<<D>>*/") + len("const D = /*<<D>>*/")
+    D, _ = json.JSONDecoder().raw_decode(txt[i:])
+    assert len(D) > 1000 and len(D[0]) == 22, (len(D), len(D[0]))
+    vazio = lambda v: "" if v in (None, "—") else str(v).strip()
+    out = []
+    for r in D:
+        out.append({"casa": r[0], "nome": r[1], "tier": r[2] or "", "masc": r[4], "calor": r[5], "ameno": r[6], "frio": r[7],
+                    "resumo": vazio(r[11]), "topo": vazio(r[12]), "coracao": vazio(r[13]), "base": vazio(r[14]),
+                    "nariz": vazio(r[16]), "wish": r[17] == "✓", "arquetipo": sem_artigo(r[18]) if r[18] else "",
+                    "gap": vazio(r[19]), "posse": r[21] or ""})
+    return {"fonte": os.path.basename(path), "perfumes": out}
+
+
 def main():
     os.makedirs(DATA, exist_ok=True)
     frascos = extrair_frascos()
@@ -147,13 +194,20 @@ def main():
     playbook = extrair_playbook(frascos)
     versao = {"frascos": "frascos_v7.py", "fichas": fichas["fonte"], "playbook": playbook["fonte"],
               "modelo": os.path.basename(achar("modelo_diario_v"))}
+    arquetipos = extrair_arquetipos(frascos)
+    mercado = extrair_mercado()
+    versao["mercado"] = mercado["fonte"]
     for nome, obj in (("frascos.json", {"versao": versao, "frascos": frascos}), ("fichas.json", fichas),
-                      ("playbook.json", playbook)):
+                      ("playbook.json", playbook), ("arquetipos.json", arquetipos), ("mercado.json", mercado)):
         with open(os.path.join(DATA, nome), "w", encoding="utf-8") as fh:
-            json.dump(obj, fh, ensure_ascii=False, indent=1)
+            if nome == "mercado.json":
+                json.dump(obj, fh, ensure_ascii=False, separators=(",", ":"))   # 1.205 linhas: compacto
+            else:
+                json.dump(obj, fh, ensure_ascii=False, indent=1)
     g = [f for f in frascos if f["camada"] == "grade" and f["tier"] != "D"]
     print(f"OK — {len(frascos)} frascos · grade {len(g)} · janelas {playbook['total_alocacoes']} · "
-          f"células {playbook['celulas']} (42 nominais) · fichas {len(fichas['fichas'])} · {versao}")
+          f"células {playbook['celulas']} (42 nominais) · fichas {len(fichas['fichas'])} · arquétipos 16 · "
+          f"mercado {len(mercado['perfumes'])} · {versao}")
 
 
 if __name__ == "__main__":

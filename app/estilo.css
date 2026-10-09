@@ -226,3 +226,49 @@ details.fora > summary { font: 500 13.5px var(--f); color: var(--suave); }
 .card.compacto { padding: 10px 16px 10px 12px; align-items: center; }
 .janelas { margin: 8px 0 0; padding-left: 0; list-style: none; font-size: 13px; display: flex; flex-direction: column; gap: 4px; }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+
+/* ── controle segmentado (estilo iOS) ── */
+.segmentos { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; background: var(--afund); border-radius: 11px; padding: 3px; gap: 2px; }
+.segmentos button { all: unset; cursor: pointer; text-align: center; padding: 8px 6px; border-radius: 8px; font: 600 14px var(--f); color: var(--suave); }
+.segmentos button[aria-selected="true"] { background: var(--sup); color: var(--tinta); box-shadow: 0 1px 3px rgba(0, 0, 0, .12); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .segmentos button[aria-selected="true"] { background: #48484a; } }
+:root[data-theme="dark"] .segmentos button[aria-selected="true"] { background: #48484a; }
+.segmentos button:focus-visible { outline: 2px solid var(--acento); }
+
+/* ── roda dos arquétipos ── */
+.roda-bloco { padding: 10px 6px 12px; }
+.roda { width: 100%; max-width: 560px; height: auto; align-self: center; display: block; overflow: visible; }
+.roda .r-rot { font: 700 27px var(--f); letter-spacing: .02em; }
+.roda .r-cnt { font: 700 22px var(--f-num); }
+.roda .r-orb { fill: none; stroke: var(--leve); stroke-opacity: .35; stroke-width: 1.5; stroke-dasharray: 4 9; }
+.roda .r-orb-S { stroke: var(--tS); stroke-opacity: .7; }
+.roda .r-tl circle { fill: var(--sup); }
+.roda .r-tl text { font: 800 19px var(--f); fill: var(--suave); }
+.roda .r-centro { font: 800 64px var(--f-num); fill: var(--tinta); }
+.roda .r-centro2 { font: 600 20px var(--f); fill: var(--suave); }
+.roda .r-fr { cursor: pointer; outline: none; }
+.roda .r-hit { fill: transparent; }
+.roda .r-ponto { stroke: var(--sup); stroke-width: 3; transition: opacity .2s; }
+.roda .r-fr:focus-visible .r-ponto { stroke: var(--acento); stroke-width: 5; }
+.roda .r-fora .r-ponto { opacity: .14; }
+.roda .r-tambem .r-ponto { opacity: .9; }
+.roda .r-anel { fill: none; stroke: var(--tinta); stroke-width: 4; }
+.roda .r-jogada .r-anel { stroke-dasharray: 6 5; }
+.roda .r-nome { font: 700 21px var(--f); fill: var(--tinta); paint-order: stroke; stroke: var(--sup); stroke-width: 7px; stroke-linejoin: round; }
+.roda .r-gap circle { fill: none; stroke: var(--acento); stroke-width: 3.5; stroke-dasharray: 6 5; }
+.roda .r-gap text { font: 800 20px var(--f); fill: var(--acento); }
+.roda-legenda { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px 14px; font-size: 12px; color: var(--suave); }
+.gaps { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; font-size: 13.5px; }
+.gap-n { display: inline-grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; border: 2px dashed var(--acento); color: var(--acento); font: 800 12px var(--f); margin-right: 8px; }
+.chip[disabled] { opacity: .35; pointer-events: none; }
+
+/* ── mercado ── */
+.mxc { display: flex; flex-direction: column; gap: 7px; }
+.mxc-l { all: unset; cursor: pointer; display: grid; grid-template-columns: minmax(0, 8.5em) minmax(0, 1fr) 4.2em; gap: 10px; align-items: center; font-size: 13px; }
+.mxc-l .t { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.mxc-l .trilho { position: relative; height: 10px; background: var(--afund); border-radius: 99px; overflow: hidden; }
+.mxc-l .trilho span { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 99px; }
+.mxc-l .n { text-align: right; font: 600 12.5px var(--f-num); color: var(--suave); font-variant-numeric: tabular-nums; }
+.mxc-l:focus-visible { outline: 2px solid var(--acento); border-radius: 6px; }
+.tier.sem { background: var(--afund); color: var(--leve); }
+.roda .r-rot.longo { font-size: 20px; letter-spacing: 0; }

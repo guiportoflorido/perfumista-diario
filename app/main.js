@@ -8,13 +8,16 @@ import { fila, adicionar, descartar, enviar, planilhaCache, baixarPlanilha } fro
 import { lerTiers, lerDiario, aplicarTiers, diarioUnificado, nomesRegistraveis } from "./planilha.js";
 import { janelasPorFrasco, ajustarSprays } from "./estatisticas.js";
 import { telaColecao, telaPlaybook, telaHistorico } from "./telas.js";
+import { telaRoda, telaMercado, fichaMercado, mercadoComPlanilha } from "./roda.js";
+import { contagens } from "./estatisticas.js";
 import { ler, gravar } from "./store.js";
 
-export const APP_VERSAO = "4.6";  // sobe a cada publicação: confere no topo da tela se o celular pegou a versão nova
+export const APP_VERSAO = "4.7";  // sobe a cada publicação: confere no topo da tela se o celular pegou a versão nova
 const S = { aba: "hoje", frascos: [], frascosAtivos: [], avisosTiers: null, fichas: {}, versao: {}, prev: null, prevOffline: false,
   prevErro: null, metar: null, metarMotivo: null, clima: null, resultado: null, erroMotor: null, entrada: "", carregandoClima: true,
   sync: { estado: "ocioso", msg: "" }, tokenNovo: null, playbook: null, janelas: new Map(),
-  filtro: ler("filtro", {}), pbFaixa: null };
+  filtro: ler("filtro", {}), pbFaixa: null, arquetipos: [], gaps: [], colModo: ler("colModo", "roda"), sim: null, verGaps: false,
+  mercadoBase: null, mercadoErro: null, mf: ler("mf", {}), mfLimite: 60 };
 const ajSpray = () => ler("sprays_ajuste", { ativo: false, geral: 0, por: {} });
 const $ = (s, el = document) => el.querySelector(s);
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
@@ -34,8 +37,9 @@ const slotNome = s => (s === "M" ? "Dia" : s === "N" ? "Noite" : "?");
 
 // ───────────────────────── dados ─────────────────────────
 async function carregarDados() {
-  const [fr, fi, pb] = await Promise.all(["frascos", "fichas", "playbook"].map(n => fetch(`data/${n}.json`).then(r => r.json())));
+  const [fr, fi, pb, aq] = await Promise.all(["frascos", "fichas", "playbook", "arquetipos"].map(n => fetch(`data/${n}.json`).then(r => r.json())));
   S.frascos = fr.frascos; S.versao = fr.versao; S.fichas = fi.fichas; S.playbook = pb; S.janelas = janelasPorFrasco(pb);
+  S.arquetipos = aq.arquetipos; S.gaps = aq.gaps;
   $("#versao").textContent = `${fr.versao.playbook.replace("playbook_", "").replace(".md", "")} · app ${APP_VERSAO}`;
   aplicarPlanilha();
 }
@@ -96,7 +100,7 @@ function render() {
   const ctx = { frascos: S.frascosAtivos, hist: historico(), hoje: hojeISO(), janelas: S.janelas, filtro: S.filtro, playbook: S.playbook,
     faixaSel: S.pbFaixa ?? S.clima?.faixaDia?.idx ?? 2, fila: fila(), ajSpray: ajSpray() };
   $("#tela").innerHTML = ({ hoje: telaHoje, registrar: telaRegistrar, ajustes: telaAjustes,
-    colecao: () => telaColecao(ctx), playbook: () => telaPlaybook(ctx), historico: () => telaHistorico(ctx) }[S.aba])();
+    colecao: () => telaColecaoTudo(ctx), playbook: () => telaPlaybook(ctx), historico: () => telaHistorico(ctx) }[S.aba])();
   if (foco && document.getElementById(foco) && S.aba !== "hoje") {
     const el = document.getElementById(foco); el.focus();
     if (el.type === "search") { const n = el.value.length; try { el.setSelectionRange(n, n); } catch { /* sem seleção */ } }
@@ -239,6 +243,32 @@ function blocoAvancado(dia) {
   </details>`;
 }
 
+// ───────────────────────── coleção: roda · lista · mercado ─────────────────────────
+function telaColecaoTudo(ctx) {
+  const modos = [["roda", "Roda"], ["lista", "Lista"], ["mercado", "Mercado"]];
+  let corpo;
+  if (S.colModo === "lista") corpo = telaColecao(ctx);
+  else if (S.colModo === "mercado") {
+    if (!S.mercadoBase && !S.mercadoErro) carregarMercado();
+    corpo = S.mercadoErro ? `<div class="bloco"><p class="erro-txt">Não consegui carregar a base: ${esc(S.mercadoErro)}</p></div>`
+      : telaMercado({ mercado: S.mercadoBase && mercadoComPlanilha(S.mercadoBase, planilha().tiers), arquetipos: S.arquetipos, filtro: S.mf, limite: S.mfLimite });
+  } else {
+    const usosPor = new Map([...contagens(ctx.hist, ctx.frascos, ctx.hoje).por.values()].map(c => [c.f.nome, c.n30]));
+    const dia = S.resultado?.slots[0];
+    corpo = telaRoda({ frascos: ctx.frascos, arquetipos: S.arquetipos, gaps: S.gaps, playbook: S.playbook, sim: S.sim, verGaps: S.verGaps, usosPor,
+      hojeFaixa: S.clima?.faixaDia?.idx ?? null, hojeOc: dia ? ocasiaoDominante(dia) : null });
+  }
+  return `<h2>Coleção</h2>
+  <div class="segmentos" role="tablist">${modos.map(([v, r]) => `<button role="tab" data-colmodo="${v}" aria-selected="${S.colModo === v}">${r}</button>`).join("")}</div>
+  ${corpo}`;
+}
+
+async function carregarMercado() {
+  try { const j = await fetch("data/mercado.json").then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); }); S.mercadoBase = j.perfumes; }
+  catch (e) { S.mercadoErro = e.message; }
+  if (S.aba === "colecao") render();
+}
+
 // ───────────────────────── registrar ─────────────────────────
 function formRegistro(p = {}) {
   const hoje = hojeISO(), hr = new Date().getHours();
@@ -312,6 +342,9 @@ function telaAjustes() {
   const a = ajustes();
   const c = (k, rot, extra = "") => `<label>${rot}<input id="aj-${k}" type="text" value="${esc(a[k])}" ${extra} autocomplete="off"></label>`;
   return `<h2>Ajustes</h2>
+  <div class="bloco"><h3>Aparência</h3>
+    <div class="segmentos">${[["escuro", "Escuro"], ["claro", "Claro"], ["auto", "Igual ao iPhone"]].map(([v, r]) => `<button data-tema="${v}" aria-selected="${ler("tema", "escuro") === v}">${r}</button>`).join("")}</div>
+  </div>
   <form class="bloco" id="formAjustes">
     <h3>Local do clima</h3>
     <div class="campos">${c("local", "Nome")}${c("lat", "Latitude", 'inputmode="decimal"')}${c("lon", "Longitude", 'inputmode="decimal"')}</div>
@@ -377,17 +410,32 @@ function janelasHTML(nome) {
   const porFaixa = new Map(); for (const j of js) { if (!porFaixa.has(j.faixaIdx)) porFaixa.set(j.faixaIdx, []); porFaixa.get(j.faixaIdx).push(j); }
   return `<ul class="janelas">${[...porFaixa.entries()].sort((a, b) => a[0] - b[0]).map(([i, l]) => `<li>${faixaHTML(i)}: ${l.map(j => `${ROT_OC[j.ocasiao]}${j.papel !== "Também" ? ` <b>(${j.papel})</b>` : ""}`).join(", ")}</li>`).join("")}</ul>`;
 }
+function abrirMercado(id) {
+  const [casa, nome] = id.split("||");
+  const p = mercadoComPlanilha(S.mercadoBase || [], planilha().tiers).find(x => x.casa === casa && x.nome === nome);
+  if (!p) return;
+  $("#folha").innerHTML = `<div class="veu" data-fechar><div class="folha" role="dialog" aria-modal="true" aria-labelledby="fichaT">${fichaMercado(p)}</div></div>`;
+  $("#folha .folha button[data-fechar]").focus();
+}
+
 function fecharFolha() { $("#folha").innerHTML = ""; }
 
 // ───────────────────────── eventos ─────────────────────────
 function mudarDia(fn) { const d = estadoDia(); fn(d); salvarDia(d); recalcular(); }
 
 document.addEventListener("click", async e => {
-  const b = e.target.closest("button, [data-fechar]");
+  const b = e.target.closest("button, [data-fechar], [data-ficha]");
   if (!b) return;
   if (b.closest("#abas")) { S.aba = b.dataset.aba; render(); window.scrollTo(0, 0); return; }
   if (b.hasAttribute("data-fechar") && (e.target === b || b.tagName === "BUTTON")) { fecharFolha(); return; }
   if (b.dataset.ficha) { abrirFicha(b.dataset.ficha); return; }
+  if (b.dataset.colmodo) { S.colModo = b.dataset.colmodo; gravar("colModo", S.colModo); render(); return; }
+  if (b.dataset.simFaixa) { const i = Number(b.dataset.simFaixa); S.sim = { faixa: i, oc: S.sim?.oc && S.playbook.grade[S.playbook.faixas[i]].celulas[S.sim.oc] ? S.sim.oc : null }; render(); return; }
+  if (b.dataset.simOc) { S.sim = { faixa: S.sim?.faixa ?? (S.clima?.faixaDia?.idx ?? 2), oc: b.dataset.simOc }; render(); return; }
+  if (b.dataset.merc) { abrirMercado(b.dataset.merc); return; }
+  if (b.dataset.mf) { S.mf = { ...S.mf, [b.dataset.mf]: b.dataset.v }; S.mfLimite = 60; gravar("mf", S.mf); render(); return; }
+  if (b.dataset.mfArq) { S.mf = { ...S.mf, arq: S.mf.arq === b.dataset.mfArq ? "" : b.dataset.mfArq }; S.mfLimite = 60; gravar("mf", S.mf); render(); $("#mf-q")?.scrollIntoView({ block: "center" }); return; }
+  if (b.dataset.tema) { gravar("tema", b.dataset.tema); aplicarTema(); render(); return; }
   if (b.dataset.filtro) { S.filtro = { ...S.filtro, [b.dataset.filtro]: b.dataset.v }; gravar("filtro", S.filtro); render(); return; }
   if (b.dataset.pbfaixa) { S.pbFaixa = Number(b.dataset.pbfaixa); render(); return; }
   if (b.dataset.chip) { const k = b.dataset.chip, v = b.dataset.v; mudarDia(d => { d[k] = v; }); return; }
@@ -412,6 +460,10 @@ document.addEventListener("click", async e => {
   else if (acao === "soltar-texto") mudarDia(d => { d.textoManual = null; });
   else if (acao === "restaurar") { salvarAjustes({}); toast("Ajustes restaurados."); render(); atualizarClima(); }
   else if (acao === "sync") sincronizar();
+  else if (acao === "sim-hoje") { const dia = S.resultado?.slots[0]; S.sim = { faixa: S.clima?.faixaDia?.idx ?? 2, oc: dia ? ocasiaoDominante(dia) : null }; render(); }
+  else if (acao === "sim-limpar") { S.sim = null; render(); }
+  else if (acao === "ver-gaps") { S.verGaps = !S.verGaps; render(); }
+  else if (acao === "mf-mais") { S.mfLimite += 120; render(); }
   else if (acao === "ler-planilha") {
     const m = $("#lerMsg"); m.textContent = "Lendo a planilha…";
     try {
@@ -442,6 +494,7 @@ document.addEventListener("click", async e => {
 document.addEventListener("change", e => {
   const el = e.target;
   if (el.dataset.ov) { const k = el.dataset.ov, v = el.value.trim().replace(",", "."); mudarDia(d => { if (v === "") delete d.override[k]; else d.override[k] = v.toLowerCase() === "nd" ? "nd" : v; }); return; }
+  if (el.id === "mf-posse" || el.id === "mf-arq") { S.mf = { ...S.mf, [el.id === "mf-posse" ? "posse" : "arq"]: el.value }; S.mfLimite = 60; gravar("mf", S.mf); render(); return; }
   if (el.id === "col-arq" || el.id === "col-faixa" || el.id === "col-oc") {
     S.filtro = { ...S.filtro, [{ "col-arq": "arq", "col-faixa": "faixa", "col-oc": "oc" }[el.id]]: el.value }; gravar("filtro", S.filtro); render(); return;
   }
@@ -451,6 +504,7 @@ document.addEventListener("change", e => {
 
 document.addEventListener("input", e => {
   if (e.target.id === "col-q") { S.filtro = { ...S.filtro, q: e.target.value }; gravar("filtro", S.filtro); render(); }
+  if (e.target.id === "mf-q") { S.mf = { ...S.mf, q: e.target.value }; S.mfLimite = 60; gravar("mf", S.mf); render(); }
 });
 
 document.addEventListener("submit", e => {
@@ -471,8 +525,21 @@ document.addEventListener("submit", e => {
   toast("Ajustes salvos."); render(); sincronizar({ silencioso: true }); atualizarClima();
 });
 
-document.addEventListener("keydown", e => { if (e.key === "Escape") fecharFolha(); });
+document.addEventListener("keydown", e => {
+  if (e.key === "Escape") fecharFolha();
+  if ((e.key === "Enter" || e.key === " ") && e.target.matches?.("g[data-ficha]")) { e.preventDefault(); abrirFicha(e.target.dataset.ficha); }
+});
 window.addEventListener("online", () => sincronizar({ silencioso: true }));
+
+// ───────────────────────── tema ─────────────────────────
+function aplicarTema() {
+  const t = ler("tema", "escuro");
+  if (t === "auto") delete document.documentElement.dataset.theme;
+  else document.documentElement.dataset.theme = t === "claro" ? "light" : "dark";
+  const escuro = t === "escuro" || (t === "auto" && matchMedia("(prefers-color-scheme: dark)").matches);
+  document.querySelectorAll('meta[name="theme-color"]').forEach(m => m.setAttribute("content", escuro ? "#000000" : "#f2f2f7"));
+}
+aplicarTema();
 
 // ───────────────────────── início ─────────────────────────
 if ("serviceWorker" in navigator) {

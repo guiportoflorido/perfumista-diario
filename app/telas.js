@@ -31,8 +31,7 @@ export function telaColecao({ frascos, hist, hoje, janelas, filtro }) {
     const j = (janelas.get(f.nome) || []).find(x => x.faixaIdx === Number(filtro.faixa) && x.ocasiao === filtro.oc);
     return j ? ` · <b>${j.papel}</b>` : "";
   };
-  return `<h2>Coleção</h2>
-  <p class="nota">Grade: ${grade.length} frascos · ${TIERS.map(t => `${t} ${grade.filter(f => f.tier === t).length}`).join(" · ")}. Camada custo fica fora.</p>
+  return `<p class="nota">Grade: ${grade.length} frascos · ${TIERS.map(t => `${t} ${grade.filter(f => f.tier === t).length}`).join(" · ")}. Camada custo fica fora.</p>
   <div class="bloco">
     <input type="search" id="col-q" placeholder="Buscar frasco, casa ou arquétipo" value="${esc(filtro.q || "")}" aria-label="Buscar">
     <div class="chips rolagem">${chip("tier", "", "Todos", !filtro.tier)}${TIERS.map(t => chip("tier", t, `Tier ${t}`, filtro.tier === t)).join("")}</div>
