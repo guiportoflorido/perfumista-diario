@@ -1,0 +1,323 @@
+{
+ "data": "2026-04-02",
+ "avisos": [
+  "Noite: nao → dia de um perfume só (janela inteira no slot Dia)",
+  "Dia: sem agenda informada → assumido dia útil: trabalho informal em AC até 18h, rua até o banho, Cozy Noite em casa depois"
+ ],
+ "segs": [
+  {
+   "ini": 7.25,
+   "fim": 18,
+   "ocas": "T.Inf",
+   "amb": "ac",
+   "fechado": false
+  },
+  {
+   "ini": 18.0,
+   "fim": 22.0,
+   "ocas": "Cozy N",
+   "amb": "casa",
+   "fechado": false
+  }
+ ],
+ "faixas_rua": [
+  2
+ ],
+ "n_passos": 30,
+ "T_passos": [
+  23.0,
+  23.0,
+  23.0,
+  23.0,
+  23.0,
+  23.0,
+  23.0,
+  23.0,
+  23.0,
+  23.0,
+  23.0,
+  23.0,
+  23.0,
+  23.0,
+  23.0,
+  23.0,
+  23.0,
+  23.0,
+  23.0,
+  23.0,
+  23.0,
+  23.0,
+  24.394134841,
+  24.139194858,
+  23.85503392,
+  23.544388652,
+  23.210250737,
+  22.855838108,
+  22.48456395,
+  22.100003837
+ ],
+ "slots": [
+  {
+   "nome": "Dia",
+   "ini": 7.25,
+   "fim": 22.0,
+   "onde": "pescoço/peito e pulsos · dia majoritariamente em AC: você percebe menos o próprio perfume (mucosa seca) — não compensar com spray",
+   "top": [
+    {
+     "nome": "Gentle Fluidity Silver",
+     "tier": "S",
+     "score": 96.91830076050513,
+     "sprays": 4,
+     "nota": "",
+     "vivo_ate": 16.25,
+     "vivo_fim": false,
+     "porque": "térmico 1.00 · T.Inf 3"
+    },
+    {
+     "nome": "Decision",
+     "tier": "S",
+     "score": 94.49532403516827,
+     "sprays": 3,
+     "nota": "",
+     "vivo_ate": 16.25,
+     "vivo_fim": false,
+     "porque": "térmico 0.91 · Td ↑ · chuva ↓ · T.Inf 3"
+    },
+    {
+     "nome": "Bois Impérial",
+     "tier": "S",
+     "score": 93.53250777471631,
+     "sprays": 3,
+     "nota": "",
+     "vivo_ate": 16.25,
+     "vivo_fim": false,
+     "porque": "térmico 0.99 · Td ↓ · T.Inf 3"
+    },
+    {
+     "nome": "Imagination",
+     "tier": "S",
+     "score": 91.66073176626159,
+     "sprays": 3,
+     "nota": "",
+     "vivo_ate": 16.25,
+     "vivo_fim": false,
+     "porque": "térmico 0.96 · Td ↓ · T.Inf 3"
+    },
+    {
+     "nome": "Désobéissant",
+     "tier": "S",
+     "score": 88.24982200895293,
+     "sprays": 6,
+     "nota": "6–7 fixo",
+     "vivo_ate": 14.25,
+     "vivo_fim": false,
+     "porque": "térmico 0.90 · Td ↓ · T.Inf 3"
+    },
+    {
+     "nome": "Reflection Man",
+     "tier": "S",
+     "score": 87.27401490011074,
+     "sprays": 4,
+     "nota": "",
+     "vivo_ate": 13.5,
+     "vivo_fim": false,
+     "porque": "térmico 0.90 · Td ↓ · T.Inf 3"
+    },
+    {
+     "nome": "Météore",
+     "tier": "S",
+     "score": 85.78795134742757,
+     "sprays": 3,
+     "nota": "",
+     "vivo_ate": 13.5,
+     "vivo_fim": false,
+     "porque": "térmico 0.86 · Td ↓ · T.Inf 3"
+    },
+    {
+     "nome": "1872 for Men",
+     "tier": "S",
+     "score": 85.12195669620812,
+     "sprays": 4,
+     "nota": "",
+     "vivo_ate": 12.5,
+     "vivo_fim": false,
+     "porque": "térmico 0.86 · Td ↓ · T.Inf 3"
+    },
+    {
+     "nome": "Aventus",
+     "tier": "A",
+     "score": 83.5603603371791,
+     "sprays": 3,
+     "nota": "",
+     "vivo_ate": 16.25,
+     "vivo_fim": false,
+     "porque": "térmico 0.96 · T.Inf 3"
+    },
+    {
+     "nome": "Search",
+     "tier": "A",
+     "score": 83.16387571153095,
+     "sprays": 4,
+     "nota": "",
+     "vivo_ate": 15.75,
+     "vivo_fim": false,
+     "porque": "térmico 0.96 · T.Inf 3"
+    }
+   ],
+   "scores": {
+    "1872 for Men": 85.12195669620812,
+    "7 Loewe": 65.39216354705529,
+    "African Leather": 81.60668122977658,
+    "Al Qurashi Blend": null,
+    "Amyris Homme Extrait": 67.06626578028097,
+    "Anelo": 64.08944287433415,
+    "Ani X": 59.59123706592315,
+    "Apotecário": 49.120100472064635,
+    "Aventus": 83.5603603371791,
+    "Aventus Absolu": 67.11077244651253,
+    "Beach Hut Man": 78.17224264840637,
+    "Bedouin Rose": null,
+    "Bijou Zafran": 68.68161579991785,
+    "Black Saffron Absolu": 60.02553061712843,
+    "Bleu de Chanel": 42.88297567371378,
+    "Blonde Amber": null,
+    "Blue Talisman": 75.36755718573625,
+    "Bois du Portugal": null,
+    "Bois Impérial": 93.53250777471631,
+    "Brompton": null,
+    "Caden": null,
+    "Carved Oud": 65.45136847805078,
+    "Castley": 63.87448519843292,
+    "Crab Apple Blossom": 70.61927774006129,
+    "Decision": 94.49532403516827,
+    "Drunk Lovers": null,
+    "Désobéissant": 88.24982200895293,
+    "Favonius": null,
+    "Gentle Fluidity Silver": 96.91830076050513,
+    "Grand Soir": null,
+    "Green Irish Tweed": 63.33548519843292,
+    "Gris Charnel": 76.1441161269334,
+    "Hacivat": 80.41616070981877,
+    "Himalaya": 59.95146594319929,
+    "Imagination": 91.66073176626159,
+    "Imperial": null,
+    "Intoxicated": null,
+    "K-Musk": 59.95146594319929,
+    "L'Immensité": 79.03055725475313,
+    "Les Sables Roses": null,
+    "Liwa": null,
+    "Lucius": 80.29516070981877,
+    "Monarch": 37.800722330372885,
+    "Montabaco Intensivo": 82.9739740033225,
+    "Météore": 85.78795134742757,
+    "New York": null,
+    "Odéon": null,
+    "Ombre Nomade": null,
+    "Omnia Omnibus Ubique": null,
+    "Oud Kyphi": null,
+    "Oud Satin Mood": null,
+    "Oudós Lux Solis": null,
+    "Outlands": null,
+    "Purpose 50": 60.921563740722526,
+    "Radical Rose": null,
+    "Reflection Man": 87.27401490011074,
+    "Royal Oud": 58.72835975293103,
+    "Santal 33": 80.41184876807918,
+    "Scarlet Sands": null,
+    "Search": 83.16387571153095,
+    "Serenity": null,
+    "Terre d'Hermès": 67.5803969331162,
+    "Torino 21": 74.09106315735872,
+    "Town & Country": 62.10062947932266,
+    "Tygar Extrait": null,
+    "Ultima Storia": 72.73463057521518,
+    "Vibrato": 76.68389476883392,
+    "Wild Vetiver": 77.20769311209745,
+    "Wood Whisper": 82.79480917577449,
+    "Ya'e": 67.8659105323536,
+    "Supremacy CE": null,
+    "Musamam Black": null,
+    "Aquatica": null,
+    "Incense 01": null,
+    "Island Dreams": 50.510538650038534,
+    "Sky": 63.175109479322664,
+    "Belgravia": 67.4002651144735,
+    "Inception": 91.38461062401797,
+    "Dubai Musk": 80.51324669700956
+   },
+   "fora": {
+    "Al Qurashi Blend": "9h vivas fora de casa sem aptidão (T.Inf)",
+    "Bedouin Rose": "tier D (fora da grade)",
+    "Blonde Amber": "11h vivas fora de casa sem aptidão (T.Inf)",
+    "Bois du Portugal": "8h vivas fora de casa sem aptidão (T.Inf)",
+    "Brompton": "11h vivas fora de casa sem aptidão (T.Inf)",
+    "Caden": "2.5h na rua acima do envelope (Fresco é o teto)",
+    "Drunk Lovers": "9.5h vivas fora de casa sem aptidão (T.Inf)",
+    "Favonius": "11h vivas fora de casa sem aptidão (T.Inf)",
+    "Grand Soir": "2.5h na rua acima do envelope (Fresco é o teto)",
+    "Imperial": "11h vivas fora de casa sem aptidão (T.Inf)",
+    "Intoxicated": "11h vivas fora de casa sem aptidão (T.Inf)",
+    "Les Sables Roses": "10.5h vivas fora de casa sem aptidão (T.Inf)",
+    "Liwa": "11h vivas fora de casa sem aptidão (T.Inf)",
+    "New York": "9.5h vivas fora de casa sem aptidão (T.Inf)",
+    "Odéon": "9.5h vivas fora de casa sem aptidão (T.Inf)",
+    "Ombre Nomade": "2.5h na rua acima do envelope (Fresco é o teto)",
+    "Omnia Omnibus Ubique": "9.5h vivas fora de casa sem aptidão (T.Inf)",
+    "Oud Kyphi": "11h vivas fora de casa sem aptidão (T.Inf)",
+    "Oud Satin Mood": "2.5h na rua acima do envelope (Fresco é o teto)",
+    "Oudós Lux Solis": "10.5h vivas fora de casa sem aptidão (T.Inf)",
+    "Outlands": "2.5h na rua acima do envelope (Fresco é o teto)",
+    "Radical Rose": "11h vivas fora de casa sem aptidão (T.Inf)",
+    "Scarlet Sands": "9.5h vivas fora de casa sem aptidão (T.Inf)",
+    "Serenity": "11h vivas fora de casa sem aptidão (T.Inf)",
+    "Tygar Extrait": "11h vivas fora de casa sem aptidão (T.Inf)",
+    "Supremacy CE": "9h vivas fora de casa sem aptidão (T.Inf)",
+    "Musamam Black": "11h vivas fora de casa sem aptidão (T.Inf)",
+    "Aquatica": "5.5h abaixo do envelope (Quente é o piso)",
+    "Incense 01": "11h vivas fora de casa sem aptidão (T.Inf)"
+   },
+   "fora_sa": [
+    {
+     "nome": "Blonde Amber",
+     "tier": "S",
+     "motivo": "11h vivas fora de casa sem aptidão (T.Inf)"
+    },
+    {
+     "nome": "Brompton",
+     "tier": "S",
+     "motivo": "11h vivas fora de casa sem aptidão (T.Inf)"
+    },
+    {
+     "nome": "Favonius",
+     "tier": "S",
+     "motivo": "11h vivas fora de casa sem aptidão (T.Inf)"
+    },
+    {
+     "nome": "Grand Soir",
+     "tier": "S",
+     "motivo": "2.5h na rua acima do envelope (Fresco é o teto)"
+    },
+    {
+     "nome": "Les Sables Roses",
+     "tier": "S",
+     "motivo": "10.5h vivas fora de casa sem aptidão (T.Inf)"
+    },
+    {
+     "nome": "Liwa",
+     "tier": "S",
+     "motivo": "11h vivas fora de casa sem aptidão (T.Inf)"
+    },
+    {
+     "nome": "Odéon",
+     "tier": "S",
+     "motivo": "9.5h vivas fora de casa sem aptidão (T.Inf)"
+    },
+    {
+     "nome": "Ombre Nomade",
+     "tier": "S",
+     "motivo": "2.5h na rua acima do envelope (Fresco é o teto)"
+    }
+   ]
+  }
+ ]
+}

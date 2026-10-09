@@ -1,0 +1,4 @@
+Data: 2026-08-08
+T: 15-24 pico 15 noite 18
+Td: 13
+Extra: escuro

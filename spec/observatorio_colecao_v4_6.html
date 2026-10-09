@@ -1,0 +1,1636 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Observatório da Coleção v4.6 — tiers S/A/B/C/D · 69 na grade · 16 arquétipos · playbook v59</title>
+<style>
+:root{
+  --ink:#14110E; --panel:#1C1814; --panel2:#221D18; --line:#342C23;
+  --bone:#E9E1D2; --smoke:#93887A; --dim:#5E554A;
+  --amber:#C9973F; --amber-glow:rgba(201,151,63,.35);
+  --danger:#B05E4A; --ok:#7C9A6D;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{background:var(--ink);color:var(--bone);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  font-size:15px;line-height:1.45}
+.serif{font-family:"Didot","Bodoni MT","Playfair Display",Georgia,serif}
+.mono{font-family:"SF Mono","Cascadia Code",Menlo,Consolas,monospace}
+
+header{padding:26px 34px 18px;border-bottom:1px solid var(--line);
+  display:flex;align-items:baseline;gap:18px;flex-wrap:wrap}
+header h1{font-family:"Didot","Bodoni MT","Playfair Display",Georgia,serif;
+  font-weight:400;font-size:30px;letter-spacing:.5px}
+header h1 em{color:var(--amber);font-style:italic}
+header .sub{color:var(--smoke);font-size:13px;letter-spacing:.4px}
+header .right{margin-left:auto;display:flex;gap:8px;align-items:center}
+
+.btn{background:none;border:1px solid var(--line);color:var(--smoke);
+  padding:7px 14px;border-radius:20px;font-size:12.5px;cursor:pointer;
+  letter-spacing:.3px;transition:all .2s}
+.btn:hover{border-color:var(--amber);color:var(--bone)}
+.btn.on{background:var(--amber);border-color:var(--amber);color:var(--ink);font-weight:600}
+.btn:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
+
+main{display:grid;grid-template-columns:minmax(0,1.5fr) 420px;gap:0;
+  min-height:calc(100vh - 90px)}
+#wheelWrap{position:relative;padding:10px;display:flex;align-items:center;justify-content:center}
+#wheel{width:100%;max-width:860px;height:auto;display:block}
+
+aside{border-left:1px solid var(--line);padding:22px 26px;display:flex;
+  flex-direction:column;gap:20px;background:var(--panel)}
+.block h3{font-size:11px;text-transform:uppercase;letter-spacing:2px;
+  color:var(--dim);margin-bottom:12px;font-weight:600}
+
+.sliderRow{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.sliderRow label{width:86px;font-size:13px;color:var(--smoke)}
+.sliderRow input[type=range]{flex:1;accent-color:var(--amber);height:4px}
+.sliderRow .val{width:58px;text-align:right;font-family:"SF Mono",Menlo,monospace;
+  font-size:14px;color:var(--bone)}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:2px}
+.chip{font-size:11.5px;padding:4px 10px;border-radius:12px;border:1px solid var(--line);
+  color:var(--smoke);letter-spacing:.3px}
+.chip b{color:var(--bone);font-weight:600}
+
+/* ocasiões */
+#occChips{display:flex;gap:6px;flex-wrap:wrap}
+.occ{background:none;border:1px solid var(--line);color:var(--smoke);
+  padding:5px 11px;border-radius:14px;font-size:12px;cursor:pointer;
+  letter-spacing:.2px;transition:all .15s}
+.occ:hover{border-color:var(--amber);color:var(--bone)}
+.occ.on{background:var(--amber);border-color:var(--amber);color:var(--ink);font-weight:600}
+.occNote{margin-top:10px;font-size:12px;color:var(--danger);font-style:italic;display:none}
+
+#ranking{display:flex;flex-direction:column;gap:2px}
+.rk{display:flex;align-items:center;gap:10px;padding:7px 10px;border-radius:8px;
+  cursor:pointer;transition:background .15s}
+.rk:hover{background:var(--panel2)}
+.rk.sel{background:var(--panel2);box-shadow:inset 2px 0 0 var(--amber)}
+.rk .pos{width:18px;font-family:"SF Mono",Menlo,monospace;font-size:12px;color:var(--dim)}
+.rk .dot{width:10px;height:10px;border-radius:50%;flex:none;box-shadow:0 0 6px currentColor}
+.rk .nm{flex:1;font-size:13.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.rk .nm small{color:var(--smoke);font-size:11.5px;display:block;white-space:normal}
+.rk .fit{font-family:"SF Mono",Menlo,monospace;font-size:13px;color:var(--amber)}
+.rk .spr{font-size:11px;color:var(--dim);width:46px;text-align:right}
+.rk.curio{opacity:.65}
+.rk.arch-item .nm{text-decoration:line-through;color:var(--dim)}
+.tag{font-size:9.5px;text-transform:uppercase;letter-spacing:1.2px;padding:2px 7px;
+  border-radius:9px;font-weight:700;flex:none}
+.tag.seg{background:var(--ok);color:var(--ink)}
+.tag.jog{background:var(--amber);color:var(--ink)}
+.tag.cur{border:1px solid var(--dim);color:var(--dim)}
+.why{font-size:11.5px;color:var(--smoke);font-style:italic;padding:2px 10px 8px 38px;line-height:1.4}
+
+#detail{border:1px solid var(--line);border-radius:12px;padding:16px 18px;
+  background:var(--panel2);min-height:150px}
+#detail .empty{color:var(--dim);font-size:13px;font-style:italic;padding-top:40px;text-align:center}
+#detail h4{font-family:"Didot","Bodoni MT",Georgia,serif;font-weight:400;font-size:21px;margin-bottom:2px}
+#detail .house{color:var(--smoke);font-size:12.5px;margin-bottom:12px;letter-spacing:.5px}
+.bars{display:flex;flex-direction:column;gap:7px;margin:10px 0 14px}
+.bar{display:flex;align-items:center;gap:10px;font-size:12px;color:var(--smoke)}
+.bar span:first-child{width:52px}
+.bar .track{flex:1;height:5px;background:var(--ink);border-radius:3px;overflow:hidden}
+.bar .fill{height:100%;border-radius:3px;transition:width .3s}
+.bar .n{width:26px;text-align:right;font-family:"SF Mono",Menlo,monospace;color:var(--bone)}
+#detail .meta{display:flex;gap:14px;font-size:12.5px;color:var(--smoke);margin-bottom:12px;flex-wrap:wrap}
+#detail .meta b{color:var(--bone);font-family:"SF Mono",Menlo,monospace}
+#detail .arch{color:var(--amber);font-style:italic}
+.archive{font-size:12px;color:var(--danger);background:none;border:1px solid var(--line);
+  padding:5px 12px;border-radius:14px;cursor:pointer}
+.archive:hover{border-color:var(--danger)}
+.archive.arch-on{background:var(--danger);color:var(--ink);border-color:var(--danger)}
+
+#gapLegend{display:none;font-size:12.5px;color:var(--smoke);line-height:1.7}
+#gapLegend .g{display:flex;gap:8px;align-items:baseline}
+#gapLegend .k{color:var(--amber);font-family:"SF Mono",Menlo,monospace;flex:none}
+#gapLegend .closed{color:var(--dim);text-decoration:line-through}
+
+.tooltip{position:absolute;pointer-events:none;background:var(--panel2);
+  border:1px solid var(--line);border-radius:8px;padding:8px 12px;font-size:12.5px;
+  opacity:0;transition:opacity .12s;z-index:10;box-shadow:0 4px 20px rgba(0,0,0,.5)}
+.tooltip b{display:block;font-size:13.5px}
+.tooltip .tt-fit{color:var(--amber);font-family:"SF Mono",Menlo,monospace}
+
+footer{padding:14px 34px;border-top:1px solid var(--line);color:var(--dim);
+  font-size:11.5px;letter-spacing:.3px;display:flex;gap:20px;flex-wrap:wrap}
+
+@media(max-width:980px){
+  main{grid-template-columns:1fr}
+  aside{border-left:none;border-top:1px solid var(--line)}
+  header{padding:20px}
+}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+
+.tp{display:inline-block;min-width:22px;text-align:center;padding:1px 7px;border-radius:10px;font-weight:700;font-size:11px;letter-spacing:.03em;margin-left:6px;vertical-align:1px}
+.tp-S{background:#1f5e2a;color:#bdf0c4}.tp-A{background:#1f4a6e;color:#c6e2f5}.tp-B{background:#6b5a14;color:#f3e5a8}.tp-C{background:#7a4a1d;color:#f6dcbd}.tp-D{background:#5a5a5a;color:#ddd}
+.clim{font-family:"SF Mono",Menlo,monospace;font-size:10.5px;color:var(--dim)}
+</style>
+</head>
+<body>
+
+<header>
+  <h1 class="serif">Observatório <em>da Coleção</em></h1>
+  <div class="sub">v4.6 · 05/out/2026 (playbook v59 · fichas v9 · tabelão v2.7) · <b>69 na grade</b> + Bedouin Rose fora da grade (tier D) · tiers = aba Tiers do Google Sheets (fonte única desde 04/out/2026) · Vibrato só dia e trabalho desde 05/out/2026 · camada custo fora do painel (só academia e corrida, regra de 25/set/2026) — a órbita é o tier (S externo → D interno); nenhum número decimal de gosto.</div>
+  <div class="right">
+    <button class="btn" id="gapBtn">Modo Gaps</button>
+    <button class="btn" id="resetBtn" style="display:none">Restaurar arquivados</button>
+  </div>
+</header>
+
+<main>
+  <div id="wheelWrap">
+    <svg id="wheel" viewBox="0 0 900 900" role="img" aria-label="Roda dos 16 arquétipos com a grade de 69 frascos, camada custo de 10 e tiers S–D"></svg>
+    <div class="tooltip" id="tt"></div>
+  </div>
+
+  <aside>
+    <div class="block">
+      <h3>Simulador de dia</h3>
+      <div class="sliderRow">
+        <label for="temp">Temperatura</label>
+        <input type="range" id="temp" min="8" max="36" step="0.5" value="24">
+        <span class="val" id="tempV">24°C</span>
+      </div>
+      <div class="sliderRow">
+        <label for="hum">Umidade</label>
+        <input type="range" id="hum" min="20" max="95" step="1" value="60">
+        <span class="val" id="humV">60%</span>
+      </div>
+      <div class="chips">
+        <span class="chip" id="faixaChip"></span>
+        <span class="chip" id="humChip"></span>
+        <span class="chip" id="sprayChip"></span>
+      </div>
+    </div>
+
+    <div class="block">
+      <h3>Ocasião <span style="color:var(--dim);text-transform:none;letter-spacing:0">(playbook v59)</span></h3>
+      <div id="occChips">
+        <button class="occ on" data-o="livre">Livre</button>
+        <button class="occ" data-o="lazer">Lazer</button>
+        <button class="occ" data-o="ti">Trab. Informal</button>
+        <button class="occ" data-o="tf">Trab. Formal</button>
+        <button class="occ" data-o="ni">Noite Informal</button>
+        <button class="occ" data-o="nf">Noite Formal</button>
+        <button class="occ" data-o="cd">Cozy Dia</button>
+        <button class="occ" data-o="cn">Cozy Noite</button>
+      </div>
+      <div class="occNote" id="occNote">Cozy não existe em Muito Quente / Quente — não há aconchego de casa a 30°C (playbook).</div>
+    </div>
+
+    <div class="block" id="gapLegend">
+      <h3>Os 5 gaps (gaps_v3)</h3>
+      <div class="g"><span class="k">1</span><span>Vetiver seco/mineral protagonista — <i>O Geólogo</i></span></div>
+      <div class="g"><span class="k">2</span><span>Chypre verde aromático — <i>O Botânico</i></span></div>
+      <div class="g"><span class="k">3</span><span class="closed">Tabaco dark — fechado (Montabaco Int.)</span></div>
+      <div class="g"><span class="k">4</span><span>Sândalo cremoso protagonista — <i>O Marceneiro</i></span></div>
+      <div class="g"><span class="k">5</span><span>Leather raw birch-tar — <i>O Curtidor</i> (baixa prioridade)</span></div>
+      <div style="margin-top:10px;color:var(--dim)">Setores apagados = vazios ou presença pontual (1 frasco).</div>
+    </div>
+
+    <div class="block" id="rankBlock">
+      <h3 id="rankTitle">Top do dia</h3>
+      <div id="ranking"></div>
+    </div>
+
+    <div class="block">
+      <h3>Frasco</h3>
+      <div id="detail"><div class="empty">Toque num frasco na roda ou no ranking</div></div>
+    </div>
+  </aside>
+</main>
+
+<footer>
+  <span>Livre: só frascos dentro do envelope climático (clima ≥ 5/9, com modificador de umidade por arquétipo), ordenados por <b>tier</b> (S → D) e, em empate, por clima. Sem nota, sem fit decimal.</span>
+  <span>Ocasião: célula literal do playbook v59 (seguro → jogada → também, na ordem tier → aptidão → centralidade). "clima x/9" = adequação à temperatura/umidade escolhidas.</span>
+  <span>Camada custo: fora do painel (usada só em academia e corrida).</span>
+</footer>
+
+<script>
+/* ============ DADOS — 05/out/2026: 70 frascos (grade 69 + Bedouin Rose D); camada custo fora */
+const FR = [{"casa": "Abdul Samad Al Qurashi", "nome": "Al Qurashi Blend", "calor": 7, "ameno": 7, "frio": 5, "arq": "O Sultão", "tier": "A", "tv": 8}, {"casa": "Amouage", "nome": "Beach Hut Man", "calor": 8, "ameno": 7, "frio": 3, "arq": "O Botânico", "tier": "A", "tv": 8}, {"casa": "Amouage", "nome": "Decision", "calor": 4, "ameno": 6, "frio": 8, "arq": "O Monge", "tier": "S", "tv": 10}, {"casa": "Amouage", "nome": "Outlands", "calor": 2, "ameno": 5, "frio": 9, "arq": "O Monge", "tier": "S", "tv": 10}, {"casa": "Amouage", "nome": "Purpose 50", "calor": 5, "ameno": 7, "frio": 7, "arq": "O Monge", "tier": "S", "tv": 10}, {"casa": "Amouage", "nome": "Reflection Man", "calor": 9, "ameno": 6, "frio": 2, "arq": "O Florista Branco", "tier": "S", "tv": 10}, {"casa": "Amouage", "nome": "Search", "calor": 8, "ameno": 7, "frio": 4, "arq": "O Monge", "tier": "A", "tv": 8}, {"casa": "BDK", "nome": "Gris Charnel Extrait", "calor": 3, "ameno": 6, "frio": 9, "arq": "O Marceneiro", "tier": "S", "tv": 10}, {"casa": "Boadicea", "nome": "Imperial", "calor": 2, "ameno": 5, "frio": 9, "arq": "O Barbeiro", "tier": "A", "tv": 8}, {"casa": "Boadicea", "nome": "Monarch", "calor": 3, "ameno": 6, "frio": 9, "arq": "O Sultão", "tier": "B", "tv": 6}, {"casa": "Born to Stand Out", "nome": "Drunk Lovers", "calor": 4, "ameno": 7, "frio": 7, "arq": "A Lareira", "tier": "A", "tv": 8}, {"casa": "Bvlgari", "nome": "Tygar Extrait", "calor": 7, "ameno": 8, "frio": 4, "arq": "O Mediterrâneo", "tier": "S", "tv": 10}, {"casa": "By Kilian", "nome": "Intoxicated", "calor": 2, "ameno": 5, "frio": 9, "arq": "O Confeiteiro", "tier": "A", "tv": 8}, {"casa": "BYNOMADS", "nome": "Bedouin Rose", "calor": 2, "ameno": 5, "frio": 9, "arq": "O Rosal", "tier": "D", "tv": 2, "out": true}, {"casa": "BYNOMADS", "nome": "K-Musk", "calor": 8, "ameno": 7, "frio": 3, "arq": "O Minimalista", "tier": "B", "tv": 6}, {"casa": "BYNOMADS", "nome": "Oud Kyphi", "calor": 2, "ameno": 5, "frio": 9, "arq": "O Sultão", "tier": "C", "tv": 4}, {"casa": "Byredo", "nome": "Black Saffron Absolu", "calor": 6, "ameno": 7, "frio": 6, "arq": "O Curtidor", "tier": "A", "tv": 8}, {"casa": "Chanel", "nome": "Bleu de Chanel EDP", "calor": 6, "ameno": 7, "frio": 6, "arq": "O Mediterrâneo", "tier": "C", "tv": 4}, {"casa": "Clive Christian", "nome": "1872 for Men", "calor": 9, "ameno": 6, "frio": 2, "arq": "O Barbeiro", "tier": "S", "tv": 10}, {"casa": "Clive Christian", "nome": "Blonde Amber", "calor": 2, "ameno": 5, "frio": 9, "arq": "A Lareira", "tier": "S", "tv": 10}, {"casa": "Clive Christian", "nome": "Crab Apple Blossom", "calor": 9, "ameno": 6, "frio": 2, "arq": "O Marinho", "tier": "S", "tv": 10}, {"casa": "Clive Christian", "nome": "Town & Country", "calor": 6, "ameno": 7, "frio": 6, "arq": "O Mediterrâneo", "tier": "A", "tv": 8}, {"casa": "Creed", "nome": "Aventus", "calor": 8, "ameno": 7, "frio": 3, "arq": "O Chiprista", "tier": "A", "tv": 8}, {"casa": "Creed", "nome": "Aventus Absolu", "calor": 9, "ameno": 6, "frio": 2, "arq": "O Chiprista", "tier": "S", "tv": 10}, {"casa": "Creed", "nome": "Bois du Portugal", "calor": 7, "ameno": 8, "frio": 4, "arq": "O Barbeiro", "tier": "B", "tv": 6}, {"casa": "Creed", "nome": "Green Irish Tweed", "calor": 8, "ameno": 7, "frio": 3, "arq": "O Botânico", "tier": "B", "tv": 6}, {"casa": "Creed", "nome": "Himalaya", "calor": 9, "ameno": 6, "frio": 2, "arq": "O Geólogo", "tier": "B", "tv": 6}, {"casa": "Creed", "nome": "Royal Oud", "calor": 9, "ameno": 6, "frio": 2, "arq": "O Marceneiro", "tier": "A", "tv": 8}, {"casa": "Creed", "nome": "Wild Vetiver", "calor": 8, "ameno": 7, "frio": 3, "arq": "O Geólogo", "tier": "A", "tv": 8}, {"casa": "Essential Parfums", "nome": "Bois Impérial", "calor": 7, "ameno": 8, "frio": 4, "arq": "O Geólogo", "tier": "S", "tv": 10}, {"casa": "Ex Nihilo", "nome": "Blue Talisman EDP", "calor": 9, "ameno": 6, "frio": 2, "arq": "O Mediterrâneo", "tier": "A", "tv": 8}, {"casa": "Ex Nihilo", "nome": "Brompton Immortals Extrait", "calor": 4, "ameno": 6, "frio": 8, "arq": "O Rosal", "tier": "S", "tv": 10}, {"casa": "Fragrance du Bois", "nome": "Lucius", "calor": 8, "ameno": 7, "frio": 3, "arq": "O Mediterrâneo", "tier": "S", "tv": 10}, {"casa": "Givenchy", "nome": "Désobéissant", "calor": 8, "ameno": 8, "frio": 4, "arq": "O Botânico", "tier": "S", "tv": 10}, {"casa": "Nishane", "nome": "Favonius", "calor": 3, "ameno": 7, "frio": 9, "arq": "O Rosal", "tier": "S", "tv": 10}, {"casa": "Granado", "nome": "Apotecário", "calor": 3, "ameno": 6, "frio": 9, "arq": "O Curtidor", "tier": "B", "tv": 6}, {"casa": "Hermès", "nome": "Terre d'Hermès Parfum", "calor": 9, "ameno": 6, "frio": 2, "arq": "O Geólogo", "tier": "A", "tv": 8}, {"casa": "Hind Al Oud", "nome": "Ya'e", "calor": 4, "ameno": 6, "frio": 8, "arq": "O Empoado", "tier": "B", "tv": 6}, {"casa": "Le Labo", "nome": "Santal 33", "calor": 5, "ameno": 7, "frio": 7, "arq": "O Marceneiro", "tier": "A", "tv": 8}, {"casa": "Ex Nihilo", "nome": "Scarlet Sands", "calor": 6, "ameno": 8, "frio": 5, "arq": "O Florista Branco", "tier": "S", "tv": 10}, {"casa": "Loewe", "nome": "7 Loewe", "calor": 7, "ameno": 8, "frio": 4, "arq": "O Monge", "tier": "B", "tv": 6}, {"casa": "Louis Vuitton", "nome": "Imagination", "calor": 6, "ameno": 7, "frio": 6, "arq": "O Mediterrâneo", "tier": "S", "tv": 10}, {"casa": "Louis Vuitton", "nome": "L'Immensité", "calor": 9, "ameno": 6, "frio": 2, "arq": "O Mediterrâneo", "tier": "A", "tv": 8}, {"casa": "Louis Vuitton", "nome": "Les Sables Roses", "calor": 3, "ameno": 6, "frio": 9, "arq": "O Rosal", "tier": "S", "tv": 10}, {"casa": "Louis Vuitton", "nome": "Météore", "calor": 9, "ameno": 6, "frio": 2, "arq": "O Geólogo", "tier": "S", "tv": 10}, {"casa": "Louis Vuitton", "nome": "Ombre Nomade", "calor": 2, "ameno": 5, "frio": 9, "arq": "O Sultão", "tier": "S", "tv": 10}, {"casa": "Memo Paris", "nome": "Omnia Omnibus Ubique", "calor": 3, "ameno": 7, "frio": 8, "arq": "O Empoado", "tier": "S", "tv": 10}, {"casa": "Matière Première", "nome": "Radical Rose Extrait", "calor": 5, "ameno": 7, "frio": 7, "arq": "O Rosal", "tier": "S", "tv": 10}, {"casa": "Memo Paris", "nome": "African Leather", "calor": 3, "ameno": 6, "frio": 9, "arq": "O Curtidor", "tier": "S", "tv": 10}, {"casa": "Memo Paris", "nome": "Odéon", "calor": 4, "ameno": 6, "frio": 8, "arq": "O Rosal", "tier": "S", "tv": 10}, {"casa": "MFK", "nome": "Amyris Homme Extrait", "calor": 4, "ameno": 6, "frio": 8, "arq": "A Lareira", "tier": "S", "tv": 10}, {"casa": "MFK", "nome": "Gentle Fluidity Silver", "calor": 7, "ameno": 7, "frio": 5, "arq": "O Minimalista", "tier": "S", "tv": 10}, {"casa": "MFK", "nome": "Grand Soir", "calor": 2, "ameno": 5, "frio": 9, "arq": "A Lareira", "tier": "S", "tv": 10}, {"casa": "MFK", "nome": "Oud Satin Mood Extrait", "calor": 3, "ameno": 6, "frio": 9, "arq": "O Sultão", "tier": "S", "tv": 10}, {"casa": "Nishane", "nome": "Ani X", "calor": 7, "ameno": 8, "frio": 4, "arq": "A Lareira", "tier": "A", "tv": 8}, {"casa": "Nishane", "nome": "Hacivat", "calor": 8, "ameno": 7, "frio": 3, "arq": "O Chiprista", "tier": "S", "tv": 10}, {"casa": "Nishane", "nome": "Oudous Lux Solis", "calor": 8, "ameno": 7, "frio": 3, "arq": "O Sultão", "tier": "A", "tv": 8}, {"casa": "OJAR", "nome": "Wood Whisper", "calor": 4, "ameno": 6, "frio": 8, "arq": "O Marceneiro", "tier": "A", "tv": 8}, {"casa": "Omanluxury", "nome": "Caden", "calor": 2, "ameno": 5, "frio": 9, "arq": "A Lareira", "tier": "A", "tv": 8}, {"casa": "Omanluxury", "nome": "Serenity", "calor": 2, "ameno": 5, "frio": 9, "arq": "O Curtidor", "tier": "B", "tv": 6}, {"casa": "Ormonde Jayne", "nome": "Bijou Zafran", "calor": 2, "ameno": 5, "frio": 9, "arq": "O Curtidor", "tier": "S", "tv": 10}, {"casa": "Ormonde Jayne", "nome": "Montabaco Intensivo", "calor": 7, "ameno": 7, "frio": 5, "arq": "O Curtidor", "tier": "A", "tv": 8}, {"casa": "Parfums de Marly", "nome": "Castley", "calor": 4, "ameno": 6, "frio": 8, "arq": "O Mediterrâneo", "tier": "B", "tv": 6}, {"casa": "Pernoire", "nome": "Anelo", "calor": 7, "ameno": 8, "frio": 4, "arq": "O Chiprista", "tier": "A", "tv": 8}, {"casa": "Sospiro", "nome": "Vibrato", "calor": 8, "ameno": 7, "frio": 3, "arq": "O Mediterrâneo", "tier": "A", "tv": 8}, {"casa": "Thameen", "nome": "Carved Oud", "calor": 3, "ameno": 6, "frio": 9, "arq": "O Marceneiro", "tier": "A", "tv": 8}, {"casa": "Thomas de Monaco", "nome": "Ultima Storia", "calor": 6, "ameno": 7, "frio": 5, "arq": "O Empoado", "tier": "A", "tv": 8}, {"casa": "Widian", "nome": "Liwa", "calor": 3, "ameno": 6, "frio": 8, "arq": "O Sultão", "tier": "S", "tv": 10}, {"casa": "Widian", "nome": "New York", "calor": 7, "ameno": 7, "frio": 4, "arq": "A Lareira", "tier": "A", "tv": 8}, {"casa": "Xerjoff", "nome": "Torino 21", "calor": 9, "ameno": 6, "frio": 2, "arq": "O Botânico", "tier": "A", "tv": 8}];
+
+/* 16 arquétipos — ordem luminoso→escuro (arquetipos_v1) + matiz do setor */
+const ARCH = [
+ {n:"O Mediterrâneo", c:"#D9B24A", hum:+1},
+ {n:"O Marinho",      c:"#5F9EA8", hum:+1},
+ {n:"O Minimalista",  c:"#AEB3B0", hum:+1},
+ {n:"O Botânico",     c:"#7C9A5E", hum:+1},
+ {n:"O Barbeiro",     c:"#8F8FBF", hum:0},
+ {n:"O Geólogo",      c:"#7E8B93", hum:+1},
+ {n:"O Chiprista",    c:"#A9985A", hum:0},
+ {n:"O Florista Branco", c:"#D8D2C4", hum:0},
+ {n:"O Rosal",        c:"#B56A78", hum:0},
+ {n:"O Empoado",      c:"#C1A9B8", hum:0},
+ {n:"O Marceneiro",   c:"#A87B4F", hum:-0.5},
+ {n:"O Monge",        c:"#8C8478", hum:+1},
+ {n:"O Curtidor",     c:"#8A5A3C", hum:-1},
+ {n:"O Sultão",       c:"#6E4A63", hum:-1},
+ {n:"A Lareira",      c:"#C07A3A", hum:-1},
+ {n:"O Confeiteiro",  c:"#C98A8A", hum:-1}
+];
+const AIDX = Object.fromEntries(ARCH.map((a,i)=>[a.n,i]));
+FR.forEach((f,i)=>{f.id=i; f.color=ARCH[AIDX[f.arq]].c; f.archived=false;});
+
+/* ============ PLAYBOOK v59 — grade literal (651 alocações · 69 frascos · teto S 12 · A 9 · B 6 · C 3 · D 0 · sem exceções) */
+/* Aliases nome-playbook → nome-tabelão */
+const ALIAS = {
+ "Oudós Lux Solis":"Oudous Lux Solis","Blue Talisman":"Blue Talisman EDP","Terre d'Hermès":"Terre d'Hermès Parfum","Bleu de Chanel":"Bleu de Chanel EDP",
+ "Blue Talisman":"Blue Talisman EDP",
+ "Terre d'Hermès":"Terre d'Hermès Parfum",
+ "Bleu de Chanel":"Bleu de Chanel EDP",
+ "Oudós Lux Solis":"Oudous Lux Solis",
+ "Gris Charnel":"Gris Charnel Extrait",
+ "Brompton":"Brompton Immortals Extrait",
+ "Radical Rose":"Radical Rose Extrait",
+ "Oud Satin Mood":"Oud Satin Mood Extrait",
+ "GFS":"Gentle Fluidity Silver"
+};
+/* camada custo removida do painel em 05/out/2026; CURIO fica vazio */
+const CURIO = new Set(FR.filter(f=>f.curio).map(f=>f.nome));
+const NIDX = Object.fromEntries(FR.map(f=>[f.nome,f.id]));
+function pbId(name){ const n=ALIAS[name]||name; return NIDX[n]!==undefined?NIDX[n]:null; }
+
+const OCC_LABEL = {lazer:"Lazer", ti:"Trab. Informal", tf:"Trab. Formal", ni:"Noite Informal", nf:"Noite Formal", cd:"Cozy Dia", cn:"Cozy Noite"};
+
+/* PB[faixa][ocasião] = {s:[nome,sprays], j:[nome,razão], t:[nomes em ordem de prioridade]} */
+const PB = {
+"mq": {
+"lazer": {
+"s": [
+"Désobéissant",
+6
+],
+"j": [
+"Hacivat",
+"o chypre-frutado que resolve o calor"
+],
+"t": [
+"Crab Apple Blossom",
+"1872 for Men",
+"Météore",
+"Reflection Man",
+"Torino 21",
+"Anelo",
+"Blue Talisman",
+"Wild Vetiver",
+"Beach Hut Man",
+"Aventus",
+"L'Immensité",
+"Vibrato",
+"Green Irish Tweed",
+"Himalaya",
+"K-Musk"
+]
+},
+"ti": {
+"s": [
+"Désobéissant",
+6
+],
+"j": [
+"Imagination",
+"Chá-canela-incenso de teto alto"
+],
+"t": [
+"1872 for Men",
+"Météore",
+"Reflection Man",
+"Crab Apple Blossom",
+"Hacivat",
+"Torino 21",
+"Blue Talisman",
+"Wild Vetiver",
+"Beach Hut Man",
+"Aventus",
+"L'Immensité",
+"Search",
+"Vibrato",
+"Anelo",
+"Himalaya",
+"K-Musk",
+"Green Irish Tweed",
+"Bleu de Chanel"
+]
+},
+"tf": {
+"s": [
+"Imagination",
+3
+],
+"j": [
+"Météore",
+"Cítrico-neroli-cardamomo sobre vetiver seco: elegante e arejado — o formal do calor"
+],
+"t": [
+"Lucius",
+"1872 for Men",
+"Désobéissant",
+"Reflection Man",
+"Town & Country",
+"Search",
+"Terre d'Hermès",
+"L'Immensité",
+"Vibrato",
+"Himalaya"
+]
+},
+"ni": {
+"s": [
+"Hacivat",
+3
+],
+"j": [
+"Lucius",
+"Cítrico sobre âmbar seco-tonka-vetiver: a seriedade que os frescos puros não entregam, sem somar calor"
+],
+"t": [
+"Imagination",
+"Tygar Extrait",
+"Désobéissant",
+"Crab Apple Blossom",
+"1872 for Men",
+"Town & Country",
+"Aventus",
+"Anelo",
+"Blue Talisman",
+"Torino 21"
+]
+},
+"nf": {
+"s": [
+"Town & Country",
+3
+],
+"j": [
+"Lucius",
+"Cítrico sobre âmbar seco-tonka-vetiver: a seriedade que os frescos puros não entregam, sem somar calor"
+],
+"t": [
+"Tygar Extrait",
+"Météore",
+"Reflection Man",
+"Terre d'Hermès"
+]
+},
+"cd": null,
+"cn": null
+},
+"q": {
+"lazer": {
+"s": [
+"Hacivat",
+3
+],
+"j": [
+"Désobéissant",
+"Verde-chá-conífera seco, zero doçura"
+],
+"t": [
+"Crab Apple Blossom",
+"Gentle Fluidity Silver",
+"Reflection Man",
+"1872 for Men",
+"Météore",
+"Scarlet Sands",
+"Bois Impérial",
+"L'Immensité",
+"Vibrato",
+"Beach Hut Man",
+"Wild Vetiver",
+"Aventus",
+"Anelo",
+"Blue Talisman",
+"Torino 21",
+"Search",
+"Ani X",
+"New York",
+"Oudós Lux Solis",
+"Al Qurashi Blend",
+"Green Irish Tweed",
+"7 Loewe",
+"Castley",
+"Himalaya",
+"K-Musk"
+]
+},
+"ti": {
+"s": [
+"Désobéissant",
+6
+],
+"j": [
+"Imagination",
+"Chá-canela-incenso de teto alto"
+],
+"t": [
+"Reflection Man",
+"1872 for Men",
+"Météore",
+"Bois Impérial",
+"Gentle Fluidity Silver",
+"Hacivat",
+"Crab Apple Blossom",
+"L'Immensité",
+"Vibrato",
+"Beach Hut Man",
+"Wild Vetiver",
+"Aventus",
+"Search",
+"Blue Talisman",
+"Torino 21",
+"Terre d'Hermès",
+"Anelo",
+"Ultima Storia",
+"Green Irish Tweed",
+"7 Loewe",
+"Castley",
+"Himalaya",
+"K-Musk",
+"Bleu de Chanel"
+]
+},
+"tf": {
+"s": [
+"Imagination",
+3
+],
+"j": [
+"Terre d'Hermès",
+"Sílex-pimenta sobre vetiver-cedro: sofisticação seca"
+],
+"t": [
+"Lucius",
+"Météore",
+"Bois Impérial",
+"Désobéissant",
+"Reflection Man",
+"1872 for Men",
+"Search",
+"Town & Country",
+"Royal Oud",
+"Ultima Storia",
+"L'Immensité",
+"Vibrato",
+"Wild Vetiver",
+"Castley"
+]
+},
+"ni": {
+"s": [
+"Hacivat",
+3
+],
+"j": [
+"Lucius",
+"Cítrico sobre âmbar seco-tonka-vetiver: a seriedade que os frescos puros não entregam, sem somar calor"
+],
+"t": [
+"Tygar Extrait",
+"Imagination",
+"Aventus Absolu",
+"Scarlet Sands",
+"Désobéissant",
+"1872 for Men",
+"Bois Impérial",
+"Crab Apple Blossom",
+"Aventus",
+"Town & Country",
+"Ani X",
+"New York",
+"Oudós Lux Solis",
+"L'Immensité",
+"Anelo",
+"Blue Talisman",
+"Al Qurashi Blend",
+"Torino 21",
+"7 Loewe",
+"Castley"
+]
+},
+"nf": {
+"s": [
+"Aventus Absolu",
+3
+],
+"j": [
+"Lucius",
+"Cítrico sobre âmbar seco-tonka-vetiver: a seriedade que os frescos puros não entregam, sem somar calor"
+],
+"t": [
+"Tygar Extrait",
+"Reflection Man",
+"Météore",
+"Scarlet Sands",
+"Terre d'Hermès",
+"Town & Country",
+"Royal Oud",
+"Ultima Storia",
+"Al Qurashi Blend"
+]
+},
+"cd": null,
+"cn": null
+},
+"am": {
+"lazer": {
+"s": [
+"Gentle Fluidity Silver",
+4
+],
+"j": [
+"Désobéissant",
+"Verde-chá-conífera seco, zero doçura"
+],
+"t": [
+"Hacivat",
+"Crab Apple Blossom",
+"Scarlet Sands",
+"Aventus Absolu",
+"Reflection Man",
+"1872 for Men",
+"Météore",
+"Bois Impérial",
+"Aventus",
+"Beach Hut Man",
+"Wild Vetiver",
+"L'Immensité",
+"Santal 33",
+"Vibrato",
+"Anelo",
+"Blue Talisman",
+"Torino 21",
+"Ani X",
+"New York",
+"Oudós Lux Solis",
+"Drunk Lovers",
+"Al Qurashi Blend",
+"Green Irish Tweed",
+"7 Loewe",
+"K-Musk"
+]
+},
+"ti": {
+"s": [
+"Imagination",
+3
+],
+"j": [
+"Gentle Fluidity Silver",
+"O coringa absoluto — #1 do ranking de uso real"
+],
+"t": [
+"Bois Impérial",
+"Désobéissant",
+"Reflection Man",
+"Decision",
+"1872 for Men",
+"Météore",
+"Hacivat",
+"Crab Apple Blossom",
+"Aventus",
+"Search",
+"Beach Hut Man",
+"Wild Vetiver",
+"L'Immensité",
+"Montabaco Intensivo",
+"Santal 33",
+"Vibrato",
+"Wood Whisper",
+"Blue Talisman",
+"Torino 21",
+"Ultima Storia",
+"Anelo",
+"Ani X",
+"Green Irish Tweed",
+"7 Loewe",
+"Castley",
+"Ya'e",
+"Himalaya",
+"K-Musk",
+"Bleu de Chanel"
+]
+},
+"tf": {
+"s": [
+"Imagination",
+3
+],
+"j": [
+"Purpose 50",
+"Olíbano-mineral protagonista sobre sand vetiver-suede: o frasco mais alinhado ao DNA primário"
+],
+"t": [
+"Bois Impérial",
+"Lucius",
+"Decision",
+"Météore",
+"Favonius",
+"1872 for Men",
+"Ultima Storia",
+"Search",
+"Terre d'Hermès",
+"Royal Oud",
+"Montabaco Intensivo",
+"Carved Oud",
+"Town & Country",
+"Vibrato",
+"Bois du Portugal",
+"Ya'e"
+]
+},
+"ni": {
+"s": [
+"Hacivat",
+3
+],
+"j": [
+"Lucius",
+"Cítrico sobre âmbar seco-tonka-vetiver: a seriedade que os frescos puros não entregam, sem somar calor"
+],
+"t": [
+"Scarlet Sands",
+"Imagination",
+"Aventus Absolu",
+"Bijou Zafran",
+"Omnia Omnibus Ubique",
+"Tygar Extrait",
+"Brompton",
+"Favonius",
+"Les Sables Roses",
+"Gentle Fluidity Silver",
+"Odéon",
+"Liwa",
+"Purpose 50",
+"Bois Impérial",
+"1872 for Men",
+"Crab Apple Blossom",
+"Ani X",
+"New York",
+"Aventus",
+"Oudós Lux Solis",
+"Black Saffron Absolu",
+"Drunk Lovers",
+"Town & Country",
+"Al Qurashi Blend",
+"Ultima Storia",
+"Anelo",
+"Blue Talisman",
+"Torino 21",
+"Ya'e"
+]
+},
+"nf": {
+"s": [
+"Purpose 50",
+2
+],
+"j": [
+"Brompton",
+"Opulência floral-resinosa em extrait — S"
+],
+"t": [
+"Lucius",
+"Aventus Absolu",
+"Tygar Extrait",
+"Favonius",
+"Les Sables Roses",
+"Scarlet Sands",
+"Reflection Man",
+"Amyris Homme Extrait",
+"Omnia Omnibus Ubique",
+"Liwa",
+"Météore",
+"Ultima Storia",
+"Terre d'Hermès",
+"Royal Oud",
+"Town & Country",
+"Al Qurashi Blend",
+"Oudós Lux Solis",
+"Bois du Portugal"
+]
+},
+"cd": {
+"s": [
+"Gris Charnel",
+4
+],
+"j": [
+"Odéon",
+"A rosa-geleia aconchegante — jammy-rose oriental da vertente secundária"
+],
+"t": [
+"Gentle Fluidity Silver",
+"Amyris Homme Extrait",
+"Wood Whisper",
+"Ani X",
+"New York",
+"Black Saffron Absolu",
+"Drunk Lovers",
+"Ya'e"
+]
+},
+"cn": {
+"s": [
+"Liwa",
+3
+],
+"j": [
+"Bijou Zafran",
+"O açafrão estranho e macio — aresta indecifrável"
+],
+"t": [
+"Amyris Homme Extrait",
+"Odéon",
+"African Leather",
+"Omnia Omnibus Ubique",
+"Les Sables Roses",
+"New York",
+"Black Saffron Absolu",
+"Drunk Lovers"
+]
+}
+},
+"fr": {
+"lazer": {
+"s": [
+"Gentle Fluidity Silver",
+4
+],
+"j": [
+"Hacivat",
+"o chypre-frutado que resolve o calor"
+],
+"t": [
+"Désobéissant",
+"Aventus Absolu",
+"Gris Charnel",
+"Scarlet Sands",
+"Bois Impérial",
+"Santal 33",
+"Beach Hut Man",
+"Wild Vetiver",
+"Drunk Lovers",
+"Montabaco Intensivo",
+"Oudós Lux Solis",
+"Ani X",
+"New York",
+"Al Qurashi Blend"
+]
+},
+"ti": {
+"s": [
+"Gentle Fluidity Silver",
+4
+],
+"j": [
+"Imagination",
+"Chá-canela-incenso de teto alto"
+],
+"t": [
+"Decision",
+"Bois Impérial",
+"Désobéissant",
+"Reflection Man",
+"African Leather",
+"Gris Charnel",
+"Hacivat",
+"Bijou Zafran",
+"Montabaco Intensivo",
+"Santal 33",
+"Wood Whisper",
+"Beach Hut Man",
+"Search",
+"Wild Vetiver",
+"Ya'e",
+"7 Loewe",
+"Castley"
+]
+},
+"tf": {
+"s": [
+"Purpose 50",
+2
+],
+"j": [
+"Decision",
+"Incenso seco e sério"
+],
+"t": [
+"Bois Impérial",
+"Imagination",
+"Lucius",
+"Favonius",
+"Radical Rose",
+"Ombre Nomade",
+"Royal Oud",
+"Montabaco Intensivo",
+"Carved Oud",
+"Search",
+"Terre d'Hermès",
+"Ultima Storia",
+"Imperial",
+"Bois du Portugal",
+"Ya'e"
+]
+},
+"ni": {
+"s": [
+"Hacivat",
+3
+],
+"j": [
+"Brompton",
+"Opulência floral-resinosa em extrait — S"
+],
+"t": [
+"Aventus Absolu",
+"Bijou Zafran",
+"Omnia Omnibus Ubique",
+"Favonius",
+"Les Sables Roses",
+"Imagination",
+"Lucius",
+"Scarlet Sands",
+"Radical Rose",
+"Grand Soir",
+"Ombre Nomade",
+"Outlands",
+"Odéon",
+"Amyris Homme Extrait",
+"Decision",
+"African Leather",
+"Liwa",
+"Purpose 50",
+"Blonde Amber",
+"Oud Satin Mood",
+"Bois Impérial",
+"Black Saffron Absolu",
+"Drunk Lovers",
+"Oudós Lux Solis",
+"Ani X",
+"New York",
+"Caden",
+"Carved Oud",
+"Al Qurashi Blend",
+"Imperial",
+"Intoxicated",
+"Monarch"
+]
+},
+"nf": {
+"s": [
+"Purpose 50",
+2
+],
+"j": [
+"Brompton",
+"Opulência floral-resinosa em extrait — S"
+],
+"t": [
+"Aventus Absolu",
+"Favonius",
+"Les Sables Roses",
+"Lucius",
+"Radical Rose",
+"Ombre Nomade",
+"Oud Satin Mood",
+"Outlands",
+"Amyris Homme Extrait",
+"Decision",
+"Omnia Omnibus Ubique",
+"Liwa",
+"Scarlet Sands",
+"Blonde Amber",
+"Grand Soir",
+"Bijou Zafran",
+"Royal Oud",
+"Terre d'Hermès",
+"Ultima Storia",
+"Imperial",
+"Carved Oud",
+"Al Qurashi Blend",
+"Bois du Portugal",
+"Serenity",
+"Monarch"
+]
+},
+"cd": {
+"s": [
+"Gris Charnel",
+4
+],
+"j": [
+"Odéon",
+"A rosa-geleia aconchegante — jammy-rose oriental da vertente secundária"
+],
+"t": [
+"Gentle Fluidity Silver",
+"Blonde Amber",
+"Grand Soir",
+"Amyris Homme Extrait",
+"African Leather",
+"Wood Whisper",
+"Caden",
+"Black Saffron Absolu",
+"Drunk Lovers",
+"Santal 33",
+"Ani X",
+"New York",
+"Intoxicated"
+]
+},
+"cn": {
+"s": [
+"African Leather",
+3
+],
+"j": [
+"Ombre Nomade",
+"Nuclear"
+],
+"t": [
+"Odéon",
+"Amyris Homme Extrait",
+"Bijou Zafran",
+"Blonde Amber",
+"Grand Soir",
+"Oud Satin Mood",
+"Omnia Omnibus Ubique",
+"Gris Charnel",
+"Les Sables Roses",
+"Liwa",
+"Caden",
+"Black Saffron Absolu",
+"Drunk Lovers",
+"Wood Whisper",
+"Intoxicated",
+"Serenity"
+]
+}
+},
+"fri": {
+"lazer": {
+"s": [
+"Gris Charnel",
+4
+],
+"j": [
+"Outlands",
+"A catedral de olíbano-elemi-açafrão-oud"
+],
+"t": [
+"Gentle Fluidity Silver",
+"Santal 33",
+"Beach Hut Man",
+"Oudós Lux Solis"
+]
+},
+"ti": {
+"s": [
+"Gentle Fluidity Silver",
+4
+],
+"j": [
+"Decision",
+"Incenso seco e sério"
+],
+"t": [
+"African Leather",
+"Gris Charnel",
+"Bijou Zafran",
+"Montabaco Intensivo",
+"Santal 33",
+"Wood Whisper",
+"Carved Oud",
+"Apotecário"
+]
+},
+"tf": {
+"s": [
+"Purpose 50",
+3
+],
+"j": [
+"Radical Rose",
+"Rosa dark-mineral com chili-imortelle: a rosa que não é rosa de mulher"
+],
+"t": [
+"Decision",
+"Favonius",
+"Outlands",
+"Ombre Nomade",
+"Carved Oud",
+"Montabaco Intensivo",
+"Imperial",
+"Royal Oud",
+"Bois du Portugal"
+]
+},
+"ni": {
+"s": [
+"Outlands",
+3
+],
+"j": [
+"Brompton",
+"Opulência floral-resinosa em extrait — S"
+],
+"t": [
+"Favonius",
+"Les Sables Roses",
+"Bijou Zafran",
+"Omnia Omnibus Ubique",
+"Aventus Absolu",
+"Radical Rose",
+"Grand Soir",
+"Ombre Nomade",
+"African Leather",
+"Liwa",
+"Purpose 50",
+"Amyris Homme Extrait",
+"Decision",
+"Blonde Amber",
+"Odéon",
+"Oud Satin Mood",
+"Black Saffron Absolu",
+"Caden",
+"Drunk Lovers",
+"Oudós Lux Solis",
+"Carved Oud",
+"Imperial",
+"Intoxicated",
+"Apotecário",
+"Monarch",
+"Oud Kyphi"
+]
+},
+"nf": {
+"s": [
+"Ombre Nomade",
+3
+],
+"j": [
+"Radical Rose",
+"Rosa dark-mineral com chili-imortelle: a rosa que não é rosa de mulher"
+],
+"t": [
+"Brompton",
+"Favonius",
+"Les Sables Roses",
+"Purpose 50",
+"Aventus Absolu",
+"Oud Satin Mood",
+"Outlands",
+"Liwa",
+"Amyris Homme Extrait",
+"Decision",
+"Omnia Omnibus Ubique",
+"Blonde Amber",
+"Grand Soir",
+"Bijou Zafran",
+"Imperial",
+"Royal Oud",
+"Carved Oud",
+"Bois du Portugal",
+"Serenity",
+"Monarch"
+]
+},
+"cd": {
+"s": [
+"Gris Charnel",
+4
+],
+"j": [
+"Brompton",
+"Opulência floral-resinosa em extrait — S"
+],
+"t": [
+"Blonde Amber",
+"Gentle Fluidity Silver",
+"Grand Soir",
+"Odéon",
+"African Leather",
+"Amyris Homme Extrait",
+"Wood Whisper",
+"Caden",
+"Intoxicated",
+"Black Saffron Absolu"
+]
+},
+"cn": {
+"s": [
+"Grand Soir",
+3
+],
+"j": [
+"Bijou Zafran",
+"O açafrão estranho e macio — aresta indecifrável"
+],
+"t": [
+"African Leather",
+"Amyris Homme Extrait",
+"Blonde Amber",
+"Odéon",
+"Oud Satin Mood",
+"Brompton",
+"Gris Charnel",
+"Les Sables Roses",
+"Liwa",
+"Omnia Omnibus Ubique",
+"Ombre Nomade",
+"Outlands",
+"Caden",
+"Intoxicated",
+"Black Saffron Absolu",
+"Serenity",
+"Apotecário"
+]
+}
+},
+"mf": {
+"lazer": {
+"s": [
+"Outlands",
+3
+],
+"j": [
+"Gris Charnel",
+"Figo-tonka denso: conforto líquido e o coringa do frio"
+],
+"t": [
+"Santal 33"
+]
+},
+"ti": {
+"s": [
+"Decision",
+4
+],
+"j": [
+"Montabaco Intensivo",
+"Tabaco seco-arejado-suede: sofisticação que nenhum colega nomeia"
+],
+"t": [
+"African Leather",
+"Gris Charnel",
+"Santal 33",
+"Wood Whisper",
+"Apotecário"
+]
+},
+"tf": {
+"s": [
+"Purpose 50",
+3
+],
+"j": [
+"Radical Rose",
+"Rosa dark-mineral com chili-imortelle: a rosa que não é rosa de mulher"
+],
+"t": [
+"Decision",
+"Outlands",
+"Favonius",
+"Ombre Nomade",
+"Imperial",
+"Carved Oud",
+"Montabaco Intensivo"
+]
+},
+"ni": {
+"s": [
+"Outlands",
+3
+],
+"j": [
+"Brompton",
+"Opulência floral-resinosa em extrait — S"
+],
+"t": [
+"Grand Soir",
+"Ombre Nomade",
+"Radical Rose",
+"Favonius",
+"Les Sables Roses",
+"Aventus Absolu",
+"Bijou Zafran",
+"Omnia Omnibus Ubique",
+"Oud Satin Mood",
+"Blonde Amber",
+"African Leather",
+"Liwa",
+"Purpose 50",
+"Caden",
+"Imperial",
+"Intoxicated",
+"Apotecário",
+"Monarch",
+"Oud Kyphi"
+]
+},
+"nf": {
+"s": [
+"Ombre Nomade",
+3
+],
+"j": [
+"Purpose 50",
+"Olíbano-mineral protagonista sobre sand vetiver-suede: o frasco mais alinhado ao DNA primário"
+],
+"t": [
+"Oud Satin Mood",
+"Outlands",
+"Radical Rose",
+"Brompton",
+"Favonius",
+"Les Sables Roses",
+"Aventus Absolu",
+"Grand Soir",
+"Blonde Amber",
+"Liwa",
+"Omnia Omnibus Ubique",
+"Imperial",
+"Royal Oud",
+"Serenity",
+"Monarch",
+"Oud Kyphi"
+]
+},
+"cd": {
+"s": [
+"Brompton",
+3
+],
+"j": [
+"Grand Soir",
+"Boozy-baunilha-âmbar sem oud: o respiro do óbvio"
+],
+"t": [
+"Blonde Amber",
+"Gris Charnel",
+"Caden",
+"Wood Whisper",
+"Intoxicated"
+]
+},
+"cn": {
+"s": [
+"Ombre Nomade",
+3
+],
+"j": [
+"Grand Soir",
+"Boozy-baunilha-âmbar sem oud: o respiro do óbvio"
+],
+"t": [
+"Oud Satin Mood",
+"Blonde Amber",
+"African Leather",
+"Amyris Homme Extrait",
+"Bijou Zafran",
+"Outlands",
+"Brompton",
+"Les Sables Roses",
+"Liwa",
+"Omnia Omnibus Ubique",
+"Caden",
+"Intoxicated",
+"Serenity",
+"Apotecário"
+]
+}
+}
+};
+
+/* v35: sem camada curiosidade no playbook */
+const CURIO_SPR = {};
+
+/* ============ GEOMETRIA DA RODA ============ */
+const NS="http://www.w3.org/2000/svg", svg=document.getElementById('wheel');
+const CX=450, CY=450, R_IN=140, R_OUT=380, R_LBL=408;
+const SEG=2*Math.PI/16, GAP_A=0.012;
+function pol(r,a){return [CX+r*Math.cos(a), CY+r*Math.sin(a)];}
+function el(t,attrs,parent){const e=document.createElementNS(NS,t);
+  for(const k in attrs)e.setAttribute(k,attrs[k]); (parent||svg).appendChild(e); return e;}
+
+/* halo central */
+const defs=el('defs',{});
+const rg=el('radialGradient',{id:'halo'},defs);
+el('stop',{offset:'0%','stop-color':'#C9973F','stop-opacity':'0.10'},rg);
+el('stop',{offset:'100%','stop-color':'#C9973F','stop-opacity':'0'},rg);
+el('circle',{cx:CX,cy:CY,r:R_IN-8,fill:'url(#halo)'});
+
+/* setores */
+const sectorEls=[];
+ARCH.forEach((a,i)=>{
+  const a0=-Math.PI/2+i*SEG+GAP_A, a1=-Math.PI/2+(i+1)*SEG-GAP_A;
+  const [x0,y0]=pol(R_IN,a0),[x1,y1]=pol(R_OUT,a0),[x2,y2]=pol(R_OUT,a1),[x3,y3]=pol(R_IN,a1);
+  const d=`M${x0},${y0} L${x1},${y1} A${R_OUT},${R_OUT} 0 0 1 ${x2},${y2} L${x3},${y3} A${R_IN},${R_IN} 0 0 0 ${x0},${y0}Z`;
+  sectorEls.push(el('path',{d, fill:a.c, 'fill-opacity':0.055, stroke:a.c,'stroke-opacity':0.22,'stroke-width':1}));
+  /* rótulo curvo */
+  const mid=(a0+a1)/2, flip = Math.cos(mid)<0 ? true : false;
+  const rl = R_LBL;
+  const p0 = pol(rl, flip?a1:a0), p1 = pol(rl, flip?a0:a1);
+  const path=el('path',{id:'lbl'+i, d:`M${p0[0]},${p0[1]} A${rl},${rl} 0 0 ${flip?0:1} ${p1[0]},${p1[1]}`, fill:'none'},defs);
+  const t=el('text',{'font-size':'14.5','letter-spacing':'1.5','fill':a.c,'fill-opacity':0.85,
+    style:'font-family:Didot,"Bodoni MT","Playfair Display",Georgia,serif;font-style:italic'});
+  const tp=el('textPath',{href:'#lbl'+i, startOffset:'50%', 'text-anchor':'middle'},t);
+  tp.textContent=a.n;
+  /* contagem */
+  const cnt=FR.filter(f=>f.arq===a.n&&!f.curio&&!f.out).length;
+  const [cx2,cy2]=pol(R_IN-22, mid);
+  const ct=el('text',{x:cx2,y:cy2,'text-anchor':'middle','dominant-baseline':'middle',
+    'font-size':'11','fill':cnt===0?'#5E554A':a.c,'fill-opacity':cnt===0?0.6:0.7,
+    style:'font-family:"SF Mono",Menlo,monospace'});
+  ct.textContent=cnt; a._cntEl=ct;
+});
+
+/* órbitas de referência = tiers (D interno → S externo) */
+const TVR={S:10,A:8,B:6,C:4,D:2};
+function orbR(tv){return R_IN+(tv-2)/8*(R_OUT-R_IN-18);}
+const TCOL={S:'#C9973F',A:'#6FA3C9',B:'#B8A24A',C:'#B07A4A',D:'#6E6E6E'};
+[['D',2],['C',4],['B',6],['A',8],['S',10]].forEach(([t,tv])=>{
+  const r=orbR(tv);
+  el('circle',{cx:CX,cy:CY,r,fill:'none',stroke:TCOL[t],'stroke-opacity':t==='S'?0.55:0.3,'stroke-width':t==='S'?1.1:0.8,'stroke-dasharray':'3 6'});
+  [ -Math.PI/2, 0, Math.PI/2, Math.PI ].forEach(ang=>{
+    const [x,y]=pol(r,ang);
+    const bg=el('circle',{cx:x,cy:y,r:8,fill:'#14110E'});
+    const lt=el('text',{x,y:y+3.5,'text-anchor':'middle','fill':TCOL[t],'font-size':'10','font-weight':'700',style:'font-family:"SF Mono",Menlo,monospace'}); lt.textContent=t;
+  });
+});
+const cT=el('text',{x:CX,y:CY-4,'text-anchor':'middle','fill':'#93887A','font-size':'13',
+  style:'font-family:Didot,Georgia,serif;font-style:italic'}); cT.textContent='tier ↑';
+const cT2=el('text',{x:CX,y:CY+16,'text-anchor':'middle','fill':'#5E554A','font-size':'10.5',
+  style:'font-family:"SF Mono",Menlo,monospace'}); cT2.textContent='órbita = tier (S fora, D dentro)';
+
+/* frascos como orbes */
+function seedRand(i){const x=Math.sin(i*127.1+311.7)*43758.5453; return x-Math.floor(x);}
+const orbG=el('g',{});
+FR.forEach(f=>{
+  const ai=AIDX[f.arq];
+  const inArch=FR.filter(x=>x.arq===f.arq); const k=inArch.indexOf(f);
+  const a0=-Math.PI/2+ai*SEG, span=SEG*0.7, off=SEG*0.15;
+  const ang=a0+off+span*((k+0.5)/inArch.length)+ (seedRand(f.id)-0.5)*SEG*0.08;
+  const r=orbR(f.tv);
+  const [x,y]=pol(r,ang);
+  f._x=x; f._y=y;
+  const g=el('g',{class:'orb',style:'cursor:pointer'},orbG);
+  f._halo=el('circle',{cx:x,cy:y,r:13,fill:f.color,'fill-opacity':0.12},g);
+  f._dot=el('circle',{cx:x,cy:y,r:6,fill:f.color,stroke:(f.curio||f.out)?f.color:'#14110E','stroke-width':1.2,'stroke-dasharray':(f.curio||f.out)?'2 2':'none','fill-opacity':f.out?0.25:(f.curio?0.5:1)},g);
+  f._ring=el('circle',{cx:x,cy:y,r:9.5,fill:'none',stroke:f.color,'stroke-width':1.4,'stroke-opacity':0},g);
+  g.addEventListener('click',()=>select(f.id));
+  g.addEventListener('mousemove',e=>showTT(e,f));
+  g.addEventListener('mouseleave',hideTT);
+});
+
+/* pinos de gap */
+const GAP_PINS=[
+ {arq:"O Geólogo", txt:"gap 1 · vetiver seco"},
+ {arq:"O Botânico", txt:"gap 2 · chypre verde"},
+ {arq:"O Marceneiro", txt:"gap 4 · sândalo cremoso"}
+];
+/* gap 5 (leather raw) arquivado — gaps_v3.4; gap 3 (tabaco) fechado */
+const gapG=el('g',{style:'display:none'});
+GAP_PINS.forEach(p=>{
+  const ai=AIDX[p.arq], mid=-Math.PI/2+(ai+0.5)*SEG;
+  const [x,y]=pol(R_OUT-24, mid);
+  el('circle',{cx:x,cy:y,r:7,fill:'none',stroke:'#C9973F','stroke-width':1.6,'stroke-dasharray':'3 3'},gapG);
+  const t=el('text',{x,y:y-14,'text-anchor':'middle','fill':'#C9973F','font-size':'10.5',
+    style:'font-family:"SF Mono",Menlo,monospace'},gapG);
+  t.textContent=p.txt;
+});
+
+/* ============ MOTOR DE FIT ============ */
+function suit(f,t){
+  if(t<=14) return f.frio;
+  if(t<=24.5) return f.frio+(f.ameno-f.frio)*(t-14)/10.5;
+  if(t<=30) return f.ameno+(f.calor-f.ameno)*(t-24.5)/5.5;
+  return f.calor;
+}
+function humMod(f,h){
+  const lean=ARCH[AIDX[f.arq]].hum;
+  if(h>70) return lean*0.55;          /* alta: sobe frescos/verdes/minerais/incenso, desce densos */
+  if(h<40) return -lean*0.45;         /* baixa: inverte — secos/resinosos sobem */
+  return 0;
+}
+/* clima 0–9 ajustado por umidade; elegível = clima >= 5 (dentro do envelope) */
+function clima(f,t,h){return Math.max(0,Math.min(9,suit(f,t)+humMod(f,h)));}
+function elig(f,t,h){return clima(f,t,h)>=5;}
+/* fit só para brilho dos orbes: tier manda, clima desempata */
+function fit(f,t,h){const c=clima(f,t,h); return (elig(f,t,h)?0.6:0.15)*f.tv/10 + 0.4*c/9;}
+/* ordem oficial do modo Livre: tier → clima */
+function tierOrder(a,b){return (b.f.tv-a.f.tv)||(b.c-a.c)||a.f.nome.localeCompare(b.f.nome,'pt');}
+function tpill(t){return `<span class="tp tp-${t}">${t}</span>`;}
+function climTxt(c){return `<span class="clim">clima ${c.toFixed(1).replace('.0','')}/9</span>`;}
+function faixa(t){
+  if(t>32)return{k:'mq',n:'Muito quente',s:'máx 3 sprays',e:'🔴'};
+  if(t>27)return{k:'q',n:'Quente',s:'3–4 sprays',e:'🟠'};
+  if(t>22)return{k:'am',n:'Ameno',s:'3–4 sprays',e:'🟡'};
+  if(t>17)return{k:'fr',n:'Fresco',s:'3–5 sprays',e:'🔵'};
+  if(t>12)return{k:'fri',n:'Frio',s:'3–5 sprays',e:'🟣'};
+  return{k:'mf',n:'Muito frio',s:'3–5 sprays',e:'⚫'};
+}
+function humBand(h){return h>70?['Alta','frescos/verdes/minerais sobem']:h<40?['Baixa','secos/resinosos sobem']:['Média','ordem padrão'];}
+
+/* ============ RENDER ============ */
+let selected=null, gapMode=false, occ='livre';
+const $=id=>document.getElementById(id);
+
+function render(){
+  const t=parseFloat($('temp').value), h=parseInt($('hum').value);
+  $('tempV').textContent=t+'°C'; $('humV').textContent=h+'%';
+  const fx=faixa(t), hb=humBand(h);
+  $('faixaChip').innerHTML=`${fx.e} Faixa: <b>${fx.n}</b>`;
+  $('humChip').innerHTML=`💧 <b>${hb[0]}</b> — ${hb[1]}`;
+  $('sprayChip').innerHTML=`Sprays: <b>${fx.s}</b>`;
+  $('occNote').style.display='none';
+
+  if(occ!=='livre'){ renderOccasion(t,h,fx); }
+  else{ renderLivre(t,h,fx); }
+  renderDetail(t,h);
+}
+
+function paintWheelByFit(t,h,highlightSet){
+  const live=FR.filter(f=>!f.archived);
+  const scored=live.map(f=>({f,v:fit(f,t,h)}));
+  const vals=scored.map(s=>s.v);
+  const max=Math.max(...vals,1e-9), min=Math.min(...vals,0);
+  FR.forEach(f=>{
+    if(f.archived){f._dot.setAttribute('fill-opacity',0.08);f._halo.setAttribute('fill-opacity',0);
+      f._dot.setAttribute('stroke-opacity',0.15);f._ring.setAttribute('stroke-opacity',0);return;}
+    const v=fit(f,t,h), n=(v-min)/(max-min+1e-9);
+    let dim=gapMode?0.35:1;
+    if(highlightSet && !highlightSet.has(f.id)) dim*=0.18;
+    f._dot.setAttribute('fill-opacity',(0.25+0.75*n)*dim);
+    f._dot.setAttribute('stroke-opacity',highlightSet&&!highlightSet.has(f.id)?0.3:1);
+    f._dot.setAttribute('r',4.5+3.5*n);
+    f._halo.setAttribute('r',9+16*n);
+    f._halo.setAttribute('fill-opacity',(0.04+0.22*n)*dim);
+    f._ring.setAttribute('stroke-opacity',selected===f.id?0.9:0);
+  });
+}
+
+function renderLivre(t,h,fx){
+  paintWheelByFit(t,h,null);
+  const live=FR.filter(f=>!f.archived&&!f.curio&&!f.out&&elig(f,t,h));
+  const scored=live.map(f=>({f,c:clima(f,t,h)})).sort(tierOrder);
+  const top=scored.slice(0,10);
+  $('rankTitle').textContent=`Top do dia — ${t}°C · ${h}% · por tier, dentro do envelope`;
+  $('ranking').innerHTML='';
+  top.forEach((s,i)=>{
+    const d=document.createElement('div');
+    d.className='rk'+(selected===s.f.id?' sel':'');
+    d.innerHTML=`<span class="pos">${i+1}</span>
+      <span class="dot" style="background:${s.f.color};color:${s.f.color}"></span>
+      <span class="nm">${s.f.nome}${tpill(s.f.tier)}<small>${s.f.casa} · <i>${s.f.arq}</i></small></span>
+      <span class="fit">${climTxt(s.c)}</span>
+      <span class="spr">${fx.s.replace(' sprays','')}</span>`;
+    d.addEventListener('click',()=>select(s.f.id));
+    $('ranking').appendChild(d);
+  });
+  appendArabeDoDia(t,h);
+}
+
+function appendArabeDoDia(t,h){
+  const cur=FR.filter(f=>f.curio&&!f.archived&&!f.out);
+  if(!cur.length) return;
+  const el0=cur.filter(f=>elig(f,t,h)); const pool=el0.length?el0:cur;
+  const best=pool.map(f=>({f,c:clima(f,t,h)})).sort(tierOrder)[0];
+  const d=document.createElement('div');
+  d.className='rk curio'+(selected===best.f.id?' sel':'');
+  d.innerHTML=`<span class="pos">☾</span>
+    <span class="dot" style="background:${best.f.color};color:${best.f.color}"></span>
+    <span class="nm">${best.f.nome}${tpill(best.f.tier)} <span class="tag cur">custo do dia</span><small>${best.f.casa} · <i>${best.f.arq}</i> · rotação livre, fora da grade</small></span>
+    <span class="fit">${climTxt(best.c)}</span><span class="spr"></span>`;
+  d.addEventListener('click',()=>select(best.f.id));
+  $('ranking').appendChild(d);
+}
+
+function renderOccasion(t,h,fx){
+  const cell=PB[fx.k][occ];
+  $('rankTitle').textContent=`${OCC_LABEL[occ]} — ${fx.n} (playbook v59)`;
+  $('ranking').innerHTML='';
+  if(!cell){
+    $('occNote').style.display='block';
+    paintWheelByFit(t,h,new Set());
+    return;
+  }
+  /* conjunto para destacar na roda */
+  const hi=new Set();
+  const addHi=n=>{const id=pbId(n); if(id!==null)hi.add(id);};
+  addHi(cell.s[0]); addHi(cell.j[0]); cell.t.forEach(addHi);
+  paintWheelByFit(t,h,hi);
+
+  const mkRow=(pos,name,tag,spr,why)=>{
+    const id=pbId(name);
+    const isCurio=CURIO.has(name);
+    const f=id!==null?FR[id]:null;
+    const d=document.createElement('div');
+    d.className='rk'+(f&&selected===f.id?' sel':'')+(isCurio?' curio':'')+(f&&f.archived?' arch-item':'');
+    const dot=f?`<span class="dot" style="background:${f.color};color:${f.color}"></span>`
+              :`<span class="dot" style="background:var(--dim);color:var(--dim)"></span>`;
+    const sub=f?`${f.casa} · <i>${f.arq}</i>`:`camada custo`;
+    const fitTxt=f?`<span class="fit">${climTxt(clima(f,t,h))}</span>`:`<span class="fit" style="color:var(--dim)">—</span>`;
+    const sprTxt=spr!==null?spr:(isCurio?(CURIO_SPR[name]||''):'');
+    d.innerHTML=`<span class="pos">${pos}</span>${dot}
+      <span class="nm">${f?f.nome:name}${f?tpill(f.tier):''}${tag?` <span class="tag ${tag[0]}">${tag[1]}</span>`:''}<small>${sub}</small></span>
+      ${fitTxt}<span class="spr">${sprTxt}</span>`;
+    if(f) d.addEventListener('click',()=>select(f.id));
+    $('ranking').appendChild(d);
+    if(why){
+      const w=document.createElement('div'); w.className='why'; w.textContent=why;
+      $('ranking').appendChild(w);
+    }
+  };
+
+  mkRow(1, cell.s[0], ['seg','seguro'], cell.s[1]+' spr', null);
+  mkRow(2, cell.j[0], ['jog','jogada'], null, cell.j[1]);
+  cell.t.forEach((n,i)=>{
+    mkRow(i+3, n, null, null, null);
+  });
+  appendArabeDoDia(t,h);
+}
+
+function renderDetail(t,h){
+  const box=$('detail');
+  if(selected===null){box.innerHTML='<div class="empty">Toque num frasco na roda ou no ranking</div>';return;}
+  const f=FR[selected], c=clima(f,t,h);
+  const barRow=(lbl,val)=>`<div class="bar"><span>${lbl}</span>
+    <div class="track"><div class="fill" style="width:${val*10}%;background:${f.color}"></div></div>
+    <span class="n">${val}</span></div>`;
+  box.innerHTML=`
+    <h4 class="serif">${f.nome}</h4>
+    <div class="house">${f.casa} · <span class="arch">${f.arq}</span>${f.curio?' · <span style="color:var(--dim)">camada custo — fora da grade</span>':''}</div>
+    <div class="meta">
+      <span>Tier ${tpill(f.tier)}${f.out?' <span style="color:var(--dim)">(D — fora da grade)</span>':''}</span>
+      <span>Clima agora <b style="color:var(--amber)">${c.toFixed(1).replace('.0','')}/9</b> ${elig(f,t,h)?'<span style="color:var(--dim)">· dentro do envelope</span>':'<span style="color:#b56a5a">· fora do envelope</span>'}</span>
+    </div>
+    <div class="bars">${barRow('Calor',f.calor)}${barRow('Ameno',f.ameno)}${barRow('Frio',f.frio)}</div>
+    <button class="archive${f.archived?' arch-on':''}" id="archBtn">
+      ${f.archived?'Arquivado — restaurar':'Arquivar (simular poda)'}</button>`;
+  $('archBtn').addEventListener('click',()=>{
+    f.archived=!f.archived;
+    ARCH.forEach(a=>{a._cntEl.textContent=FR.filter(x=>x.arq===a.n&&!x.archived&&!x.curio&&!x.out).length;});
+    $('resetBtn').style.display=FR.some(x=>x.archived)?'':'none';
+    render();
+  });
+}
+
+function select(id){selected=(selected===id?null:id);render();}
+
+/* tooltip */
+const tt=$('tt'), wrap=$('wheelWrap');
+function showTT(e,f){
+  const t=parseFloat($('temp').value), h=parseInt($('hum').value);
+  tt.innerHTML=`<b>${f.nome}</b>${f.casa} · <i>${f.arq}</i><br>
+    tier <b>${f.tier}</b>${f.out?' · fora da grade':''} · <span class="tt-fit">clima ${clima(f,t,h).toFixed(1).replace('.0','')}/9${elig(f,t,h)?'':' · fora do envelope'}</span>`;
+  const r=wrap.getBoundingClientRect();
+  tt.style.left=(e.clientX-r.left+14)+'px'; tt.style.top=(e.clientY-r.top-10)+'px';
+  tt.style.opacity=1;
+}
+function hideTT(){tt.style.opacity=0;}
+
+/* ocasiões */
+document.querySelectorAll('.occ').forEach(b=>{
+  b.addEventListener('click',()=>{
+    occ=b.dataset.o;
+    document.querySelectorAll('.occ').forEach(x=>x.classList.toggle('on',x===b));
+    render();
+  });
+});
+
+/* modo gaps */
+$('gapBtn').addEventListener('click',()=>{
+  gapMode=!gapMode;
+  $('gapBtn').classList.toggle('on',gapMode);
+  gapG.style.display=gapMode?'':'none';
+  $('gapLegend').style.display=gapMode?'block':'none';
+  ARCH.forEach((a,i)=>{
+    const cnt=FR.filter(f=>f.arq===a.n&&!f.archived&&!f.curio&&!f.out).length;
+    if(gapMode){
+      sectorEls[i].setAttribute('fill-opacity', cnt<=1?0.02:0.10);
+      sectorEls[i].setAttribute('stroke-opacity', cnt<=1?0.10:0.45);
+      sectorEls[i].setAttribute('stroke-dasharray', cnt<=1?'4 4':'none');
+    }else{
+      sectorEls[i].setAttribute('fill-opacity',0.055);
+      sectorEls[i].setAttribute('stroke-opacity',0.22);
+      sectorEls[i].setAttribute('stroke-dasharray','none');
+    }
+  });
+  render();
+});
+$('resetBtn').addEventListener('click',()=>{
+  FR.forEach(f=>f.archived=false);
+  ARCH.forEach(a=>{a._cntEl.textContent=FR.filter(x=>x.arq===a.n&&!x.curio&&!x.out).length;});
+  $('resetBtn').style.display='none'; render();
+});
+
+$('temp').addEventListener('input',render);
+$('hum').addEventListener('input',render);
+render();
+</script>
+</body>
+</html>

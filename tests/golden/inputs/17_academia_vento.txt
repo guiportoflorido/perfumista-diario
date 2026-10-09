@@ -1,0 +1,4 @@
+Data: 2026-05-02
+T: 14-22 pico 15 noite 17
+Td: 10
+Extra: academia, vento

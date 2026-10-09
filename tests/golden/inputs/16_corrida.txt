@@ -1,0 +1,5 @@
+Data: 2026-02-14
+T: 21-30 pico 15 noite 24
+Td: 19
+Extra: corrida
+Dia: 7:15-9 lazer rua; 9-19:30 lazer rua; 19:30-23 cn casa

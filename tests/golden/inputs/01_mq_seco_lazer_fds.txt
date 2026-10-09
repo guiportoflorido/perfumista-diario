@@ -1,0 +1,5 @@
+Data: 2026-01-17
+T: 24-35 pico 15 noite 29
+Td: 9
+Chuva: seco
+Extra: sol

@@ -1,0 +1,5 @@
+Data: 2026-05-14
+T: 14-23 pico 15 noite 17
+Td: 11
+Manhã: Grand Soir
+Dia: 8-18 ti ac; 18-19:30 rua; 19:30-23 ni rua

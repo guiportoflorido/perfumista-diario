@@ -1,0 +1,4 @@
+Data: 2026-03-05
+T: 20-29 pico 15 noite 23
+Td: 18
+Manhã: Hacivat

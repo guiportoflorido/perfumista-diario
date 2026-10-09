@@ -1,0 +1,5 @@
+Data: 2026-07-12
+T: 8-16 pico 14 noite 11
+Td: 4
+Chuva: seco
+Dia: 7:15-19:30 cd casa; 19:30-23 cn casa

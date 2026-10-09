@@ -1,0 +1,10 @@
+{
+  "name": "perfumista-diario",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "extrair": "python3 tools/extrair.py",
+    "golden": "python3 tools/golden.py",
+    "test": "node --test tests/*.test.js"
+  }
+}

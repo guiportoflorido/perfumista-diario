@@ -1,0 +1,6 @@
+Data: 2026-01-30
+T: 26-36 pico 15 noite 31
+Td: 23
+Chuva: pancadas
+Extra: sol, vento
+Dia: 8-18 lazer rua; 19:30-23 ni rua

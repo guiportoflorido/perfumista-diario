@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mapa climático da coleção v5 — temperatura × ponto de orvalho × chuva · 70 frascos · fichas v9 · 05/out/2026</title>
+<style>
+:root{
+  --bg:#EFE8DA; --panel:#E6DDCB; --line:#CFC4AE; --text:#14110E; --muted:#6A6054; --dim:#8F8576;
+  --amber:#9A6B14; --danger:#9C4331; --zone:rgba(20,17,14,.045); --hatch:rgba(20,17,14,.22); --ring:#14110E;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#14110E; --panel:#1C1814; --line:#342C23; --text:#E9E1D2; --muted:#93887A; --dim:#5E554A;
+    --amber:#C9973F; --danger:#D07A63; --zone:rgba(233,225,210,.04); --hatch:rgba(233,225,210,.2); --ring:#E9E1D2;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#14110E; --panel:#1C1814; --line:#342C23; --text:#E9E1D2; --muted:#93887A; --dim:#5E554A;
+  --amber:#C9973F; --danger:#D07A63; --zone:rgba(233,225,210,.04); --hatch:rgba(233,225,210,.2); --ring:#E9E1D2;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;font-size:15px;line-height:1.45}
+header{padding:24px 32px 16px;border-bottom:1px solid var(--line)}
+header h1{font-family:"Didot","Bodoni MT","Playfair Display",Georgia,serif;font-weight:400;font-size:30px;letter-spacing:.3px}
+header p{color:var(--muted);font-size:13px;margin-top:4px;max-width:78ch}
+.controls{display:flex;flex-wrap:wrap;gap:12px 28px;align-items:center;padding:14px 32px;border-bottom:1px solid var(--line)}
+.group{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted)}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:20px;overflow:hidden}
+.seg button{background:none;border:0;color:var(--muted);padding:7px 14px;font-size:13px;cursor:pointer;font-family:inherit}
+.seg button[aria-pressed="true"]{background:var(--amber);color:var(--bg);font-weight:600}
+.seg button:focus-visible,input:focus-visible,select:focus-visible,.arch:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
+input[type=number],select{background:var(--panel);border:1px solid var(--line);color:var(--text);border-radius:8px;padding:6px 8px;font-size:13px;width:74px;font-family:inherit}
+select{width:auto}
+#err{color:var(--danger);font-size:12.5px;min-height:1em}
+main{display:grid;grid-template-columns:minmax(0,1fr) 300px}
+#plot{padding:8px 8px 8px 16px;min-width:0}
+#chart{width:100%;height:auto;display:block}
+aside{border-left:1px solid var(--line);background:var(--panel);padding:18px 20px;display:flex;flex-direction:column;gap:18px}
+aside h2{font-size:12.5px;font-weight:600;color:var(--muted);margin-bottom:8px}
+.arch{display:flex;align-items:center;gap:8px;width:100%;background:none;border:0;color:var(--text);font-size:13px;padding:3px 4px;border-radius:6px;cursor:pointer;text-align:left;font-family:inherit}
+.arch .dot{width:12px;height:12px;border-radius:50%;flex:none;border:1px solid var(--ring)}
+.arch .n{margin-left:auto;color:var(--dim);font-variant-numeric:tabular-nums;font-size:12px}
+.arch.off{color:var(--dim)} .arch.off .dot{opacity:.25}
+.sizes{display:flex;align-items:flex-end;gap:14px;font-size:12px;color:var(--muted)}
+.sizes span{display:flex;flex-direction:column;align-items:center;gap:4px}
+.sizes i{display:block;border-radius:50%;background:var(--dim)}
+#detail{font-size:13px;min-height:150px}
+#detail .nm{font-family:"Didot","Bodoni MT","Playfair Display",Georgia,serif;font-size:20px;line-height:1.2}
+#detail .casa{color:var(--muted);margin-bottom:8px}
+#detail dl{display:grid;grid-template-columns:auto 1fr;gap:3px 12px}
+#detail dt{color:var(--muted)} #detail dd{font-variant-numeric:tabular-nums}
+#detail .hint{color:var(--dim)}
+footer{padding:16px 32px 28px;border-top:1px solid var(--line);color:var(--muted);font-size:12.5px}
+footer p{margin-top:6px;max-width:110ch}
+.lbl{font-size:10.5px;fill:var(--text);pointer-events:none;text-anchor:middle;paint-order:stroke;stroke:var(--bg);stroke-width:3px;stroke-linejoin:round}
+.ax{font-size:11.5px;fill:var(--muted)} .axt{font-size:12.5px;fill:var(--muted)}
+.fx{font-size:12px;fill:var(--text);font-weight:600} .fxs{font-size:11px;fill:var(--dim)}
+.zone-l{font-size:12px;fill:var(--muted)}
+.node{cursor:pointer}
+@media (max-width:900px){main{grid-template-columns:1fr}aside{border-left:0;border-top:1px solid var(--line)}header,.controls,footer{padding-left:16px;padding-right:16px}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<header>
+  <h1>Mapa climático da coleção</h1>
+  <p>70 frascos posicionados pelo ponto térmico ideal (horizontal) e, na vertical, pelo ar que os favorece: ponto de orvalho ou chuva. Cor é o arquétipo, tamanho é o tier. v5 de 05/out/2026: camada custo fora do mapa (usada só em academia e corrida — regra de 25/set/2026); 70 frascos = grade 69 + Bedouin Rose (D). Posições, envelopes e tiers inalterados vs v4 (tiers conferidos com a aba Tiers do Google Sheets). Sem ocasião. Índice de chuva dos três novos é hipótese do Claude. O eixo de chuva é hipótese do Claude, não dado medido.</p>
+</header>
+<div class="controls">
+  <div class="group"><span id="lv">Eixo vertical</span>
+    <div class="seg" role="group" aria-labelledby="lv">
+      <button id="bTd" aria-pressed="true">Ponto de orvalho</button><button id="bRain" aria-pressed="false">Chuva</button>
+    </div>
+  </div>
+  <div class="group"><span>Hoje</span>
+    <label for="iT">T °C</label><input id="iT" type="number" min="6" max="38" step="0.5" placeholder="24">
+    <span id="gTd"><label for="iTd">Td °C</label> <input id="iTd" type="number" min="-6" max="26" step="0.5" placeholder="17"></span>
+    <span id="gRain" hidden><label for="iR">Chuva</label> <select id="iR"><option value="">—</option><option value="0">Dia seco</option><option value="1">Pancadas</option><option value="2">Chuva contínua</option></select></span>
+  </div>
+  <div class="group"><span id="lr">Rótulos</span>
+    <div class="seg" role="group" aria-labelledby="lr">
+      <button data-l="all" aria-pressed="true">Todos</button><button data-l="s" aria-pressed="false">Só tier S</button><button data-l="none" aria-pressed="false">Nenhum</button>
+    </div>
+  </div>
+  <div id="err" role="alert"></div>
+</div>
+<main>
+  <div id="plot"><svg id="chart" viewBox="0 0 1200 880" role="img" aria-label="Dispersão dos 70 frascos por temperatura ideal e sensibilidade ao ar"></svg></div>
+  <aside>
+    <div id="detail"><p class="hint">Passe o mouse ou toque numa esfera para ver a ficha e o envelope térmico do frasco.</p></div>
+    <div><h2>Arquétipo (clique para isolar)</h2><div id="legend"></div></div>
+    <div><h2>Tamanho é o tier</h2>
+      <div class="sizes"><span><i style="width:30px;height:30px"></i>S</span><span><i style="width:24px;height:24px"></i>A</span><span><i style="width:19px;height:19px"></i>B</span><span><i style="width:14px;height:14px"></i>C e D</span></div>
+    </div>
+  </aside>
+</main>
+<footer>
+  <p><b>Horizontal.</b> Ponto térmico ideal = centro do envelope da ficha, deslocado 0,5 faixa para o frio por ponto de peso acima de 3 (a mesma centralidade do gerador do playbook). A barra que aparece ao focar um frasco é o envelope inteiro.</p>
+  <p><b>Vertical, ponto de orvalho.</b> A zona vem da coluna Td da ficha (C sobe no ar carregado, N indiferente, S sobe no ar seco). Dentro da zona, a altura é peso + doçura: quanto mais leve e seco, mais vapor aguenta. A área hachurada é impossível, porque o ponto de orvalho nunca passa da temperatura.</p>
+  <p><b>Vertical, chuva.</b> Não existe dado de chuva nas fichas. O índice é uma hipótese do Claude, calculada nota a nota sobre a pirâmide verificada: vetiver, musgo, incenso, íris, chá, galbanum, coníferas e madeiras puxam para chuva; coco, marinho, frutas tropicais, cítricos, menta e açúcar puxam para sol. Dividido pela raiz do número de notas para não premiar pirâmide longa. Esferas vazadas não têm pirâmide documentada.</p>
+  <p><b>Em todos os casos</b> as esferas se afastam o mínimo necessário para não se sobrepor, então a posição é aproximada; a ficha no painel é o dado exato. Envelope, peso, doçura e Td são derivações de análise, não leitura de pele. Tier é seu.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+<script>
+const DATA=[{"n":"1872 for Men","casa":"Clive Christian","arq":"Barbeiro","t":"S","td":"C","p":2,"d":0,"a":0,"b":2,"c":0,"r":0.27,"u":0,"s":"1872 for Men"},{"n":"7 Loewe","casa":"Loewe","arq":"Monge","t":"B","td":"N","p":2,"d":0,"a":1,"b":3,"c":0,"r":0.67,"u":0,"s":"7 Loewe"},{"n":"African Leather","casa":"Memo Paris","arq":"Curtidor","t":"S","td":"S","p":4,"d":1,"a":2,"b":5,"c":0,"r":0.32,"u":0,"s":"African Leather"},{"n":"Al Qurashi Blend","casa":"Abdul Samad Al Qurashi","arq":"Sultão","t":"A","td":"N","p":3,"d":1,"a":1,"b":3,"c":0,"r":0.0,"u":0,"s":"Al Qurashi"},{"n":"Amyris Homme Extrait","casa":"MFK","arq":"Lareira","t":"S","td":"N","p":3,"d":2,"a":2,"b":5,"c":0,"r":0.19,"u":0,"s":"Amyris Extrait"},{"n":"Anelo","casa":"Pernoire","arq":"Chiprista","t":"A","td":"C","p":2,"d":1,"a":0,"b":2,"c":0,"r":-0.83,"u":0,"s":"Anelo"},{"n":"Ani X","casa":"Nishane","arq":"Lareira","t":"A","td":"N","p":3,"d":2,"a":1,"b":3,"c":0,"r":-0.61,"u":0,"s":"Ani X"},{"n":"Apotecário","casa":"Granado","arq":"Curtidor","t":"B","td":"S","p":4,"d":1,"a":3,"b":5,"c":0,"r":1.21,"u":0,"s":"Apotecário"},{"n":"Aventus","casa":"Creed","arq":"Chiprista","t":"A","td":"N","p":3,"d":1,"a":0,"b":3,"c":0,"r":0.14,"u":0,"s":"Aventus"},{"n":"Aventus Absolu","casa":"Creed","arq":"Chiprista","t":"S","td":"N","p":3,"d":1,"a":1,"b":5,"c":0,"r":0.11,"u":0,"s":"Av. Absolu"},{"n":"Beach Hut Man","casa":"Amouage","arq":"Botânico","t":"A","td":"C","p":2,"d":0,"a":0,"b":4,"c":0,"r":1.66,"u":0,"s":"Beach Hut"},{"n":"Bedouin Rose","casa":"BYNOMADS","arq":"Rosal","t":"D","td":"S","p":4,"d":2,"a":3,"b":5,"c":0,"r":0.88,"u":0,"s":"Bedouin Rose"},{"n":"Bijou Zafran","casa":"Ormonde Jayne","arq":"Curtidor","t":"S","td":"S","p":3,"d":1,"a":2,"b":5,"c":0,"r":1.21,"u":0,"s":"Bijou Zafran"},{"n":"Black Saffron Absolu","casa":"Byredo","arq":"Curtidor","t":"A","td":"N","p":3,"d":1,"a":2,"b":4,"c":0,"r":0.75,"u":0,"s":"Black Saffron"},{"n":"Bleu de Chanel","casa":"Chanel","arq":"Mediterrâneo","t":"C","td":"C","p":2,"d":0,"a":0,"b":2,"c":0,"r":-0.11,"u":0,"s":"BdC"},{"n":"Blonde Amber","casa":"Clive Christian","arq":"Lareira","t":"S","td":"S","p":4,"d":2,"a":3,"b":5,"c":0,"r":1.08,"u":0,"s":"Blonde Amber"},{"n":"Blue Talisman","casa":"Ex Nihilo","arq":"Mediterrâneo","t":"A","td":"C","p":2,"d":1,"a":0,"b":2,"c":0,"r":0.0,"u":0,"s":"Blue Talisman"},{"n":"Bois du Portugal","casa":"Creed","arq":"Barbeiro","t":"B","td":"N","p":3,"d":0,"a":1,"b":5,"c":0,"r":0.82,"u":0,"s":"Bois Portugal"},{"n":"Bois Impérial","casa":"Essential Parfums","arq":"Geólogo","t":"S","td":"C","p":3,"d":0,"a":1,"b":3,"c":0,"r":0.45,"u":0,"s":"Bois Impérial"},{"n":"Brompton","casa":"Ex Nihilo","arq":"Rosal","t":"S","td":"S","p":4,"d":2,"a":2,"b":5,"c":0,"r":0.4,"u":0,"s":"Brompton"},{"n":"Caden","casa":"Omanluxury","arq":"Lareira","t":"A","td":"S","p":5,"d":3,"a":3,"b":5,"c":0,"r":0.43,"u":0,"s":"Caden"},{"n":"Carved Oud","casa":"Thameen","arq":"Marceneiro","t":"A","td":"S","p":4,"d":1,"a":2,"b":5,"c":0,"r":1.2,"u":0,"s":"Carved Oud"},{"n":"Castley","casa":"Parfums de Marly","arq":"Mediterrâneo","t":"B","td":"C","p":2,"d":1,"a":1,"b":3,"c":0,"r":-0.13,"u":0,"s":"Castley"},{"n":"Crab Apple Blossom","casa":"Clive Christian","arq":"Marinho","t":"S","td":"C","p":1,"d":1,"a":0,"b":2,"c":0,"r":-0.63,"u":0,"s":"Crab Apple"},{"n":"Decision","casa":"Amouage","arq":"Monge","t":"S","td":"S","p":3,"d":1,"a":2,"b":5,"c":0,"r":1.26,"u":0,"s":"Decision"},{"n":"Drunk Lovers","casa":"Born to Stand Out","arq":"Lareira","t":"A","td":"N","p":3,"d":2,"a":2,"b":4,"c":0,"r":0.4,"u":0,"s":"Drunk Lovers"},{"n":"Désobéissant","casa":"Givenchy","arq":"Botânico","t":"S","td":"C","p":2,"d":0,"a":0,"b":3,"c":0,"r":0.63,"u":0,"s":"Désobéissant"},{"n":"Favonius","casa":"Nishane","arq":"Rosal","t":"S","td":"S","p":4,"d":1,"a":2,"b":5,"c":0,"r":0.6,"u":0,"s":"Favonius"},{"n":"Gentle Fluidity Silver","casa":"MFK","arq":"Minimalista","t":"S","td":"N","p":3,"d":1,"a":1,"b":4,"c":0,"r":0.38,"u":0,"s":"GF Silver"},{"n":"Grand Soir","casa":"MFK","arq":"Lareira","t":"S","td":"S","p":5,"d":2,"a":3,"b":5,"c":0,"r":0.0,"u":0,"s":"Grand Soir"},{"n":"Green Irish Tweed","casa":"Creed","arq":"Botânico","t":"B","td":"C","p":2,"d":0,"a":0,"b":4,"c":0,"r":0.57,"u":0,"s":"GIT"},{"n":"Gris Charnel","casa":"BDK","arq":"Marceneiro","t":"S","td":"N","p":4,"d":2,"a":2,"b":5,"c":0,"r":1.2,"u":0,"s":"Gris Charnel"},{"n":"Hacivat","casa":"Nishane","arq":"Chiprista","t":"S","td":"N","p":3,"d":1,"a":0,"b":3,"c":0,"r":0.18,"u":0,"s":"Hacivat"},{"n":"Himalaya","casa":"Creed","arq":"Geólogo","t":"B","td":"C","p":2,"d":0,"a":0,"b":2,"c":0,"r":0.0,"u":0,"s":"Himalaya"},{"n":"Imagination","casa":"Louis Vuitton","arq":"Mediterrâneo","t":"S","td":"C","p":3,"d":0,"a":0,"b":3,"c":0,"r":0.3,"u":0,"s":"Imagination"},{"n":"Imperial","casa":"Boadicea","arq":"Barbeiro","t":"A","td":"S","p":4,"d":1,"a":3,"b":5,"c":0,"r":1.01,"u":0,"s":"Imperial"},{"n":"Intoxicated","casa":"By Kilian","arq":"Confeiteiro","t":"A","td":"S","p":4,"d":3,"a":3,"b":5,"c":0,"r":-0.12,"u":0,"s":"Intoxicated"},{"n":"K-Musk","casa":"BYNOMADS","arq":"Minimalista","t":"B","td":"C","p":2,"d":1,"a":0,"b":2,"c":0,"r":0.0,"u":0,"s":"K-Musk"},{"n":"L'Immensité","casa":"Louis Vuitton","arq":"Mediterrâneo","t":"A","td":"C","p":3,"d":1,"a":0,"b":2,"c":0,"r":-0.63,"u":0,"s":"L'Immensité"},{"n":"Les Sables Roses","casa":"Louis Vuitton","arq":"Rosal","t":"S","td":"S","p":4,"d":1,"a":2,"b":5,"c":0,"r":0.41,"u":0,"s":"Sables Roses"},{"n":"Liwa","casa":"Widian","arq":"Sultão","t":"S","td":"S","p":4,"d":2,"a":2,"b":5,"c":0,"r":1.17,"u":0,"s":"Liwa"},{"n":"Lucius","casa":"Fragrance du Bois","arq":"Mediterrâneo","t":"S","td":"N","p":3,"d":1,"a":0,"b":3,"c":0,"r":0.29,"u":0,"s":"Lucius"},{"n":"Monarch","casa":"Boadicea","arq":"Sultão","t":"B","td":"S","p":4,"d":2,"a":3,"b":5,"c":0,"r":0.92,"u":0,"s":"Monarch"},{"n":"Montabaco Intensivo","casa":"Ormonde Jayne","arq":"Curtidor","t":"A","td":"S","p":3,"d":1,"a":2,"b":5,"c":0,"r":0.94,"u":0,"s":"Montabaco"},{"n":"Météore","casa":"Louis Vuitton","arq":"Geólogo","t":"S","td":"C","p":2,"d":0,"a":0,"b":2,"c":0,"r":-0.13,"u":0,"s":"Météore"},{"n":"New York","casa":"Widian","arq":"Lareira","t":"A","td":"N","p":3,"d":2,"a":1,"b":3,"c":0,"r":0.45,"u":0,"s":"New York"},{"n":"Odéon","casa":"Memo Paris","arq":"Rosal","t":"S","td":"N","p":3,"d":2,"a":2,"b":4,"c":0,"r":0.32,"u":0,"s":"Odéon"},{"n":"Ombre Nomade","casa":"Louis Vuitton","arq":"Sultão","t":"S","td":"S","p":5,"d":2,"a":3,"b":5,"c":0,"r":0.5,"u":0,"s":"Ombre Nomade"},{"n":"Omnia Omnibus Ubique","casa":"Memo Paris","arq":"Empoado","t":"S","td":"S","p":3,"d":2,"a":2,"b":5,"c":0,"r":0.45,"u":0,"s":"Omnia"},{"n":"Oud Kyphi","casa":"BYNOMADS","arq":"Sultão","t":"C","td":"S","p":4,"d":2,"a":3,"b":5,"c":0,"r":-0.12,"u":0,"s":"Oud Kyphi"},{"n":"Oud Satin Mood","casa":"MFK","arq":"Sultão","t":"S","td":"S","p":5,"d":3,"a":3,"b":5,"c":0,"r":0.13,"u":0,"s":"Oud Satin"},{"n":"Oudós Lux Solis","casa":"Nishane","arq":"Sultão","t":"A","td":"N","p":3,"d":2,"a":1,"b":4,"c":0,"r":-1.59,"u":0,"s":"Oudós"},{"n":"Outlands","casa":"Amouage","arq":"Monge","t":"S","td":"S","p":5,"d":1,"a":3,"b":5,"c":0,"r":0.46,"u":0,"s":"Outlands"},{"n":"Purpose 50","casa":"Amouage","arq":"Monge","t":"S","td":"S","p":4,"d":1,"a":2,"b":5,"c":0,"r":1.03,"u":0,"s":"Purpose 50"},{"n":"Radical Rose","casa":"Matière Première","arq":"Rosal","t":"S","td":"S","p":4,"d":1,"a":3,"b":5,"c":0,"r":0.16,"u":0,"s":"Radical Rose"},{"n":"Reflection Man","casa":"Amouage","arq":"Florista Branco","t":"S","td":"C","p":2,"d":1,"a":0,"b":3,"c":0,"r":0.87,"u":0,"s":"Reflection"},{"n":"Royal Oud","casa":"Creed","arq":"Marceneiro","t":"A","td":"N","p":3,"d":0,"a":1,"b":5,"c":0,"r":0.45,"u":0,"s":"Royal Oud"},{"n":"Santal 33","casa":"Le Labo","arq":"Marceneiro","t":"A","td":"N","p":3,"d":1,"a":2,"b":5,"c":0,"r":1.26,"u":0,"s":"Santal 33"},{"n":"Scarlet Sands","casa":"Ex Nihilo","arq":"Florista Branco","t":"S","td":"N","p":3,"d":2,"a":1,"b":3,"c":0,"r":-0.3,"u":0,"s":"Scarlet Sands"},{"n":"Search","casa":"Amouage","arq":"Monge","t":"A","td":"N","p":3,"d":0,"a":0,"b":3,"c":0,"r":0.79,"u":0,"s":"Search"},{"n":"Serenity","casa":"Omanluxury","arq":"Curtidor","t":"B","td":"S","p":4,"d":2,"a":3,"b":5,"c":0,"r":0.58,"u":0,"s":"Serenity"},{"n":"Terre d'Hermès","casa":"Hermès","arq":"Geólogo","t":"A","td":"C","p":3,"d":0,"a":0,"b":3,"c":0,"r":0.67,"u":0,"s":"TdH"},{"n":"Torino 21","casa":"Xerjoff","arq":"Botânico","t":"A","td":"C","p":1,"d":0,"a":0,"b":2,"c":0,"r":-0.45,"u":0,"s":"Torino 21"},{"n":"Town & Country","casa":"Clive Christian","arq":"Mediterrâneo","t":"A","td":"C","p":2,"d":0,"a":0,"b":2,"c":0,"r":1.11,"u":0,"s":"T&C"},{"n":"Tygar Extrait","casa":"Bvlgari (Le Gemme)","arq":"Mediterrâneo","t":"S","td":"N","p":3,"d":2,"a":0,"b":2,"c":0,"r":-0.12,"u":0,"s":"Tygar Ext."},{"n":"Ultima Storia","casa":"Thomas de Monaco","arq":"Empoado","t":"A","td":"N","p":3,"d":1,"a":1,"b":3,"c":0,"r":0.29,"u":0,"s":"Ultima Storia"},{"n":"Vibrato","casa":"Sospiro","arq":"Mediterrâneo","t":"A","td":"C","p":3,"d":1,"a":0,"b":2,"c":0,"r":0.43,"u":0,"s":"Vibrato"},{"n":"Wild Vetiver","casa":"Creed","arq":"Geólogo","t":"A","td":"C","p":2,"d":1,"a":0,"b":3,"c":0,"r":0.45,"u":0,"s":"Wild Vetiver"},{"n":"Wood Whisper","casa":"OJAR","arq":"Marceneiro","t":"A","td":"N","p":3,"d":2,"a":2,"b":5,"c":0,"r":0.32,"u":0,"s":"Wood Whisper"},{"n":"Ya'e","casa":"Hind Al Oud","arq":"Empoado","t":"B","td":"N","p":3,"d":1,"a":2,"b":3,"c":0,"r":0.35,"u":0,"s":"Ya'e"}];
+const ARCH=[["Mediterrâneo","#D9B24A"],["Marinho","#5F9EA8"],["Minimalista","#AEB3B0"],["Botânico","#7C9A5E"],["Barbeiro","#8F8FBF"],["Geólogo","#7E8B93"],["Chiprista","#A9985A"],["Florista Branco","#D8D2C4"],["Rosal","#B56A78"],["Empoado","#C1A9B8"],["Marceneiro","#A87B4F"],["Monge","#8C8478"],["Curtidor","#8A5A3C"],["Sultão","#6E4A63"],["Lareira","#C07A3A"],["Confeiteiro","#C98A8A"]];
+const COL=Object.fromEntries(ARCH);
+const FX=[["Muito quente","acima de 32",32,38,"#C8553D"],["Quente","27 a 32",27,32,"#D98A3A"],["Ameno","22 a 27",22,27,"#D9B24A"],["Fresco","17 a 22",17,22,"#5F86A8"],["Frio","12 a 17",12,17,"#7A6A9A"],["Muito frio","abaixo de 12",6,12,"#6B645C"]];
+const FN=["Muito quente","Quente","Ameno","Fresco","Frio","Muito frio"];
+const TDN={C:"C · sobe no ar carregado",N:"N · indiferente",S:"S · sobe no ar seco"};
+const R={S:15,A:12,B:9.5,C:7,D:7};
+const W=1200,H=880,M={l:150,r:24,t:64,b:56};
+const x=d3.scaleLinear([6,38],[M.l,W-M.r]);
+const PH=H-M.t-M.b;const yTd=d3.scaleLinear().domain([-6,12,20,26]).range([H-M.b,M.t+PH*.58,M.t+PH*.33,M.t]);
+const yR=d3.scaleLinear([-2.3,1.9],[H-M.b,M.t]);
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+DATA.forEach(d=>{
+  d.T=34.5-5*((d.a+d.b)/2+0.5*(d.p-3));
+  d.T=clamp(d.T,7.5,36.5);
+  const k=d.p+d.d;
+  let td=d.td==="C"?24-(k-1):d.td==="N"?19-(k-2)*1.5:11-(k-4)*3;
+  td=d.td==="C"?clamp(td,20.5,24.5):d.td==="N"?clamp(td,12.8,19.2):clamp(td,-3,11.2);
+  d.Td=Math.min(td,d.T-1.5);
+  d.rad=R[d.t];
+});
+function layout(key,ys){
+  const n=DATA.map(d=>({d,x:x(d.T),y:ys(d[key]),tx:x(d.T),ty:ys(d[key]),r:d.rad,w:Math.max(2*d.rad,d.s.length*6)+6,h:2*d.rad+17}));
+  n.forEach(p=>{const z=key!=="Td"?[M.t,H-M.b]:p.d.td==="C"?[M.t,yTd(20)]:p.d.td==="N"?[yTd(20),yTd(12)]:[yTd(12),H-M.b];p.z0=z[0]+p.r+3;p.z1=z[1]-p.r-15});
+  const sim=d3.forceSimulation(n).force("x",d3.forceX(p=>p.tx).strength(.3)).force("y",d3.forceY(p=>p.ty).strength(.1)).stop();
+  for(let i=0;i<1200;i++){
+    sim.tick();
+    for(let a=0;a<n.length;a++)for(let b=a+1;b<n.length;b++){
+      const A=n[a],B=n[b],dx=B.x-A.x,dy=B.y-A.y,ox=(A.w+B.w)/2-Math.abs(dx),oy=(A.h+B.h)/2-Math.abs(dy);
+      if(ox>0&&oy>0){
+        const sg=dy<0?-1:1,sy=oy/2*sg,sx=ox/2*(dx<0?-1:1);
+        const okA=v=>A.y-v>=A.z0&&A.y-v<=A.z1,okB=v=>B.y+v>=B.z0&&B.y+v<=B.z1;
+        const mode=okA(sy)&&okB(sy)?1:okA(2*sy)?2:okB(2*sy)?3:0;
+        let useX=mode===0||ox/(A.w+B.w)<oy/(A.h+B.h)*1.2;
+        if(useX&&mode!==0&&(Math.abs(A.x-sx-A.tx)>64||Math.abs(B.x+sx-B.tx)>64))useX=false;
+        if(useX){A.x-=sx;B.x+=sx}else if(mode===1){A.y-=sy;B.y+=sy}else if(mode===2){A.y-=2*sy}else{B.y+=2*sy}
+      }
+    }
+    n.forEach(p=>{p.x=clamp(p.x,M.l+p.w/2,W-M.r-p.w/2);p.y=clamp(p.y,p.z0,p.z1);
+      if(key==="Td"){const tmin=yTd.invert(p.y-p.r-4);if(x.invert(p.x)<tmin)p.x=x(tmin)}});
+  }
+  return new Map(n.map(p=>[p.d.n,[p.x,p.y]]));
+}
+const POS={td:layout("Td",yTd),rain:layout("r",yR)};
+let view="td",labels="all",off=new Set(),pinned=null;
+const svg=d3.select("#chart");
+const defs=svg.append("defs");
+defs.append("pattern").attr("id","hatch").attr("width",8).attr("height",8).attr("patternUnits","userSpaceOnUse").attr("patternTransform","rotate(45)").append("line").attr("x1",0).attr("y1",0).attr("x2",0).attr("y2",8).attr("stroke","var(--hatch)").attr("stroke-width",1.2);
+const gBg=svg.append("g"),gY=svg.append("g"),gToday=svg.append("g"),gEnv=svg.append("g"),gN=svg.append("g");
+FX.forEach((f,i)=>{
+  gBg.append("rect").attr("x",x(f[2])).attr("y",M.t).attr("width",x(f[3])-x(f[2])).attr("height",H-M.t-M.b).attr("fill",i%2?"none":"var(--zone)");
+  const cx=(x(f[2])+x(f[3]))/2;
+  gBg.append("circle").attr("cx",cx-f[0].length*3.6-10).attr("cy",22).attr("r",5).attr("fill",f[4]);
+  gBg.append("text").attr("class","fx").attr("x",cx+4).attr("y",26).attr("text-anchor","middle").text(f[0]);
+  gBg.append("text").attr("class","fxs").attr("x",cx+4).attr("y",43).attr("text-anchor","middle").text(f[1]+" °C");
+});
+[7,12,17,22,27,32,37].forEach(t=>{
+  gBg.append("line").attr("x1",x(t)).attr("x2",x(t)).attr("y1",M.t).attr("y2",H-M.b).attr("stroke","var(--line)");
+  gBg.append("text").attr("class","ax").attr("x",x(t)).attr("y",H-M.b+18).attr("text-anchor","middle").text(t+"°");
+});
+gBg.append("text").attr("class","axt").attr("x",(M.l+W-M.r)/2).attr("y",H-12).attr("text-anchor","middle").text("Temperatura ideal do frasco (°C) — frio à esquerda, calor à direita");
+function drawY(){
+  gY.selectAll("*").remove();
+  const zl=(y0,y1,a,b)=>{const g=gY.append("g");g.append("text").attr("class","fx").attr("x",M.l-14).attr("y",(y0+y1)/2-3).attr("text-anchor","end").text(a);g.append("text").attr("class","fxs").attr("x",M.l-14).attr("y",(y0+y1)/2+13).attr("text-anchor","end").text(b)};
+  const hl=v=>gY.append("line").attr("x1",M.l).attr("x2",W-M.r).attr("y1",v).attr("y2",v).attr("stroke","var(--dim)").attr("stroke-dasharray","2 5");
+  if(view==="td"){
+    hl(yTd(12));hl(yTd(20));
+    zl(yTd(26),yTd(20),"Ar carregado","Td 20 °C ou mais");zl(yTd(20),yTd(12),"Neutro","Td 12 a 20 °C");zl(yTd(12),yTd(-6),"Ar seco","Td abaixo de 12 °C");
+    [-4,0,4,8,12,16,20,23,26].forEach(t=>gY.append("text").attr("class","ax").attr("x",M.l+6).attr("y",yTd(t)-4).text(t+"°"));
+    const dg=d3.range(6,26.01,1).map(t=>[x(t),yTd(t)]);
+    gY.append("polygon").attr("points",dg.concat([[x(6),yTd(26)]]).map(p=>p.join(",")).join(" ")).attr("fill","url(#hatch)");
+    gY.append("polyline").attr("points",dg.map(p=>p.join(",")).join(" ")).attr("fill","none").attr("stroke","var(--dim)");
+    gY.append("text").attr("class","zone-l").attr("x",x(6)+14).attr("y",yTd(26)+22).text("Impossível: o ponto de orvalho");
+    gY.append("text").attr("class","zone-l").attr("x",x(6)+14).attr("y",yTd(26)+38).text("nunca passa da temperatura");
+  }else{
+    hl(yR(-0.3));hl(yR(0.6));
+    zl(yR(1.9),yR(0.6),"Chuva contínua","cresce no ar molhado");zl(yR(0.6),yR(-0.3),"Pancadas","tanto faz");zl(yR(-0.3),yR(-2.3),"Dia seco","pede sol");
+  }
+}
+const node=gN.selectAll("g").data(DATA).join("g").attr("class","node").attr("tabindex",0).attr("role","button").attr("aria-label",d=>d.n+", "+d.arq+", tier "+d.t);
+node.append("circle").attr("r",d=>d.rad).attr("fill",d=>COL[d.arq]).attr("stroke","var(--ring)").attr("stroke-width",d=>d.c?1.6:.8).attr("stroke-dasharray",d=>d.c?"3 2.5":null);
+node.append("text").attr("class","lbl").attr("y",d=>d.rad+10).text(d=>d.s);
+function place(anim){
+  const P=POS[view];
+  const t=anim&&!matchMedia("(prefers-reduced-motion: reduce)").matches?node.transition().duration(900).ease(d3.easeCubicInOut):node;
+  t.attr("transform",d=>"translate("+P.get(d.n).join(",")+")");
+  node.select("circle").attr("fill-opacity",d=>view==="rain"&&d.u?.12:1);
+}
+function faixaOf(t){return t>32?0:t>=27?1:t>=22?2:t>=17?3:t>=12?4:5}
+function style(){
+  const T=parseFloat(document.getElementById("iT").value),hasT=!isNaN(T);
+  const f=hasT?faixaOf(T):null;
+  node.attr("opacity",d=>{if(off.has(d.arq))return .06;if(hasT&&(f<d.a||f>d.b))return .16;return 1});
+  node.select("text").attr("display",d=>labels==="all"||(labels==="s"&&d.t==="S")||pinned===d.n?null:"none");
+}
+function today(){
+  gToday.selectAll("*").remove();
+  const err=document.getElementById("err");err.textContent="";
+  const T=parseFloat(document.getElementById("iT").value),Td=parseFloat(document.getElementById("iTd").value),rz=document.getElementById("iR").value;
+  if(!isNaN(T)){
+    if(T<6||T>38){err.textContent="Use uma temperatura entre 6 e 38 °C.";style();return}
+    gToday.append("line").attr("x1",x(T)).attr("x2",x(T)).attr("y1",M.t).attr("y2",H-M.b).attr("stroke","var(--amber)").attr("stroke-width",1.5);
+    gToday.append("text").attr("class","ax").attr("x",x(T)+6).attr("y",M.t+14).attr("fill","var(--amber)").style("fill","var(--amber)").text("hoje "+T+" °C · "+FN[faixaOf(T)]);
+  }
+  if(view==="td"&&!isNaN(Td)){
+    if(!isNaN(T)&&Td>T){err.textContent="O ponto de orvalho não pode passar da temperatura. Confira os dois números.";}
+    else if(Td<-6||Td>26){err.textContent="Use um ponto de orvalho entre −6 e 26 °C.";}
+    else gToday.append("line").attr("x1",M.l).attr("x2",W-M.r).attr("y1",yTd(Td)).attr("y2",yTd(Td)).attr("stroke","var(--amber)").attr("stroke-width",1.5);
+  }
+  if(view==="rain"&&rz!==""){
+    const z=[[-2.3,-0.3],[-0.3,0.6],[0.6,1.9]][+rz];
+    gToday.append("rect").attr("x",M.l).attr("width",W-M.r-M.l).attr("y",yR(z[1])).attr("height",yR(z[0])-yR(z[1])).attr("fill","var(--amber)").attr("opacity",.12);
+  }
+  style();
+}
+function detail(d){
+  const el=document.getElementById("detail");
+  if(!d){el.innerHTML='<p class="hint">Passe o mouse ou toque numa esfera para ver a ficha e o envelope térmico do frasco.</p>';gEnv.selectAll("*").remove();return}
+  const rz=d.r>0.6?"chuva contínua":d.r<-0.3?"dia seco":"pancadas, tanto faz";
+  el.innerHTML="";
+  const add=(t,c,x)=>{const e=document.createElement(t);if(c)e.className=c;e.textContent=x;el.appendChild(e);return e};
+  add("div","nm",d.n);add("div","casa",d.casa+(d.c?" · camada custo":""));
+  const dl=document.createElement("dl");
+  [["Tier",d.t],["Arquétipo",d.arq],["Envelope",FN[d.a]+" até "+FN[d.b]],["Ideal térmico","≈ "+Math.round(d.T)+" °C"],["Peso",d.p+" de 5"],["Doçura",d.d+" de 3"],["Td",TDN[d.td]],["Chuva (hipótese)",(d.u?"sem pirâmide documentada":rz+" ("+(d.r>0?"+":"")+d.r.toFixed(2).replace(".",",")+")")]].forEach(([k,v])=>{const a=document.createElement("dt");a.textContent=k;const b=document.createElement("dd");b.textContent=v;dl.append(a,b)});
+  el.appendChild(dl);
+  const P=POS[view].get(d.n),lo=d.b===5?6:32-5*d.b,hi=d.a===0?38:37-5*d.a;
+  gEnv.selectAll("*").remove();
+  gEnv.append("line").attr("x1",x(lo)).attr("x2",x(hi)).attr("y1",P[1]).attr("y2",P[1]).attr("stroke",COL[d.arq]).attr("stroke-width",d.rad*2+6).attr("stroke-linecap","round").attr("opacity",.28);
+}
+node.on("mouseenter focus",(e,d)=>{if(!pinned)detail(d)}).on("mouseleave blur",()=>{if(!pinned)detail(null)})
+  .on("click keydown",(e,d)=>{if(e.type==="keydown"&&e.key!=="Enter"&&e.key!==" ")return;e.preventDefault();pinned=pinned===d.n?null:d.n;detail(pinned?d:null);style();e.stopPropagation()});
+svg.on("click",()=>{pinned=null;detail(null);style()});
+const lg=document.getElementById("legend");
+ARCH.forEach(([n,c])=>{const k=DATA.filter(d=>d.arq===n).length;const b=document.createElement("button");b.className="arch";b.setAttribute("aria-pressed","true");
+  const dot=document.createElement("span");dot.className="dot";dot.style.background=c;const t=document.createElement("span");t.textContent=n;const q=document.createElement("span");q.className="n";q.textContent=k;b.append(dot,t,q);
+  b.onclick=()=>{const only=off.size===ARCH.length-1&&!off.has(n);off=only?new Set():new Set(ARCH.map(a=>a[0]).filter(a=>a!==n));
+    lg.querySelectorAll(".arch").forEach((e,i)=>{const o=off.has(ARCH[i][0]);e.classList.toggle("off",o);e.setAttribute("aria-pressed",String(!o))});style()};
+  lg.appendChild(b)});
+function setView(v){view=v;document.getElementById("bTd").setAttribute("aria-pressed",String(v==="td"));document.getElementById("bRain").setAttribute("aria-pressed",String(v==="rain"));
+  document.getElementById("gTd").hidden=v!=="td";document.getElementById("gRain").hidden=v!=="rain";pinned=null;detail(null);drawY();place(true);today()}
+document.getElementById("bTd").onclick=()=>setView("td");document.getElementById("bRain").onclick=()=>setView("rain");
+document.querySelectorAll("[data-l]").forEach(b=>b.onclick=()=>{labels=b.dataset.l;document.querySelectorAll("[data-l]").forEach(o=>o.setAttribute("aria-pressed",String(o===b)));style()});
+["iT","iTd","iR"].forEach(i=>document.getElementById(i).addEventListener("input",today));
+drawY();place(false);today();
+</script>
+</body>
+</html>

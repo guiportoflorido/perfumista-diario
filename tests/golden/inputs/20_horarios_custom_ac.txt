@@ -1,0 +1,8 @@
+Data: 2026-10-14
+T: 19-30 pico 13 noite 24
+Td: 20
+Aplico: 6:30
+Noite: 20
+Tiro: 23:30
+AC: 21
+Dia: 7-19 ti ac; 20-23:30 ni rua

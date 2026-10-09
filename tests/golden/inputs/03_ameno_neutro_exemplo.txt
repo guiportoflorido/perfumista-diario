@@ -1,0 +1,12 @@
+Data: 2026-09-21
+T: 17-28 pico 15 noite 21
+Td: 16
+Chuva: pancadas
+Aplico: 7:15
+Noite: 19:30
+Tiro: 23
+Manhã:
+Dia: 8-18 ti ac fechado; 18-19:30 rua; 19:30-23 cn casa
+Roupa: camisa manga longa, sem paletó
+Extra:
+Diario: 2026-09-18 Vibrato (manhã); 2026-09-18 Liwa (noite); 2026-09-17 Hacivat; 2026-09-16 Imagination; 2026-08-01 Désobéissant

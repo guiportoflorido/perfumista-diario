@@ -1,0 +1,5 @@
+Data: 2026-07-20
+T: 5-11 pico 14 noite 8
+Td: 2
+Dia: 8-18 tf ac; 18-19:30 rua; 19:30-23:30 nf rua
+Tiro: 23:30

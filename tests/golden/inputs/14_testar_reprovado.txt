@@ -1,0 +1,4 @@
+Data: 2026-12-28
+T: 24-34 pico 15 noite 28
+Td: 22
+Extra: testar Grand Soir

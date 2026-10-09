@@ -1,0 +1,4 @@
+Data: 2026-04-15
+T: 16-25 pico 15 noite 19
+Td: 12
+Manhã: Xyz Inexistente

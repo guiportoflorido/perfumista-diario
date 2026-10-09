@@ -1,0 +1,5 @@
+Data: 2026-04-02
+T: 18-27 pico 15
+Td: 14
+Noite: nao
+Tiro: 22

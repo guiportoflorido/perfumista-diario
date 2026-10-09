@@ -1,0 +1,6 @@
+Data: 2026-06-03
+T: 13-21 pico 14 noite 16
+Td: nd
+Chuva: continua
+Dia: 8-18 tf ac; 18-19:30 rua; 19:30-23 nf rua
+Roupa: paletó

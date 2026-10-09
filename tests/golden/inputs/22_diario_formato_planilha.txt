@@ -1,0 +1,9 @@
+Data: 2026-10-09
+T: 19-32 pico 15 noite 24
+Td: 18
+2026-10-08 | Tygar Extrait | N.Inf | 29
+2026-10-08 | Météore | T.Inf | 29
+2026-10-07 | Bijou Zafran | Cozy N
+2026-10-07 | Désobéissant | T.Inf | 25
+2026-10-06 | Odéon | Cozy N
+2026-10-06 | Lucius

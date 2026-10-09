@@ -1,0 +1,5 @@
+Data: 2026-09-29
+T: 16-25 pico 15 noite 19
+Td: 12
+Dia: 8-12 tf ac fechado; 12-14 tf rua; 14-18 tf ac fechado; 18-19:30 rua; 19:30-23 nf rua
+Roupa: paletó, manga longa

@@ -1,0 +1,4 @@
+Data: 2026-10-06
+T: 17-26 pico 15 noite 20
+Td: 15
+Extra: testar Liwa
