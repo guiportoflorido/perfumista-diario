@@ -9,14 +9,15 @@ import { lerTiers, lerDiario, aplicarTiers, diarioUnificado, nomesRegistraveis }
 import { janelasPorFrasco, ajustarSprays } from "./estatisticas.js";
 import { telaColecao, telaPlaybook, telaHistorico } from "./telas.js";
 import { telaRoda } from "./roda.js";
+import { definirCores, arqTag, arqIcone } from "./icones.js";
 import { telaMercado, fichaEditavel, camposAlterados, baseComTiers, deLinhas, linhasParaCriar, cachePlanilha, baixarMercado, criarNaPlanilha, editarNaPlanilha } from "./mercado.js";
 import { contagens } from "./estatisticas.js";
 import { ler, gravar } from "./store.js";
 
-export const APP_VERSAO = "4.11";  // sobe a cada publicação: confere no topo da tela se o celular pegou a versão nova
+export const APP_VERSAO = "5.0";  // sobe a cada publicação: confere no topo da tela se o celular pegou a versão nova
 const S = { aba: "hoje", frascos: [], frascosAtivos: [], avisosTiers: null, fichas: {}, versao: {}, prev: null, prevOffline: false,
   prevErro: null, metar: null, metarMotivo: null, clima: null, resultado: null, erroMotor: null, entrada: "", carregandoClima: true,
-  sync: { estado: "ocioso", msg: "" }, tokenNovo: null, playbook: null, janelas: new Map(),
+  sync: { estado: "ocioso", msg: "" }, hr: ler("hr", { preset: "tudo" }), tokenNovo: null, playbook: null, janelas: new Map(),
   filtro: ler("filtro", {}), pbFaixa: null, arquetipos: [], gaps: [], colModo: ler("colModo", "roda") === "lista" ? "lista" : "roda", sim: null, verGaps: false,
   mercadoBase: null, mercadoErro: null, mf: ler("mf", {}), mfLimite: 60, mercadoBaixado: false, criandoMercado: false, salvandoMercado: false };
 const ajSpray = () => ler("sprays_ajuste", { ativo: false, geral: 0, por: {} });
@@ -40,7 +41,7 @@ const slotNome = s => (s === "M" ? "Dia" : s === "N" ? "Noite" : "?");
 async function carregarDados() {
   const [fr, fi, pb, aq] = await Promise.all(["frascos", "fichas", "playbook", "arquetipos"].map(n => fetch(`data/${n}.json`).then(r => r.json())));
   S.frascos = fr.frascos; S.versao = fr.versao; S.fichas = fi.fichas; S.playbook = pb; S.janelas = janelasPorFrasco(pb);
-  S.arquetipos = aq.arquetipos; S.gaps = aq.gaps;
+  S.arquetipos = aq.arquetipos; S.gaps = aq.gaps; definirCores(aq.arquetipos);
   $("#versao").textContent = `${fr.versao.playbook.replace("playbook_", "").replace(".md", "")} · app ${APP_VERSAO}`;
   aplicarPlanilha();
 }
@@ -98,7 +99,9 @@ function render() {
     if (b.dataset.aba === S.aba) b.setAttribute("aria-current", "page"); else b.removeAttribute("aria-current");
   });
   const foco = document.activeElement?.id;
-  const ctx = { frascos: S.frascosAtivos, hist: historico(), hoje: hojeISO(), janelas: S.janelas, filtro: S.filtro, playbook: S.playbook,
+  const arqDe = new Map(S.frascos.map(f => [f.nome, f.arquetipo]));
+  const ctx = { fichas: S.fichas, arqTag, arqIcone, arqDe, hr: S.hr,
+    frascos: S.frascosAtivos, hist: historico(), hoje: hojeISO(), janelas: S.janelas, filtro: S.filtro, playbook: S.playbook,
     faixaSel: S.pbFaixa ?? S.clima?.faixaDia?.idx ?? 2, fila: fila(), ajSpray: ajSpray() };
   $("#tela").innerHTML = ({ hoje: telaHoje, registrar: telaRegistrar, ajustes: telaAjustes,
     colecao: () => telaColecaoTudo(ctx), mercado: telaMercadoAba, playbook: () => telaPlaybook(ctx), historico: () => telaHistorico(ctx) }[S.aba])();
@@ -208,7 +211,7 @@ function blocoSlot(s) {
     const ja = usado && usado.perfume === t.nome;
     return `<article class="card ${i === 0 && !custo ? "top1" : ""}">
       <span class="pos">${i + 1}</span>
-      <div style="min-width:0"><button class="nome" data-ficha="${esc(t.nome)}">${esc(t.nome)}</button>${tierHTML(t.tier)}<div class="casa">${esc(t.casa)} · ${esc(t.arquetipo)}</div></div>
+      <div style="min-width:0"><button class="nome" data-ficha="${esc(t.nome)}">${esc(t.nome)}</button>${tierHTML(t.tier)}<div class="casa">${esc(t.casa)} · ${arqTag(t.arquetipo, 13)}</div></div>
       <span class="score" title="Score">${t.score.toFixed(0)}</span>
       <div class="meta">${spraysHTML(t)}<span>vivo até <b>${t.vivo_fim ? "o fim" : "~" + fmtH(t.vivo_ate)}</b></span></div>
       <div class="pq">${esc(t.porque)}</div>
@@ -252,8 +255,7 @@ function telaColecaoTudo(ctx) {
   else {
     const usosPor = new Map([...contagens(ctx.hist, ctx.frascos, ctx.hoje).por.values()].map(c => [c.f.nome, c.n30]));
     const dia = S.resultado?.slots[0];
-    corpo = telaRoda({ frascos: ctx.frascos, arquetipos: S.arquetipos, gaps: S.gaps, playbook: S.playbook, sim: S.sim, verGaps: S.verGaps, usosPor,
-      hojeFaixa: S.clima?.faixaDia?.idx ?? null, hojeOc: dia ? ocasiaoDominante(dia) : null });
+    corpo = telaRoda({ frascos: ctx.frascos, arquetipos: S.arquetipos, gaps: S.gaps, verGaps: S.verGaps, usosPor });
   }
   return `<h2>Coleção</h2>
   <div class="segmentos" role="tablist">${modos.map(([v, r]) => `<button role="tab" data-colmodo="${v}" aria-selected="${S.colModo === v}">${r}</button>`).join("")}</div>
@@ -402,8 +404,8 @@ function abrirFicha(nome) {
   const usos = historico().filter(r => r.perfume === nome);
   const ult = usos[usos.length - 1];
   $("#folha").innerHTML = `<div class="veu" data-fechar><div class="folha" role="dialog" aria-modal="true" aria-labelledby="fichaT">
-    <div class="linha-flex"><h2 id="fichaT">${esc(nome)}</h2>${tierHTML(f.tier)}<span class="esp"></span><button class="btn sec peq" data-fechar>Fechar</button></div>
-    <p class="nota">${esc(f.casa)} · ${esc(fi.conc)} · ${esc(f.arquetipo)}</p>
+    <div class="linha-flex"><span class="ficha-ic">${arqIcone(f.arquetipo, 34)}</span><h2 id="fichaT">${esc(nome)}</h2>${tierHTML(f.tier)}<span class="esp"></span><button class="btn sec peq" data-fechar>Fechar</button></div>
+    <p class="nota ficha-sub">${esc(f.casa)} · ${esc(fi.conc)} · ${arqTag(f.arquetipo)}</p>
     <dl class="kv">
       <dt>Pirâmide</dt><dd>${esc(fi.perfil)} <span class="nota">· fonte: ${esc(S.versao.fichas)}</span></dd>
       <dt>Envelope</dt><dd>${esc(fi.envelope)}</dd>
@@ -473,8 +475,8 @@ document.addEventListener("click", async e => {
   if (b.hasAttribute("data-fechar") && (e.target === b || b.tagName === "BUTTON")) { fecharFolha(); return; }
   if (b.dataset.ficha) { abrirFicha(b.dataset.ficha); return; }
   if (b.dataset.colmodo) { S.colModo = b.dataset.colmodo; gravar("colModo", S.colModo); render(); return; }
-  if (b.dataset.simFaixa) { const i = Number(b.dataset.simFaixa); S.sim = { faixa: i, oc: S.sim?.oc && S.playbook.grade[S.playbook.faixas[i]].celulas[S.sim.oc] ? S.sim.oc : null }; render(); return; }
-  if (b.dataset.simOc) { S.sim = { faixa: S.sim?.faixa ?? (S.clima?.faixaDia?.idx ?? 2), oc: b.dataset.simOc }; render(); return; }
+  if (b.dataset.colOrd) { const k = b.dataset.colOrd; S.filtro = { ...S.filtro, ord: k, dir: (S.filtro.ord || "tier") === k && (S.filtro.dir || "asc") === "asc" ? "desc" : "asc" }; gravar("filtro", S.filtro); render(); return; }
+  if (b.dataset.hr) { S.hr = { ...S.hr, preset: b.dataset.hr }; gravar("hr", S.hr); render(); return; }
   if (b.dataset.merc) { abrirMercado(b.dataset.merc); return; }
   if (b.dataset.mfOrd) { const k = b.dataset.mfOrd; S.mf = { ...S.mf, ord: k, dir: (S.mf.ord || "tier") === k && (S.mf.dir || "asc") === "asc" ? "desc" : "asc" }; gravar("mf", S.mf); render(); return; }
   if (b.dataset.mf) { S.mf = { ...S.mf, [b.dataset.mf]: b.dataset.v }; S.mfLimite = 60; gravar("mf", S.mf); render(); return; }
@@ -504,8 +506,6 @@ document.addEventListener("click", async e => {
   else if (acao === "soltar-texto") mudarDia(d => { d.textoManual = null; });
   else if (acao === "restaurar") { salvarAjustes({}); toast("Ajustes restaurados."); render(); atualizarClima(); }
   else if (acao === "sync") sincronizar();
-  else if (acao === "sim-hoje") { const dia = S.resultado?.slots[0]; S.sim = { faixa: S.clima?.faixaDia?.idx ?? 2, oc: dia ? ocasiaoDominante(dia) : null }; render(); }
-  else if (acao === "sim-limpar") { S.sim = null; render(); }
   else if (acao === "ver-gaps") { S.verGaps = !S.verGaps; render(); }
   else if (acao === "mf-mais") { S.mfLimite += 120; render(); }
   else if (acao === "criar-mercado") criarMercado();
@@ -539,6 +539,7 @@ document.addEventListener("click", async e => {
 document.addEventListener("change", e => {
   const el = e.target;
   if (el.dataset.ov) { const k = el.dataset.ov, v = el.value.trim().replace(",", "."); mudarDia(d => { if (v === "") delete d.override[k]; else d.override[k] = v.toLowerCase() === "nd" ? "nd" : v; }); return; }
+  if (el.id === "hr-de" || el.id === "hr-ate") { S.hr = { ...S.hr, [el.id === "hr-de" ? "de" : "ate"]: el.value }; gravar("hr", S.hr); render(); return; }
   if (el.id === "mf-posse" || el.id === "mf-arq") { S.mf = { ...S.mf, [el.id === "mf-posse" ? "posse" : "arq"]: el.value }; S.mfLimite = 60; gravar("mf", S.mf); render(); return; }
   if (el.id === "col-arq" || el.id === "col-faixa" || el.id === "col-oc") {
     S.filtro = { ...S.filtro, [{ "col-arq": "arq", "col-faixa": "faixa", "col-oc": "oc" }[el.id]]: el.value }; gravar("filtro", S.filtro); render(); return;
@@ -573,10 +574,72 @@ document.addEventListener("submit", e => {
 
 document.addEventListener("keydown", e => {
   if (e.key === "Escape") fecharFolha();
-  if ((e.key === "Enter" || e.key === " ") && e.target.matches?.("g[data-ficha]")) { e.preventDefault(); abrirFicha(e.target.dataset.ficha); }
+  if ((e.key === "Enter" || e.key === " ") && e.target.matches?.("[data-ficha]:not(button)")) { e.preventDefault(); abrirFicha(e.target.dataset.ficha); }
+  if ((e.key === "Enter" || e.key === " ") && e.target.matches?.("g.r-fr")) { e.preventDefault(); abrirFicha(e.target.dataset.fr); }
   if ((e.key === "Enter" || e.key === " ") && e.target.matches?.("[data-merc]")) { e.preventDefault(); abrirMercado(e.target.dataset.merc); }
 });
 window.addEventListener("online", () => sincronizar({ silencioso: true }));
+
+// ───────────────────────── roda: prévia ao passar o dedo ou o mouse ─────────────────────────
+const R = { ativo: null, ativoAntes: null, tipo: "mouse", esconder: null };
+function previaRoda(g) {
+  const box = $("#rodaPrev"), bloco = $("#rodaBloco");
+  if (!box || !g) return;
+  if (R.ativo === g) return;
+  R.ativo?.classList.remove("ativo"); R.ativo = g; g.classList.add("ativo");
+  $("#roda")?.classList.add("focando");
+  const nome = g.dataset.fr, f = S.frascosAtivos.find(x => x.nome === nome), fi = S.fichas[nome];
+  if (!f) return;
+  const k = contagens(historico(), S.frascosAtivos, hojeISO()).por.get(nome);
+  const quando = k?.dias == null ? "sem registro" : k.dias === 0 ? "hoje" : k.dias === 1 ? "ontem" : `há ${k.dias} d`;
+  box.innerHTML = `<button class="prev-in" data-ficha="${esc(nome)}">
+    <span class="prev-ic">${arqIcone(f.arquetipo, 30)}</span>
+    <span class="prev-tx"><b>${esc(nome)}</b>${tierHTML(f.tier)}<span class="nota">${esc(f.casa)} · ${esc(f.arquetipo)}</span>
+      <span class="prev-meta">${k?.n30 || 0} uso${k?.n30 === 1 ? "" : "s"} em 30 d · último ${quando} · ${f.janelas} janelas</span>
+      ${fi?.perfil ? `<span class="prev-perfil">${esc(fi.perfil)}</span>` : ""}</span>
+    <span class="prev-abrir">Abrir ›</span></button>`;
+  box.hidden = false;
+  const rb = bloco.getBoundingClientRect(), gb = g.querySelector(".r-ponto").getBoundingClientRect();
+  const largura = Math.min(300, rb.width - 16);
+  let left = gb.left + gb.width / 2 - rb.left - largura / 2;
+  left = Math.max(8, Math.min(left, rb.width - largura - 8));
+  const acima = gb.top - rb.top > rb.height * 0.45;
+  box.style.width = largura + "px"; box.style.left = left + "px";
+  box.style.top = acima ? "" : (gb.bottom - rb.top + 10) + "px";
+  box.style.bottom = acima ? (rb.bottom - gb.top + 10) + "px" : "";
+}
+function esconderPrevia() {
+  R.ativo?.classList.remove("ativo"); R.ativo = null;
+  $("#roda")?.classList.remove("focando");
+  const box = $("#rodaPrev"); if (box) box.hidden = true;
+}
+document.addEventListener("pointerover", e => {
+  if (e.pointerType !== "mouse") return;
+  const g = e.target.closest?.("#roda .r-fr");
+  if (g) { clearTimeout(R.esconder); previaRoda(g); }
+  else if (e.target.closest?.("#rodaPrev")) clearTimeout(R.esconder);
+  else if (R.ativo) { clearTimeout(R.esconder); R.esconder = setTimeout(esconderPrevia, 350); }
+});
+document.addEventListener("pointerdown", e => {
+  R.tipo = e.pointerType;
+  const g = e.target.closest?.("#roda .r-fr");
+  R.ativoAntes = g && R.ativo === g ? g : null;
+  if (e.pointerType !== "mouse" && e.target.closest?.("#roda")) { R.arrastando = true; if (g) previaRoda(g); }
+  else if (!e.target.closest?.("#rodaPrev, #roda")) esconderPrevia();
+});
+document.addEventListener("pointermove", e => {
+  if (!R.arrastando || e.pointerType === "mouse") return;
+  const g = document.elementFromPoint(e.clientX, e.clientY)?.closest?.("#roda .r-fr");
+  if (g) previaRoda(g);
+});
+document.addEventListener("pointerup", () => { R.arrastando = false; });
+document.addEventListener("pointercancel", () => { R.arrastando = false; });
+document.addEventListener("click", e => {
+  const g = e.target.closest?.("#roda .r-fr");
+  if (!g) return;
+  // mouse: clique abre a ficha; toque: o 1º toque mostra a prévia, o 2º na mesma bola abre
+  if (R.tipo === "mouse" || R.ativoAntes === g) { esconderPrevia(); abrirFicha(g.dataset.fr); }
+});
 
 // ───────────────────────── tema ─────────────────────────
 function aplicarTema() {

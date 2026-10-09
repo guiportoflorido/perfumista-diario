@@ -1,6 +1,7 @@
 // mercado.js — aba Mercado: base da avaliação v51 (1.205 perfumes, inclusive os da coleção) guardada na aba
 // "Mercado" da planilha, com edição. Tier e posse da aba Tiers sempre vencem na exibição (fonte única de tier).
 import { esc, tierHTML } from "./util.js";
+import { arqTag } from "./icones.js";
 import { chamar } from "./api.js";
 import { ler, gravar } from "./store.js";
 
@@ -146,7 +147,7 @@ function tabela(linhas, f) {
       ${td("nome", `${esc(p.nome)}${p.wish ? ` <span class="estrela" title="Wishlist">★</span>` : ""}`)}
       ${td("posse", esc(posseRot(p.posse) || "—"))}
       ${td("tier", p.tier ? tierHTML(p.tier) : `<span class="tier sem">–</span>`)}
-      ${td("arquetipo", esc(p.arquetipo || "—"))}
+      ${td("arquetipo", arqTag(p.arquetipo, 14))}
       ${tx("resumo", p.resumo)}${tx("topo", p.topo)}${tx("coracao", p.coracao)}${tx("base", p.base)}
     </tr>`).join("")}</tbody></table></div>
   <p class="nota">Arraste para o lado para ver todas as colunas. Toque no cabeçalho para ordenar e na linha para editar.</p>`;

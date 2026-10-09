@@ -9,30 +9,44 @@ const opt = (v, rot, atual) => `<option value="${esc(v)}" ${String(atual) === St
 const chip = (grupo, v, rot, on) => `<button class="chip" data-filtro="${grupo}" data-v="${esc(v)}" aria-pressed="${on}">${esc(rot)}</button>`;
 const quando = d => (d === null ? "sem registro" : d === 0 ? "hoje" : d === 1 ? "ontem" : `há ${d} d`);
 
-// ───────────────────────── Coleção ─────────────────────────
-export function telaColecao({ frascos, hist, hoje, janelas, filtro }) {
+// ───────────────────────── Coleção (tabela) ─────────────────────────
+const COLS_COL = [["nome", "Perfume"], ["casa", "Casa"], ["tier", "Tier"], ["arquetipo", "Arquétipo"], ["eixo", "Eixo"], ["td", "Td"],
+  ["peso", "Peso"], ["doc", "Doçura"], ["envelope", "Envelope"], ["janelas", "Janelas"], ["usos", "Usos"], ["ultimo", "Último uso"]];
+const TD_ROT = { C: "C · carregado", S: "S · seco", N: "N · indiferente" };
+
+function ordenarColecao(linhas, ord = "tier", dir = "asc") {
+  const s = dir === "desc" ? -1 : 1;
+  const v = (x) => ({ tier: TIERS.indexOf(x.f.tier), nome: x.f.nome, casa: x.f.casa, arquetipo: x.f.arquetipo, eixo: x.f.eixo, td: x.f.td,
+    peso: x.f.peso, doc: x.f.doc, envelope: x.f.env_hot * 10 + x.f.env_cold, janelas: x.f.janelas || 0, usos: x.k.n, ultimo: x.k.ultimo || "" }[ord]);
+  const padrao = (a, b) => TIERS.indexOf(a.f.tier) - TIERS.indexOf(b.f.tier) || a.f.nome.localeCompare(b.f.nome, "pt");
+  return [...linhas].sort((a, b) => {
+    const x = v(a), y = v(b);
+    const c = typeof x === "number" ? x - y : (!x && y) ? 1 : (x && !y) ? -1 : String(x).localeCompare(String(y), "pt");
+    return (ord === "ultimo" && (!x || !y) ? c : s * c) || padrao(a, b);
+  });
+}
+
+export function telaColecao({ frascos, hist, hoje, janelas, filtro, fichas, arqTag }) {
   const c = contagens(hist, frascos, hoje);
   const grade = frascos.filter(daGrade);
   const arqs = [...new Set(grade.map(f => f.arquetipo))].sort((a, b) => a.localeCompare(b));
   const q = (filtro.q || "").toLowerCase();
-  const lista = grade.filter(f => {
+  const recorte = filtro.faixa !== "" && filtro.faixa != null || filtro.oc;
+  const filtrados = grade.filter(f => {
     if (filtro.tier && f.tier !== filtro.tier) return false;
     if (filtro.eixo && f.eixo !== filtro.eixo) return false;
     if (filtro.arq && f.arquetipo !== filtro.arq) return false;
-    if (filtro.faixa !== "" && filtro.faixa != null || filtro.oc) {
+    if (recorte) {
       const js = janelas.get(f.nome) || [];
       if (!js.some(j => (filtro.faixa === "" || filtro.faixa == null || j.faixaIdx === Number(filtro.faixa)) && (!filtro.oc || j.ocasiao === filtro.oc))) return false;
     }
     if (q && !`${f.nome} ${f.casa} ${f.arquetipo}`.toLowerCase().includes(q)) return false;
     return true;
-  }).sort((a, b) => TIERS.indexOf(a.tier) - TIERS.indexOf(b.tier) || a.nome.localeCompare(b.nome));
-  const papelNaCelula = f => {
-    if (filtro.faixa === "" || filtro.faixa == null || !filtro.oc) return "";
-    const j = (janelas.get(f.nome) || []).find(x => x.faixaIdx === Number(filtro.faixa) && x.ocasiao === filtro.oc);
-    return j ? ` · <b>${j.papel}</b>` : "";
-  };
-  return `<p class="nota">Grade: ${grade.length} frascos · ${TIERS.map(t => `${t} ${grade.filter(f => f.tier === t).length}`).join(" · ")}. Camada custo fica fora.</p>
-  <div class="bloco">
+  }).map(f => ({ f, k: c.por.get(f.nome) }));
+  const linhas = ordenarColecao(filtrados, filtro.ord, filtro.dir);
+  const ord = filtro.ord || "tier", dir = filtro.dir || "asc";
+  const th = ([k, r]) => `<th class="cc-${k}" scope="col"><button data-col-ord="${k}" aria-sort="${ord === k ? (dir === "asc" ? "ascending" : "descending") : "none"}">${r}${ord === k ? (dir === "asc" ? " ↑" : " ↓") : ""}</button></th>`;
+  return `<div class="bloco">
     <input type="search" id="col-q" placeholder="Buscar frasco, casa ou arquétipo" value="${esc(filtro.q || "")}" aria-label="Buscar">
     <div class="chips rolagem">${chip("tier", "", "Todos", !filtro.tier)}${TIERS.map(t => chip("tier", t, `Tier ${t}`, filtro.tier === t)).join("")}</div>
     <div class="chips rolagem">${chip("eixo", "", "Todo eixo", !filtro.eixo)}${Object.entries(EIXOS).map(([k, r]) => chip("eixo", k, r, filtro.eixo === k)).join("")}</div>
@@ -41,24 +55,33 @@ export function telaColecao({ frascos, hist, hoje, janelas, filtro }) {
       <label>Faixa<select id="col-faixa">${opt("", "Todas", filtro.faixa ?? "")}${FAIXAS.map((x, i) => opt(i, x, filtro.faixa ?? "")).join("")}</select></label>
       <label>Ocasião<select id="col-oc">${opt("", "Todas", filtro.oc)}${OCAS_TODAS.map(o => opt(o, ROT_OC[o], filtro.oc)).join("")}</select></label>
     </div>
-    <p class="nota">${lista.length} frasco${lista.length === 1 ? "" : "s"}${filtro.faixa !== "" && filtro.faixa != null || filtro.oc ? " com janela no playbook nesse recorte" : ""}.</p>
+    <p class="nota">${linhas.length} de ${grade.length} frascos da grade${recorte ? " com janela no playbook nesse recorte" : ""} · ${TIERS.map(t => `${t} ${grade.filter(f => f.tier === t).length}`).join(" · ")}.</p>
   </div>
-  <div class="lista">${lista.length ? lista.map(f => {
-    const k = c.por.get(f.nome);
-    return `<article class="card"><span class="pos">${tierHTML(f.tier)}</span>
-      <div style="min-width:0"><button class="nome" data-ficha="${esc(f.nome)}">${esc(f.nome)}</button><div class="casa">${esc(f.casa)} · ${esc(f.arquetipo)} · eixo ${esc(f.eixo)}${papelNaCelula(f)}</div></div>
-      <span class="score" title="Janelas no playbook">${f.janelas}</span>
-      <div class="meta"><span>${k.n} uso${k.n === 1 ? "" : "s"}${k.n ? ` (☀︎${k.M} ☾${k.N})` : ""}</span><span>último: <b>${quando(k.dias)}</b></span>${f.janelas_estimadas ? `<span class="selo aviso">janelas estimadas</span>` : ""}</div>
-    </article>`;
-  }).join("") : `<p class="vazio">Nenhum frasco nesse recorte.</p>`}</div>
-  <p class="nota">Número à direita = janelas no playbook.</p>`;
+  ${linhas.length ? `<div class="tabelao" role="region" aria-label="Tabela da coleção" tabindex="0"><table class="t-colecao">
+    <thead><tr><th class="c-n" scope="col">#</th>${COLS_COL.map(th).join("")}</tr></thead>
+    <tbody>${linhas.map(({ f, k }, i) => `<tr data-ficha="${esc(f.nome)}" tabindex="0">
+      <td class="c-n">${i + 1}</td>
+      <td class="c-nome">${esc(f.nome)}${f.janelas_estimadas ? ` <span class="selo aviso" title="janelas estimadas">est.</span>` : ""}</td>
+      <td class="cc-casa">${esc(f.casa)}</td>
+      <td class="c-tier">${tierHTML(f.tier)}</td>
+      <td class="cc-arquetipo">${arqTag(f.arquetipo)}</td>
+      <td class="cc-eixo">${esc(f.eixo)}</td>
+      <td class="cc-td">${esc(TD_ROT[f.td] || f.td)}</td>
+      <td class="cc-num">${f.peso}</td><td class="cc-num">${f.doc}</td>
+      <td class="cc-env">${esc(fichas[f.nome]?.envelope || "")}</td>
+      <td class="cc-num">${f.janelas}</td>
+      <td class="cc-num">${k.n}${k.n ? ` <span class="nota">☀︎${k.M} ☾${k.N}</span>` : ""}</td>
+      <td class="cc-ult">${quando(k.dias)}</td>
+    </tr>`).join("")}</tbody></table></div>
+  <p class="nota">Toque no cabeçalho para ordenar e na linha para abrir a ficha. Peso 1–5 · Doçura 0–3 · Td = como reage à umidade.</p>`
+    : `<div class="bloco"><p class="vazio">Nenhum frasco nesse recorte.</p></div>`}`;
 }
 
 // ───────────────────────── Playbook ─────────────────────────
-export function telaPlaybook({ playbook, faixaSel, ajSpray }) {
+export function telaPlaybook({ playbook, faixaSel, ajSpray, arqDe, arqIcone }) {
   if (!playbook) return `<h2>Playbook</h2><p class="nota">Carregando…</p>`;
   const fi = Number(faixaSel ?? 2), faixa = playbook.faixas[fi], g = playbook.grade[faixa];
-  const nomeBtn = n => `<button class="nome-inline" data-ficha="${esc(n)}">${esc(n)}</button>`;
+  const nomeBtn = n => `<button class="nome-inline" data-ficha="${esc(n)}">${arqIcone(arqDe.get(n), 14)}${esc(n)}</button>`;
   return `<h2>Playbook</h2>
   <p class="nota">${esc(playbook.fonte)} · ${playbook.total_alocacoes} alocações · ${playbook.celulas} células (Cozy só de Ameno para baixo). Sprays da célula são os do playbook.</p>
   <div class="chips rolagem" role="tablist">${playbook.faixas.map((x, i) => `<button class="chip" data-pbfaixa="${i}" aria-pressed="${i === fi}">${pinta(i)} ${esc(x)}</button>`).join("")}</div>
@@ -77,34 +100,63 @@ export function telaPlaybook({ playbook, faixaSel, ajSpray }) {
 }
 
 // ───────────────────────── Histórico ─────────────────────────
-export function telaHistorico({ frascos, hist, hoje, fila, ajSpray, limiteEsq = 45 }) {
-  const c = contagens(hist, frascos, hoje);
-  if (!hist.length) return `<h2>Histórico</h2><div class="bloco"><p class="vazio">Sem registros ainda. Conecte a planilha em Ajustes ou registre um uso.</p></div>`;
+// períodos do Histórico: atalhos e intervalo livre
+export function periodo(preset, hoje, de, ate) {
+  const d = new Date(hoje + "T12:00:00");
+  const iso = x => `${x.getFullYear()}-${String(x.getMonth() + 1).padStart(2, "0")}-${String(x.getDate()).padStart(2, "0")}`;
+  const menos = n => { const x = new Date(d); x.setDate(x.getDate() - n + 1); return iso(x); };
+  if (preset === "7") return { de: menos(7), ate: hoje };
+  if (preset === "30") return { de: menos(30), ate: hoje };
+  if (preset === "90") return { de: menos(90), ate: hoje };
+  if (preset === "mes") return { de: hoje.slice(0, 8) + "01", ate: hoje };
+  if (preset === "mesant") { const a = new Date(d.getFullYear(), d.getMonth() - 1, 1), b = new Date(d.getFullYear(), d.getMonth(), 0); return { de: iso(a), ate: iso(b) }; }
+  if (preset === "livre") return { de: de || null, ate: ate || hoje };
+  return { de: null, ate: hoje };
+}
+const PRESETS = [["tudo", "Tudo"], ["7", "7 dias"], ["30", "30 dias"], ["90", "90 dias"], ["mes", "Este mês"], ["mesant", "Mês passado"], ["livre", "Escolher datas"]];
+const dataBR = iso => (iso ? iso.split("-").reverse().join("/") : "—");
+
+export function telaHistorico({ frascos, hist: histTodo, hoje, fila: filaToda, ajSpray, limiteEsq = 45, hr = {}, arqTag }) {
+  const preset = hr.preset || "tudo";
+  const { de, ate } = periodo(preset, hoje, hr.de, hr.ate);
+  const dentro = r => (!de || r.data >= de) && r.data <= ate;
+  const hist = histTodo.filter(dentro), fila = filaToda.filter(dentro);
+  const seletor = `<div class="bloco periodo">
+    <div class="chips rolagem">${PRESETS.map(([v, r]) => `<button class="chip" data-hr="${v}" aria-pressed="${preset === v}">${r}</button>`).join("")}</div>
+    ${preset === "livre" ? `<div class="campos"><label>De<input type="date" id="hr-de" value="${esc(hr.de || "")}" max="${hoje}"></label><label>Até<input type="date" id="hr-ate" value="${esc(hr.ate || hoje)}" max="${hoje}"></label></div>` : ""}
+    <p class="nota">${de ? `${dataBR(de)} a ${dataBR(ate)}` : `Todo o diário até ${dataBR(ate)}`} · ${hist.length} registro${hist.length === 1 ? "" : "s"}</p>
+  </div>`;
+  const c = contagens(hist, frascos, ate);
+  if (!hist.length) return `<h2>Histórico</h2>${seletor}<div class="bloco"><p class="vazio">${histTodo.length ? "Nenhum registro nesse período." : "Sem registros ainda. Conecte a planilha em Ajustes ou registre um uso."}</p></div>`;
+  const doPeriodo = preset !== "tudo";
   const barras = (pares, max) => `<div class="barras">${pares.map(([k, v]) => `<div class="barra"><span class="t">${k}</span><span class="trilho"><span style="width:${max ? (v / max) * 100 : 0}%"></span></span><span class="n">${v}</span></div>`).join("")}</div>`;
   const usados = [...c.por.values()].filter(x => x.n).sort((a, b) => b.n - a.n || (a.ultimo < b.ultimo ? 1 : -1));
   const porArq = agrupar(c.por, f => f.arquetipo).filter(([, v]) => v);
   const porTier = TIERS.map(t => [`Tier ${t}`, [...c.por.values()].filter(x => x.f.tier === t).reduce((s, x) => s + x.n, 0)]);
-  const slots = [["☀︎ Dia", hist.filter(r => r.slot === "M" && r.data <= hoje).length], ["☾ Noite", hist.filter(r => r.slot === "N" && r.data <= hoje).length]];
-  const esq = esquecidos(c.por, limiteEsq);
+  const slots = [["☀︎ Dia", hist.filter(r => r.slot === "M").length], ["☾ Noite", hist.filter(r => r.slot === "N").length]];
+  // no período: frascos sem uso dentro dele; em "Tudo": regra dos 45 dias
+  const esq = doPeriodo ? [...c.por.values()].filter(x => !x.n).sort((a, b) => TIERS.indexOf(a.f.tier) - TIERS.indexOf(b.f.tier) || a.f.nome.localeCompare(b.f.nome)) : esquecidos(c.por, limiteEsq);
   const uv = usoVsJanelas(c.por).filter(x => x.usos || x.janelas);
   const acima = uv.filter(x => x.desvio >= 1).sort((a, b) => b.desvio - a.desvio).slice(0, 8);
   const cal = calibracao(fila);
+  const diasPeriodo = de ? Math.round((new Date(ate) - new Date(de)) / 864e5) + 1 : c.cobertura;
   return `<h2>Histórico</h2>
+  ${seletor}
   <div class="kpis">
     <div class="kpi"><span class="v">${c.total}</span><span class="l">usos de frascos da grade</span></div>
-    <div class="kpi"><span class="v">${c.cobertura}</span><span class="l">dias desde o 1º registro (${esc(c.primeiro || "—")})</span></div>
+    <div class="kpi"><span class="v">${diasPeriodo}</span><span class="l">${de ? "dias no período" : `dias desde o 1º registro (${dataBR(c.primeiro)})`}</span></div>
     <div class="kpi"><span class="v">${usados.length}/${c.por.size}</span><span class="l">frascos usados ao menos 1×</span></div>
   </div>
-  ${c.cobertura < 90 ? `<p class="nota">Diário com menos de 90 dias: não serve ainda para conclusões de desbaste sobre os B.</p>` : ""}
+  ${!doPeriodo && c.cobertura < 90 ? `<p class="nota">Diário com menos de 90 dias: não serve ainda para conclusões de desbaste sobre os B.</p>` : ""}
   <div class="bloco"><h3>Mais usados</h3>${usados.length ? barras(usados.slice(0, 15).map(x => [`<button class="nome-inline" data-ficha="${esc(x.f.nome)}">${esc(x.f.nome)}</button>`, x.n]), usados[0].n) : `<p class="nota">Nenhum.</p>`}</div>
   <div class="duas">
     <div class="bloco"><h3>Por slot</h3>${barras(slots, Math.max(...slots.map(s => s[1])))}</div>
     <div class="bloco"><h3>Por tier</h3>${barras(porTier, Math.max(...porTier.map(s => s[1]), 1))}</div>
   </div>
-  <div class="bloco"><h3>Por arquétipo</h3>${porArq.length ? barras(porArq.map(([k, v]) => [esc(k), v]), porArq[0][1]) : `<p class="nota">Nenhum.</p>`}</div>
-  <div class="bloco"><h3>Esquecidos · sem uso há ${limiteEsq}+ dias ou sem registro · ${esq.length}</h3>
-    <p class="nota">“Sem registro” é ausência no diário, não prova de que você não usou. O diário cobre ${c.cobertura} dias.</p>
-    ${(() => { const item = x => `<article class="card compacto"><span class="pos">${tierHTML(x.f.tier)}</span><div style="min-width:0"><button class="nome" data-ficha="${esc(x.f.nome)}">${esc(x.f.nome)}</button><div class="casa">${esc(x.f.arquetipo)} · ${x.f.janelas} janelas</div></div><span class="nota">${quando(x.dias)}</span></article>`;
+  <div class="bloco"><h3>Por arquétipo</h3>${porArq.length ? barras(porArq.map(([k, v]) => [arqTag(k), v]), porArq[0][1]) : `<p class="nota">Nenhum.</p>`}</div>
+  <div class="bloco"><h3>${doPeriodo ? `Sem uso no período · ${esq.length}` : `Esquecidos · sem uso há ${limiteEsq}+ dias ou sem registro · ${esq.length}`}</h3>
+    <p class="nota">“Sem registro” é ausência no diário, não prova de que você não usou.</p>
+    ${(() => { const item = x => `<article class="card compacto"><span class="pos">${tierHTML(x.f.tier)}</span><div style="min-width:0"><button class="nome" data-ficha="${esc(x.f.nome)}">${esc(x.f.nome)}</button><div class="casa">${arqTag(x.f.arquetipo, 13)} · ${x.f.janelas} janelas</div></div><span class="nota">${quando(x.dias)}</span></article>`;
       return `<div class="lista">${esq.slice(0, 8).map(item).join("")}</div>${esq.length > 8 ? `<details><summary>Ver os outros ${esq.length - 8}</summary><div class="lista" style="margin-top:8px">${esq.slice(8).map(item).join("")}</div></details>` : ""}`; })()}
   </div>
   <div class="bloco"><h3>Uso × janelas do playbook</h3>
@@ -125,5 +177,5 @@ export function telaHistorico({ frascos, hist, hoje, fila, ajSpray, limiteEsq = 
     <p class="nota">Desligado por padrão. O número do modelo continua visível; o ajuste nunca passa do teto do frasco (EDP/extrait 4, EDT 5, beasts com teto próprio) e não mexe no Désobéissant (6–7).</p>
     <div class="linha-flex"><button class="btn peq" data-acao="salvar-spr">Salvar ajuste</button>${cal.n ? `<button class="btn sec peq" data-acao="spr-sugerir">Usar o desvio medido</button>` : ""}</div>
   </div>
-  <div class="bloco"><h3>Registros recentes</h3><div class="lista">${hist.filter(r => r.data <= hoje).slice(-20).reverse().map(r => `<article class="card compacto"><span class="pos">${esc(r.slot)}</span><div style="min-width:0"><b>${esc(r.perfume)}</b><div class="casa">${esc(r.data)} · ${slotNome(r.slot)}${r.sprays ? ` · ${esc(r.sprays)} sprays` : ""}${r.pendente ? " · na fila" : ""}</div></div><span></span></article>`).join("")}</div></div>`;
+  <div class="bloco"><h3>Registros ${doPeriodo ? "do período" : "recentes"}</h3><div class="lista">${hist.slice(-30).reverse().map(r => `<article class="card compacto"><span class="pos">${esc(r.slot)}</span><div style="min-width:0"><b>${esc(r.perfume)}</b><div class="casa">${esc(r.data)} · ${slotNome(r.slot)}${r.sprays ? ` · ${esc(r.sprays)} sprays` : ""}${r.pendente ? " · na fila" : ""}</div></div><span></span></article>`).join("")}</div></div>`;
 }

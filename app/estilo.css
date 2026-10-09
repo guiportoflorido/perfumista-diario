@@ -320,3 +320,44 @@ select[disabled], input[readonly], textarea[readonly] { opacity: .75; }
 .tabelao .c-resumo { min-width: 280px; max-width: 320px; }
 .tabelao .c-topo, .tabelao .c-coracao, .tabelao .c-base { min-width: 170px; max-width: 200px; color: var(--suave); }
 .tabelao .estrela { color: var(--acento); font-size: 11px; }
+
+/* ── ícones de arquétipo ── */
+.arq-ic { display: inline-block; vertical-align: -3px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+.arq-tag { display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; }
+.nome-inline .arq-ic { margin-right: 4px; }
+.ficha-ic { display: grid; place-items: center; width: 46px; height: 46px; border-radius: 14px; background: var(--afund); flex: none; }
+.ficha-sub .arq-tag { color: var(--tinta); }
+.roda .r-ic { fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+
+/* ── roda: prévia ao passar ── */
+.roda-bloco { position: relative; }
+.roda { touch-action: none; -webkit-user-select: none; user-select: none; }
+.roda .r-setor { fill-opacity: .12; stroke-opacity: .35; transition: fill-opacity .2s; }
+.roda .r-fr .r-ponto { transform-box: fill-box; transform-origin: center; transition: transform .18s cubic-bezier(.2, .9, .3, 1.4), opacity .2s; }
+.roda .r-fr:hover .r-ponto, .roda .r-fr.ativo .r-ponto { transform: scale(1.45); }
+.roda .r-fr.ativo .r-ponto { stroke: var(--tinta); stroke-width: 4; }
+.roda.focando .r-fr:not(.ativo) .r-ponto { opacity: .4; }
+.roda-prev { position: absolute; z-index: 5; animation: surge .16s ease; }
+.prev-in { all: unset; cursor: pointer; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 4px 10px; align-items: start; width: 100%; box-sizing: border-box;
+  background: var(--sup); border-radius: 16px; padding: 12px 14px; box-shadow: 0 10px 30px rgba(0, 0, 0, .35); border: .5px solid var(--linha); }
+.prev-ic { grid-row: span 2; display: grid; place-items: center; width: 44px; height: 44px; border-radius: 12px; background: var(--afund); }
+.prev-tx { display: flex; flex-direction: column; gap: 2px; min-width: 0; font-size: 13px; }
+.prev-tx b { font: 700 16px/1.25 var(--f); }
+.prev-tx .tier { position: absolute; top: 12px; right: 14px; }
+.prev-meta { color: var(--suave); font-size: 12px; }
+.prev-perfil { color: var(--leve); font-size: 12px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.prev-abrir { grid-column: 2; font: 600 13px var(--f); color: var(--acento); }
+.prev-in:focus-visible { outline: 2px solid var(--acento); }
+@keyframes surge { from { opacity: 0; transform: translateY(4px) scale(.98); } to { opacity: 1; transform: none; } }
+
+/* ── tabela da coleção ── */
+.t-colecao { min-width: 1080px !important; }
+.t-colecao td.c-nome { white-space: normal; }
+.t-colecao .cc-casa { min-width: 110px; color: var(--suave); }
+.t-colecao .cc-arquetipo { min-width: 120px; }
+.t-colecao .cc-eixo { text-align: center; min-width: 46px; }
+.t-colecao .cc-td { min-width: 110px; white-space: nowrap; color: var(--suave); }
+.t-colecao .cc-num { text-align: right; min-width: 56px; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.t-colecao .cc-env { min-width: 100px; white-space: nowrap; }
+.t-colecao .cc-ult { min-width: 90px; white-space: nowrap; color: var(--suave); }
+.periodo .campos { grid-template-columns: 1fr 1fr; }
