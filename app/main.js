@@ -11,11 +11,11 @@ import { telaColecao, telaPlaybook, telaHistorico } from "./telas.js";
 import { telaRoda } from "./roda.js";
 import { definirCores, arqTag, arqIcone, corArq } from "./icones.js";
 import { ceuHTML, abrirRoleta, animarSpray } from "./diversao.js";
-import { telaMercado, fichaEditavel, camposAlterados, baseComTiers, deLinhas, linhasParaCriar, cachePlanilha, baixarMercado, criarNaPlanilha, editarNaPlanilha } from "./mercado.js";
+import { telaMercado, fichaEditavel, camposAlterados, baseComTiers, deLinhas, linhasParaCriar, cachePlanilha, baixarMercado, criarNaPlanilha, editarNaPlanilha, adicionarNaPlanilha, removerNaPlanilha } from "./mercado.js";
 import { contagens } from "./estatisticas.js";
 import { ler, gravar } from "./store.js";
 
-export const APP_VERSAO = "5.3";  // sobe a cada publicação: confere no topo da tela se o celular pegou a versão nova
+export const APP_VERSAO = "5.4";  // sobe a cada publicação: confere no topo da tela se o celular pegou a versão nova
 const S = { aba: "hoje", frascos: [], frascosAtivos: [], avisosTiers: null, fichas: {}, versao: {}, prev: null, prevOffline: false,
   prevErro: null, metar: null, metarMotivo: null, clima: null, resultado: null, erroMotor: null, entrada: "", carregandoClima: true,
   sync: { estado: "ocioso", msg: "" }, hr: ler("hr", { preset: "tudo" }), tokenNovo: null, playbook: null, janelas: new Map(),
@@ -446,28 +446,44 @@ function janelasHTML(nome) {
   const porFaixa = new Map(); for (const j of js) { if (!porFaixa.has(j.faixaIdx)) porFaixa.set(j.faixaIdx, []); porFaixa.get(j.faixaIdx).push(j); }
   return `<ul class="janelas">${[...porFaixa.entries()].sort((a, b) => a[0] - b[0]).map(([i, l]) => `<li>${faixaHTML(i)}: ${l.map(j => `${ROT_OC[j.ocasiao]}${j.papel !== "Também" ? ` <b>(${j.papel})</b>` : ""}`).join(", ")}</li>`).join("")}</ul>`;
 }
-function abrirMercado(id) {
-  const [casa, nome] = id.split("||");
-  const p = (listaMercado().lista || []).find(x => x.casa === casa && x.nome === nome);
+function abrirMercado(id, { confirmarRemover = false } = {}) {
+  const novo = id === null;
+  const p = novo ? {} : (listaMercado().lista || []).find(x => x.casa + "||" + x.nome === id);
   if (!p) return;
-  S.mercadoAberto = p;
-  $("#folha").innerHTML = `<div class="veu" data-fechar><div class="folha" role="dialog" aria-modal="true" aria-labelledby="fichaT">${fichaEditavel(p, { arquetipos: S.arquetipos, editavel: Boolean(cachePlanilha()?.existe) && configurado() })}</div></div>`;
-  $("#folha .folha button[data-fechar]").focus();
+  S.mercadoAberto = novo ? null : p;
+  $("#folha").innerHTML = `<div class="veu" data-fechar><div class="folha" role="dialog" aria-modal="true" aria-labelledby="fichaT">${fichaEditavel(p, { arquetipos: S.arquetipos, editavel: Boolean(cachePlanilha()?.existe) && configurado(), novo, confirmarRemover })}</div></div>`;
+  (novo ? $("#me-casa") : $("#folha .folha button[data-fechar]"))?.focus();
+}
+
+function lerFormMercado(form) {
+  const v = id => form.querySelector("#" + id);
+  return { "me-casa": v("me-casa").value, "me-nome": v("me-nome").value, "me-notas": v("me-notas").value, "me-tier": v("me-tier").value, "me-posse": v("me-posse").value,
+    "me-arq": v("me-arq").value, "me-nariz": v("me-nariz").value, "me-resumo": v("me-resumo").value, "me-topo": v("me-topo").value,
+    "me-coracao": v("me-coracao").value, "me-base": v("me-base").value, "me-wish": v("me-wish").checked };
 }
 
 async function salvarMercado(form) {
-  const p = S.mercadoAberto;
-  const v = id => form.querySelector("#" + id);
-  const campos = camposAlterados(p, { "me-tier": v("me-tier").value, "me-posse": v("me-posse").value, "me-arq": v("me-arq").value, "me-nariz": v("me-nariz").value,
-    "me-resumo": v("me-resumo").value, "me-topo": v("me-topo").value, "me-coracao": v("me-coracao").value, "me-base": v("me-base").value, "me-wish": v("me-wish").checked });
+  const novo = Boolean(form.dataset.novo), p = novo ? {} : S.mercadoAberto;
+  const campos = camposAlterados(p, lerFormMercado(form));
+  if (novo && (!campos.Casa || !campos.Perfume)) { toast("Preencha casa e perfume."); return; }
   if (!Object.keys(campos).length) { toast("Nada mudou."); return; }
   const btn = form.querySelector("button[type=submit]"); btn.disabled = true; btn.textContent = "Salvando…";
   try {
-    const r = await editarNaPlanilha(p.casa, p.nome, campos);
+    const r = novo ? await adicionarNaPlanilha(campos) : await editarNaPlanilha(p.casa, p.nome, campos);
     fecharFolha();
-    toast(`Salvo na planilha: ${Object.keys(campos).join(", ")}${r.tiers ? (r.tiers.nova ? " (linha nova na aba Tiers)" : " (aba Tiers atualizada)") : ""}.`);
+    toast(novo ? `${campos.Perfume} adicionado à base${r.tiers ? " e à aba Tiers" : ""}.`
+      : `Salvo: ${Object.keys(campos).join(", ")}${r.tiers ? (r.tiers.nova ? " (linha nova na aba Tiers)" : " (aba Tiers atualizada)") : ""}.`);
     if (r.tiers) { await baixarPlanilha().catch(() => {}); aplicarPlanilha(); recalcular(); } else render();
-  } catch (e) { btn.disabled = false; btn.textContent = "Salvar na planilha"; toast(`Não salvou: ${e.message}`); }
+  } catch (e) { btn.disabled = false; btn.textContent = novo ? "Adicionar à base" : "Salvar na planilha"; toast(`Não salvou: ${e.message}`); }
+}
+
+async function removerMercado() {
+  const p = S.mercadoAberto;
+  if (!p) return;
+  if (!S.confirmandoRemocao) { S.confirmandoRemocao = true; abrirMercado(p.casa + "||" + p.nome, { confirmarRemover: true }); return; }
+  S.confirmandoRemocao = false;
+  try { await removerNaPlanilha(p.casa, p.nome); fecharFolha(); toast(`${p.nome} removido da base do Mercado.`); render(); }
+  catch (e) { toast(`Não removeu: ${e.message}`); }
 }
 
 async function criarMercado() {
@@ -496,7 +512,7 @@ document.addEventListener("click", async e => {
   if (b.dataset.colOrd) { const k = b.dataset.colOrd; S.filtro = { ...S.filtro, ord: k, dir: (S.filtro.ord || "tier") === k && (S.filtro.dir || "asc") === "asc" ? "desc" : "asc" }; gravar("filtro", S.filtro); render(); return; }
   if (b.dataset.dia) { const el = $("#calInfo"); if (el) el.innerHTML = b.dataset.info; document.querySelectorAll(".cal .dia.sel").forEach(x => x.classList.remove("sel")); b.classList.add("sel"); return; }
   if (b.dataset.hr) { S.hr = { ...S.hr, preset: b.dataset.hr }; gravar("hr", S.hr); render(); return; }
-  if (b.dataset.merc) { abrirMercado(b.dataset.merc); return; }
+  if (b.dataset.merc) { S.confirmandoRemocao = false; abrirMercado(b.dataset.merc); return; }
   if (b.dataset.mfOrd) { const k = b.dataset.mfOrd; S.mf = { ...S.mf, ord: k, dir: (S.mf.ord || "tier") === k && (S.mf.dir || "asc") === "asc" ? "desc" : "asc" }; gravar("mf", S.mf); render(); return; }
   if (b.dataset.mf) { S.mf = { ...S.mf, [b.dataset.mf]: b.dataset.v }; S.mfLimite = 60; gravar("mf", S.mf); render(); return; }
   if (b.dataset.mfArq) { S.mf = { ...S.mf, arq: S.mf.arq === b.dataset.mfArq ? "" : b.dataset.mfArq }; S.mfLimite = 60; gravar("mf", S.mf); render(); $("#mf-q")?.scrollIntoView({ block: "center" }); return; }
@@ -533,6 +549,8 @@ document.addEventListener("click", async e => {
   else if (acao === "ver-gaps") { S.verGaps = !S.verGaps; render(); }
   else if (acao === "mf-mais") { S.mfLimite += 120; render(); }
   else if (acao === "criar-mercado") criarMercado();
+  else if (acao === "novo-mercado") { S.confirmandoRemocao = false; abrirMercado(null); }
+  else if (acao === "remover-mercado") removerMercado();
   else if (acao === "ler-planilha") {
     const m = $("#lerMsg"); m.textContent = "Lendo a planilha…";
     try {

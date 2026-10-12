@@ -19,6 +19,8 @@ export function carregarBackend(abas, { token = "dev", metar } = {}) {
       getDataRange: () => ({ getDisplayValues: () => { const w = Math.max(...rows.map(r => r.length)); return rows.map(r => Array.from({ length: w }, (_, j) => String(r[j] ?? ""))); } }),
       getRange: range,
       insertRowAfter: n => rows.splice(n, 0, []),
+      deleteRow: n => rows.splice(n - 1, 1),
+      getLastColumn: () => Math.max(0, ...rows.map(r => r.length)),
       appendRow: l => rows.push([...l]),
       setFrozenRows: () => {},
     };

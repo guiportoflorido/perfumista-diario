@@ -1,7 +1,7 @@
 // mercado.js — aba Mercado: base da avaliação v51 (1.205 perfumes, inclusive os da coleção) guardada na aba
 // "Mercado" da planilha, com edição. Tier e posse da aba Tiers sempre vencem na exibição (fonte única de tier).
 import { esc, tierHTML } from "./util.js";
-import { arqTag } from "./icones.js";
+import { arqTag, arqIcone } from "./icones.js";
 import { chamar } from "./api.js";
 import { ler, gravar } from "./store.js";
 
@@ -33,7 +33,8 @@ export function deLinhas(linhas, tiers) {
   const objs = linhas.slice(1).filter(r => r[i("Perfume")]).map(r => ({
     casa: r[i("Casa")], nome: r[i("Perfume")], tier: (r[i("Tier")] || "").trim().toUpperCase(), posse: r[i("Posse")] || "",
     arquetipo: r[i("Arquétipo")] || "", resumo: r[i("Resumo")] || "", topo: r[i("Topo")] || "", coracao: r[i("Coração")] || "",
-    base: r[i("Base")] || "", nariz: r[i("Nariz")] || "", wish: /✓|sim|x/i.test(r[i("Wishlist")] || ""), atualizado: r[i("Atualizado em")] || "" }));
+    base: r[i("Base")] || "", nariz: r[i("Nariz")] || "", wish: /✓|sim|x/i.test(r[i("Wishlist")] || ""), atualizado: r[i("Atualizado em")] || "",
+    notas: i("Notas") >= 0 ? r[i("Notas")] || "" : "" }));
   return baseComTiers(objs, tiers);
 }
 
@@ -47,15 +48,43 @@ export async function criarNaPlanilha(linhas) {
   const j = await chamar("criarMercado", { linhas }, { timeoutMs: 60000 });
   return j.linhas;
 }
+const hojeISO = () => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`; };
+
+/** Mexe na cópia local da aba Mercado (sem baixar 1.205 linhas de novo). */
+function mexerCache(fn) {
+  const c = cachePlanilha();
+  if (!c?.existe) return;
+  fn(c.linhas, c.linhas[0]);
+  gravar("mercadoPlanilha", c);
+}
+const garantirCol = (linhas, cab, n) => { if (!cab.includes(n)) { cab.push(n); linhas.slice(1).forEach(r => { r[cab.length - 1] = ""; }); } };
+
 export async function editarNaPlanilha(casa, perfume, campos) {
   const j = await chamar("editarMercado", { casa, perfume, campos }, { timeoutMs: 25000 });
-  // atualiza a cópia local sem baixar tudo de novo
-  const c = cachePlanilha();
-  if (c?.existe) {
-    const cab = c.linhas[0], k = chave(casa, perfume);
-    const row = c.linhas.find((r, i) => i > 0 && chave(r[cab.indexOf("Casa")], r[cab.indexOf("Perfume")]) === k);
-    if (row) { for (const [n, v] of Object.entries(campos)) if (cab.includes(n)) row[cab.indexOf(n)] = String(v); gravar("mercadoPlanilha", c); }
-  }
+  mexerCache((linhas, cab) => {
+    if (campos.Notas !== undefined) garantirCol(linhas, cab, "Notas");
+    const k = chave(casa, perfume);
+    const row = linhas.find((r, i) => i > 0 && chave(r[cab.indexOf("Casa")], r[cab.indexOf("Perfume")]) === k);
+    if (row) { for (const [n, v] of Object.entries(campos)) if (cab.includes(n)) row[cab.indexOf(n)] = String(v); row[cab.indexOf("Atualizado em")] = hojeISO(); }
+  });
+  return j;
+}
+
+export async function adicionarNaPlanilha(campos) {
+  const j = await chamar("adicionarMercado", { campos }, { timeoutMs: 25000 });
+  mexerCache((linhas, cab) => {
+    if (campos.Notas) garantirCol(linhas, cab, "Notas");
+    linhas.push(cab.map(n => (n === "Atualizado em" ? hojeISO() : String(campos[n] ?? ""))));
+  });
+  return j;
+}
+
+export async function removerNaPlanilha(casa, perfume) {
+  const j = await chamar("removerMercado", { casa, perfume }, { timeoutMs: 25000 });
+  mexerCache((linhas, cab) => {
+    const k = chave(casa, perfume), i = linhas.findIndex((r, n) => n > 0 && chave(r[cab.indexOf("Casa")], r[cab.indexOf("Perfume")]) === k);
+    if (i > 0) linhas.splice(i, 1);
+  });
   return j;
 }
 
@@ -100,7 +129,7 @@ export function telaMercado({ lista, fonte, arquetipos, filtro, limite, podeCria
   const maxM = Math.max(...porArq.map(x => x.merc), 1);
   const op = (v, r, at) => `<option value="${esc(v)}" ${String(at ?? "") === String(v) ? "selected" : ""}>${esc(r)}</option>`;
   return `
-  ${fonte === "planilha" ? `<p class="nota">Lido da aba <b>Mercado</b> da planilha. Toque num perfume para ver e editar.</p>`
+  ${fonte === "planilha" ? `<div class="linha-flex"><p class="nota" style="flex:1">Lido da aba <b>Mercado</b> da planilha. Toque num perfume para ver, editar ou remover.</p><button class="btn peq" data-acao="novo-mercado">+ Novo perfume</button></div>`
     : podeCriar ? `<div class="bloco destaque"><h3>Editar exige a aba Mercado na planilha</h3>
         <p class="nota">Crio na planilha “Diário de Uso” uma aba <b>Mercado</b> com os ${lista.length} perfumes (tier e posse da aba Tiers, resto da avaliação v51). Depois disso, o que você editar aqui fica salvo lá. É feito uma vez só.</p>
         <div class="linha-flex"><button class="btn" data-acao="criar-mercado" ${criando ? "disabled" : ""}>${criando ? "Criando…" : "Criar aba Mercado"}</button></div></div>`
@@ -153,33 +182,38 @@ function tabela(linhas, f) {
   <p class="nota">Arraste para o lado para ver todas as colunas. Toque no cabeçalho para ordenar e na linha para editar.</p>`;
 }
 
-export function fichaEditavel(p, { arquetipos, editavel, salvando }) {
+export function fichaEditavel(p, { arquetipos, editavel, novo = false, confirmarRemover = false }) {
   const sel = (id, opcoes, at) => `<select id="${id}" ${editavel ? "" : "disabled"}>${opcoes.map(([v, r]) => `<option value="${esc(v)}" ${String(at) === String(v) ? "selected" : ""}>${esc(r)}</option>`).join("")}</select>`;
-  const txt = (id, v, linhas = 1) => linhas > 1 ? `<textarea id="${id}" rows="${linhas}" ${editavel ? "" : "readonly"}>${esc(v)}</textarea>` : `<input id="${id}" value="${esc(v)}" ${editavel ? "" : "readonly"} autocomplete="off">`;
-  return `<div class="linha-flex"><h2 id="fichaT">${esc(p.nome)}</h2>${p.tier ? tierHTML(p.tier) : ""}<span class="esp"></span><button class="btn sec peq" data-fechar>Fechar</button></div>
-    <p class="nota">${esc(p.casa)}${p.atualizado ? ` · editado em ${esc(p.atualizado)}` : ""}</p>
-    <form class="bloco" id="formMercado" data-casa="${esc(p.casa)}" data-nome="${esc(p.nome)}">
+  const txt = (id, v, linhas = 1, extra = "") => linhas > 1 ? `<textarea id="${id}" rows="${linhas}" ${editavel ? "" : "readonly"}>${esc(v)}</textarea>` : `<input id="${id}" value="${esc(v)}" ${editavel ? "" : "readonly"} autocomplete="off" ${extra}>`;
+  return `<div class="linha-flex">${p.arquetipo ? `<span class="ficha-ic">${arqIcone(p.arquetipo, 34)}</span>` : ""}<h2 id="fichaT">${novo ? "Novo perfume" : esc(p.nome)}</h2>${p.tier && !novo ? tierHTML(p.tier) : ""}<span class="esp"></span><button class="btn sec peq" data-fechar>Fechar</button></div>
+    ${novo ? `<p class="nota">Entra na aba Mercado da planilha. Tier e posse, se preenchidos, também vão para a aba Tiers.</p>` : `<p class="nota">${esc(p.casa)}${p.atualizado ? ` · editado em ${esc(p.atualizado)}` : ""}</p>`}
+    <form class="bloco" id="formMercado" data-casa="${esc(p.casa || "")}" data-nome="${esc(p.nome || "")}" data-novo="${novo ? 1 : ""}">
       <div class="campos">
-        <label>Tier${sel("me-tier", [["", "sem tier"], ["S", "S"], ["A", "A"], ["B", "B"], ["C", "C"], ["D", "D"]], p.tier)}</label>
-        <label>Posse${sel("me-posse", POSSES_EDIT.map(x => [x, x || "—"]).concat(POSSES_EDIT.includes(p.posse) ? [] : [[p.posse, p.posse]]), p.posse)}</label>
-        <label>Arquétipo${sel("me-arq", [["", "—"], ...arquetipos.map(a => [a.nome, a.nome])], p.arquetipo)}</label>
-        <label>Nariz${txt("me-nariz", p.nariz)}</label>
-        <label class="largo">Resumo${txt("me-resumo", p.resumo, 3)}</label>
-        <label class="largo">Topo${txt("me-topo", p.topo)}</label>
-        <label class="largo">Coração${txt("me-coracao", p.coracao)}</label>
-        <label class="largo">Base${txt("me-base", p.base)}</label>
+        <label>Casa${txt("me-casa", p.casa || "", 1, novo ? "required" : "")}</label>
+        <label>Perfume${txt("me-nome", p.nome || "", 1, novo ? "required" : "")}</label>
+        <label>Tier${sel("me-tier", [["", "sem tier"], ["S", "S"], ["A", "A"], ["B", "B"], ["C", "C"], ["D", "D"]], p.tier || "")}</label>
+        <label>Posse${sel("me-posse", POSSES_EDIT.map(x => [x, x || "—"]).concat(!p.posse || POSSES_EDIT.includes(p.posse) ? [] : [[p.posse, p.posse]]), p.posse || "")}</label>
+        <label>Arquétipo${sel("me-arq", [["", "—"], ...arquetipos.map(a => [a.nome, a.nome])], p.arquetipo || "")}</label>
+        <label>Nariz${txt("me-nariz", p.nariz || "")}</label>
+        <label class="largo">Resumo${txt("me-resumo", p.resumo || "", 3)}</label>
+        <label class="largo">Topo${txt("me-topo", p.topo || "")}</label>
+        <label class="largo">Coração${txt("me-coracao", p.coracao || "")}</label>
+        <label class="largo">Base${txt("me-base", p.base || "")}</label>
+        <label class="largo">Notas (suas)${txt("me-notas", p.notas || "", 3)}</label>
       </div>
       <label class="linha-flex"><input type="checkbox" id="me-wish" ${p.wish ? "checked" : ""} ${editavel ? "" : "disabled"}> Wishlist</label>
-      ${editavel ? `<p class="nota">Tier e posse também vão para a aba Tiers. Mudar tier de frasco da grade deixa a grade desatualizada até rodar o gerador.</p>
-        <div class="linha-flex"><button class="btn" type="submit" ${salvando ? "disabled" : ""}>${salvando ? "Salvando…" : "Salvar na planilha"}</button></div>`
+      ${editavel ? `<p class="nota">Tier e posse também vão para a aba Tiers. Mudar casa ou nome renomeia a linha da aba Tiers (o “Nome no diário” não muda). Mudar tier de frasco da grade deixa a grade desatualizada até rodar o gerador.</p>
+        <div class="linha-flex"><button class="btn" type="submit">${novo ? "Adicionar à base" : "Salvar na planilha"}</button><span class="esp"></span>
+          ${novo ? "" : `<button class="btn ${confirmarRemover ? "perigo" : "sec"} peq" type="button" data-acao="remover-mercado">${confirmarRemover ? "Confirmar remoção" : "Remover da base"}</button>`}</div>
+        ${confirmarRemover ? `<p class="nota erro-txt">Sai só da aba Mercado. A aba Tiers e o Diário não mudam. Toque de novo para confirmar.</p>` : ""}`
         : `<p class="nota">Somente leitura: crie a aba Mercado (no topo da aba) para editar.</p>`}
     </form>`;
 }
 
 /** Campos alterados no formulário (nomes das colunas da planilha). */
 export function camposAlterados(p, form) {
-  const novo = { Tier: form["me-tier"], Posse: form["me-posse"], "Arquétipo": form["me-arq"], Nariz: form["me-nariz"], Resumo: form["me-resumo"],
+  const novo = { Casa: form["me-casa"], Perfume: form["me-nome"], Notas: form["me-notas"], Tier: form["me-tier"], Posse: form["me-posse"], "Arquétipo": form["me-arq"], Nariz: form["me-nariz"], Resumo: form["me-resumo"],
     Topo: form["me-topo"], "Coração": form["me-coracao"], Base: form["me-base"], Wishlist: form["me-wish"] ? "✓" : "" };
-  const velho = { Tier: p.tier, Posse: p.posse, "Arquétipo": p.arquetipo, Nariz: p.nariz, Resumo: p.resumo, Topo: p.topo, "Coração": p.coracao, Base: p.base, Wishlist: p.wish ? "✓" : "" };
-  return Object.fromEntries(Object.entries(novo).filter(([k, v]) => String(v ?? "").trim() !== String(velho[k] ?? "").trim()).map(([k, v]) => [k, String(v ?? "").trim()]));
+  const velho = { Casa: p.casa, Perfume: p.nome, Notas: p.notas, Tier: p.tier, Posse: p.posse, "Arquétipo": p.arquetipo, Nariz: p.nariz, Resumo: p.resumo, Topo: p.topo, "Coração": p.coracao, Base: p.base, Wishlist: p.wish ? "✓" : "" };
+  return Object.fromEntries(Object.entries(novo).filter(([k, v]) => v !== undefined && String(v).trim() !== String(velho[k] ?? "").trim()).map(([k, v]) => [k, String(v).trim()]));
 }

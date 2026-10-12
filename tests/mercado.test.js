@@ -43,3 +43,12 @@ test("ordenação por coluna (TABELAO): casa, posse, tier asc/desc; vazios no fi
   assert.deepEqual(filtrar(m, { ord: "tier", dir: "desc" }).map(p => p.nome), ["Search", "Gypsy Water", "Decision"]);
   assert.deepEqual(filtrar(m, { ord: "resumo" }).map(p => p.nome), ["Decision", "Gypsy Water", "Search"]);
 });
+
+test("renomear e notas entram como campos alterados; novo perfume leva tudo que foi preenchido", () => {
+  const p = baseComTiers(base, tiers)[0];
+  const f = { "me-casa": "Amouage", "me-nome": "Decision EDP", "me-notas": "comprar refil", "me-tier": "S", "me-posse": "Frasco Gui", "me-arq": "Monge",
+    "me-nariz": "", "me-resumo": "incenso", "me-topo": "a", "me-coracao": "b", "me-base": "c", "me-wish": false };
+  assert.deepEqual(camposAlterados(p, f), { Perfume: "Decision EDP", Notas: "comprar refil" });
+  const n = camposAlterados({}, { ...f, "me-casa": "Nishane", "me-nome": "Hundred Silent Ways", "me-wish": true });
+  assert.equal(n.Casa, "Nishane"); assert.equal(n.Perfume, "Hundred Silent Ways"); assert.equal(n.Wishlist, "✓"); assert.equal(n.Nariz, undefined);
+});
