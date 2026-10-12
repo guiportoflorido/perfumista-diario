@@ -16,7 +16,7 @@ import { telaMercado, fichaEditavel, camposAlterados, baseComTiers, deLinhas, li
 import { contagens } from "./estatisticas.js";
 import { ler, gravar } from "./store.js";
 
-export const APP_VERSAO = "5.6";  // sobe a cada publicação: confere no topo da tela se o celular pegou a versão nova
+export const APP_VERSAO = "5.7";  // sobe a cada publicação: confere no topo da tela se o celular pegou a versão nova
 const S = { aba: "hoje", frascos: [], frascosAtivos: [], avisosTiers: null, fichas: {}, versao: {}, prev: null, prevOffline: false,
   prevErro: null, metar: null, metarMotivo: null, clima: null, resultado: null, erroMotor: null, entrada: "", carregandoClima: true,
   sync: { estado: "ocioso", msg: "" }, hr: ler("hr", { preset: "tudo" }), tokenNovo: null, playbook: null, janelas: new Map(),
@@ -487,6 +487,17 @@ async function removerMercado() {
   catch (e) { toast(`Não removeu: ${e.message}`); }
 }
 
+/** Edição direto na tabela do Mercado: grava um campo e atualiza a tela; tier/posse também vão para a aba Tiers. */
+async function editarCelula(el, p, campo, valor) {
+  const cel = el.closest("td"); cel?.classList.add("salvando");
+  try {
+    const r = await editarNaPlanilha(p.casa, p.nome, { [campo]: valor });
+    toast(`${p.nome}: ${campo === "Wishlist" ? (valor ? "na wishlist ★" : "fora da wishlist") : `${campo} → ${valor || "—"}`}`);
+    if (r.tiers) { baixarPlanilha().then(() => { aplicarPlanilha(); recalcular(); }).catch(() => {}); }
+  } catch (e) { toast(`Não salvou: ${e.message}`); }
+  render();
+}
+
 async function criarMercado() {
   if (!S.mercadoBase) { toast("A base ainda está carregando; tente de novo em instantes."); return; }
   S.criandoMercado = true; render();
@@ -504,6 +515,7 @@ function fecharFolha() { $("#folha").innerHTML = ""; }
 function mudarDia(fn) { const d = estadoDia(); fn(d); salvarDia(d); recalcular(); }
 
 document.addEventListener("click", async e => {
+  if (e.target.closest("label.ed, select[data-ed]")) return;   // seletores da tabela do Mercado: não abrir a ficha
   const b = e.target.closest("button, [data-fechar], [data-ficha], [data-merc]");
   if (!b) return;
   if (b.closest("#abas")) { S.aba = b.dataset.aba; render(); window.scrollTo(0, 0); return; }
@@ -514,6 +526,7 @@ document.addEventListener("click", async e => {
   if (b.dataset.ordDir) { mudarOrdem(b.dataset.ordDir, Number(b.dataset.n), { inverter: true }); return; }
   if (b.dataset.dia) { const el = $("#calInfo"); if (el) el.innerHTML = b.dataset.info; document.querySelectorAll(".cal .dia.sel").forEach(x => x.classList.remove("sel")); b.classList.add("sel"); return; }
   if (b.dataset.hr) { S.hr = { ...S.hr, preset: b.dataset.hr }; gravar("hr", S.hr); render(); return; }
+  if (b.dataset.edWish) { const p = (listaMercado().lista || []).find(x => x.casa + "||" + x.nome === b.dataset.edWish); if (p) editarCelula(b, p, "Wishlist", p.wish ? "" : "✓"); return; }
   if (b.dataset.merc) { S.confirmandoRemocao = false; abrirMercado(b.dataset.merc); return; }
   if (b.dataset.mfOrd) { S.mf = { ...S.mf, ords: tocarOrd(ordsDe(S.mf, "tier"), b.dataset.mfOrd) }; gravar("mf", S.mf); render(); return; }
   if (b.dataset.mf) { S.mf = { ...S.mf, [b.dataset.mf]: b.dataset.v }; S.mfLimite = 60; gravar("mf", S.mf); render(); return; }
@@ -583,6 +596,7 @@ document.addEventListener("click", async e => {
 document.addEventListener("change", e => {
   const el = e.target;
   if (el.dataset.ov) { const k = el.dataset.ov, v = el.value.trim().replace(",", "."); mudarDia(d => { if (v === "") delete d.override[k]; else d.override[k] = v.toLowerCase() === "nd" ? "nd" : v; }); return; }
+  if (el.dataset.ed) { const p = (listaMercado().lista || []).find(x => x.casa + "||" + x.nome === el.dataset.id); if (p) editarCelula(el, p, el.dataset.ed, el.value); return; }
   if (el.dataset.ordSel) { mudarOrdem(el.dataset.ordSel, Number(el.dataset.n), { k: el.value }); return; }
   if (el.id === "hr-de" || el.id === "hr-ate") { S.hr = { ...S.hr, [el.id === "hr-de" ? "de" : "ate"]: el.value }; gravar("hr", S.hr); render(); return; }
   if (el.id === "mf-posse" || el.id === "mf-arq" || el.id === "mf-wish") { S.mf = { ...S.mf, [{ "mf-posse": "posse", "mf-arq": "arq", "mf-wish": "wish" }[el.id]]: el.value }; S.mfLimite = 60; gravar("mf", S.mf); render(); return; }

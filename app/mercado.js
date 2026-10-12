@@ -146,7 +146,7 @@ export function telaMercado({ lista, fonte, arquetipos, filtro, limite, podeCria
     </div>
     <p class="nota">${res.length} perfume${res.length === 1 ? "" : "s"}.</p>
   </div>
-  ${res.length ? tabela(res.slice(0, limite), filtro) : `<div class="bloco"><p class="vazio">Nada com esses filtros.</p></div>`}
+  ${res.length ? tabela(res.slice(0, limite), filtro, { editavel: fonte === "planilha", arquetipos }) : `<div class="bloco"><p class="vazio">Nada com esses filtros.</p></div>`}
   ${res.length > limite ? `<button class="btn sec" data-acao="mf-mais">Mostrar mais (${res.length - limite})</button>` : ""}
   <details class="bloco"><summary>Mercado × coleção por arquétipo</summary>
     <div class="mxc">${porArq.sort((x, y) => y.merc - x.merc).map(x => `<button class="mxc-l" data-mf-arq="${esc(x.a.nome)}">
@@ -159,7 +159,24 @@ export function telaMercado({ lista, fonte, arquetipos, filtro, limite, podeCria
 
 const posseRot = p => (p === "Frasco Gui" ? "na coleção" : p);
 
-function tabela(linhas, f) {
+// células editáveis na própria tabela (Tier, Posse, Wishlist, Arquétipo)
+const opts = (lista, at) => lista.map(([v, r]) => `<option value="${esc(v)}" ${String(at) === String(v) ? "selected" : ""}>${esc(r)}</option>`).join("");
+function celTier(p, id) {
+  return `<label class="ed ed-tier t-${p.tier || "x"}"><span class="sr">Tier de ${esc(p.nome)}</span>
+    <select data-ed="Tier" data-id="${esc(id)}">${opts([["", "–"], ["S", "S"], ["A", "A"], ["B", "B"], ["C", "C"], ["D", "D"]], p.tier || "")}</select></label>`;
+}
+function celPosse(p, id) {
+  const lista = POSSES_EDIT.map(x => [x, x ? posseRot(x) : "—"]).concat(!p.posse || POSSES_EDIT.includes(p.posse) ? [] : [[p.posse, p.posse]]);
+  return `<label class="ed ed-posse ${p.posse === "Frasco Gui" ? "minha" : ""}"><span class="sr">Posse de ${esc(p.nome)}</span>
+    <select data-ed="Posse" data-id="${esc(id)}">${opts(lista, p.posse || "")}</select></label>`;
+}
+function celArq(p, id, arquetipos) {
+  return `<label class="ed ed-arq">${p.arquetipo ? arqIcone(p.arquetipo, 15) : ""}<span class="sr">Arquétipo de ${esc(p.nome)}</span>
+    <select data-ed="Arquétipo" data-id="${esc(id)}">${opts([["", "—"], ...arquetipos.map(a => [a.nome, a.nome])], p.arquetipo || "")}</select></label>`;
+}
+const celWish = (p, id) => `<button class="ed ed-wish ${p.wish ? "on" : ""}" data-ed-wish="${esc(id)}" aria-pressed="${p.wish}" aria-label="${p.wish ? "Tirar da" : "Pôr na"} wishlist: ${esc(p.nome)}">${p.wish ? "★" : "☆"}</button>`;
+
+function tabela(linhas, f, { editavel = false, arquetipos = [] } = {}) {
   const ords = ordsDe(f, "tier");
   const th = ([k, r]) => `<th class="c-${k}" scope="col">${cabOrd(k, r, ords, "mf-ord")}</th>`;
   const td = (k, v, extra = "") => `<td class="c-${k}${extra}">${v}</td>`;
@@ -168,17 +185,17 @@ function tabela(linhas, f) {
   return `${painelOrd(ords, [["casa", "Casa"], ["nome", "Perfume"], ...COLUNAS], "mf")}
   <div class="tabelao" role="region" aria-label="Tabela do mercado" tabindex="0"><table>
     <thead><tr><th class="c-n" scope="col">#</th><th class="c-casa" scope="col">${btnOrd("casa", "Casa")}</th><th class="c-nome" scope="col">${btnOrd("nome", "Perfume")}</th>${COLUNAS.map(th).join("")}</tr></thead>
-    <tbody>${linhas.map((p, i) => `<tr data-merc="${esc(p.casa + "||" + p.nome)}" tabindex="0" class="${p.posse === "Frasco Gui" ? "minha" : ""}">
+    <tbody>${linhas.map((p, i) => { const id = p.casa + "||" + p.nome; return `<tr data-merc="${esc(id)}" tabindex="0" class="${p.posse === "Frasco Gui" ? "minha" : ""}">
       ${td("n", i + 1)}
       ${td("casa", esc(p.casa))}
       ${td("nome", esc(p.nome))}
-      ${td("posse", esc(posseRot(p.posse) || "—"))}
-      ${td("tier", p.tier ? tierHTML(p.tier) : `<span class="tier sem">–</span>`)}
-      ${td("wish", p.wish ? `<span class="estrela" title="Na wishlist">★</span>` : "")}
-      ${td("arquetipo", arqTag(p.arquetipo, 14))}
+      ${td("posse", editavel ? celPosse(p, id) : esc(posseRot(p.posse) || "—"))}
+      ${td("tier", editavel ? celTier(p, id) : p.tier ? tierHTML(p.tier) : `<span class="tier sem">–</span>`)}
+      ${td("wish", editavel ? celWish(p, id) : p.wish ? `<span class="estrela" title="Na wishlist">★</span>` : "")}
+      ${td("arquetipo", editavel ? celArq(p, id, arquetipos) : arqTag(p.arquetipo, 14))}
       ${tx("resumo", p.resumo)}${tx("topo", p.topo)}${tx("coracao", p.coracao)}${tx("base", p.base)}
-    </tr>`).join("")}</tbody></table></div>
-  <p class="nota">Arraste para o lado para ver todas as colunas. Toque no cabeçalho para ordenar (vira o 1º critério; os anteriores viram 2º e 3º) e na linha para editar.</p>`;
+    </tr>`; }).join("")}</tbody></table></div>
+  <p class="nota">Arraste para o lado para ver todas as colunas. ${editavel ? "Tier, Posse, Wishlist e Arquétipo mudam direto na tabela (grava na hora); toque no nome para o resto." : "Toque na linha para ver a ficha."} Toque no cabeçalho para ordenar.</p>`;
 }
 
 export function fichaEditavel(p, { arquetipos, editavel, novo = false, confirmarRemover = false }) {

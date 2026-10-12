@@ -493,3 +493,24 @@ select[disabled], input[readonly], textarea[readonly] { opacity: .75; }
 .tabelao thead th button.ord-ativa { color: var(--acento); }
 .tabelao thead th button.ord-1, .tabelao thead th button.ord-2 { color: color-mix(in srgb, var(--acento) 70%, var(--suave)); }
 .ord-n { font-size: 13px; }
+
+/* ── edição direto na tabela do Mercado ── */
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.tabelao label.ed { position: relative; display: inline-flex; align-items: center; gap: 5px; }
+.tabelao label.ed select { width: auto; min-width: 0; padding: 5px 24px 5px 8px; font-size: 13px; border-radius: 8px; background-color: var(--afund);
+  background-position: calc(100% - 13px) 52%, calc(100% - 8px) 52%; }
+.tabelao .ed-tier select { font: 700 13px var(--f); text-align: center; padding-left: 10px; }
+.tabelao .ed-tier.t-S select { background-color: var(--tS); color: var(--tier-tinta); }
+.tabelao .ed-tier.t-A select { background-color: var(--tA); color: var(--tier-tinta); }
+.tabelao .ed-tier.t-B select { background-color: var(--tB); color: var(--tier-tinta); }
+.tabelao .ed-tier.t-C select { background-color: var(--tC); color: var(--tier-tinta); }
+.tabelao .ed-tier.t-D select { background-color: var(--tD); color: var(--tier-tinta); }
+.tabelao .ed-posse.minha select { color: var(--ok); font-weight: 600; }
+.tabelao .ed-arq select { max-width: 130px; }
+.tabelao button.ed-wish { all: unset; cursor: pointer; font-size: 20px; line-height: 1; color: var(--leve); padding: 4px 8px; border-radius: 8px; }
+.tabelao button.ed-wish.on { color: var(--tS); }
+.tabelao button.ed-wish:active { transform: scale(1.3); }
+.tabelao button.ed-wish:focus-visible { outline: 2px solid var(--acento); }
+.tabelao td.salvando { opacity: .45; pointer-events: none; }
+.tabelao .c-posse { min-width: 130px; }
+.tabelao .c-arquetipo { min-width: 160px; }
