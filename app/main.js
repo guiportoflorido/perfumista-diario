@@ -16,7 +16,7 @@ import { telaMercado, fichaEditavel, camposAlterados, baseComTiers, deLinhas, li
 import { contagens } from "./estatisticas.js";
 import { ler, gravar } from "./store.js";
 
-export const APP_VERSAO = "5.7";  // sobe a cada publicação: confere no topo da tela se o celular pegou a versão nova
+export const APP_VERSAO = "5.8";  // sobe a cada publicação: confere no topo da tela se o celular pegou a versão nova
 const S = { aba: "hoje", frascos: [], frascosAtivos: [], avisosTiers: null, fichas: {}, versao: {}, prev: null, prevOffline: false,
   prevErro: null, metar: null, metarMotivo: null, clima: null, resultado: null, erroMotor: null, entrada: "", carregandoClima: true,
   sync: { estado: "ocioso", msg: "" }, hr: ler("hr", { preset: "tudo" }), tokenNovo: null, playbook: null, janelas: new Map(),
@@ -116,11 +116,24 @@ function render() {
   const ctx = { fichas: S.fichas, arqTag, arqIcone, arqDe, hr: S.hr,
     frascos: S.frascosAtivos, hist: historico(), hoje: hojeISO(), janelas: S.janelas, filtro: S.filtro, playbook: S.playbook,
     faixaSel: S.pbFaixa ?? S.clima?.faixaDia?.idx ?? 2, fila: fila(), ajSpray: ajSpray() };
+  // mesma aba: guarda rolagem da página, das tabelas e painéis abertos para restaurar depois de redesenhar
+  const antes = trocouAba ? null : {
+    y: window.scrollY,
+    tabelas: [...document.querySelectorAll("#tela .tabelao")].map(t => [t.scrollTop, t.scrollLeft]),
+    abertos: [...document.querySelectorAll("#tela details")].map(d => d.open),
+  };
   try {
     $("#tela").innerHTML = ({ hoje: telaHoje, registrar: telaRegistrar, ajustes: telaAjustes,
       colecao: () => telaColecaoTudo(ctx), mercado: telaMercadoAba, playbook: () => telaPlaybook(ctx), historico: () => telaHistorico(ctx) }[S.aba])();
   } catch (e) { $("#tela").innerHTML = erroHTML(e, S.aba); console.error(e); }
   if (trocouAba) { const t = $("#tela"); t.classList.remove("entra"); void t.offsetWidth; t.classList.add("entra"); }
+  else if (antes) {
+    $("#tela").classList.remove("entra");
+    const ds = document.querySelectorAll("#tela details");
+    if (ds.length === antes.abertos.length) ds.forEach((d, i) => { d.open = antes.abertos[i]; });
+    document.querySelectorAll("#tela .tabelao").forEach((t, i) => { const p = antes.tabelas[i]; if (p) { t.scrollTop = p[0]; t.scrollLeft = p[1]; } });
+    window.scrollTo(0, antes.y);
+  }
   if (foco && document.getElementById(foco) && S.aba !== "hoje") {
     const el = document.getElementById(foco); el.focus();
     if (el.type === "search") { const n = el.value.length; try { el.setSelectionRange(n, n); } catch { /* sem seleção */ } }
