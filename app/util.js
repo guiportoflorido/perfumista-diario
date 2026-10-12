@@ -33,3 +33,57 @@ export function md(txt) {
   }
   return out.join("");
 }
+
+// ───────────────────────── ordenação em até 3 níveis (tabelas da Coleção e do Mercado) ─────────────────────────
+/** Lista de critérios [{k, dir}] (máx. 3). Aceita o formato antigo {ord, dir}. */
+export function ordsDe(f, padrao = "tier") {
+  if (Array.isArray(f.ords) && f.ords.length) return f.ords.slice(0, 3);
+  return [{ k: f.ord || padrao, dir: f.dir || "asc" }];
+}
+/** Tocar num cabeçalho: vira o 1º critério (se já é o 1º, inverte); os outros descem. */
+export function tocarOrd(ords, k) {
+  if (ords[0]?.k === k) return [{ k, dir: ords[0].dir === "asc" ? "desc" : "asc" }, ...ords.slice(1)];
+  return [{ k, dir: "asc" }, ...ords.filter(o => o.k !== k)].slice(0, 3);
+}
+/** Comparador encadeado. cmp(k, a, b) compara um critério em ordem crescente; vazios ficam no fim nos dois sentidos. */
+export function compararMulti(ords, cmp, desempate) {
+  return (a, b) => {
+    for (const { k, dir } of ords) {
+      const r = cmp(k, a, b);
+      if (r.vazio) { if (r.c) return r.c; continue; }
+      if (r.c) return dir === "desc" ? -r.c : r.c;
+    }
+    return desempate(a, b);
+  };
+}
+/** Compara valores: números, textos (pt) e vazios sempre no fim. */
+export function cmpValor(x, y) {
+  const vx = x === "" || x == null, vy = y === "" || y == null;
+  if (vx || vy) return { vazio: true, c: vx === vy ? 0 : vx ? 1 : -1 };
+  return { c: typeof x === "number" && typeof y === "number" ? x - y : String(x).localeCompare(String(y), "pt") };
+}
+/** Botão de cabeçalho com o selo do nível (①②③) e a seta. attr = nome do data-atributo (ex.: "col-ord"). */
+export function cabOrd(k, rot, ords, attr) {
+  const i = ords.findIndex(o => o.k === k), o = ords[i];
+  const selo = i >= 0 ? `<span class="ord-n">${"①②③"[i]}</span>${o.dir === "asc" ? "↑" : "↓"}` : "";
+  return `<button data-${attr}="${k}" aria-sort="${i === 0 ? (o.dir === "asc" ? "ascending" : "descending") : "none"}" class="${i >= 0 ? `ord-ativa ord-${i}` : ""}">${rot}${selo ? ` ${selo}` : ""}</button>`;
+}
+/** Painel com 3 seletores (1º, 2º, 3º) e a direção de cada um. prefixo identifica a tabela ("col" ou "mf"). */
+export function painelOrd(ords, colunas, prefixo) {
+  const linha = n => {
+    const o = ords[n] || { k: "", dir: "asc" };
+    return `<div class="ord-linha"><span class="ord-rot">${n + 1}º</span>
+      <select data-ord-sel="${prefixo}" data-n="${n}" aria-label="${n + 1}º critério">${n ? `<option value="">—</option>` : ""}${colunas.map(([k, r]) => `<option value="${esc(k)}" ${o.k === k ? "selected" : ""}>${esc(r)}</option>`).join("")}</select>
+      <button class="chip" data-ord-dir="${prefixo}" data-n="${n}" ${o.k ? "" : "disabled"} aria-label="Inverter direção">${o.dir === "asc" ? "↑ crescente" : "↓ decrescente"}</button></div>`;
+  };
+  return `<details class="ordenar" ${ords.length > 1 ? "open" : ""}><summary>Ordenar por <span class="nota">${ords.map((o, i) => `${i + 1}º ${esc(colunas.find(c => c[0] === o.k)?.[1] || o.k)} ${o.dir === "asc" ? "↑" : "↓"}`).join(" · ")}</span></summary>
+    <div class="ord-painel">${linha(0)}${linha(1)}${linha(2)}</div></details>`;
+}
+/** Aplica a mudança de um seletor ou botão de direção do painel. */
+export function mudarOrds(ords, n, { k, inverter }) {
+  const r = ords.map(o => ({ ...o }));
+  if (inverter) { if (r[n]) r[n].dir = r[n].dir === "asc" ? "desc" : "asc"; return r; }
+  if (!k) return n === 0 ? r : r.slice(0, n);                // "—" corta este nível e os seguintes
+  r[n] = { k, dir: r[n]?.dir || "asc" };
+  return r.filter((o, i) => o && (o.k !== k || i === n)).slice(0, 3);
+}

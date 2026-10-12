@@ -1,6 +1,6 @@
 // telas.js — Coleção, Playbook e Histórico (fase 4). Recebem o contexto pronto do main.js e devolvem HTML.
 import { FAIXAS } from "../engine/index.js";
-import { esc, ROT_OC, OCAS_TODAS, pinta, faixaHTML, nf, tierHTML, slotNome, md } from "./util.js";
+import { esc, ROT_OC, OCAS_TODAS, pinta, faixaHTML, nf, tierHTML, slotNome, md, ordsDe, compararMulti, cmpValor, cabOrd, painelOrd } from "./util.js";
 import { daGrade, contagens, agrupar, esquecidos, usoVsJanelas, calibracao } from "./estatisticas.js";
 import { arqIcone, corArq, ARQ_PATHS } from "./icones.js";
 
@@ -15,16 +15,11 @@ const COLS_COL = [["nome", "Perfume"], ["casa", "Casa"], ["tier", "Tier"], ["arq
   ["peso", "Peso"], ["doc", "Doçura"], ["envelope", "Envelope"], ["janelas", "Janelas"], ["usos", "Usos"], ["ultimo", "Último uso"]];
 const TD_ROT = { C: "C · carregado", S: "S · seco", N: "N · indiferente" };
 
-function ordenarColecao(linhas, ord = "tier", dir = "asc") {
-  const s = dir === "desc" ? -1 : 1;
-  const v = (x) => ({ tier: TIERS.indexOf(x.f.tier), nome: x.f.nome, casa: x.f.casa, arquetipo: x.f.arquetipo, eixo: x.f.eixo, td: x.f.td,
-    peso: x.f.peso, doc: x.f.doc, envelope: x.f.env_hot * 10 + x.f.env_cold, janelas: x.f.janelas || 0, usos: x.k.n, ultimo: x.k.ultimo || "" }[ord]);
+function ordenarColecao(linhas, ords) {
+  const v = (k, x) => ({ tier: TIERS.indexOf(x.f.tier), nome: x.f.nome, casa: x.f.casa, arquetipo: x.f.arquetipo, eixo: x.f.eixo, td: x.f.td,
+    peso: x.f.peso, doc: x.f.doc, envelope: x.f.env_hot * 10 + x.f.env_cold, janelas: x.f.janelas || 0, usos: x.k.n, ultimo: x.k.ultimo || "" }[k]);
   const padrao = (a, b) => TIERS.indexOf(a.f.tier) - TIERS.indexOf(b.f.tier) || a.f.nome.localeCompare(b.f.nome, "pt");
-  return [...linhas].sort((a, b) => {
-    const x = v(a), y = v(b);
-    const c = typeof x === "number" ? x - y : (!x && y) ? 1 : (x && !y) ? -1 : String(x).localeCompare(String(y), "pt");
-    return (ord === "ultimo" && (!x || !y) ? c : s * c) || padrao(a, b);
-  });
+  return [...linhas].sort(compararMulti(ords, (k, a, b) => cmpValor(v(k, a), v(k, b)), padrao));
 }
 
 export function telaColecao({ frascos, hist, hoje, janelas, filtro, fichas, arqTag }) {
@@ -44,9 +39,9 @@ export function telaColecao({ frascos, hist, hoje, janelas, filtro, fichas, arqT
     if (q && !`${f.nome} ${f.casa} ${f.arquetipo}`.toLowerCase().includes(q)) return false;
     return true;
   }).map(f => ({ f, k: c.por.get(f.nome) }));
-  const linhas = ordenarColecao(filtrados, filtro.ord, filtro.dir);
-  const ord = filtro.ord || "tier", dir = filtro.dir || "asc";
-  const th = ([k, r]) => `<th class="cc-${k}" scope="col"><button data-col-ord="${k}" aria-sort="${ord === k ? (dir === "asc" ? "ascending" : "descending") : "none"}">${r}${ord === k ? (dir === "asc" ? " ↑" : " ↓") : ""}</button></th>`;
+  const ords = ordsDe(filtro, "tier");
+  const linhas = ordenarColecao(filtrados, ords);
+  const th = ([k, r]) => `<th class="cc-${k}" scope="col">${cabOrd(k, r, ords, "col-ord")}</th>`;
   return `<div class="bloco">
     <input type="search" id="col-q" placeholder="Buscar frasco, casa ou arquétipo" value="${esc(filtro.q || "")}" aria-label="Buscar">
     <div class="chips rolagem">${chip("tier", "", "Todos", !filtro.tier)}${TIERS.map(t => chip("tier", t, `Tier ${t}`, filtro.tier === t)).join("")}</div>
@@ -58,7 +53,7 @@ export function telaColecao({ frascos, hist, hoje, janelas, filtro, fichas, arqT
     </div>
     <p class="nota">${linhas.length} de ${grade.length} frascos da grade${recorte ? " com janela no playbook nesse recorte" : ""} · ${TIERS.map(t => `${t} ${grade.filter(f => f.tier === t).length}`).join(" · ")}.</p>
   </div>
-  ${linhas.length ? `<div class="tabelao" role="region" aria-label="Tabela da coleção" tabindex="0"><table class="t-colecao">
+  ${linhas.length ? `${painelOrd(ords, COLS_COL, "col")}<div class="tabelao" role="region" aria-label="Tabela da coleção" tabindex="0"><table class="t-colecao">
     <thead><tr><th class="c-n" scope="col">#</th>${COLS_COL.map(th).join("")}</tr></thead>
     <tbody>${linhas.map(({ f, k }, i) => `<tr data-ficha="${esc(f.nome)}" tabindex="0">
       <td class="c-n">${i + 1}</td>
@@ -74,7 +69,7 @@ export function telaColecao({ frascos, hist, hoje, janelas, filtro, fichas, arqT
       <td class="cc-num">${k.n}${k.n ? ` <span class="nota">☀︎${k.M} ☾${k.N}</span>` : ""}</td>
       <td class="cc-ult">${quando(k.dias)}</td>
     </tr>`).join("")}</tbody></table></div>
-  <p class="nota">Toque no cabeçalho para ordenar e na linha para abrir a ficha. Peso 1–5 · Doçura 0–3 · Td = como reage à umidade.</p>`
+  <p class="nota">Toque no cabeçalho para ordenar (vira o 1º critério; os anteriores viram 2º e 3º) e na linha para abrir a ficha. Peso 1–5 · Doçura 0–3 · Td = como reage à umidade.</p>`
     : `<div class="bloco"><p class="vazio">Nenhum frasco nesse recorte.</p></div>`}`;
 }
 

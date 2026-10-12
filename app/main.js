@@ -9,13 +9,14 @@ import { lerTiers, lerDiario, aplicarTiers, diarioUnificado, nomesRegistraveis }
 import { janelasPorFrasco, ajustarSprays } from "./estatisticas.js";
 import { telaColecao, telaPlaybook, telaHistorico } from "./telas.js";
 import { telaRoda } from "./roda.js";
+import { ordsDe, tocarOrd, mudarOrds } from "./util.js";
 import { definirCores, arqTag, arqIcone, corArq } from "./icones.js";
 import { ceuHTML, abrirRoleta, animarSpray } from "./diversao.js";
 import { telaMercado, fichaEditavel, camposAlterados, baseComTiers, deLinhas, linhasParaCriar, cachePlanilha, baixarMercado, criarNaPlanilha, editarNaPlanilha, adicionarNaPlanilha, removerNaPlanilha } from "./mercado.js";
 import { contagens } from "./estatisticas.js";
 import { ler, gravar } from "./store.js";
 
-export const APP_VERSAO = "5.5";  // sobe a cada publicação: confere no topo da tela se o celular pegou a versão nova
+export const APP_VERSAO = "5.6";  // sobe a cada publicação: confere no topo da tela se o celular pegou a versão nova
 const S = { aba: "hoje", frascos: [], frascosAtivos: [], avisosTiers: null, fichas: {}, versao: {}, prev: null, prevOffline: false,
   prevErro: null, metar: null, metarMotivo: null, clima: null, resultado: null, erroMotor: null, entrada: "", carregandoClima: true,
   sync: { estado: "ocioso", msg: "" }, hr: ler("hr", { preset: "tudo" }), tokenNovo: null, playbook: null, janelas: new Map(),
@@ -509,11 +510,12 @@ document.addEventListener("click", async e => {
   if (b.hasAttribute("data-fechar") && (e.target === b || b.tagName === "BUTTON")) { fecharFolha(); return; }
   if (b.dataset.ficha) { abrirFicha(b.dataset.ficha); return; }
   if (b.dataset.colmodo) { S.colModo = b.dataset.colmodo; gravar("colModo", S.colModo); render(); return; }
-  if (b.dataset.colOrd) { const k = b.dataset.colOrd; S.filtro = { ...S.filtro, ord: k, dir: (S.filtro.ord || "tier") === k && (S.filtro.dir || "asc") === "asc" ? "desc" : "asc" }; gravar("filtro", S.filtro); render(); return; }
+  if (b.dataset.colOrd) { S.filtro = { ...S.filtro, ords: tocarOrd(ordsDe(S.filtro, "tier"), b.dataset.colOrd) }; gravar("filtro", S.filtro); render(); return; }
+  if (b.dataset.ordDir) { mudarOrdem(b.dataset.ordDir, Number(b.dataset.n), { inverter: true }); return; }
   if (b.dataset.dia) { const el = $("#calInfo"); if (el) el.innerHTML = b.dataset.info; document.querySelectorAll(".cal .dia.sel").forEach(x => x.classList.remove("sel")); b.classList.add("sel"); return; }
   if (b.dataset.hr) { S.hr = { ...S.hr, preset: b.dataset.hr }; gravar("hr", S.hr); render(); return; }
   if (b.dataset.merc) { S.confirmandoRemocao = false; abrirMercado(b.dataset.merc); return; }
-  if (b.dataset.mfOrd) { const k = b.dataset.mfOrd; S.mf = { ...S.mf, ord: k, dir: (S.mf.ord || "tier") === k && (S.mf.dir || "asc") === "asc" ? "desc" : "asc" }; gravar("mf", S.mf); render(); return; }
+  if (b.dataset.mfOrd) { S.mf = { ...S.mf, ords: tocarOrd(ordsDe(S.mf, "tier"), b.dataset.mfOrd) }; gravar("mf", S.mf); render(); return; }
   if (b.dataset.mf) { S.mf = { ...S.mf, [b.dataset.mf]: b.dataset.v }; S.mfLimite = 60; gravar("mf", S.mf); render(); return; }
   if (b.dataset.mfArq) { S.mf = { ...S.mf, arq: S.mf.arq === b.dataset.mfArq ? "" : b.dataset.mfArq }; S.mfLimite = 60; gravar("mf", S.mf); render(); $("#mf-q")?.scrollIntoView({ block: "center" }); return; }
   if (b.dataset.tema) { gravar("tema", b.dataset.tema); aplicarTema(); render(); return; }
@@ -581,6 +583,7 @@ document.addEventListener("click", async e => {
 document.addEventListener("change", e => {
   const el = e.target;
   if (el.dataset.ov) { const k = el.dataset.ov, v = el.value.trim().replace(",", "."); mudarDia(d => { if (v === "") delete d.override[k]; else d.override[k] = v.toLowerCase() === "nd" ? "nd" : v; }); return; }
+  if (el.dataset.ordSel) { mudarOrdem(el.dataset.ordSel, Number(el.dataset.n), { k: el.value }); return; }
   if (el.id === "hr-de" || el.id === "hr-ate") { S.hr = { ...S.hr, [el.id === "hr-de" ? "de" : "ate"]: el.value }; gravar("hr", S.hr); render(); return; }
   if (el.id === "mf-posse" || el.id === "mf-arq" || el.id === "mf-wish") { S.mf = { ...S.mf, [{ "mf-posse": "posse", "mf-arq": "arq", "mf-wish": "wish" }[el.id]]: el.value }; S.mfLimite = 60; gravar("mf", S.mf); render(); return; }
   if (el.id === "col-arq" || el.id === "col-faixa" || el.id === "col-oc") {
@@ -682,6 +685,14 @@ document.addEventListener("click", e => {
   // mouse: clique abre a ficha; toque: o 1º toque mostra a prévia, o 2º na mesma bola abre
   if (R.tipo === "mouse" || R.ativoAntes === g) { esconderPrevia(); abrirFicha(g.dataset.fr); }
 });
+
+// ───────────────────────── ordenação em 3 níveis ─────────────────────────
+function mudarOrdem(tabela, n, mud) {
+  if (tabela === "col") { S.filtro = { ...S.filtro, ords: mudarOrds(ordsDe(S.filtro, "tier"), n, mud) }; gravar("filtro", S.filtro); }
+  else { S.mf = { ...S.mf, ords: mudarOrds(ordsDe(S.mf, "tier"), n, mud) }; gravar("mf", S.mf); }
+  render();
+  document.querySelector("details.ordenar")?.setAttribute("open", "");
+}
 
 // ───────────────────────── tema ─────────────────────────
 function aplicarTema() {

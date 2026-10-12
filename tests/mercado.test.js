@@ -40,7 +40,7 @@ test("ordenação por coluna (TABELAO): casa, posse, tier asc/desc; vazios no fi
   const m = baseComTiers(base, tiers);
   assert.deepEqual(filtrar(m, { ord: "casa", dir: "desc" }).map(p => p.nome), ["Gypsy Water", "Decision", "Search"]);
   assert.deepEqual(filtrar(m, { ord: "posse" }).map(p => p.nome), ["Decision", "Gypsy Water", "Search"]);
-  assert.deepEqual(filtrar(m, { ord: "tier", dir: "desc" }).map(p => p.nome), ["Search", "Gypsy Water", "Decision"]);
+  assert.deepEqual(filtrar(m, { ord: "tier", dir: "desc" }).map(p => p.nome), ["Gypsy Water", "Decision", "Search"]);   // sem tier no fim
   assert.deepEqual(filtrar(m, { ord: "resumo" }).map(p => p.nome), ["Decision", "Gypsy Water", "Search"]);
 });
 
@@ -59,4 +59,19 @@ test("filtro de wishlist: só, fora, e o valor antigo '1'; ordenar pela coluna W
   assert.deepEqual(filtrar(m, { wish: "1" }).map(p => p.nome), ["Search"]);
   assert.deepEqual(filtrar(m, { wish: "nao" }).map(p => p.nome), ["Decision", "Gypsy Water"]);
   assert.equal(filtrar(m, { ord: "wish" })[0].nome, "Search");
+});
+
+import { tocarOrd, mudarOrds, ordsDe } from "../app/util.js";
+test("ordenação em 3 níveis: tocar no cabeçalho empurra os critérios; painel troca e corta níveis", () => {
+  let o = ordsDe({}, "tier");
+  o = tocarOrd(o, "casa"); assert.deepEqual(o.map(x => x.k), ["casa", "tier"]);
+  o = tocarOrd(o, "wish"); assert.deepEqual(o.map(x => x.k), ["wish", "casa", "tier"]);
+  o = tocarOrd(o, "posse"); assert.deepEqual(o.map(x => x.k), ["posse", "wish", "casa"]);
+  o = tocarOrd(o, "posse"); assert.equal(o[0].dir, "desc");
+  o = mudarOrds(o, 1, { k: "casa" }); assert.deepEqual(o.map(x => x.k), ["posse", "casa"]);
+  o = mudarOrds(o, 2, { k: "nome" }); assert.deepEqual(o.map(x => x.k), ["posse", "casa", "nome"]);
+  o = mudarOrds(o, 1, { k: "" }); assert.deepEqual(o.map(x => x.k), ["posse"]);
+  const m = baseComTiers([...base, { casa: "Amouage", nome: "Beach Hut", tier: "A", posse: "", arquetipo: "Botânico", wish: true }], tiers);
+  const r = filtrar(m, { ords: [{ k: "casa", dir: "asc" }, { k: "wish", dir: "asc" }, { k: "nome", dir: "desc" }] }).map(p => p.nome);
+  assert.deepEqual(r, ["Search", "Beach Hut", "Decision", "Gypsy Water"]);
 });

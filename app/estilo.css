@@ -481,3 +481,15 @@ select[disabled], input[readonly], textarea[readonly] { opacity: .75; }
 .btn.perigo { background: var(--erro); color: #fff; }
 .tabelao .c-wish { min-width: 64px; text-align: center; }
 .tabelao td.c-wish .estrela { font-size: 16px; color: var(--tS); }
+
+/* ── ordenação em 3 níveis ── */
+.ordenar { background: var(--sup); border-radius: var(--r); padding: 12px 14px; box-shadow: var(--sombra); }
+.ordenar > summary { font-size: 14px; flex-wrap: wrap; }
+.ordenar > summary .nota { font-weight: 500; }
+.ord-painel { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
+.ord-linha { display: grid; grid-template-columns: 26px minmax(0, 1fr) auto; gap: 8px; align-items: center; }
+.ord-rot { font: 700 13px var(--f); color: var(--suave); }
+.ord-linha .chip { padding: 8px 12px; font-size: 13px; }
+.tabelao thead th button.ord-ativa { color: var(--acento); }
+.tabelao thead th button.ord-1, .tabelao thead th button.ord-2 { color: color-mix(in srgb, var(--acento) 70%, var(--suave)); }
+.ord-n { font-size: 13px; }
