@@ -479,3 +479,5 @@ select[disabled], input[readonly], textarea[readonly] { opacity: .75; }
 .tela.entra .carimbo.ok { animation: carimba .4s cubic-bezier(.2, .9, .3, 1.6) backwards; animation-delay: 250ms; }
 @keyframes carimba { from { transform: scale(1.6) rotate(-20deg); opacity: 0; } }
 .btn.perigo { background: var(--erro); color: #fff; }
+.tabelao .c-wish { min-width: 64px; text-align: center; }
+.tabelao td.c-wish .estrela { font-size: 16px; color: var(--tS); }

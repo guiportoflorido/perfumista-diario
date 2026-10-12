@@ -52,3 +52,11 @@ test("renomear e notas entram como campos alterados; novo perfume leva tudo que 
   const n = camposAlterados({}, { ...f, "me-casa": "Nishane", "me-nome": "Hundred Silent Ways", "me-wish": true });
   assert.equal(n.Casa, "Nishane"); assert.equal(n.Perfume, "Hundred Silent Ways"); assert.equal(n.Wishlist, "✓"); assert.equal(n.Nariz, undefined);
 });
+
+test("filtro de wishlist: só, fora, e o valor antigo '1'; ordenar pela coluna Wishlist", () => {
+  const m = baseComTiers(base, tiers);
+  assert.deepEqual(filtrar(m, { wish: "sim" }).map(p => p.nome), ["Search"]);
+  assert.deepEqual(filtrar(m, { wish: "1" }).map(p => p.nome), ["Search"]);
+  assert.deepEqual(filtrar(m, { wish: "nao" }).map(p => p.nome), ["Decision", "Gypsy Water"]);
+  assert.equal(filtrar(m, { ord: "wish" })[0].nome, "Search");
+});

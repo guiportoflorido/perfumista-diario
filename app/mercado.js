@@ -98,20 +98,22 @@ export function filtrar(lista, f) {
     if (f.tier === "sem" ? p.tier : f.tier && p.tier !== f.tier) return false;
     if (f.posse === "amostra" ? !/amostra/i.test(p.posse) : f.posse === "nao" ? /frasco/i.test(p.posse) : f.posse && p.posse !== f.posse) return false;
     if (f.arq && p.arquetipo !== f.arq) return false;
-    if (f.wish && !p.wish) return false;
+    const w = f.wish === "1" ? "sim" : f.wish;   // "1" = valor salvo pela versão anterior
+    if (w === "sim" && !p.wish) return false;
+    if (w === "nao" && p.wish) return false;
     if (q && !norm(`${p.nome} ${p.casa} ${p.nariz} ${p.resumo} ${p.topo} ${p.coracao} ${p.base}`).includes(q)) return false;
     return true;
   }).sort(comparador(f.ord, f.dir));
 }
 
 // colunas da tabela (formato do TABELAO): chave do objeto, rótulo, ordenável
-export const COLUNAS = [["posse", "Posse"], ["tier", "Tier"], ["arquetipo", "Arquétipo"],
+export const COLUNAS = [["posse", "Posse"], ["tier", "Tier"], ["wish", "Wishlist"], ["arquetipo", "Arquétipo"],
   ["resumo", "Resumo"], ["topo", "Topo"], ["coracao", "Coração"], ["base", "Base"]];
 const ordemPosse = p => ({ "Frasco Gui": 0, "Frasco Bia": 1, "Amostra": 2, "Amostra Bia": 3, "Avaliado": 4 }[p] ?? (p ? 5 : 6));
 function comparador(ord = "tier", dir = "asc") {
   const s = dir === "desc" ? -1 : 1;
   const padrao = (a, b) => ordemTier(a.tier) - ordemTier(b.tier) || a.casa.localeCompare(b.casa, "pt") || a.nome.localeCompare(b.nome, "pt");
-  const chaveDe = { tier: p => ordemTier(p.tier), posse: p => ordemPosse(p.posse) }[ord];
+  const chaveDe = { tier: p => ordemTier(p.tier), posse: p => ordemPosse(p.posse), wish: p => (p.wish ? 0 : 1) }[ord];
   return (a, b) => {
     let c;
     if (chaveDe) c = chaveDe(a) - chaveDe(b);
@@ -142,10 +144,11 @@ export function telaMercado({ lista, fonte, arquetipos, filtro, limite, podeCria
   <div class="bloco">
     <input type="search" id="mf-q" placeholder="Buscar perfume, casa, nariz ou nota" value="${esc(filtro.q || "")}" aria-label="Buscar no mercado">
     <div class="chips rolagem">${[["", "Todo tier"], ...["S", "A", "B", "C", "D"].map(t => [t, `Tier ${t}`]), ["sem", "Sem tier"]].map(([v, r]) => `<button class="chip" data-mf="tier" data-v="${v}" aria-pressed="${(filtro.tier || "") === v}">${r}</button>`).join("")}
-      <button class="chip" data-mf="wish" data-v="${filtro.wish ? "" : "1"}" aria-pressed="${Boolean(filtro.wish)}">★ Wishlist (${wish})</button></div>
+      </div>
     <div class="campos">
       <label>Posse<select id="mf-posse">${POSSES_FILTRO.map(([v, r]) => op(v, r, filtro.posse)).join("")}</select></label>
       <label>Arquétipo<select id="mf-arq">${op("", "Todos", filtro.arq)}${arquetipos.map(a => op(a.nome, a.nome, filtro.arq)).join("")}</select></label>
+      <label>Wishlist<select id="mf-wish">${op("", "Todos", filtro.wish === "1" ? "sim" : filtro.wish)}${op("sim", `Só wishlist (${wish})`, filtro.wish === "1" ? "sim" : filtro.wish)}${op("nao", "Fora da wishlist", filtro.wish === "1" ? "sim" : filtro.wish)}</select></label>
     </div>
     <p class="nota">${res.length} perfume${res.length === 1 ? "" : "s"}.</p>
   </div>
@@ -173,9 +176,10 @@ function tabela(linhas, f) {
     <tbody>${linhas.map((p, i) => `<tr data-merc="${esc(p.casa + "||" + p.nome)}" tabindex="0" class="${p.posse === "Frasco Gui" ? "minha" : ""}">
       ${td("n", i + 1)}
       ${td("casa", esc(p.casa))}
-      ${td("nome", `${esc(p.nome)}${p.wish ? ` <span class="estrela" title="Wishlist">★</span>` : ""}`)}
+      ${td("nome", esc(p.nome))}
       ${td("posse", esc(posseRot(p.posse) || "—"))}
       ${td("tier", p.tier ? tierHTML(p.tier) : `<span class="tier sem">–</span>`)}
+      ${td("wish", p.wish ? `<span class="estrela" title="Na wishlist">★</span>` : "")}
       ${td("arquetipo", arqTag(p.arquetipo, 14))}
       ${tx("resumo", p.resumo)}${tx("topo", p.topo)}${tx("coracao", p.coracao)}${tx("base", p.base)}
     </tr>`).join("")}</tbody></table></div>

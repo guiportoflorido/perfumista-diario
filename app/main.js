@@ -15,7 +15,7 @@ import { telaMercado, fichaEditavel, camposAlterados, baseComTiers, deLinhas, li
 import { contagens } from "./estatisticas.js";
 import { ler, gravar } from "./store.js";
 
-export const APP_VERSAO = "5.4";  // sobe a cada publicação: confere no topo da tela se o celular pegou a versão nova
+export const APP_VERSAO = "5.5";  // sobe a cada publicação: confere no topo da tela se o celular pegou a versão nova
 const S = { aba: "hoje", frascos: [], frascosAtivos: [], avisosTiers: null, fichas: {}, versao: {}, prev: null, prevOffline: false,
   prevErro: null, metar: null, metarMotivo: null, clima: null, resultado: null, erroMotor: null, entrada: "", carregandoClima: true,
   sync: { estado: "ocioso", msg: "" }, hr: ler("hr", { preset: "tudo" }), tokenNovo: null, playbook: null, janelas: new Map(),
@@ -582,7 +582,7 @@ document.addEventListener("change", e => {
   const el = e.target;
   if (el.dataset.ov) { const k = el.dataset.ov, v = el.value.trim().replace(",", "."); mudarDia(d => { if (v === "") delete d.override[k]; else d.override[k] = v.toLowerCase() === "nd" ? "nd" : v; }); return; }
   if (el.id === "hr-de" || el.id === "hr-ate") { S.hr = { ...S.hr, [el.id === "hr-de" ? "de" : "ate"]: el.value }; gravar("hr", S.hr); render(); return; }
-  if (el.id === "mf-posse" || el.id === "mf-arq") { S.mf = { ...S.mf, [el.id === "mf-posse" ? "posse" : "arq"]: el.value }; S.mfLimite = 60; gravar("mf", S.mf); render(); return; }
+  if (el.id === "mf-posse" || el.id === "mf-arq" || el.id === "mf-wish") { S.mf = { ...S.mf, [{ "mf-posse": "posse", "mf-arq": "arq", "mf-wish": "wish" }[el.id]]: el.value }; S.mfLimite = 60; gravar("mf", S.mf); render(); return; }
   if (el.id === "col-arq" || el.id === "col-faixa" || el.id === "col-oc") {
     S.filtro = { ...S.filtro, [{ "col-arq": "arq", "col-faixa": "faixa", "col-oc": "oc" }[el.id]]: el.value }; gravar("filtro", S.filtro); render(); return;
   }
