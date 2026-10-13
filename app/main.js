@@ -12,16 +12,19 @@ import { telaRoda } from "./roda.js";
 import { ordsDe, tocarOrd, mudarOrds } from "./util.js";
 import { definirCores, arqTag, arqIcone, corArq } from "./icones.js";
 import { ceuHTML, abrirRoleta, animarSpray } from "./diversao.js";
-import { telaMercado, fichaEditavel, camposAlterados, baseComTiers, deLinhas, linhasParaCriar, cachePlanilha, baixarMercado, criarNaPlanilha, editarNaPlanilha, adicionarNaPlanilha, removerNaPlanilha } from "./mercado.js";
+import { chave as mercadoChave, telaMercado, fichaEditavel, camposAlterados, baseComTiers, deLinhas, linhasParaCriar, cachePlanilha, baixarMercado, criarNaPlanilha, editarNaPlanilha, adicionarNaPlanilha, removerNaPlanilha } from "./mercado.js";
 import { contagens } from "./estatisticas.js";
+import { telaAmostras, fichaAmostra, deLinhas as amostrasDeLinhas, juntar, semRegistro, camposAmostra, camposAvaliacaoMexidos, cacheAmostras, baixarAmostras,
+  adicionarAmostra, editarAmostra, removerAmostra, novoId, normalizar } from "./amostras.js";
 import { ler, gravar } from "./store.js";
 
-export const APP_VERSAO = "5.8";  // sobe a cada publicação: confere no topo da tela se o celular pegou a versão nova
+export const APP_VERSAO = "5.9";  // sobe a cada publicação: confere no topo da tela se o celular pegou a versão nova
 const S = { aba: "hoje", frascos: [], frascosAtivos: [], avisosTiers: null, fichas: {}, versao: {}, prev: null, prevOffline: false,
   prevErro: null, metar: null, metarMotivo: null, clima: null, resultado: null, erroMotor: null, entrada: "", carregandoClima: true,
   sync: { estado: "ocioso", msg: "" }, hr: ler("hr", { preset: "tudo" }), tokenNovo: null, playbook: null, janelas: new Map(),
   filtro: ler("filtro", {}), pbFaixa: null, arquetipos: [], gaps: [], colModo: ler("colModo", "roda") === "lista" ? "lista" : "roda", sim: null, verGaps: false,
-  mercadoBase: null, mercadoErro: null, mf: ler("mf", {}), mfLimite: 60, mercadoBaixado: false, criandoMercado: false, salvandoMercado: false };
+  mercadoBase: null, mercadoErro: null, mf: ler("mf", {}), mfLimite: 60, mercadoBaixado: false, criandoMercado: false, salvandoMercado: false,
+  am: ler("am", {}), amBaixando: false, amBaixadas: false, amErro: null };
 const ajSpray = () => ler("sprays_ajuste", { ativo: false, geral: 0, por: {} });
 const $ = (s, el = document) => el.querySelector(s);
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
@@ -124,7 +127,7 @@ function render() {
   };
   try {
     $("#tela").innerHTML = ({ hoje: telaHoje, registrar: telaRegistrar, ajustes: telaAjustes,
-      colecao: () => telaColecaoTudo(ctx), mercado: telaMercadoAba, playbook: () => telaPlaybook(ctx), historico: () => telaHistorico(ctx) }[S.aba])();
+      colecao: () => telaColecaoTudo(ctx), mercado: telaMercadoAba, amostras: telaAmostrasAba, playbook: () => telaPlaybook(ctx), historico: () => telaHistorico(ctx) }[S.aba])();
   } catch (e) { $("#tela").innerHTML = erroHTML(e, S.aba); console.error(e); }
   if (trocouAba) { const t = $("#tela"); t.classList.remove("entra"); void t.offsetWidth; t.classList.add("entra"); }
   else if (antes) {
@@ -298,12 +301,17 @@ function listaMercado() {
   return { lista: S.mercadoBase && baseComTiers(S.mercadoBase, tiers), fonte: "app" };
 }
 
-function telaMercadoAba() {
+/** Base do Mercado (JSON do app) e cópia da aba Mercado da planilha: usadas pelas abas Mercado e Amostras. */
+function garantirMercado() {
   if (!S.mercadoBase && !S.mercadoErro) carregarMercado();
   if (configurado() && !S.mercadoBaixado) {
     S.mercadoBaixado = true;
-    baixarMercado().then(() => { if (S.aba === "mercado") render(); }).catch(e => { S.mercadoBaixado = false; toast(`Aba Mercado: ${e.message}`); });
+    baixarMercado().then(() => { if (S.aba === "mercado" || S.aba === "amostras") render(); }).catch(e => { S.mercadoBaixado = false; toast(`Aba Mercado: ${e.message}`); });
   }
+}
+
+function telaMercadoAba() {
+  garantirMercado();
   const { lista, fonte } = listaMercado();
   return `<h2>Mercado</h2>
   ${S.mercadoErro && !lista ? `<div class="bloco"><p class="erro-txt">Não consegui carregar a base: ${esc(S.mercadoErro)}</p></div>`
@@ -314,7 +322,132 @@ function telaMercadoAba() {
 async function carregarMercado() {
   try { const j = await fetch("data/mercado.json").then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); }); S.mercadoBase = j.perfumes; }
   catch (e) { S.mercadoErro = e.message; }
-  if (S.aba === "mercado") render();
+  if (S.aba === "mercado" || S.aba === "amostras") render();
+}
+
+// ───────────────────────── amostras ─────────────────────────
+function listaAmostras() {
+  const c = cacheAmostras();
+  if (!c) return null;
+  return juntar(c.existe ? amostrasDeLinhas(c.linhas) : [], listaMercado().lista || []);
+}
+
+async function lerAmostras({ forcar = false } = {}) {
+  if (!configurado() || S.amBaixando || (S.amBaixadas && !forcar)) return;
+  S.amBaixando = true;
+  try { await baixarAmostras(); S.amErro = null; S.amBaixadas = true; }
+  catch (e) { S.amErro = e.message; }
+  S.amBaixando = false;
+  if (S.aba === "amostras") render();
+}
+
+/** Usos no Diário de uma amostra: pelo "Nome no diário" da aba Tiers ou pelo próprio nome. */
+function usosAmostra(a) {
+  const k = mercadoChave(a.casa, a.nome), t = planilha().tiers.find(x => mercadoChave(x.casa, x.perfume) === k);
+  const nomes = new Set([a.nome, t?.nomeDiario, t?.perfume].filter(Boolean));
+  return historico().filter(r => nomes.has(r.perfume)).length;
+}
+
+function telaAmostrasAba() {
+  garantirMercado();
+  lerAmostras();
+  const lista = listaAmostras(), merc = listaMercado().lista || [];
+  return `<h2>Amostras e decants</h2>
+  ${telaAmostras({ lista, filtro: S.am, configurado: configurado(), existe: Boolean(cacheAmostras()?.existe), erro: S.amErro,
+    sem: lista ? semRegistro(lista, merc) : [], usosDe: usosAmostra })}`;
+}
+
+function abrirAmostra(id, { prefixo = null, confirmarRemover = false } = {}) {
+  const novo = id === null;
+  let a;
+  if (novo) {
+    const [casa, nome] = prefixo ? prefixo.split("||") : ["", ""];
+    a = { casa, nome, m: (listaMercado().lista || []).find(p => p.casa === casa && p.nome === nome) || null };
+  } else a = (listaAmostras() || []).find(x => x.id === id);
+  if (!a) return;
+  S.amAberta = novo ? null : a;
+  const merc = listaMercado().lista || [];
+  $("#folha").innerHTML = `<div class="veu" data-fechar><div class="folha" role="dialog" aria-modal="true" aria-labelledby="fichaT">${fichaAmostra(a, {
+    arquetipos: S.arquetipos, nomes: [...new Set(merc.map(p => p.nome))], novo, podeAvaliar: Boolean(cachePlanilha()?.existe),
+    confirmarRemover, usos: novo ? 0 : usosAmostra(a) })}</div></div>`;
+  (novo && !a.nome ? $("#am-nome") : $("#folha .folha button[data-fechar]"))?.focus();
+}
+
+/** Ao digitar o perfume numa entrada nova: completa a casa e mostra a avaliação atual do Mercado (sem marcar como mexida). */
+function preencherDoMercado() {
+  const form = $("#formAmostra"); if (!form) return;
+  const nome = $("#am-nome").value.trim(), casa = $("#am-casa").value.trim();
+  const merc = listaMercado().lista || [];
+  const cands = merc.filter(p => mercadoChave("", p.nome) === mercadoChave("", nome));
+  if (!casa && cands.length === 1) $("#am-casa").value = cands[0].casa;
+  const m = merc.find(p => mercadoChave(p.casa, p.nome) === mercadoChave($("#am-casa").value, nome));
+  const add = $("#av-add")?.closest("label");
+  if (add) add.hidden = Boolean(m);
+  if (!$("#av-tier")) return;
+  const pos = { "av-tier": m?.tier || "", "av-arq": m?.arquetipo || "", "av-resumo": m?.resumo || "", "av-notas": m?.notas || "" };
+  for (const [id, v] of Object.entries(pos)) { const el = $("#" + id); if (!el.dataset.mexido) el.value = v; }
+  const w = $("#av-wish"); if (!w.dataset.mexido) w.checked = Boolean(m?.wish);
+  const ps = $("#av-posse"), atual = m?.posse || "";
+  if (ps.dataset.mexido !== "eu") {
+    if (form.dataset.novo && (!atual || atual === "Avaliado")) { ps.value = "Amostra"; ps.dataset.mexido = "1"; }
+    else { if (![...ps.options].some(o => o.value === atual)) ps.add(new Option(atual, atual)); ps.value = atual; delete ps.dataset.mexido; }
+  }
+}
+
+async function salvarAmostra(form) {
+  const novo = Boolean(form.dataset.novo), velho = novo ? null : S.amAberta, v = id => $("#" + id, form);
+  const dados = { casa: v("am-casa").value.trim(), nome: v("am-nome").value.trim(), tipo: v("am-tipo-f").value, ml: v("am-ml").value.trim().replace(".", ","),
+    origem: v("am-origem").value, status: v("am-status").value, entrada: v("am-entrada").value, saida: v("am-saida").value, motivo: v("am-motivo").value,
+    impressao: v("am-impressao").value, obs: v("am-obs").value };
+  if (!dados.casa || !dados.nome) { toast("Preencha perfume e casa."); return; }
+  if (dados.entrada && dados.saida && dados.saida < dados.entrada) { toast("A saída não pode ser antes da entrada."); return; }
+  const campos = camposAmostra(velho, dados);
+  // avaliação: só os campos que você mexeu; perfume fora do Mercado entra nele se a caixa estiver marcada
+  const merc = listaMercado().lista || [], m = merc.find(p => mercadoChave(p.casa, p.nome) === mercadoChave(dados.casa, dados.nome)) || null;
+  let aval = {}, addMerc = false;
+  if (v("av-tier")) {
+    const mexidos = [...form.querySelectorAll("[id^=av-][data-mexido]")].map(el => el.id.slice(3));
+    aval = camposAvaliacaoMexidos(m, { tier: v("av-tier").value, arq: v("av-arq").value, posse: v("av-posse").value, resumo: v("av-resumo").value,
+      notas: v("av-notas").value, wish: v("av-wish").checked }, mexidos);
+    addMerc = !m && Boolean(v("av-add")?.checked);
+  }
+  if (!novo && !Object.keys(campos).length && !Object.keys(aval).length && !addMerc) { toast("Nada mudou."); return; }
+  const btn = form.querySelector("button[type=submit]"); btn.disabled = true; btn.textContent = "Salvando…";
+  const feito = [];
+  try {
+    if (novo) { await adicionarAmostra({ ID: novoId(), ...campos }); feito.push("entrada lançada"); }
+    else if (Object.keys(campos).length) { await editarAmostra(velho.id, campos); feito.push(`amostra: ${Object.keys(campos).join(", ")}`); }
+  } catch (e) { btn.disabled = false; btn.textContent = novo ? "Lançar entrada" : "Salvar"; toast(`Não salvou: ${e.message}`); return; }
+  let tiersMudou = false;
+  try {
+    if (addMerc) { const r = await adicionarNaPlanilha({ Casa: dados.casa, Perfume: dados.nome, ...aval }); tiersMudou = Boolean(r.tiers); feito.push("perfume adicionado à aba Mercado"); }
+    else if (m && Object.keys(aval).length) { const r = await editarNaPlanilha(m.casa, m.nome, aval); tiersMudou = Boolean(r.tiers); feito.push(`avaliação: ${Object.keys(aval).join(", ")}`); }
+  } catch (e) { feito.push(`avaliação NÃO salva (${e.message})`); }
+  fecharFolha();
+  toast(`${dados.nome}: ${feito.join(" · ")}.`);
+  await lerAmostras({ forcar: true });
+  if (tiersMudou) { await baixarPlanilha().catch(() => {}); aplicarPlanilha(); recalcular(); } else render();
+}
+
+async function mudarStatusAmostra(el, id, status) {
+  const a = (listaAmostras() || []).find(x => x.id === id);
+  if (!a || a.status === status) return;
+  const campos = camposAmostra(a, normalizar({ ...a, status }));
+  el.disabled = true;
+  try {
+    await editarAmostra(id, campos);
+    toast(`${a.nome}: ${status}${campos["Saída"] ? ` (saída ${campos["Saída"]})` : ""}.`);
+    await lerAmostras({ forcar: true });
+  } catch (e) { toast(`Não salvou: ${e.message}`); render(); }
+}
+
+async function excluirAmostra() {
+  const a = S.amAberta;
+  if (!a) return;
+  if (!S.confirmandoRemocao) { S.confirmandoRemocao = true; abrirAmostra(a.id, { confirmarRemover: true }); return; }
+  S.confirmandoRemocao = false;
+  try { await removerAmostra(a.id); fecharFolha(); toast(`Lançamento de ${a.nome} excluído.`); await lerAmostras({ forcar: true }); }
+  catch (e) { toast(`Não excluiu: ${e.message}`); }
 }
 
 // ───────────────────────── registrar ─────────────────────────
@@ -528,8 +661,8 @@ function fecharFolha() { $("#folha").innerHTML = ""; }
 function mudarDia(fn) { const d = estadoDia(); fn(d); salvarDia(d); recalcular(); }
 
 document.addEventListener("click", async e => {
-  if (e.target.closest("label.ed, select[data-ed]")) return;   // seletores da tabela do Mercado: não abrir a ficha
-  const b = e.target.closest("button, [data-fechar], [data-ficha], [data-merc]");
+  if (e.target.closest("label.ed, select[data-ed], select[data-am-status]")) return;   // seletores na linha: não abrir a ficha
+  const b = e.target.closest("button, [data-fechar], [data-ficha], [data-merc], [data-amostra]");
   if (!b) return;
   if (b.closest("#abas")) { S.aba = b.dataset.aba; render(); window.scrollTo(0, 0); return; }
   if (b.hasAttribute("data-fechar") && (e.target === b || b.tagName === "BUTTON")) { fecharFolha(); return; }
@@ -541,6 +674,9 @@ document.addEventListener("click", async e => {
   if (b.dataset.hr) { S.hr = { ...S.hr, preset: b.dataset.hr }; gravar("hr", S.hr); render(); return; }
   if (b.dataset.edWish) { const p = (listaMercado().lista || []).find(x => x.casa + "||" + x.nome === b.dataset.edWish); if (p) editarCelula(b, p, "Wishlist", p.wish ? "" : "✓"); return; }
   if (b.dataset.merc) { S.confirmandoRemocao = false; abrirMercado(b.dataset.merc); return; }
+  if (b.dataset.amostra) { S.confirmandoRemocao = false; abrirAmostra(b.dataset.amostra); return; }
+  if (b.dataset.amNova) { S.confirmandoRemocao = false; abrirAmostra(null, { prefixo: b.dataset.amNova }); return; }
+  if (b.dataset.am) { S.am = { ...S.am, [b.dataset.am]: b.dataset.v }; gravar("am", S.am); render(); return; }
   if (b.dataset.mfOrd) { S.mf = { ...S.mf, ords: tocarOrd(ordsDe(S.mf, "tier"), b.dataset.mfOrd) }; gravar("mf", S.mf); render(); return; }
   if (b.dataset.mf) { S.mf = { ...S.mf, [b.dataset.mf]: b.dataset.v }; S.mfLimite = 60; gravar("mf", S.mf); render(); return; }
   if (b.dataset.mfArq) { S.mf = { ...S.mf, arq: S.mf.arq === b.dataset.mfArq ? "" : b.dataset.mfArq }; S.mfLimite = 60; gravar("mf", S.mf); render(); $("#mf-q")?.scrollIntoView({ block: "center" }); return; }
@@ -579,6 +715,8 @@ document.addEventListener("click", async e => {
   else if (acao === "criar-mercado") criarMercado();
   else if (acao === "novo-mercado") { S.confirmandoRemocao = false; abrirMercado(null); }
   else if (acao === "remover-mercado") removerMercado();
+  else if (acao === "nova-amostra") { S.confirmandoRemocao = false; abrirAmostra(null); }
+  else if (acao === "remover-amostra") excluirAmostra();
   else if (acao === "ler-planilha") {
     const m = $("#lerMsg"); m.textContent = "Lendo a planilha…";
     try {
@@ -609,6 +747,10 @@ document.addEventListener("click", async e => {
 document.addEventListener("change", e => {
   const el = e.target;
   if (el.dataset.ov) { const k = el.dataset.ov, v = el.value.trim().replace(",", "."); mudarDia(d => { if (v === "") delete d.override[k]; else d.override[k] = v.toLowerCase() === "nd" ? "nd" : v; }); return; }
+  if (el.dataset.amStatus) { mudarStatusAmostra(el, el.dataset.amStatus, el.value); return; }
+  if (el.id === "am-tipo") { S.am = { ...S.am, tipo: el.value }; gravar("am", S.am); render(); return; }
+  if (el.id === "am-nome" || el.id === "am-casa") { if ($("#formAmostra")?.dataset.novo) preencherDoMercado(); return; }
+  if (el.id?.startsWith("av-")) { el.dataset.mexido = "eu"; return; }
   if (el.dataset.ed) { const p = (listaMercado().lista || []).find(x => x.casa + "||" + x.nome === el.dataset.id); if (p) editarCelula(el, p, el.dataset.ed, el.value); return; }
   if (el.dataset.ordSel) { mudarOrdem(el.dataset.ordSel, Number(el.dataset.n), { k: el.value }); return; }
   if (el.id === "hr-de" || el.id === "hr-ate") { S.hr = { ...S.hr, [el.id === "hr-de" ? "de" : "ate"]: el.value }; gravar("hr", S.hr); render(); return; }
@@ -622,6 +764,8 @@ document.addEventListener("change", e => {
 
 document.addEventListener("input", e => {
   if (e.target.id === "col-q") { S.filtro = { ...S.filtro, q: e.target.value }; gravar("filtro", S.filtro); render(); }
+  if (e.target.id === "am-q") { S.am = { ...S.am, q: e.target.value }; gravar("am", S.am); render(); }
+  if (e.target.id?.startsWith("av-")) e.target.dataset.mexido = "eu";
   if (e.target.id === "mf-q") { S.mf = { ...S.mf, q: e.target.value }; S.mfLimite = 60; gravar("mf", S.mf); render(); }
 });
 
@@ -629,6 +773,7 @@ document.addEventListener("submit", e => {
   e.preventDefault();
   if (e.target.id === "formRegistro") { salvarRegistro(); return; }
   if (e.target.id === "formMercado") { salvarMercado(e.target); return; }
+  if (e.target.id === "formAmostra") { salvarAmostra(e.target); return; }
   if (e.target.id !== "formAjustes") return;
   const a = {};
   for (const k of Object.keys(AJUSTES_PADRAO)) {
@@ -649,6 +794,7 @@ document.addEventListener("keydown", e => {
   if ((e.key === "Enter" || e.key === " ") && e.target.matches?.("[data-ficha]:not(button)")) { e.preventDefault(); abrirFicha(e.target.dataset.ficha); }
   if ((e.key === "Enter" || e.key === " ") && e.target.matches?.("g.r-fr")) { e.preventDefault(); abrirFicha(e.target.dataset.fr); }
   if ((e.key === "Enter" || e.key === " ") && e.target.matches?.("[data-merc]")) { e.preventDefault(); abrirMercado(e.target.dataset.merc); }
+  if ((e.key === "Enter" || e.key === " ") && e.target.matches?.("[data-amostra]")) { e.preventDefault(); abrirAmostra(e.target.dataset.amostra); }
 });
 window.addEventListener("online", () => sincronizar({ silencioso: true }));
 
