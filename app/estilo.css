@@ -206,6 +206,9 @@ details.fora > summary { font: 500 13.5px var(--f); color: var(--suave); }
 .celula h3 { font-size: 15px; color: var(--tinta); }
 .celula.vazia { opacity: .55; }
 .kpis { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.kpis.k4 { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+.kpis.k4 .kpi { padding: 10px 10px; }
+.kpis.k4 .kpi .v { font-size: 24px; }
 .kpi { background: var(--sup); border-radius: var(--r); padding: 12px 14px; display: flex; flex-direction: column; gap: 3px; min-width: 0; box-shadow: var(--sombra); }
 .kpi .v { font: 700 28px/1.05 var(--f-num); letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
 .kpi .l { font-size: 11.5px; color: var(--suave); line-height: 1.3; }
@@ -525,6 +528,7 @@ select[disabled], input[readonly], textarea[readonly] { opacity: .75; }
 .tabelao .c-obs { min-width: 160px; max-width: 220px; color: var(--suave); }
 .am-tab table { min-width: 1560px; }
 .tabelao tr.am-pend .am-st select { color: var(--alerta); font-weight: 600; }
+.tabelao tr.am-teste .am-st select { color: var(--acento); font-weight: 600; }
 .tabelao tr.am-ok .am-st select { color: var(--ok); font-weight: 600; }
 .tabelao tr.am-esg td { color: var(--leve); }
 .tabelao tr.am-esg .am-st select { color: var(--leve); }

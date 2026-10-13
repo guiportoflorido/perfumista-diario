@@ -24,7 +24,7 @@ var EDITAVEIS = ['Tier', 'Posse', 'Arquétipo', 'Resumo', 'Topo', 'Coração', '
 var COLS_DIARIO = ['Data', 'Slot', 'Perfume', 'Ocasião', 'Temp (°C)', 'Td (°C)', 'Sprays', 'NotaDia', 'Obs'];
 var ABA_AMOSTRAS = 'Amostras';
 var COLS_AMOSTRAS = ['ID', 'Casa', 'Perfume', 'Tipo', 'Volume (ml)', 'Origem', 'Status', 'Entrada', 'Saída', 'Motivo saída', 'Impressão', 'Obs', 'Atualizado em'];
-var TIPOS_AMOSTRA = ['Amostra', 'Decant'], STATUS_AMOSTRA = ['Pendente', 'Realizado', 'Esgotado'];
+var TIPOS_AMOSTRA = ['Amostra', 'Decant'], STATUS_AMOSTRA = ['Pendente', 'Em teste', 'Realizado', 'Esgotado'];
 var OCASIOES = ['Lazer', 'T.Inf', 'T.For', 'N.Inf', 'N.For', 'Cozy D', 'Cozy N'];
 
 function doPost(e) {

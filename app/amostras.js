@@ -1,6 +1,6 @@
 // amostras.js — aba Amostras: entradas e saídas de amostras e decants, guardadas na aba "Amostras" da planilha.
 // A avaliação (tier, arquétipo, resumo, wishlist, notas, posse) não é duplicada: vive na aba Mercado e a ligação
-// é pela Casa + Perfume (mesma chave do Mercado). Status: Pendente (a testar) · Realizado (testada) · Esgotado (saiu).
+// é pela Casa + Perfume (mesma chave do Mercado). Status: Pendente (a testar) · Em teste · Realizado (testada) · Esgotado (saiu).
 import { esc, tierHTML, ordsDe, compararMulti, cmpValor, cabOrd, painelOrd } from "./util.js";
 import { arqTag, arqIcone } from "./icones.js";
 import { chamar } from "./api.js";
@@ -9,8 +9,8 @@ import { chave, POSSES_EDIT, celTier, celPosse, celArq, celWish, posseRot } from
 
 export const COLS = ["ID", "Casa", "Perfume", "Tipo", "Volume (ml)", "Origem", "Status", "Entrada", "Saída", "Motivo saída", "Impressão", "Obs", "Atualizado em"];
 export const TIPOS = ["Amostra", "Decant"];
-export const STATUS = ["Pendente", "Realizado", "Esgotado"];
-export const ROT_STATUS = { Pendente: "Pendente · a testar", Realizado: "Realizado · testada", Esgotado: "Esgotado · saiu" };
+export const STATUS = ["Pendente", "Em teste", "Realizado", "Esgotado"];
+export const ROT_STATUS = { Pendente: "Pendente · a testar", "Em teste": "Em teste · testando agora", Realizado: "Realizado · testada", Esgotado: "Esgotado · saiu" };
 export const MOTIVOS = ["", "Acabou", "Doada", "Trocada", "Descartada", "Perdida"];
 const norm = s => String(s || "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().replace(/\s+/g, " ").trim();
 const hojeISO = () => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`; };
@@ -38,7 +38,7 @@ const mlNum = s => { const n = Number(String(s || "").replace(",", ".")); return
 export function resumo(lista) {
   const n = s => lista.filter(a => a.status === s).length;
   const mao = lista.filter(a => a.status !== "Esgotado");
-  return { pendente: n("Pendente"), realizado: n("Realizado"), esgotado: n("Esgotado"), mao: mao.length,
+  return { pendente: n("Pendente"), emTeste: n("Em teste"), realizado: n("Realizado"), esgotado: n("Esgotado"), mao: mao.length,
     ml: Math.round(mao.reduce((s, a) => s + mlNum(a.ml), 0) * 10) / 10 };
 }
 
@@ -51,7 +51,7 @@ export function semRegistro(amostras, mercado) {
     .sort((a, b) => a.casa.localeCompare(b.casa, "pt") || a.nome.localeCompare(b.nome, "pt"));
 }
 
-const ORD_STATUS = { Pendente: 0, Realizado: 1, Esgotado: 2 };
+const ORD_STATUS = { "Em teste": 0, Pendente: 1, Realizado: 2, Esgotado: 3 };
 const ordemTier = t => (t && "SABCD".includes(t) ? "SABCD".indexOf(t) : "");
 const ordemPosse = p => ({ "Frasco Gui": 0, "Frasco Bia": 1, "Amostra": 2, "Amostra Bia": 3, "Avaliado": 4 }[p] ?? (p ? 5 : ""));
 /** Dias da amostra: pendente = esperando teste desde a entrada; em mãos = desde a entrada; esgotada = entrada → saída. */
@@ -60,7 +60,7 @@ export function dias(a, hoje = hojeISO()) {
   return diasDesde(a.entrada, hoje);
 }
 
-// padrão (sem ordenação escolhida): pendentes primeiro, a mais antiga antes; depois a mais recente primeiro
+// padrão (sem ordenação escolhida): em teste primeiro, depois pendentes (a mais antiga antes); depois a mais recente primeiro
 function padrao(a, b) {
   return ORD_STATUS[a.status] - ORD_STATUS[b.status]
     || (a.status === "Pendente" ? (a.entrada || "9").localeCompare(b.entrada || "9") : (b.saida || b.entrada || "").localeCompare(a.saida || a.entrada || ""))
@@ -129,7 +129,7 @@ export const editarAmostra = (id, campos) => chamar("editarAmostra", { id, campo
 export const removerAmostra = id => chamar("removerAmostra", { id }, { timeoutMs: 25000 });
 
 // ───────────────────────── tela ─────────────────────────
-const SEL_STATUS = { Pendente: "pend", Realizado: "ok", Esgotado: "esg" };
+const SEL_STATUS = { Pendente: "pend", "Em teste": "teste", Realizado: "ok", Esgotado: "esg" };
 const op = (v, r, at) => `<option value="${esc(v)}" ${String(at ?? "") === String(v) ? "selected" : ""}>${esc(r)}</option>`;
 const dataBR = iso => (/^\d{4}-\d{2}-\d{2}$/.test(iso || "") ? `${iso.slice(8, 10)}/${iso.slice(5, 7)}/${iso.slice(2, 4)}` : "");
 
@@ -142,9 +142,10 @@ export function telaAmostras({ lista, filtro, configurado, existe, erro, sem, us
   <div class="linha-flex"><p class="nota" style="flex:1">${existe ? "Lido da aba <b>Amostras</b> da planilha." : "A aba <b>Amostras</b> é criada na planilha na primeira entrada."} Avaliação (tier, arquétipo…) é a da aba Mercado.</p>
     <button class="btn peq" data-acao="nova-amostra">+ Entrada</button></div>
   ${erro ? `<p class="nota erro-txt">Planilha indisponível (${esc(erro)}): mostrando a última cópia.</p>` : ""}
-  <div class="kpis">
+  <div class="kpis k4">
     <div class="kpi"><span class="v">${r.pendente}</span><span class="l">pendentes (a testar)</span></div>
-    <div class="kpi"><span class="v">${r.realizado}</span><span class="l">testadas, ainda em mãos</span></div>
+    <div class="kpi"><span class="v">${r.emTeste}</span><span class="l">em teste</span></div>
+    <div class="kpi"><span class="v">${r.realizado}</span><span class="l">testadas, em mãos</span></div>
     <div class="kpi"><span class="v">${r.esgotado}</span><span class="l">esgotadas / saíram</span></div>
   </div>
   <p class="nota">${r.mao} em mãos${r.ml ? ` · ${String(r.ml).replace(".", ",")} ml no total` : ""}.</p>
@@ -178,7 +179,7 @@ function tabela(linhas, f, { usosDe, hoje, editavel, arquetipos }) {
     <thead><tr><th class="c-n" scope="col">#</th><th class="c-casa" scope="col">${btn("casa", "Casa")}</th><th class="c-nome" scope="col">${btn("nome", "Perfume")}</th>${COLUNAS.map(th).join("")}</tr></thead>
     <tbody>${linhas.map((a, i) => {
       const m = a.m, id = m ? m.casa + "||" + m.nome : "", ed = editavel && m, d = dias(a, hoje), usos = usosDe ? usosDe(a) : 0;
-      const sufDias = a.status === "Pendente" ? " esperando" : a.status === "Esgotado" ? " em mãos" : "";
+      const sufDias = a.status === "Pendente" ? " esperando" : a.status === "Em teste" ? " desde a entrada" : a.status === "Esgotado" ? " em mãos" : "";
       return `<tr data-amostra="${esc(a.id)}" tabindex="0" class="am-${SEL_STATUS[a.status]}">
       ${td("n", i + 1)}${td("casa", esc(a.casa))}${td("nome", esc(a.nome))}
       ${td("status", `<label class="ed am-st"><span class="sr">Status de ${esc(a.nome)}</span><select data-am-status="${esc(a.id)}">${STATUS.map(s => op(s, s, a.status)).join("")}</select></label>`)}
@@ -219,7 +220,7 @@ export function fichaAmostra(a, { arquetipos, nomes, novo, podeAvaliar, confirma
         <label class="largo">Obs${txt("am-obs", a.obs)}</label>
       </div>
       <datalist id="am-nomes">${nomes.map(n => `<option value="${esc(n)}">`).join("")}</datalist>
-      <p class="nota">Pendente = a testar · Realizado = testada, ainda em mãos · Esgotado = acabou ou saiu. Data de saída marca Esgotado; Esgotado sem data usa hoje. Voltar para Pendente/Realizado limpa a saída.</p>
+      <p class="nota">Pendente = a testar · Em teste = testando agora · Realizado = testada, ainda em mãos · Esgotado = acabou ou saiu. Data de saída marca Esgotado; Esgotado sem data usa hoje. Voltar para outro status limpa a saída.</p>
       <h3>Avaliação · aba Mercado</h3>
       ${!podeAvaliar ? `<p class="nota">A aba Mercado ainda não existe na planilha: crie-a na aba Mercado do app para avaliar daqui.</p>`
         : `${m ? "" : `<label class="linha-flex"><input type="checkbox" id="av-add" checked> Adicionar este perfume à aba Mercado (não está lá)</label>`}
