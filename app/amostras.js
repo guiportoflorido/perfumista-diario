@@ -7,7 +7,8 @@ import { chamar } from "./api.js";
 import { ler, gravar } from "./store.js";
 import { chave, POSSES_EDIT, celTier, celPosse, celArq, celWish, posseRot } from "./mercado.js";
 
-export const COLS = ["ID", "Casa", "Perfume", "Tipo", "Volume (ml)", "Origem", "Status", "Entrada", "Saída", "Motivo saída", "Impressão", "Obs", "Atualizado em"];
+export const COLS = ["ID", "Casa", "Perfume", "Tipo", "Volume (ml)", "Origem", "Status", "Entrada", "Saída", "Motivo saída", "Impressão", "Obs", "Atualizado em", "Dono"];
+export const DONOS = ["Gui", "Bia"];
 export const TIPOS = ["Amostra", "Decant"];
 export const STATUS = ["Pendente", "Em teste", "Realizado", "Esgotado"];
 export const ROT_STATUS = { Pendente: "Pendente · a testar", "Em teste": "Em teste · testando agora", Realizado: "Realizado · testada", Esgotado: "Esgotado · saiu" };
@@ -25,7 +26,8 @@ export function deLinhas(linhas) {
   return linhas.slice(1).filter(r => v(r, "ID") && v(r, "Perfume")).map(r => ({
     id: v(r, "ID"), casa: v(r, "Casa"), nome: v(r, "Perfume"), tipo: v(r, "Tipo") || "Amostra", ml: v(r, "Volume (ml)"),
     origem: v(r, "Origem"), status: STATUS.includes(v(r, "Status")) ? v(r, "Status") : "Pendente", entrada: v(r, "Entrada"),
-    saida: v(r, "Saída"), motivo: v(r, "Motivo saída"), impressao: v(r, "Impressão"), obs: v(r, "Obs"), atualizado: v(r, "Atualizado em") }));
+    saida: v(r, "Saída"), motivo: v(r, "Motivo saída"), impressao: v(r, "Impressão"), obs: v(r, "Obs"), atualizado: v(r, "Atualizado em"),
+    dono: DONOS.includes(v(r, "Dono")) ? v(r, "Dono") : "" }));
 }
 
 /** Liga cada amostra ao perfume da aba Mercado (com tier/posse da aba Tiers já aplicados). `m` = null se não achar. */
@@ -69,11 +71,16 @@ function padrao(a, b) {
 
 export function filtrar(lista, f = {}, { usosDe = null, hoje = hojeISO() } = {}) {
   const q = norm(f.q);
-  const valor = (k, a) => ({ status: ORD_STATUS[a.status], tier: ordemTier(a.m?.tier), posse: ordemPosse(a.m?.posse), wish: a.m ? (a.m.wish ? 0 : 1) : "",
+  const valor = (k, a) => ({ dono: a.dono, status: ORD_STATUS[a.status], tier: ordemTier(a.m?.tier), posse: ordemPosse(a.m?.posse), wish: a.m ? (a.m.wish ? 0 : 1) : "",
     arquetipo: a.m?.arquetipo || "", ml: a.ml ? mlNum(a.ml) : "", dias: dias(a, hoje) ?? "", usos: usosDe ? usosDe(a) : "" }[k] ?? a[k] ?? "");
   const res = lista.filter(a => {
     if (f.status === "mao" ? a.status === "Esgotado" : f.status && a.status !== f.status) return false;
     if (f.tipo && a.tipo !== f.tipo) return false;
+    if (f.casa && a.casa !== f.casa) return false;
+    if (f.dono && a.dono !== f.dono) return false;
+    if (f.arq === "sem" ? a.m?.arquetipo : f.arq && a.m?.arquetipo !== f.arq) return false;
+    if (f.tier === "sem" ? a.m?.tier : f.tier && a.m?.tier !== f.tier) return false;
+    if (f.posse === "sem" ? a.m?.posse : f.posse && a.m?.posse !== f.posse) return false;
     if (q && !norm(`${a.nome} ${a.casa} ${a.origem} ${a.impressao} ${a.obs} ${a.m?.arquetipo || ""}`).includes(q)) return false;
     return true;
   });
@@ -91,7 +98,7 @@ export function normalizar(c, hoje = hojeISO()) {
 }
 
 const PARA_COL = { casa: "Casa", nome: "Perfume", tipo: "Tipo", ml: "Volume (ml)", origem: "Origem", status: "Status", entrada: "Entrada",
-  saida: "Saída", motivo: "Motivo saída", impressao: "Impressão", obs: "Obs" };
+  saida: "Saída", motivo: "Motivo saída", impressao: "Impressão", obs: "Obs", dono: "Dono" };
 
 /** Campos da aba Amostras que mudaram (nomes das colunas). Para amostra nova devolve todos os preenchidos. */
 export function camposAmostra(velho, novo, hoje = hojeISO()) {
@@ -152,8 +159,15 @@ export function telaAmostras({ lista, filtro, configurado, existe, erro, sem, us
   <div class="bloco">
     <input type="search" id="am-q" placeholder="Buscar perfume, casa, origem ou impressão" value="${esc(filtro.q || "")}" aria-label="Buscar amostras">
     <div class="chips rolagem">${chip("", "Todas")}${chip("mao", "Em mãos")}${STATUS.map(s => chip(s, s)).join("")}</div>
-    <div class="campos"><label>Tipo<select id="am-tipo">${op("", "Amostra e decant", filtro.tipo)}${TIPOS.map(t => op(t, t, filtro.tipo)).join("")}</select></label></div>
-    <p class="nota">${res.length} de ${lista.length}.</p>
+    <div class="campos">
+      <label>Dono<select id="amf-dono">${op("", "Gui e Bia", filtro.dono)}${op("Gui", "G · Gui", filtro.dono)}${op("Bia", "B · Bia", filtro.dono)}</select></label>
+      <label>Casa<select id="amf-casa">${op("", "Todas", filtro.casa)}${[...new Set(lista.map(a => a.casa))].sort((x, y) => x.localeCompare(y, "pt")).map(c => op(c, c, filtro.casa)).join("")}</select></label>
+      <label>Arquétipo<select id="amf-arq">${op("", "Todos", filtro.arq)}${arquetipos.map(x => op(x.nome, x.nome, filtro.arq)).join("")}${op("sem", "Sem arquétipo", filtro.arq)}</select></label>
+      <label>Tier<select id="amf-tier">${op("", "Todos", filtro.tier)}${["S", "A", "B", "C", "D"].map(t => op(t, `Tier ${t}`, filtro.tier)).join("")}${op("sem", "Sem tier", filtro.tier)}</select></label>
+      <label>Posse (Mercado)<select id="amf-posse">${op("", "Todas", filtro.posse)}${POSSES_EDIT.filter(Boolean).map(p => op(p, posseRot(p), filtro.posse)).join("")}${op("sem", "Sem posse", filtro.posse)}</select></label>
+      <label>Tipo<select id="am-tipo">${op("", "Amostra e decant", filtro.tipo)}${TIPOS.map(t => op(t, t, filtro.tipo)).join("")}</select></label>
+    </div>
+    <p class="nota">${res.length} de ${lista.length}.${["dono", "casa", "arq", "tier", "posse", "tipo", "q", "status"].some(k => filtro[k]) ? ` <button class="btn sec peq" data-acao="am-limpar">Limpar filtros</button>` : ""}</p>
   </div>
   ${res.length ? tabela(res, filtro, { usosDe, hoje, editavel, arquetipos })
     : `<div class="bloco"><p class="vazio">${lista.length ? "Nada com esses filtros." : "Nenhuma amostra lançada ainda. Toque em “+ Entrada”."}</p></div>`}
@@ -165,7 +179,7 @@ export function telaAmostras({ lista, filtro, configurado, existe, erro, sem, us
 }
 
 // colunas da tabela (formato do Mercado): chave, rótulo
-export const COLUNAS = [["status", "Status"], ["tier", "Tier"], ["wish", "Wishlist"], ["arquetipo", "Arquétipo"], ["posse", "Posse"],
+export const COLUNAS = [["status", "Status"], ["dono", "Dono"], ["tier", "Tier"], ["wish", "Wishlist"], ["arquetipo", "Arquétipo"], ["posse", "Posse"],
   ["tipo", "Tipo"], ["ml", "ml"], ["origem", "Origem"], ["entrada", "Entrada"], ["dias", "Dias"], ["saida", "Saída"], ["motivo", "Motivo"],
   ["usos", "Usos"], ["impressao", "Impressão"], ["obs", "Obs"]];
 
@@ -183,6 +197,7 @@ function tabela(linhas, f, { usosDe, hoje, editavel, arquetipos }) {
       return `<tr data-amostra="${esc(a.id)}" tabindex="0" class="am-${SEL_STATUS[a.status]}">
       ${td("n", i + 1)}${td("casa", esc(a.casa))}${td("nome", esc(a.nome))}
       ${td("status", `<label class="ed am-st"><span class="sr">Status de ${esc(a.nome)}</span><select data-am-status="${esc(a.id)}">${STATUS.map(s => op(s, s, a.status)).join("")}</select></label>`)}
+      ${td("dono", `<label class="ed am-dono"><span class="sr">Dono de ${esc(a.nome)}</span><select data-am-dono="${esc(a.id)}">${op("", "–", a.dono)}${op("Gui", "G", a.dono)}${op("Bia", "B", a.dono)}</select></label>`)}
       ${td("tier", ed ? celTier(m, id) : m?.tier ? tierHTML(m.tier) : `<span class="tier sem">–</span>`)}
       ${td("wish", ed ? celWish(m, id) : m?.wish ? `<span class="estrela" title="Na wishlist">★</span>` : "")}
       ${td("arquetipo", ed ? celArq(m, id, arquetipos) : m ? arqTag(m.arquetipo, 14) : `<span class="selo aviso">fora do Mercado</span>`)}
@@ -210,6 +225,7 @@ export function fichaAmostra(a, { arquetipos, nomes, novo, podeAvaliar, confirma
         <label>Perfume${txt("am-nome", a.nome, 'list="am-nomes" required')}</label>
         <label>Casa${txt("am-casa", a.casa, "required")}</label>
         <label>Tipo${sel("am-tipo-f", TIPOS.map(t => [t, t]), a.tipo || "Amostra")}</label>
+        <label>Dono${sel("am-dono", [["Gui", "Gui"], ["Bia", "Bia"], ...(novo || a.dono ? [] : [["", "—"]])], a.dono || (novo ? "Gui" : ""))}</label>
         <label>Volume (ml)${txt("am-ml", a.ml, 'inputmode="decimal"')}</label>
         <label class="largo">Origem (loja, pessoa, brinde)${txt("am-origem", a.origem)}</label>
         <label>Entrada${txt("am-entrada", a.entrada || (novo ? hoje : ""), `type="date" max="${hoje}"`)}</label>

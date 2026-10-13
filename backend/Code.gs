@@ -23,8 +23,8 @@ var COLS_MERCADO = ['Casa', 'Perfume', 'Tier', 'Posse', 'Arquétipo', 'Resumo', 
 var EDITAVEIS = ['Tier', 'Posse', 'Arquétipo', 'Resumo', 'Topo', 'Coração', 'Base', 'Nariz', 'Wishlist', 'Notas'];
 var COLS_DIARIO = ['Data', 'Slot', 'Perfume', 'Ocasião', 'Temp (°C)', 'Td (°C)', 'Sprays', 'NotaDia', 'Obs'];
 var ABA_AMOSTRAS = 'Amostras';
-var COLS_AMOSTRAS = ['ID', 'Casa', 'Perfume', 'Tipo', 'Volume (ml)', 'Origem', 'Status', 'Entrada', 'Saída', 'Motivo saída', 'Impressão', 'Obs', 'Atualizado em'];
-var TIPOS_AMOSTRA = ['Amostra', 'Decant'], STATUS_AMOSTRA = ['Pendente', 'Em teste', 'Realizado', 'Esgotado'];
+var COLS_AMOSTRAS = ['ID', 'Casa', 'Perfume', 'Tipo', 'Volume (ml)', 'Origem', 'Status', 'Entrada', 'Saída', 'Motivo saída', 'Impressão', 'Obs', 'Atualizado em', 'Dono'];
+var DONOS_AMOSTRA = ['', 'Gui', 'Bia'], TIPOS_AMOSTRA = ['Amostra', 'Decant'], STATUS_AMOSTRA = ['Pendente', 'Em teste', 'Realizado', 'Esgotado'];
 var OCASIOES = ['Lazer', 'T.Inf', 'T.For', 'N.Inf', 'N.For', 'Cozy D', 'Cozy N'];
 
 function doPost(e) {
@@ -335,6 +335,7 @@ function validarAmostra_(c, completo) {
   if (completo && (!txt('Casa') || !txt('Perfume'))) throw new Error('casa e perfume são obrigatórios');
   if (!completo && (c.Casa !== undefined && !txt('Casa') || c.Perfume !== undefined && !txt('Perfume'))) throw new Error('casa e perfume não podem ficar vazios');
   if (txt('Tipo') !== undefined && TIPOS_AMOSTRA.indexOf(txt('Tipo')) === -1) throw new Error('tipo inválido: ' + c.Tipo);
+  if (txt('Dono') !== undefined && DONOS_AMOSTRA.indexOf(txt('Dono')) === -1) throw new Error('dono inválido: ' + c.Dono);
   if (txt('Status') !== undefined && STATUS_AMOSTRA.indexOf(txt('Status')) === -1) throw new Error('status inválido: ' + c.Status);
   ['Entrada', 'Saída'].forEach(function (k) {
     var v = txt(k);
@@ -369,6 +370,7 @@ function adicionarAmostra_(campos) {
   var lock = LockService.getScriptLock(); lock.waitLock(20000);
   try {
     var aba = abaAmostras_(SpreadsheetApp.getActive());
+    if (campos.Dono) garantirColuna_(aba, 'Dono');   // aba criada antes da coluna Dono
     var vals = aba.getDataRange().getDisplayValues(), cab = vals[0];
     var ja = acharAmostra_(vals, id);
     if (ja !== -1) return { ok: true, linha: ja, duplicada: true };
@@ -393,6 +395,7 @@ function editarAmostra_(id, campos) {
   try {
     var aba = SpreadsheetApp.getActive().getSheetByName(ABA_AMOSTRAS);
     if (!aba) throw new Error('a aba Amostras ainda não existe');
+    if (campos.Dono !== undefined) garantirColuna_(aba, 'Dono');
     var vals = aba.getDataRange().getDisplayValues(), cab = vals[0];
     var linha = acharAmostra_(vals, id);
     if (linha === -1) throw new Error('amostra não encontrada: ' + id);

@@ -63,6 +63,23 @@ test("Em teste: conta à parte, vem primeiro na ordem padrão, entra em Em mãos
   assert.match(h, /class="am-teste"/); assert.match(h, /data-am="status" data-v="Em teste"/); assert.match(h, /<option value="Em teste" selected>/);
 });
 
+test("filtros: dono (G/B), casa, arquétipo, tier e posse do Mercado, inclusive “sem”", () => {
+  const l = juntar(deLinhas(linhas), mercado).map(a => ({ ...a, dono: a.id === "a3" ? "Bia" : "Gui" }));
+  assert.deepEqual(filtrar(l, { dono: "Bia" }).map(a => a.id), ["a3"]);
+  assert.deepEqual(filtrar(l, { casa: "Amouage" }).map(a => a.id), ["a4", "a2"]);
+  assert.deepEqual(filtrar(l, { arq: "Minimalista" }).map(a => a.id), ["a3"]);
+  assert.deepEqual(filtrar(l, { arq: "sem" }).map(a => a.id), ["a1"]);          // fora do Mercado
+  assert.deepEqual(filtrar(l, { tier: "A" }).map(a => a.id), ["a4", "a2"]);
+  assert.deepEqual(filtrar(l, { tier: "sem" }).map(a => a.id), ["a1"]);
+  assert.deepEqual(filtrar(l, { posse: "Avaliado" }).map(a => a.id), ["a3"]);
+  assert.deepEqual(filtrar(l, { posse: "Amostra", dono: "Gui", tier: "A" }).map(a => a.id), ["a4", "a2"]);
+  const dl = deLinhas([COLS, COLS.map(c => ({ ID: "x1", Perfume: "P", Dono: "Bia" }[c] ?? "")), COLS.map(c => ({ ID: "x2", Perfume: "Q", Dono: "Zé" }[c] ?? ""))]);
+  assert.deepEqual(dl.map(a => a.dono), ["Bia", ""]);
+  assert.deepEqual(camposAmostra(dl[0], { ...dl[0], dono: "Gui" }), { Dono: "Gui" });
+  const h = telaAmostras({ lista: l, filtro: { dono: "Bia" }, configurado: true, existe: true, sem: [], arquetipos: [{ nome: "Monge" }], hoje: "2026-10-13" });
+  assert.match(h, /id="amf-casa"/); assert.match(h, /id="amf-posse"/); assert.match(h, /data-am-dono="a3"/); assert.match(h, /data-acao="am-limpar"/);
+});
+
 test("normalizar: saída ⇒ Esgotado; Esgotado sem data ⇒ hoje; voltar limpa saída e motivo", () => {
   assert.deepEqual(normalizar({ status: "Pendente", saida: "2026-10-02" }, "2026-10-13"), { status: "Esgotado", saida: "2026-10-02" });
   assert.equal(normalizar({ status: "Esgotado", saida: "" }, "2026-10-13").saida, "2026-10-13");
