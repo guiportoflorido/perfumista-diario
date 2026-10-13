@@ -18,7 +18,7 @@ import { telaAmostras, fichaAmostra, deLinhas as amostrasDeLinhas, juntar, semRe
   adicionarAmostra, editarAmostra, removerAmostra, novoId, normalizar } from "./amostras.js";
 import { ler, gravar } from "./store.js";
 
-export const APP_VERSAO = "5.11";  // sobe a cada publicação: confere no topo da tela se o celular pegou a versão nova
+export const APP_VERSAO = "5.12";  // sobe a cada publicação: confere no topo da tela se o celular pegou a versão nova
 const S = { aba: "hoje", frascos: [], frascosAtivos: [], avisosTiers: null, fichas: {}, versao: {}, prev: null, prevOffline: false,
   prevErro: null, metar: null, metarMotivo: null, clima: null, resultado: null, erroMotor: null, entrada: "", carregandoClima: true,
   sync: { estado: "ocioso", msg: "" }, hr: ler("hr", { preset: "tudo" }), tokenNovo: null, playbook: null, janelas: new Map(),
@@ -405,7 +405,7 @@ async function salvarAmostra(form) {
   const novo = Boolean(form.dataset.novo), velho = novo ? null : S.amAberta, v = id => $("#" + id, form);
   const dados = { casa: v("am-casa").value.trim(), nome: v("am-nome").value.trim(), tipo: v("am-tipo-f").value, ml: v("am-ml").value.trim().replace(".", ","),
     origem: v("am-origem").value, status: v("am-status").value, entrada: v("am-entrada").value, saida: v("am-saida").value, motivo: v("am-motivo").value,
-    impressao: v("am-impressao").value, obs: v("am-obs").value };
+    impressao: v("am-impressao").value, obs: v("am-obs").value, dono: v("am-dono").value };
   if (!dados.casa || !dados.nome) { toast("Preencha perfume e casa."); return; }
   if (dados.entrada && dados.saida && dados.saida < dados.entrada) { toast("A saída não pode ser antes da entrada."); return; }
   const campos = camposAmostra(velho, dados);
@@ -446,6 +446,14 @@ async function mudarStatusAmostra(el, id, status) {
     toast(`${a.nome}: ${status}${campos["Saída"] ? ` (saída ${campos["Saída"]})` : ""}.`);
     await lerAmostras({ forcar: true });
   } catch (e) { toast(`Não salvou: ${e.message}`); render(); }
+}
+
+async function mudarDonoAmostra(el, id, dono) {
+  const a = (listaAmostras() || []).find(x => x.id === id);
+  if (!a || a.dono === dono) return;
+  el.disabled = true;
+  try { await editarAmostra(id, { Dono: dono }); toast(`${a.nome}: amostra ${dono === "Bia" ? "da Bia" : dono === "Gui" ? "sua" : "sem dono"}.`); await lerAmostras({ forcar: true }); }
+  catch (e) { toast(`Não salvou: ${e.message}`); render(); }
 }
 
 async function excluirAmostra() {
@@ -668,7 +676,7 @@ function fecharFolha() { $("#folha").innerHTML = ""; }
 function mudarDia(fn) { const d = estadoDia(); fn(d); salvarDia(d); recalcular(); }
 
 document.addEventListener("click", async e => {
-  if (e.target.closest("label.ed, select[data-ed], select[data-am-status]")) return;   // seletores na linha: não abrir a ficha
+  if (e.target.closest("label.ed, select[data-ed], select[data-am-status], select[data-am-dono]")) return;   // seletores na linha: não abrir a ficha
   const b = e.target.closest("button, [data-fechar], [data-ficha], [data-merc], [data-amostra]");
   if (!b) return;
   if (b.closest("#abas")) { S.aba = b.dataset.aba; render(); window.scrollTo(0, 0); return; }
@@ -725,6 +733,7 @@ document.addEventListener("click", async e => {
   else if (acao === "remover-mercado") removerMercado();
   else if (acao === "nova-amostra") { S.confirmandoRemocao = false; abrirAmostra(null); }
   else if (acao === "remover-amostra") excluirAmostra();
+  else if (acao === "am-limpar") { S.am = { ords: S.am.ords }; gravar("am", S.am); render(); }
   else if (acao === "ler-planilha") {
     const m = $("#lerMsg"); m.textContent = "Lendo a planilha…";
     try {
@@ -757,6 +766,8 @@ document.addEventListener("change", e => {
   if (el.dataset.ov) { const k = el.dataset.ov, v = el.value.trim().replace(",", "."); mudarDia(d => { if (v === "") delete d.override[k]; else d.override[k] = v.toLowerCase() === "nd" ? "nd" : v; }); return; }
   if (el.dataset.amStatus) { mudarStatusAmostra(el, el.dataset.amStatus, el.value); return; }
   if (el.id === "am-tipo") { S.am = { ...S.am, tipo: el.value }; gravar("am", S.am); render(); return; }
+  if (el.id?.startsWith("amf-")) { S.am = { ...S.am, [el.id.slice(4)]: el.value }; gravar("am", S.am); render(); return; }
+  if (el.dataset.amDono) { mudarDonoAmostra(el, el.dataset.amDono, el.value); return; }
   if (el.id === "am-nome" || el.id === "am-casa") { if ($("#formAmostra")?.dataset.novo) preencherDoMercado(); return; }
   if (el.id?.startsWith("av-")) { el.dataset.mexido = "eu"; return; }
   if (el.dataset.ed) { const p = (listaMercado().lista || []).find(x => x.casa + "||" + x.nome === el.dataset.id); if (p) editarCelula(el, p, el.dataset.ed, el.value); return; }

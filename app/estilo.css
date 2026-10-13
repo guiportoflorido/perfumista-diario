@@ -520,6 +520,7 @@ select[disabled], input[readonly], textarea[readonly] { opacity: .75; }
 
 /* amostras: status na própria linha (tabela) */
 .tabelao .c-status { min-width: 112px; }
+.tabelao .c-dono { min-width: 64px; text-align: center; }
 .tabelao .c-tipo, .tabelao .c-ml, .tabelao .c-entrada, .tabelao .c-saida, .tabelao .c-usos { white-space: nowrap; }
 .tabelao .c-dias { min-width: 92px; white-space: nowrap; color: var(--suave); }
 .tabelao .c-ml, .tabelao .c-usos { text-align: right; font-variant-numeric: tabular-nums; }

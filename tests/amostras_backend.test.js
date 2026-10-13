@@ -3,7 +3,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { carregarBackend } from "../tools/planilha_falsa.mjs";
 
-const COLS = ["ID", "Casa", "Perfume", "Tipo", "Volume (ml)", "Origem", "Status", "Entrada", "Saída", "Motivo saída", "Impressão", "Obs", "Atualizado em"];
+const COLS = ["ID", "Casa", "Perfume", "Tipo", "Volume (ml)", "Origem", "Status", "Entrada", "Saída", "Motivo saída", "Impressão", "Obs", "Atualizado em", "Dono"];
 const novo = () => carregarBackend({ "Tiers": [["Casa", "Perfume", "Nome no diário", "Posse", "Tier"]], "Diário": [["Data", "Slot", "Perfume"]] });
 const post = (b, acao, extra = {}) => b.post({ token: "dev", acao, ...extra });
 
@@ -59,4 +59,14 @@ test("remover por ID apaga só aquela linha", () => {
   assert.equal(post(b, "removerAmostra", { id: "am0001" }).ok, true);
   assert.equal(b.abas.Amostras.length, 2); assert.equal(b.abas.Amostras[1][0], "am0002");
   assert.equal(post(b, "removerAmostra", { id: "am0001" }).ok, false);
+});
+
+test("Dono: Gui/Bia aceitos, outro recusado; aba antiga sem a coluna ganha a coluna ao gravar", () => {
+  const velha = ["ID", "Casa", "Perfume", "Tipo", "Volume (ml)", "Origem", "Status", "Entrada", "Saída", "Motivo saída", "Impressão", "Obs", "Atualizado em"];
+  const b = carregarBackend({ "Tiers": [["Casa", "Perfume"]], "Diário": [["Data"]], "Amostras": [velha, ["am0001", "A", "B", "Amostra", "", "", "Pendente", "", "", "", "", "", ""]] });
+  assert.equal(post(b, "editarAmostra", { id: "am0001", campos: { Dono: "Zé" } }).ok, false);
+  assert.equal(post(b, "editarAmostra", { id: "am0001", campos: { Dono: "Bia" } }).ok, true);
+  assert.equal(b.abas.Amostras[0].at(-1), "Dono"); assert.equal(b.abas.Amostras[1][13], "Bia");
+  assert.equal(post(b, "adicionarAmostra", { campos: { ID: "am0002", Casa: "C", Perfume: "D", Dono: "Gui" } }).ok, true);
+  assert.equal(b.abas.Amostras[2][13], "Gui");
 });
