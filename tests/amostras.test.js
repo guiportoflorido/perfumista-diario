@@ -32,7 +32,7 @@ test("juntar liga pela casa + perfume sem acento/maiúscula; fora do Mercado fic
 });
 
 test("resumo conta por status e soma ml só do que está em mãos", () => {
-  assert.deepEqual(resumo(deLinhas(linhas)), { pendente: 2, realizado: 1, esgotado: 1, mao: 3, ml: 12.5 });
+  assert.deepEqual(resumo(deLinhas(linhas)), { pendente: 2, emTeste: 0, realizado: 1, esgotado: 1, mao: 3, ml: 12.5 });
 });
 
 test("filtrar: pendentes primeiro (mais antiga antes), em mãos, tipo e busca", () => {
@@ -50,6 +50,17 @@ test("ordenar pelo cabeçalho: até 3 critérios, vazios no fim; usos e dias cal
   assert.deepEqual(filtrar(l, { ords: [{ k: "tier", dir: "desc" }, { k: "entrada", dir: "desc" }] }).map(a => a.id), ["a3", "a2", "a4", "a1"]);
   assert.deepEqual(filtrar(l, { ords: [{ k: "usos", dir: "desc" }] }, { usosDe: a => (a.id === "a1" ? 5 : 0) }).map(a => a.id)[0], "a1");
   assert.deepEqual(filtrar(l, { ords: [{ k: "dias", dir: "desc" }] }, { hoje: "2026-10-13" }).map(a => a.id), ["a3", "a4", "a1", "a2"]);   // 31 (entrada→saída), 28, 23, 12
+});
+
+test("Em teste: conta à parte, vem primeiro na ordem padrão, entra em Em mãos e no filtro próprio", () => {
+  const l = juntar(deLinhas(linhas), mercado).map(a => (a.id === "a1" ? { ...a, status: "Em teste" } : a));
+  assert.equal(resumo(l).emTeste, 1); assert.equal(resumo(l).mao, 3);
+  assert.deepEqual(filtrar(l).map(a => a.id), ["a1", "a4", "a2", "a3"]);
+  assert.deepEqual(filtrar(l, { status: "Em teste" }).map(a => a.id), ["a1"]);
+  assert.ok(filtrar(l, { status: "mao" }).some(a => a.id === "a1"));
+  assert.equal(deLinhas([COLS, COLS.map(c => ({ ID: "x1", Perfume: "P", Status: "Em teste" }[c] ?? ""))])[0].status, "Em teste");
+  const h = telaAmostras({ lista: l, filtro: {}, configurado: true, existe: true, sem: [], hoje: "2026-10-13" });
+  assert.match(h, /class="am-teste"/); assert.match(h, /data-am="status" data-v="Em teste"/); assert.match(h, /<option value="Em teste" selected>/);
 });
 
 test("normalizar: saída ⇒ Esgotado; Esgotado sem data ⇒ hoje; voltar limpa saída e motivo", () => {

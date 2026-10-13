@@ -36,6 +36,8 @@ test("validação: obrigatórios, tipo, status, datas, volume, saída antes da e
     { ...ok, "Volume (ml)": "dois" }, { ...ok, Entrada: "2026-10-05", "Saída": "2026-10-01" }, { ...ok, ID: "x" }])
     assert.equal(post(b, "adicionarAmostra", { campos: ruim }).ok, false, JSON.stringify(ruim));
   assert.equal(post(b, "adicionarAmostra", { campos: { ...ok, "Volume (ml)": "1,5" } }).ok, true);
+  assert.equal(post(b, "adicionarAmostra", { campos: { ...ok, ID: "am0002", Status: "Em teste" } }).ok, true);
+  assert.equal(post(b, "editarAmostra", { id: "am0001", campos: { Status: "Em teste" } }).ok, true);
 });
 
 test("editar por ID: muda só os campos enviados, não mexe em ID; recusa saída antes da entrada já gravada", () => {
