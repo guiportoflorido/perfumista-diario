@@ -515,11 +515,16 @@ select[disabled], input[readonly], textarea[readonly] { opacity: .75; }
 .tabelao .c-posse { min-width: 130px; }
 .tabelao .c-arquetipo { min-width: 160px; }
 
-/* amostras: status na própria linha */
-.card .am-st { align-self: center; }
-.card .am-st select { width: auto; min-width: 0; padding: 5px 22px 5px 8px; font: 600 12.5px var(--f); border-radius: 8px; background-color: var(--afund); }
-.card.am-pend .am-st select { color: var(--alerta); }
-.card.am-ok .am-st select { color: var(--ok); }
-.card.am-esg { opacity: .62; }
-.card.am-esg .am-st select { color: var(--leve); }
-.card .estrela { color: var(--tS); }
+/* amostras: status na própria linha (tabela) */
+.tabelao .c-status { min-width: 112px; }
+.tabelao .c-tipo, .tabelao .c-ml, .tabelao .c-entrada, .tabelao .c-saida, .tabelao .c-usos { white-space: nowrap; }
+.tabelao .c-dias { min-width: 92px; white-space: nowrap; color: var(--suave); }
+.tabelao .c-ml, .tabelao .c-usos { text-align: right; font-variant-numeric: tabular-nums; }
+.tabelao .c-origem, .tabelao .c-motivo { min-width: 100px; max-width: 150px; color: var(--suave); }
+.tabelao .c-impressao { min-width: 240px; max-width: 300px; }
+.tabelao .c-obs { min-width: 160px; max-width: 220px; color: var(--suave); }
+.am-tab table { min-width: 1560px; }
+.tabelao tr.am-pend .am-st select { color: var(--alerta); font-weight: 600; }
+.tabelao tr.am-ok .am-st select { color: var(--ok); font-weight: 600; }
+.tabelao tr.am-esg td { color: var(--leve); }
+.tabelao tr.am-esg .am-st select { color: var(--leve); }

@@ -18,7 +18,7 @@ import { telaAmostras, fichaAmostra, deLinhas as amostrasDeLinhas, juntar, semRe
   adicionarAmostra, editarAmostra, removerAmostra, novoId, normalizar } from "./amostras.js";
 import { ler, gravar } from "./store.js";
 
-export const APP_VERSAO = "5.9";  // sobe a cada publicação: confere no topo da tela se o celular pegou a versão nova
+export const APP_VERSAO = "5.10";  // sobe a cada publicação: confere no topo da tela se o celular pegou a versão nova
 const S = { aba: "hoje", frascos: [], frascosAtivos: [], avisosTiers: null, fichas: {}, versao: {}, prev: null, prevOffline: false,
   prevErro: null, metar: null, metarMotivo: null, clima: null, resultado: null, erroMotor: null, entrada: "", carregandoClima: true,
   sync: { estado: "ocioso", msg: "" }, hr: ler("hr", { preset: "tudo" }), tokenNovo: null, playbook: null, janelas: new Map(),
@@ -341,12 +341,19 @@ async function lerAmostras({ forcar = false } = {}) {
   if (S.aba === "amostras") render();
 }
 
-/** Usos no Diário de uma amostra: pelo "Nome no diário" da aba Tiers ou pelo próprio nome. */
-function usosAmostra(a) {
-  const k = mercadoChave(a.casa, a.nome), t = planilha().tiers.find(x => mercadoChave(x.casa, x.perfume) === k);
-  const nomes = new Set([a.nome, t?.nomeDiario, t?.perfume].filter(Boolean));
-  return historico().filter(r => nomes.has(r.perfume)).length;
+/** Usos no Diário por amostra: pelo "Nome no diário" da aba Tiers ou pelo próprio nome. Lê planilha e diário uma vez só. */
+function contadorUsos() {
+  const porNome = new Map();
+  for (const r of historico()) porNome.set(r.perfume, (porNome.get(r.perfume) || 0) + 1);
+  const tiers = new Map(planilha().tiers.map(t => [mercadoChave(t.casa, t.perfume), t]));
+  const memo = new Map();
+  return a => {
+    const k = mercadoChave(a.casa, a.nome);
+    if (!memo.has(k)) { const t = tiers.get(k); memo.set(k, [...new Set([a.nome, t?.nomeDiario, t?.perfume].filter(Boolean))].reduce((s, n) => s + (porNome.get(n) || 0), 0)); }
+    return memo.get(k);
+  };
 }
+const usosAmostra = a => contadorUsos()(a);
 
 function telaAmostrasAba() {
   garantirMercado();
@@ -354,7 +361,7 @@ function telaAmostrasAba() {
   const lista = listaAmostras(), merc = listaMercado().lista || [];
   return `<h2>Amostras e decants</h2>
   ${telaAmostras({ lista, filtro: S.am, configurado: configurado(), existe: Boolean(cacheAmostras()?.existe), erro: S.amErro,
-    sem: lista ? semRegistro(lista, merc) : [], usosDe: usosAmostra })}`;
+    sem: lista ? semRegistro(lista, merc) : [], usosDe: contadorUsos(), editavel: Boolean(cachePlanilha()?.existe), arquetipos: S.arquetipos })}`;
 }
 
 function abrirAmostra(id, { prefixo = null, confirmarRemover = false } = {}) {
@@ -677,6 +684,7 @@ document.addEventListener("click", async e => {
   if (b.dataset.amostra) { S.confirmandoRemocao = false; abrirAmostra(b.dataset.amostra); return; }
   if (b.dataset.amNova) { S.confirmandoRemocao = false; abrirAmostra(null, { prefixo: b.dataset.amNova }); return; }
   if (b.dataset.am) { S.am = { ...S.am, [b.dataset.am]: b.dataset.v }; gravar("am", S.am); render(); return; }
+  if (b.dataset.amOrd) { S.am = { ...S.am, ords: tocarOrd(ordsDe(S.am, "status"), b.dataset.amOrd) }; gravar("am", S.am); render(); return; }
   if (b.dataset.mfOrd) { S.mf = { ...S.mf, ords: tocarOrd(ordsDe(S.mf, "tier"), b.dataset.mfOrd) }; gravar("mf", S.mf); render(); return; }
   if (b.dataset.mf) { S.mf = { ...S.mf, [b.dataset.mf]: b.dataset.v }; S.mfLimite = 60; gravar("mf", S.mf); render(); return; }
   if (b.dataset.mfArq) { S.mf = { ...S.mf, arq: S.mf.arq === b.dataset.mfArq ? "" : b.dataset.mfArq }; S.mfLimite = 60; gravar("mf", S.mf); render(); $("#mf-q")?.scrollIntoView({ block: "center" }); return; }
@@ -862,6 +870,7 @@ document.addEventListener("click", e => {
 // ───────────────────────── ordenação em 3 níveis ─────────────────────────
 function mudarOrdem(tabela, n, mud) {
   if (tabela === "col") { S.filtro = { ...S.filtro, ords: mudarOrds(ordsDe(S.filtro, "tier"), n, mud) }; gravar("filtro", S.filtro); }
+  else if (tabela === "am") { S.am = { ...S.am, ords: mudarOrds(ordsDe(S.am, "status"), n, mud) }; gravar("am", S.am); }
   else { S.mf = { ...S.mf, ords: mudarOrds(ordsDe(S.mf, "tier"), n, mud) }; gravar("mf", S.mf); }
   render();
   document.querySelector("details.ordenar")?.setAttribute("open", "");
