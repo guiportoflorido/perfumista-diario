@@ -11,7 +11,9 @@
  * Ações: ping · metar · dados (Tiers + Diário + Frascos) · registrar (linhas no formato da aba Diário) ·
  *        mercado (lê a aba Mercado) · criarMercado (cria a aba uma vez) · editarMercado (edita um perfume,
  *        inclusive casa/nome; tier e posse também vão para a aba Tiers) · adicionarMercado · removerMercado
- *        (tira só da aba Mercado; Tiers e Diário não mudam).
+ *        (tira só da aba Mercado; Tiers e Diário não mudam) · amostras (lê a aba Amostras) · adicionarAmostra (cria a
+ *        aba no primeiro registro) · editarAmostra · removerAmostra (por ID; avaliação — tier, arquétipo etc. — fica
+ *        na aba Mercado, ligada pela Casa + Perfume).
  * Regras da planilha: data como texto AAAA-MM-DD; campo vazio = ""; nunca editar ou apagar linhas existentes;
  * aba Frascos é só fórmula (nunca escrita aqui).
  */
@@ -20,6 +22,9 @@ var ABA_TIERS = 'Tiers', ABA_DIARIO = 'Diário', ABA_FRASCOS = 'Frascos', ABA_ME
 var COLS_MERCADO = ['Casa', 'Perfume', 'Tier', 'Posse', 'Arquétipo', 'Resumo', 'Topo', 'Coração', 'Base', 'Nariz', 'Wishlist', 'Atualizado em'];
 var EDITAVEIS = ['Tier', 'Posse', 'Arquétipo', 'Resumo', 'Topo', 'Coração', 'Base', 'Nariz', 'Wishlist', 'Notas'];
 var COLS_DIARIO = ['Data', 'Slot', 'Perfume', 'Ocasião', 'Temp (°C)', 'Td (°C)', 'Sprays', 'NotaDia', 'Obs'];
+var ABA_AMOSTRAS = 'Amostras';
+var COLS_AMOSTRAS = ['ID', 'Casa', 'Perfume', 'Tipo', 'Volume (ml)', 'Origem', 'Status', 'Entrada', 'Saída', 'Motivo saída', 'Impressão', 'Obs', 'Atualizado em'];
+var TIPOS_AMOSTRA = ['Amostra', 'Decant'], STATUS_AMOSTRA = ['Pendente', 'Realizado', 'Esgotado'];
 var OCASIOES = ['Lazer', 'T.Inf', 'T.For', 'N.Inf', 'N.For', 'Cozy D', 'Cozy N'];
 
 function doPost(e) {
@@ -38,6 +43,10 @@ function doPost(e) {
       case 'editarMercado': return saida_(editarMercado_(req.casa, req.perfume, req.campos || {}));
       case 'adicionarMercado': return saida_(adicionarMercado_(req.campos || {}));
       case 'removerMercado': return saida_(removerMercado_(req.casa, req.perfume));
+      case 'amostras': return saida_({ ok: true, amostras: lerAmostras_() });
+      case 'adicionarAmostra': return saida_(adicionarAmostra_(req.campos || {}));
+      case 'editarAmostra': return saida_(editarAmostra_(req.id, req.campos || {}));
+      case 'removerAmostra': return saida_(removerAmostra_(req.id));
       default: return saida_({ ok: false, erro: 'ação desconhecida' });
     }
   } catch (err) {
@@ -305,6 +314,111 @@ function removerMercado_(casa, perfume) {
     if (!aba) throw new Error('a aba Mercado ainda não existe');
     var linha = acharLinha_(aba.getDataRange().getDisplayValues(), casa, perfume);
     if (linha === -1) throw new Error('perfume não encontrado na aba Mercado: ' + casa + ' — ' + perfume);
+    aba.deleteRow(linha);
+    SpreadsheetApp.flush();
+    return { ok: true, removida: linha };
+  } finally { lock.releaseLock(); }
+}
+
+// ───────────────────────── amostras e decants ─────────────────────────
+// Uma linha por amostra/decant (o mesmo perfume pode ter várias). A avaliação (tier, arquétipo, resumo, wishlist)
+// não é copiada aqui: vive na aba Mercado e o app liga as duas pela Casa + Perfume.
+function lerAmostras_() {
+  var aba = SpreadsheetApp.getActive().getSheetByName(ABA_AMOSTRAS);
+  if (!aba) return { existe: false };
+  return { existe: true, linhas: aba.getDataRange().getDisplayValues(), lido: new Date().toISOString() };
+}
+
+/** Valida os campos enviados (só os presentes; em `completo`, Casa e Perfume são obrigatórios). */
+function validarAmostra_(c, completo) {
+  var txt = function (k) { return c[k] === undefined || c[k] === null ? undefined : String(c[k]).trim(); };
+  if (completo && (!txt('Casa') || !txt('Perfume'))) throw new Error('casa e perfume são obrigatórios');
+  if (!completo && (c.Casa !== undefined && !txt('Casa') || c.Perfume !== undefined && !txt('Perfume'))) throw new Error('casa e perfume não podem ficar vazios');
+  if (txt('Tipo') !== undefined && TIPOS_AMOSTRA.indexOf(txt('Tipo')) === -1) throw new Error('tipo inválido: ' + c.Tipo);
+  if (txt('Status') !== undefined && STATUS_AMOSTRA.indexOf(txt('Status')) === -1) throw new Error('status inválido: ' + c.Status);
+  ['Entrada', 'Saída'].forEach(function (k) {
+    var v = txt(k);
+    if (v && !/^\d{4}-\d{2}-\d{2}$/.test(v)) throw new Error(k.toLowerCase() + ' inválida: ' + v + ' (use AAAA-MM-DD)');
+  });
+  var ml = txt('Volume (ml)');
+  if (ml && !/^\d+([.,]\d+)?$/.test(ml)) throw new Error('volume inválido: ' + ml);
+  var ent = txt('Entrada'), sai = txt('Saída');
+  if (ent && sai && sai < ent) throw new Error('saída antes da entrada');
+}
+
+function abaAmostras_(ss) {
+  var aba = ss.getSheetByName(ABA_AMOSTRAS);
+  if (aba) return aba;
+  aba = ss.insertSheet(ABA_AMOSTRAS);
+  aba.getRange(1, 1, 1, COLS_AMOSTRAS.length).setValues([COLS_AMOSTRAS]).setFontWeight('bold');
+  aba.setFrozenRows(1);
+  return aba;
+}
+
+function acharAmostra_(vals, id) {
+  var i = vals[0].indexOf('ID');
+  for (var r = 1; r < vals.length; r++) if (String(vals[r][i]) === String(id)) return r + 1;
+  return -1;
+}
+
+/** Acrescenta uma amostra (ID vem do app, para o reenvio não duplicar). Cria a aba Amostras se faltar. */
+function adicionarAmostra_(campos) {
+  validarAmostra_(campos, true);
+  var id = String(campos.ID || '').trim();
+  if (!/^[A-Za-z0-9_-]{4,40}$/.test(id)) throw new Error('ID inválido');
+  var lock = LockService.getScriptLock(); lock.waitLock(20000);
+  try {
+    var aba = abaAmostras_(SpreadsheetApp.getActive());
+    var vals = aba.getDataRange().getDisplayValues(), cab = vals[0];
+    var ja = acharAmostra_(vals, id);
+    if (ja !== -1) return { ok: true, linha: ja, duplicada: true };
+    var nova = cab.map(function (c) {
+      if (c === 'Atualizado em') return hoje_();
+      if (c === 'Tipo' && !campos.Tipo) return 'Amostra';
+      if (c === 'Status' && !campos.Status) return 'Pendente';
+      return campos[c] === undefined || campos[c] === null ? '' : String(campos[c]).trim();
+    });
+    var alvo = aba.getLastRow() + 1;
+    aba.getRange(alvo, 1, 1, cab.length).setNumberFormat('@').setValues([nova]);
+    SpreadsheetApp.flush();
+    return { ok: true, linha: alvo };
+  } finally { lock.releaseLock(); }
+}
+
+/** Edita uma amostra pelo ID (qualquer coluna menos ID e Atualizado em). */
+function editarAmostra_(id, campos) {
+  if (!id) throw new Error('ID obrigatório');
+  validarAmostra_(campos, false);
+  var lock = LockService.getScriptLock(); lock.waitLock(20000);
+  try {
+    var aba = SpreadsheetApp.getActive().getSheetByName(ABA_AMOSTRAS);
+    if (!aba) throw new Error('a aba Amostras ainda não existe');
+    var vals = aba.getDataRange().getDisplayValues(), cab = vals[0];
+    var linha = acharAmostra_(vals, id);
+    if (linha === -1) throw new Error('amostra não encontrada: ' + id);
+    var atual = {}; cab.forEach(function (c, j) { atual[c] = vals[linha - 1][j]; });
+    var ent = campos.Entrada !== undefined ? String(campos.Entrada) : atual.Entrada, sai = campos['Saída'] !== undefined ? String(campos['Saída']) : atual['Saída'];
+    if (ent && sai && sai < ent) throw new Error('saída antes da entrada');
+    var mudou = [];
+    cab.forEach(function (c, j) {
+      if (c === 'ID' || c === 'Atualizado em' || campos[c] === undefined) return;
+      aba.getRange(linha, j + 1).setNumberFormat('@').setValue(String(campos[c]).trim());
+      mudou.push(c);
+    });
+    aba.getRange(linha, cab.indexOf('Atualizado em') + 1).setNumberFormat('@').setValue(hoje_());
+    SpreadsheetApp.flush();
+    return { ok: true, linha: linha, mudou: mudou };
+  } finally { lock.releaseLock(); }
+}
+
+/** Apaga a linha de uma amostra (para lançamento errado; saída normal é Status Esgotado + data de saída). */
+function removerAmostra_(id) {
+  var lock = LockService.getScriptLock(); lock.waitLock(20000);
+  try {
+    var aba = SpreadsheetApp.getActive().getSheetByName(ABA_AMOSTRAS);
+    if (!aba) throw new Error('a aba Amostras ainda não existe');
+    var linha = acharAmostra_(aba.getDataRange().getDisplayValues(), id);
+    if (linha === -1) throw new Error('amostra não encontrada: ' + id);
     aba.deleteRow(linha);
     SpreadsheetApp.flush();
     return { ok: true, removida: linha };
