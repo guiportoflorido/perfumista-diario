@@ -44,6 +44,14 @@ test("filtrar: pendentes primeiro (mais antiga antes), em mãos, tipo e busca", 
   assert.deepEqual(filtrar(l, { q: "monge" }).map(a => a.id), ["a4", "a2"]);   // arquétipo vem do Mercado
 });
 
+test("ordenar pelo cabeçalho: até 3 critérios, vazios no fim; usos e dias calculados", () => {
+  const l = juntar(deLinhas(linhas), mercado);
+  assert.deepEqual(filtrar(l, { ords: [{ k: "tier", dir: "asc" }] }).map(a => a.id), ["a4", "a2", "a3", "a1"]);   // A, A, C, sem tier
+  assert.deepEqual(filtrar(l, { ords: [{ k: "tier", dir: "desc" }, { k: "entrada", dir: "desc" }] }).map(a => a.id), ["a3", "a2", "a4", "a1"]);
+  assert.deepEqual(filtrar(l, { ords: [{ k: "usos", dir: "desc" }] }, { usosDe: a => (a.id === "a1" ? 5 : 0) }).map(a => a.id)[0], "a1");
+  assert.deepEqual(filtrar(l, { ords: [{ k: "dias", dir: "desc" }] }, { hoje: "2026-10-13" }).map(a => a.id), ["a3", "a4", "a1", "a2"]);   // 31 (entrada→saída), 28, 23, 12
+});
+
 test("normalizar: saída ⇒ Esgotado; Esgotado sem data ⇒ hoje; voltar limpa saída e motivo", () => {
   assert.deepEqual(normalizar({ status: "Pendente", saida: "2026-10-02" }, "2026-10-13"), { status: "Esgotado", saida: "2026-10-02" });
   assert.equal(normalizar({ status: "Esgotado", saida: "" }, "2026-10-13").saida, "2026-10-13");
@@ -75,7 +83,9 @@ test("diasDesde e telas renderizam sem erro (inclusive sem dados)", () => {
   assert.equal(diasDesde("2026-10-01", "2026-10-13"), 12); assert.equal(diasDesde(""), null);
   const l = juntar(deLinhas(linhas), mercado);
   const h = telaAmostras({ lista: l, filtro: {}, configurado: true, existe: true, erro: null, sem: semRegistro(l, mercado), usosDe: () => 2, hoje: "2026-10-13" });
-  assert.match(h, /esperando há 28 d/); assert.match(h, /Naxos/); assert.match(h, /2 usos no diário/);
+  assert.match(h, /28 d esperando/); assert.match(h, /Naxos/); assert.match(h, /<td class="c-usos">2<\/td>/); assert.match(h, /class="tabelao am-tab"/);
+  assert.doesNotMatch(h, /data-ed=/);   // sem aba Mercado na planilha: tier/arquétipo só leitura
+  assert.match(telaAmostras({ lista: l, filtro: {}, configurado: true, existe: true, sem: [], editavel: true, arquetipos: [{ nome: "Monge" }] }), /data-ed="Tier" data-id="Amouage\|\|Search"/);
   assert.match(telaAmostras({ lista: null, filtro: {}, configurado: false, sem: [] }), /Conecte a planilha/);
   assert.match(telaAmostras({ lista: [], filtro: {}, configurado: true, existe: false, sem: [] }), /Nenhuma amostra/);
   const f = fichaAmostra({ casa: "", nome: "", m: null }, { arquetipos: [{ nome: "Monge" }], nomes: ["Search"], novo: true, podeAvaliar: true, hoje: "2026-10-13" });

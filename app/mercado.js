@@ -157,24 +157,24 @@ export function telaMercado({ lista, fonte, arquetipos, filtro, limite, podeCria
   </details>`;
 }
 
-const posseRot = p => (p === "Frasco Gui" ? "na coleção" : p);
+export const posseRot = p => (p === "Frasco Gui" ? "na coleção" : p);
 
 // células editáveis na própria tabela (Tier, Posse, Wishlist, Arquétipo)
 const opts = (lista, at) => lista.map(([v, r]) => `<option value="${esc(v)}" ${String(at) === String(v) ? "selected" : ""}>${esc(r)}</option>`).join("");
-function celTier(p, id) {
+export function celTier(p, id) {
   return `<label class="ed ed-tier t-${p.tier || "x"}"><span class="sr">Tier de ${esc(p.nome)}</span>
     <select data-ed="Tier" data-id="${esc(id)}">${opts([["", "–"], ["S", "S"], ["A", "A"], ["B", "B"], ["C", "C"], ["D", "D"]], p.tier || "")}</select></label>`;
 }
-function celPosse(p, id) {
+export function celPosse(p, id) {
   const lista = POSSES_EDIT.map(x => [x, x ? posseRot(x) : "—"]).concat(!p.posse || POSSES_EDIT.includes(p.posse) ? [] : [[p.posse, p.posse]]);
   return `<label class="ed ed-posse ${p.posse === "Frasco Gui" ? "minha" : ""}"><span class="sr">Posse de ${esc(p.nome)}</span>
     <select data-ed="Posse" data-id="${esc(id)}">${opts(lista, p.posse || "")}</select></label>`;
 }
-function celArq(p, id, arquetipos) {
+export function celArq(p, id, arquetipos) {
   return `<label class="ed ed-arq">${p.arquetipo ? arqIcone(p.arquetipo, 15) : ""}<span class="sr">Arquétipo de ${esc(p.nome)}</span>
     <select data-ed="Arquétipo" data-id="${esc(id)}">${opts([["", "—"], ...arquetipos.map(a => [a.nome, a.nome])], p.arquetipo || "")}</select></label>`;
 }
-const celWish = (p, id) => `<button class="ed ed-wish ${p.wish ? "on" : ""}" data-ed-wish="${esc(id)}" aria-pressed="${p.wish}" aria-label="${p.wish ? "Tirar da" : "Pôr na"} wishlist: ${esc(p.nome)}">${p.wish ? "★" : "☆"}</button>`;
+export const celWish = (p, id) => `<button class="ed ed-wish ${p.wish ? "on" : ""}" data-ed-wish="${esc(id)}" aria-pressed="${p.wish}" aria-label="${p.wish ? "Tirar da" : "Pôr na"} wishlist: ${esc(p.nome)}">${p.wish ? "★" : "☆"}</button>`;
 
 function tabela(linhas, f, { editavel = false, arquetipos = [] } = {}) {
   const ords = ordsDe(f, "tier");

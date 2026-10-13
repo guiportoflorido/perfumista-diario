@@ -1,11 +1,11 @@
 // amostras.js — aba Amostras: entradas e saídas de amostras e decants, guardadas na aba "Amostras" da planilha.
 // A avaliação (tier, arquétipo, resumo, wishlist, notas, posse) não é duplicada: vive na aba Mercado e a ligação
 // é pela Casa + Perfume (mesma chave do Mercado). Status: Pendente (a testar) · Realizado (testada) · Esgotado (saiu).
-import { esc, tierHTML } from "./util.js";
+import { esc, tierHTML, ordsDe, compararMulti, cmpValor, cabOrd, painelOrd } from "./util.js";
 import { arqTag, arqIcone } from "./icones.js";
 import { chamar } from "./api.js";
 import { ler, gravar } from "./store.js";
-import { chave, POSSES_EDIT } from "./mercado.js";
+import { chave, POSSES_EDIT, celTier, celPosse, celArq, celWish, posseRot } from "./mercado.js";
 
 export const COLS = ["ID", "Casa", "Perfume", "Tipo", "Volume (ml)", "Origem", "Status", "Entrada", "Saída", "Motivo saída", "Impressão", "Obs", "Atualizado em"];
 export const TIPOS = ["Amostra", "Decant"];
@@ -52,17 +52,33 @@ export function semRegistro(amostras, mercado) {
 }
 
 const ORD_STATUS = { Pendente: 0, Realizado: 1, Esgotado: 2 };
-export function filtrar(lista, f = {}) {
+const ordemTier = t => (t && "SABCD".includes(t) ? "SABCD".indexOf(t) : "");
+const ordemPosse = p => ({ "Frasco Gui": 0, "Frasco Bia": 1, "Amostra": 2, "Amostra Bia": 3, "Avaliado": 4 }[p] ?? (p ? 5 : ""));
+/** Dias da amostra: pendente = esperando teste desde a entrada; em mãos = desde a entrada; esgotada = entrada → saída. */
+export function dias(a, hoje = hojeISO()) {
+  if (a.status === "Esgotado" && a.entrada && a.saida) return diasDesde(a.entrada, a.saida);
+  return diasDesde(a.entrada, hoje);
+}
+
+// padrão (sem ordenação escolhida): pendentes primeiro, a mais antiga antes; depois a mais recente primeiro
+function padrao(a, b) {
+  return ORD_STATUS[a.status] - ORD_STATUS[b.status]
+    || (a.status === "Pendente" ? (a.entrada || "9").localeCompare(b.entrada || "9") : (b.saida || b.entrada || "").localeCompare(a.saida || a.entrada || ""))
+    || a.nome.localeCompare(b.nome, "pt");
+}
+
+export function filtrar(lista, f = {}, { usosDe = null, hoje = hojeISO() } = {}) {
   const q = norm(f.q);
-  return lista.filter(a => {
+  const valor = (k, a) => ({ status: ORD_STATUS[a.status], tier: ordemTier(a.m?.tier), posse: ordemPosse(a.m?.posse), wish: a.m ? (a.m.wish ? 0 : 1) : "",
+    arquetipo: a.m?.arquetipo || "", ml: a.ml ? mlNum(a.ml) : "", dias: dias(a, hoje) ?? "", usos: usosDe ? usosDe(a) : "" }[k] ?? a[k] ?? "");
+  const res = lista.filter(a => {
     if (f.status === "mao" ? a.status === "Esgotado" : f.status && a.status !== f.status) return false;
     if (f.tipo && a.tipo !== f.tipo) return false;
     if (q && !norm(`${a.nome} ${a.casa} ${a.origem} ${a.impressao} ${a.obs} ${a.m?.arquetipo || ""}`).includes(q)) return false;
     return true;
-  }).sort((a, b) => ORD_STATUS[a.status] - ORD_STATUS[b.status]
-    // pendentes: a mais antiga primeiro (há mais tempo esperando teste); demais: a mais recente primeiro
-    || (a.status === "Pendente" ? (a.entrada || "9").localeCompare(b.entrada || "9") : (b.saida || b.entrada || "").localeCompare(a.saida || a.entrada || ""))
-    || a.nome.localeCompare(b.nome, "pt"));
+  });
+  // sem escolha: Status ↑ (empates pelo padrão: pendente mais antiga primeiro)
+  return res.sort(compararMulti(ordsDe(f, "status"), (k, a, b) => cmpValor(valor(k, a), valor(k, b)), padrao));
 }
 
 /** Coerência de status e saída: data de saída ⇒ Esgotado; Esgotado sem data ⇒ saída hoje; voltar de Esgotado limpa a saída. */
@@ -117,10 +133,10 @@ const SEL_STATUS = { Pendente: "pend", Realizado: "ok", Esgotado: "esg" };
 const op = (v, r, at) => `<option value="${esc(v)}" ${String(at ?? "") === String(v) ? "selected" : ""}>${esc(r)}</option>`;
 const dataBR = iso => (/^\d{4}-\d{2}-\d{2}$/.test(iso || "") ? `${iso.slice(8, 10)}/${iso.slice(5, 7)}/${iso.slice(2, 4)}` : "");
 
-export function telaAmostras({ lista, filtro, configurado, existe, erro, sem, usosDe, hoje = hojeISO() }) {
+export function telaAmostras({ lista, filtro, configurado, existe, erro, sem, usosDe, hoje = hojeISO(), editavel = false, arquetipos = [] }) {
   if (!configurado) return `<div class="bloco"><p class="nota">As amostras ficam numa aba <b>Amostras</b> da planilha. Conecte a planilha em Ajustes para começar.</p></div>`;
   if (!lista) return `<div class="bloco"><p class="nota">${erro ? `<span class="erro-txt">Não consegui ler a aba Amostras: ${esc(erro)}</span>` : "Carregando as amostras…"}</p></div>`;
-  const r = resumo(lista), res = filtrar(lista, filtro);
+  const r = resumo(lista), res = filtrar(lista, filtro, { usosDe, hoje });
   const chip = (v, rot) => `<button class="chip" data-am="status" data-v="${v}" aria-pressed="${(filtro.status || "") === v}">${rot}</button>`;
   return `
   <div class="linha-flex"><p class="nota" style="flex:1">${existe ? "Lido da aba <b>Amostras</b> da planilha." : "A aba <b>Amostras</b> é criada na planilha na primeira entrada."} Avaliação (tier, arquétipo…) é a da aba Mercado.</p>
@@ -138,7 +154,7 @@ export function telaAmostras({ lista, filtro, configurado, existe, erro, sem, us
     <div class="campos"><label>Tipo<select id="am-tipo">${op("", "Amostra e decant", filtro.tipo)}${TIPOS.map(t => op(t, t, filtro.tipo)).join("")}</select></label></div>
     <p class="nota">${res.length} de ${lista.length}.</p>
   </div>
-  ${res.length ? `<div class="lista">${res.map((a, i) => cartao(a, i, usosDe, hoje)).join("")}</div>`
+  ${res.length ? tabela(res, filtro, { usosDe, hoje, editavel, arquetipos })
     : `<div class="bloco"><p class="vazio">${lista.length ? "Nada com esses filtros." : "Nenhuma amostra lançada ainda. Toque em “+ Entrada”."}</p></div>`}
   ${sem.length ? `<details class="bloco"><summary>Posse “Amostra” na aba Tiers sem lançamento aqui · ${sem.length}</summary>
     <p class="nota">Toque para lançar a entrada (data e volume ficam por sua conta: não invento).</p>
@@ -147,18 +163,34 @@ export function telaAmostras({ lista, filtro, configurado, existe, erro, sem, us
   </details>` : ""}`;
 }
 
-function cartao(a, i, usosDe, hoje) {
-  const m = a.m, usos = usosDe ? usosDe(a) : 0, d = diasDesde(a.entrada, hoje);
-  const quando = a.status === "Pendente" ? (d == null ? "sem data de entrada" : d === 0 ? "chegou hoje" : `esperando há ${d} d`)
-    : a.status === "Esgotado" ? `saiu ${dataBR(a.saida)}${a.motivo ? ` · ${esc(a.motivo.toLowerCase())}` : ""}` : a.entrada ? `entrou ${dataBR(a.entrada)}` : "";
-  return `<div class="card merc am-${SEL_STATUS[a.status]}" data-amostra="${esc(a.id)}" tabindex="0">
-    <span class="pos">${m?.tier ? tierHTML(m.tier) : `<span class="tier sem">–</span>`}</span>
-    <div style="min-width:0"><b class="nome">${esc(a.nome)}</b><div class="casa">${esc(a.casa)} · ${esc(a.tipo)}${a.ml ? ` ${esc(a.ml)} ml` : ""}${a.origem ? ` · ${esc(a.origem)}` : ""}</div></div>
-    <label class="ed am-st"><span class="sr">Status de ${esc(a.nome)}</span><select data-am-status="${esc(a.id)}">${STATUS.map(s => op(s, s, a.status)).join("")}</select></label>
-    <div class="meta">${m?.arquetipo ? arqTag(m.arquetipo, 14) : m ? `<span class="nota">sem arquétipo</span>` : `<span class="selo aviso">fora da aba Mercado</span>`}
-      ${m?.wish ? `<span class="estrela" title="Na wishlist">★</span>` : ""}<span class="nota">${quando}${usos ? ` · ${usos} uso${usos > 1 ? "s" : ""} no diário` : ""}</span></div>
-    ${a.impressao ? `<div class="pq">${esc(a.impressao)}</div>` : ""}
-  </div>`;
+// colunas da tabela (formato do Mercado): chave, rótulo
+export const COLUNAS = [["status", "Status"], ["tier", "Tier"], ["wish", "Wishlist"], ["arquetipo", "Arquétipo"], ["posse", "Posse"],
+  ["tipo", "Tipo"], ["ml", "ml"], ["origem", "Origem"], ["entrada", "Entrada"], ["dias", "Dias"], ["saida", "Saída"], ["motivo", "Motivo"],
+  ["usos", "Usos"], ["impressao", "Impressão"], ["obs", "Obs"]];
+
+function tabela(linhas, f, { usosDe, hoje, editavel, arquetipos }) {
+  const ords = ordsDe(f, "status"), btn = (k, r) => cabOrd(k, r, ords, "am-ord");
+  const th = ([k, r]) => `<th class="c-${k}" scope="col">${btn(k, r)}</th>`;
+  const td = (k, v) => `<td class="c-${k}">${v}</td>`;
+  const tx = (k, v) => `<td class="c-${k}"><div class="clamp">${esc(v || "")}</div></td>`;
+  return `${painelOrd(ords, [["casa", "Casa"], ["nome", "Perfume"], ...COLUNAS], "am")}
+  <div class="tabelao am-tab" role="region" aria-label="Tabela de amostras" tabindex="0"><table>
+    <thead><tr><th class="c-n" scope="col">#</th><th class="c-casa" scope="col">${btn("casa", "Casa")}</th><th class="c-nome" scope="col">${btn("nome", "Perfume")}</th>${COLUNAS.map(th).join("")}</tr></thead>
+    <tbody>${linhas.map((a, i) => {
+      const m = a.m, id = m ? m.casa + "||" + m.nome : "", ed = editavel && m, d = dias(a, hoje), usos = usosDe ? usosDe(a) : 0;
+      const sufDias = a.status === "Pendente" ? " esperando" : a.status === "Esgotado" ? " em mãos" : "";
+      return `<tr data-amostra="${esc(a.id)}" tabindex="0" class="am-${SEL_STATUS[a.status]}">
+      ${td("n", i + 1)}${td("casa", esc(a.casa))}${td("nome", esc(a.nome))}
+      ${td("status", `<label class="ed am-st"><span class="sr">Status de ${esc(a.nome)}</span><select data-am-status="${esc(a.id)}">${STATUS.map(s => op(s, s, a.status)).join("")}</select></label>`)}
+      ${td("tier", ed ? celTier(m, id) : m?.tier ? tierHTML(m.tier) : `<span class="tier sem">–</span>`)}
+      ${td("wish", ed ? celWish(m, id) : m?.wish ? `<span class="estrela" title="Na wishlist">★</span>` : "")}
+      ${td("arquetipo", ed ? celArq(m, id, arquetipos) : m ? arqTag(m.arquetipo, 14) : `<span class="selo aviso">fora do Mercado</span>`)}
+      ${td("posse", ed ? celPosse(m, id) : esc(posseRot(m?.posse || "") || "—"))}
+      ${td("tipo", esc(a.tipo))}${td("ml", esc(a.ml))}${tx("origem", a.origem)}
+      ${td("entrada", dataBR(a.entrada))}${td("dias", d == null ? "" : `${d} d${sufDias}`)}${td("saida", dataBR(a.saida))}${td("motivo", esc(a.motivo))}
+      ${td("usos", usos || "")}${tx("impressao", a.impressao)}${tx("obs", a.obs)}
+    </tr>`; }).join("")}</tbody></table></div>
+  <p class="nota">Arraste para o lado para ver todas as colunas. Status muda direto na tabela${editavel ? "; Tier, Wishlist, Arquétipo e Posse também (gravam na aba Mercado, e tier/posse na aba Tiers)" : ""}. Toque no nome para o resto. Toque no cabeçalho para ordenar.</p>`;
 }
 
 /** Ficha de entrada/edição: dados da amostra + avaliação (aba Mercado). */
