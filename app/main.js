@@ -17,9 +17,9 @@ import { contagens } from "./estatisticas.js";
 import { telaAmostras, fichaAmostra, deLinhas as amostrasDeLinhas, juntar, semRegistro, camposAmostra, camposAvaliacaoMexidos, cacheAmostras, baixarAmostras,
   adicionarAmostra, editarAmostra, removerAmostra, novoId, normalizar } from "./amostras.js";
 import { ler, gravar } from "./store.js";
-import { fotoFicha, fotoMini, reduzirImagem, subirFoto } from "./fotos.js";
+import { fotoFicha, fotoMini, reduzirImagem, subirFoto, removerFotoPlanilha, iniciarFotos } from "./fotos.js";
 
-export const APP_VERSAO = "5.18";  // sobe a cada publicação: confere no topo da tela se o celular pegou a versão nova
+export const APP_VERSAO = "5.19";  // sobe a cada publicação: confere no topo da tela se o celular pegou a versão nova
 const S = { aba: "hoje", frascos: [], frascosAtivos: [], avisosTiers: null, fichas: {}, versao: {}, prev: null, prevOffline: false,
   prevErro: null, metar: null, metarMotivo: null, clima: null, resultado: null, erroMotor: null, entrada: "", carregandoClima: true,
   sync: { estado: "ocioso", msg: "" }, hr: ler("hr", { preset: "tudo" }), tokenNovo: null, playbook: null, janelas: new Map(),
@@ -119,7 +119,6 @@ function doMercado(casa, nome) {
   }
   return mercadoPorChave.get(mercadoChave(casa, nome)) || null;
 }
-const fotoDe = (casa, nome) => doMercado(casa, nome)?.foto || "";
 
 function render() {
   mercadoPorChave = null;
@@ -258,7 +257,7 @@ function blocoSlot(s) {
     const hero = i === 0 && !custo;
     return `<article class="card ${hero ? "top1" : ""}" style="--i:${i};--cor:${corArq(t.arquetipo)}">
       ${hero ? `<span class="pos pos-hero">${arqIcone(t.arquetipo, 30)}<span class="n1">1</span></span>` : `<span class="pos">${i + 1}</span>`}
-      <div style="min-width:0" class="card-tx">${fotoMini(fotoDe(t.casa, t.nome), t.nome, hero ? "foto-hero" : "foto-mini")}<button class="nome" data-ficha="${esc(t.nome)}">${esc(t.nome)}</button>${tierHTML(t.tier)}<div class="casa">${esc(t.casa)} · ${arqTag(t.arquetipo, 13)}</div></div>
+      <div style="min-width:0" class="card-tx">${fotoMini(doMercado(t.casa, t.nome), hero ? "foto-hero" : "foto-mini")}<button class="nome" data-ficha="${esc(t.nome)}">${esc(t.nome)}</button>${tierHTML(t.tier)}<div class="casa">${esc(t.casa)} · ${arqTag(t.arquetipo, 13)}</div></div>
       <span class="score" title="Score">${t.score.toFixed(0)}</span>
       <div class="meta">${spraysHTML(t)}<span>vivo até <b>${t.vivo_fim ? "o fim" : "~" + fmtH(t.vivo_ate)}</b></span></div>
       <div class="pq">${esc(t.porque)}</div>
@@ -713,16 +712,15 @@ async function enviarFoto(input) {
   if (!arq) return;
   const rot = input.closest("label"); if (rot) rot.firstChild.textContent = "Enviando…";
   try {
-    const url = await subirFoto(casa, nome, await reduzirImagem(arq));
-    fotoNoCache(casa, nome, url);
-    toast(`Foto de ${nome} salva no seu Drive.`);
+    fotoNoCache(casa, nome, await subirFoto(casa, nome, await reduzirImagem(arq)));
+    toast(`Foto de ${nome} salva na planilha (aba Fotos).`);
   } catch (e) { toast(`Foto não salva: ${e.message}`); }
   render(); reabrirFicha?.();
 }
 
 async function removerFoto(id) {
   const [casa, nome] = id.split("||");
-  try { await editarNaPlanilha(casa, nome, { Foto: "" }); toast(`Foto de ${nome} removida (o arquivo continua no Drive).`); }
+  try { await removerFotoPlanilha(casa, nome); fotoNoCache(casa, nome, ""); toast(`Foto de ${nome} apagada da planilha.`); }
   catch (e) { toast(`Não removi: ${e.message}`); }
   render(); reabrirFicha?.();
 }
@@ -967,6 +965,7 @@ if ("serviceWorker" in navigator) {
   try { await carregarDados(); }
   catch (e) { $("#tela").innerHTML = `<p class="erro-txt">Não consegui carregar os dados da coleção (${esc(e.message)}).</p>`; return; }
   render();
+  iniciarFotos();
   await Promise.all([atualizarClima(), sincronizar({ silencioso: true })]);
   document.addEventListener("visibilitychange", () => {
     if (document.visibilityState !== "visible") return;

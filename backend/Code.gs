@@ -13,16 +13,17 @@
  *        inclusive casa/nome; tier e posse também vão para a aba Tiers) · adicionarMercado · removerMercado
  *        (tira só da aba Mercado; Tiers e Diário não mudam) · amostras (lê a aba Amostras) · adicionarAmostra (cria a
  *        aba no primeiro registro) · editarAmostra · removerAmostra (por ID; avaliação — tier, arquétipo etc. — fica
- *        na aba Mercado, ligada pela Casa + Perfume) · subirFoto (guarda a foto no Drive, na pasta "Perfumista Diário —
- *        Fotos", e grava o link na coluna Foto da aba Mercado; remover = editarMercado com Foto vazia).
+ *        na aba Mercado, ligada pela Casa + Perfume) · subirFoto (guarda a foto na aba Fotos desta planilha — nada de
+ *        Google Drive — e marca a coluna Foto da aba Mercado) · fotos (devolve as fotos pedidas) · removerFoto.
  * Regras da planilha: data como texto AAAA-MM-DD; campo vazio = ""; nunca editar ou apagar linhas existentes;
  * aba Frascos é só fórmula (nunca escrita aqui).
  */
 
 var ABA_TIERS = 'Tiers', ABA_DIARIO = 'Diário', ABA_FRASCOS = 'Frascos', ABA_MERCADO = 'Mercado';
 var COLS_MERCADO = ['Casa', 'Perfume', 'Tier', 'Posse', 'Arquétipo', 'Resumo', 'Topo', 'Coração', 'Base', 'Nariz', 'Wishlist', 'Atualizado em'];
-var EDITAVEIS = ['Tier', 'Posse', 'Arquétipo', 'Resumo', 'Topo', 'Coração', 'Base', 'Nariz', 'Wishlist', 'Notas', 'Foto'];
-var PASTA_FOTOS = 'Perfumista Diário — Fotos';
+var EDITAVEIS = ['Tier', 'Posse', 'Arquétipo', 'Resumo', 'Topo', 'Coração', 'Base', 'Nariz', 'Wishlist', 'Notas'];   // Foto: só por subirFoto/removerFoto
+var ABA_FOTOS = 'Fotos', COLS_FOTOS = ['Casa', 'Perfume', 'Versão', 'Tipo'];
+var PARTES_FOTO = 10, TAM_PARTE = 45000;   // célula aceita até 50 mil caracteres: a imagem (base64) vai em pedaços
 var COLS_DIARIO = ['Data', 'Slot', 'Perfume', 'Ocasião', 'Temp (°C)', 'Td (°C)', 'Sprays', 'NotaDia', 'Obs'];
 var ABA_AMOSTRAS = 'Amostras';
 var COLS_AMOSTRAS = ['ID', 'Casa', 'Perfume', 'Tipo', 'Volume (ml)', 'Origem', 'Status', 'Entrada', 'Saída', 'Motivo saída', 'Impressão', 'Obs', 'Atualizado em', 'Dono'];
@@ -50,6 +51,8 @@ function doPost(e) {
       case 'editarAmostra': return saida_(editarAmostra_(req.id, req.campos || {}));
       case 'removerAmostra': return saida_(removerAmostra_(req.id));
       case 'subirFoto': return saida_(subirFoto_(req.casa, req.perfume, req.imagem, req.tipo));
+      case 'fotos': return saida_({ ok: true, fotos: lerFotos_(req.itens || []) });
+      case 'removerFoto': return saida_(removerFoto_(req.casa, req.perfume));
       default: return saida_({ ok: false, erro: 'ação desconhecida' });
     }
   } catch (err) {
@@ -65,7 +68,6 @@ function configurar() {
     token = (Utilities.getUuid() + Utilities.getUuid()).replace(/-/g, '');
     props.setProperty('TOKEN', token);
   }
-  try { pastaFotos_(); } catch (err) { Logger.log('Fotos: rode também a função autorizarFotos para dar acesso ao Drive.'); }
   var url = ScriptApp.getService().getUrl();
   Logger.log('URL do App da Web: ' + (url || '(implante primeiro: Implantar → Nova implantação → App da Web)'));
   Logger.log('Token: ' + token);
@@ -208,7 +210,6 @@ function editarMercado_(casa, perfume, campos) {
     var aba = ss.getSheetByName(ABA_MERCADO);
     if (!aba) throw new Error('a aba Mercado ainda não existe');
     if (campos.Notas !== undefined) garantirColuna_(aba, 'Notas');
-    if (campos.Foto !== undefined) garantirColuna_(aba, 'Foto');
     var vals = aba.getDataRange().getDisplayValues(), cab = vals[0];
     var linha = acharLinha_(vals, casa, perfume);
     if (linha === -1) throw new Error('perfume não encontrado na aba Mercado: ' + casa + ' — ' + perfume);
@@ -221,6 +222,7 @@ function editarMercado_(casa, perfume, campos) {
       if (!novaCasa || !novoNome) throw new Error('casa e perfume não podem ficar vazios');
       if (acharLinha_(vals, novaCasa, novoNome) !== -1) throw new Error('já existe ' + novaCasa + ' — ' + novoNome + ' na aba Mercado');
       aba.getRange(linha, 1, 1, 2).setNumberFormat('@').setValues([[novaCasa, novoNome]]);
+      moverFoto_(casa, perfume, novaCasa, novoNome);
       mudou.push('Casa/Perfume');
     }
     EDITAVEIS.forEach(function (c) {
@@ -320,6 +322,7 @@ function removerMercado_(casa, perfume) {
     var linha = acharLinha_(aba.getDataRange().getDisplayValues(), casa, perfume);
     if (linha === -1) throw new Error('perfume não encontrado na aba Mercado: ' + casa + ' — ' + perfume);
     aba.deleteRow(linha);
+    moverFoto_(casa, perfume, null, null);
     SpreadsheetApp.flush();
     return { ok: true, removida: linha };
   } finally { lock.releaseLock(); }
@@ -434,23 +437,28 @@ function removerAmostra_(id) {
 }
 
 // ───────────────────────── fotos ─────────────────────────
-// A foto (JPEG já reduzido pelo app) vai para uma pasta do Drive do dono da planilha, com acesso "qualquer pessoa com o
-// link pode ver" (o app precisa carregar a imagem). O link vai para a coluna Foto da aba Mercado.
-/** Rode uma vez no editor (Executar ▶ autorizarFotos): pede a permissão do Google Drive que as fotos usam e cria a
- *  pasta. Depois, implante uma nova versão. */
-function autorizarFotos() {
-  // Na tela de consentimento com caixinhas, força o pedido do Drive se ele ficou desmarcado.
-  if (typeof ScriptApp.requireScopes === 'function') {
-    ScriptApp.requireScopes(ScriptApp.AuthMode.FULL, ['https://www.googleapis.com/auth/drive']);
-  }
-  var pasta = pastaFotos_();
-  Logger.log('Pasta das fotos: ' + pasta.getUrl());
-  return pasta.getUrl();
+// A foto (JPEG já reduzido pelo app) fica na aba Fotos desta planilha, em base64 dividido em pedaços, uma linha por
+// perfume (Casa + Perfume). Não usa o Google Drive: a única permissão é a desta planilha. Na aba Mercado, a coluna
+// Foto recebe só uma marca com data e hora (a "versão"), para o app saber que há foto e quando ela mudou.
+function abaFotos_(criar) {
+  var ss = SpreadsheetApp.getActive(), aba = ss.getSheetByName(ABA_FOTOS);
+  if (aba || !criar) return aba;
+  aba = ss.insertSheet(ABA_FOTOS);
+  var cab = COLS_FOTOS.slice();
+  for (var i = 1; i <= PARTES_FOTO; i++) cab.push('Imagem ' + i);
+  aba.getRange(1, 1, 1, cab.length).setValues([cab]).setFontWeight('bold');
+  aba.setFrozenRows(1);
+  aba.hideSheet();
+  return aba;
 }
 
-function pastaFotos_() {
-  var it = DriveApp.getFoldersByName(PASTA_FOTOS);
-  return it.hasNext() ? it.next() : DriveApp.createFolder(PASTA_FOTOS);
+/** Linha (1-based) da foto de casa+perfume na aba Fotos, ou -1. Lê só Casa e Perfume (as imagens são pesadas). */
+function linhaFoto_(aba, casa, perfume) {
+  var n = aba.getLastRow();
+  if (n < 2) return -1;
+  var vals = aba.getRange(1, 1, n, 2).getDisplayValues(), k = chave_(casa, perfume);
+  for (var i = 1; i < vals.length; i++) if (chave_(vals[i][0], vals[i][1]) === k) return i + 1;
+  return -1;
 }
 
 function subirFoto_(casa, perfume, imagem, tipo) {
@@ -458,22 +466,64 @@ function subirFoto_(casa, perfume, imagem, tipo) {
   tipo = String(tipo || 'image/jpeg');
   if (['image/jpeg', 'image/png', 'image/webp'].indexOf(tipo) === -1) throw new Error('tipo de imagem não aceito: ' + tipo);
   imagem = String(imagem || '');
-  if (!imagem || imagem.length > 8000000) throw new Error('imagem vazia ou grande demais');
+  if (!imagem || !/^[A-Za-z0-9+\/=]+$/.test(imagem)) throw new Error('imagem vazia ou inválida');
+  if (imagem.length > PARTES_FOTO * TAM_PARTE) throw new Error('imagem grande demais');
   var lock = LockService.getScriptLock(); lock.waitLock(20000);
   try {
     var aba = SpreadsheetApp.getActive().getSheetByName(ABA_MERCADO);
     if (!aba) throw new Error('a aba Mercado ainda não existe');
     var vals = aba.getDataRange().getDisplayValues(), linha = acharLinha_(vals, casa, perfume);
     if (linha === -1) throw new Error('perfume não encontrado na aba Mercado: ' + casa + ' — ' + perfume);
-    var nomeArq = (vals[linha - 1][0] + ' — ' + vals[linha - 1][1]).replace(/[\\/:*?"<>|]/g, ' ') + ' ' + hoje_() + (tipo === 'image/png' ? '.png' : tipo === 'image/webp' ? '.webp' : '.jpg');
-    var arq = pastaFotos_().createFile(Utilities.newBlob(Utilities.base64Decode(imagem), tipo, nomeArq));
-    arq.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
-    var url = 'https://drive.google.com/thumbnail?id=' + arq.getId() + '&sz=w1200';
+    casa = vals[linha - 1][0]; perfume = vals[linha - 1][1];
+    var versao = 'aba Fotos · ' + new Date().toISOString();
+    var partes = [];
+    for (var i = 0; i < PARTES_FOTO; i++) partes.push(imagem.slice(i * TAM_PARTE, (i + 1) * TAM_PARTE));
+    var fotos = abaFotos_(true), lf = linhaFoto_(fotos, casa, perfume);
+    if (lf === -1) lf = fotos.getLastRow() + 1;
+    fotos.getRange(lf, 1, 1, COLS_FOTOS.length + PARTES_FOTO).setNumberFormat('@').setValues([[casa, perfume, versao, tipo].concat(partes)]);
     garantirColuna_(aba, 'Foto');
     var cab = aba.getRange(1, 1, 1, aba.getLastColumn()).getDisplayValues()[0];
-    aba.getRange(linha, cab.indexOf('Foto') + 1).setNumberFormat('@').setValue(url);
+    aba.getRange(linha, cab.indexOf('Foto') + 1).setNumberFormat('@').setValue(versao);
     aba.getRange(linha, cab.indexOf('Atualizado em') + 1).setNumberFormat('@').setValue(hoje_());
     SpreadsheetApp.flush();
-    return { ok: true, url: url, linha: linha };
+    return { ok: true, versao: versao, linha: linha };
   } finally { lock.releaseLock(); }
+}
+
+/** itens = [{casa, perfume}] (até 12 por chamada) → [{casa, perfume, versao, tipo, imagem}] das que existem. */
+function lerFotos_(itens) {
+  var aba = abaFotos_(false), saida = [];
+  if (!aba) return saida;
+  itens.slice(0, 12).forEach(function (it) {
+    var lf = linhaFoto_(aba, it.casa, it.perfume);
+    if (lf === -1) return;
+    var l = aba.getRange(lf, 1, 1, COLS_FOTOS.length + PARTES_FOTO).getDisplayValues()[0];
+    saida.push({ casa: it.casa, perfume: it.perfume, versao: l[2], tipo: l[3], imagem: l.slice(COLS_FOTOS.length).join('') });
+  });
+  return saida;
+}
+
+/** Apaga a foto (linha da aba Fotos) e limpa a coluna Foto da aba Mercado. */
+function removerFoto_(casa, perfume) {
+  if (!casa || !perfume) throw new Error('casa e perfume são obrigatórios');
+  var lock = LockService.getScriptLock(); lock.waitLock(20000);
+  try {
+    var fotos = abaFotos_(false), lf = fotos ? linhaFoto_(fotos, casa, perfume) : -1;
+    if (lf !== -1) fotos.deleteRow(lf);
+    var aba = SpreadsheetApp.getActive().getSheetByName(ABA_MERCADO);
+    if (aba) {
+      var vals = aba.getDataRange().getDisplayValues(), linha = acharLinha_(vals, casa, perfume), col = vals[0].indexOf('Foto');
+      if (linha !== -1 && col !== -1) aba.getRange(linha, col + 1).setNumberFormat('@').setValue('');
+    }
+    SpreadsheetApp.flush();
+    return { ok: true, apagada: lf !== -1 };
+  } finally { lock.releaseLock(); }
+}
+
+/** Quando o perfume muda de casa/nome ou sai da aba Mercado, a foto acompanha (ou é apagada). */
+function moverFoto_(casa, perfume, novaCasa, novoNome) {
+  var fotos = abaFotos_(false), lf = fotos ? linhaFoto_(fotos, casa, perfume) : -1;
+  if (lf === -1) return;
+  if (novaCasa === null) fotos.deleteRow(lf);
+  else fotos.getRange(lf, 1, 1, 2).setNumberFormat('@').setValues([[novaCasa, novoNome]]);
 }

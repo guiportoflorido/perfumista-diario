@@ -1,4 +1,5 @@
-// Fotos: só links https entram na página; ficha mostra foto e botões conforme edição; miniatura some sem foto.
+// Fotos: links https antigos entram direto; foto da aba Fotos vira marca para buscar na planilha; ficha mostra botões
+// conforme edição; miniatura some sem foto.
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { fotoSegura, fotoFicha, fotoMini } from "../app/fotos.js";
@@ -19,7 +20,17 @@ test("ficha: com foto mostra imagem + Trocar/Remover; sem foto e editável mostr
   assert.match(fotoFicha({ nome: "X" }, { editavel: true, id: "A||X" }), /Adicionar foto/);
   assert.equal(fotoFicha({ nome: "X" }, {}), "");
   assert.match(fotoFicha({ nome: "X" }, { motivo: "conecte a planilha" }), /conecte a planilha/);
-  assert.equal(fotoMini("", "X"), ""); assert.match(fotoMini(URL, "X", "foto-hero"), /class="foto-hero"/);
+  assert.equal(fotoMini({ nome: "X", foto: "" }), ""); assert.match(fotoMini({ nome: "X", foto: URL }, "foto-hero"), /class="foto-hero" src="https/);
+});
+
+test("foto guardada na aba Fotos: <img> sem src, marcada com casa||nome e versão (o app busca depois)", () => {
+  const p = { casa: "Amouage", nome: "Decision", foto: "aba Fotos · 2026-10-14T12:00:00.000Z" };
+  const h = fotoFicha(p, { editavel: true, id: "Amouage||Decision" });
+  assert.match(h, /<img data-foto-planilha="Amouage\|\|Decision" data-foto-v="aba Fotos · 2026-10-14T12:00:00.000Z" alt="Foto de Decision"/);
+  assert.doesNotMatch(h, /src=/); assert.match(h, /Trocar foto/);
+  assert.match(fotoMini(p), /class="foto-mini" data-foto-planilha="Amouage\|\|Decision"/);
+  assert.equal(fotoMini({ nome: "Decision", foto: "aba Fotos · x" }), "");   // sem casa não dá para buscar
+  assert.doesNotMatch(fotoMini({ casa: 'A"><b>', nome: "x", foto: "v" }), /"><b>/);
 });
 
 test("aba Mercado: coluna Foto vira p.foto e aparece na ficha", () => {

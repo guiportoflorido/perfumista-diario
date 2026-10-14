@@ -71,12 +71,12 @@ export async function editarNaPlanilha(casa, perfume, campos) {
   return j;
 }
 
-/** Depois do upload: grava o link da foto na cópia local da aba Mercado (sem baixar tudo de novo). */
-export function fotoNoCache(casa, perfume, url) {
+/** Depois de enviar/apagar: grava a versão da foto ("" = sem foto) na cópia local da aba Mercado (sem baixar tudo de novo). */
+export function fotoNoCache(casa, perfume, versao) {
   mexerCache((linhas, cab) => {
     garantirCol(linhas, cab, "Foto");
     const k = chave(casa, perfume), row = linhas.find((r, i) => i > 0 && chave(r[cab.indexOf("Casa")], r[cab.indexOf("Perfume")]) === k);
-    if (row) row[cab.indexOf("Foto")] = url;
+    if (row) row[cab.indexOf("Foto")] = versao;
   });
 }
 
