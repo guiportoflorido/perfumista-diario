@@ -65,6 +65,7 @@ function configurar() {
     token = (Utilities.getUuid() + Utilities.getUuid()).replace(/-/g, '');
     props.setProperty('TOKEN', token);
   }
+  try { pastaFotos_(); } catch (err) { Logger.log('Fotos: rode também a função autorizarFotos para dar acesso ao Drive.'); }
   var url = ScriptApp.getService().getUrl();
   Logger.log('URL do App da Web: ' + (url || '(implante primeiro: Implantar → Nova implantação → App da Web)'));
   Logger.log('Token: ' + token);
@@ -435,6 +436,14 @@ function removerAmostra_(id) {
 // ───────────────────────── fotos ─────────────────────────
 // A foto (JPEG já reduzido pelo app) vai para uma pasta do Drive do dono da planilha, com acesso "qualquer pessoa com o
 // link pode ver" (o app precisa carregar a imagem). O link vai para a coluna Foto da aba Mercado.
+/** Rode uma vez no editor (Executar ▶ autorizarFotos): pede a permissão do Google Drive que as fotos usam e cria a
+ *  pasta. Depois, implante uma nova versão. */
+function autorizarFotos() {
+  var pasta = pastaFotos_();
+  Logger.log('Pasta das fotos: ' + pasta.getUrl());
+  return pasta.getUrl();
+}
+
 function pastaFotos_() {
   var it = DriveApp.getFoldersByName(PASTA_FOTOS);
   return it.hasNext() ? it.next() : DriveApp.createFolder(PASTA_FOTOS);
