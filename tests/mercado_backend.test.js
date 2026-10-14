@@ -72,20 +72,45 @@ test("remover tira só da aba Mercado", () => {
   assert.equal(b.post({ token: "dev", acao: "removerMercado", casa: "Amouage", perfume: "Decision" }).ok, false);
 });
 
-test("subirFoto: guarda no Drive (pasta própria, link público de leitura) e grava o link na coluna Foto; remover = Foto vazia", () => {
+test("fotos: ficam na aba Fotos da planilha (sem Drive), em pedaços; Mercado guarda só a versão; renomear e remover acompanham", () => {
   const b = novo();
-  b.post({ token: "dev", acao: "criarMercado", linhas: [L("Amouage", "Decision", "S", "Frasco Gui")] });
+  b.post({ token: "dev", acao: "criarMercado", linhas: [L("Amouage", "Decision", "S", "Frasco Gui"), L("Amouage", "Search")] });
   assert.equal(b.post({ token: "dev", acao: "subirFoto", casa: "Amouage", perfume: "Nada", imagem: "AAAA" }).ok, false);
   assert.equal(b.post({ token: "dev", acao: "subirFoto", casa: "Amouage", perfume: "Decision", imagem: "AAAA", tipo: "image/gif" }).ok, false);
-  const r = b.post({ token: "dev", acao: "subirFoto", casa: "amouage", perfume: "decision", imagem: Buffer.from("jpeg").toString("base64"), tipo: "image/jpeg" });
-  assert.equal(r.ok, true); assert.match(r.url, /^https:\/\/drive\.google\.com\/thumbnail\?id=arq1&sz=w1200$/);
+  assert.equal(b.post({ token: "dev", acao: "subirFoto", casa: "Amouage", perfume: "Decision", imagem: "<script>" }).ok, false);
+  assert.equal(b.post({ token: "dev", acao: "subirFoto", casa: "Amouage", perfume: "Decision", imagem: "A".repeat(450001) }).ok, false);
+  const img = "QUJD".repeat(30000);   // 120 mil caracteres → 3 pedaços
+  const r = b.post({ token: "dev", acao: "subirFoto", casa: "amouage", perfume: "decision", imagem: img, tipo: "image/jpeg" });
+  assert.equal(r.ok, true); assert.match(r.versao, /^aba Fotos · \d{4}-/);
   const cab = b.abas.Mercado[0];
-  assert.equal(cab.at(-1), "Foto"); assert.equal(b.abas.Mercado[1][cab.indexOf("Foto")], r.url);
-  const drive = b.ctx.DriveApp;
-  assert.equal(drive.pastas.length, 1); assert.equal(drive.pastas[0].nome, "Perfumista Diário — Fotos");
-  assert.deepEqual(drive.arquivos[0].acesso, ["link", "ver"]); assert.match(drive.arquivos[0].nome, /^Amouage — Decision 2026-10-09\.jpg$/);
-  b.post({ token: "dev", acao: "subirFoto", casa: "Amouage", perfume: "Decision", imagem: "AAAA" });
-  assert.equal(drive.pastas.length, 1);   // reaproveita a pasta
-  assert.equal(b.post({ token: "dev", acao: "editarMercado", casa: "Amouage", perfume: "Decision", campos: { Foto: "" } }).ok, true);
-  assert.equal(b.abas.Mercado[1][cab.indexOf("Foto")], "");
+  assert.equal(cab.at(-1), "Foto"); assert.equal(b.abas.Mercado[1][cab.indexOf("Foto")], r.versao);
+  const f = b.abas.Fotos;
+  assert.deepEqual(f[0].slice(0, 5), ["Casa", "Perfume", "Versão", "Tipo", "Imagem 1"]); assert.equal(f[0].length, 14);
+  assert.deepEqual(f[1].slice(0, 2), ["Amouage", "Decision"]);   // nomes da planilha, não os digitados
+  assert.ok(f[1].every(c => String(c).length <= 45000));
+  let [lida] = b.post({ token: "dev", acao: "fotos", itens: [{ casa: "Amouage", perfume: "Decision" }, { casa: "Amouage", perfume: "Search" }] }).fotos;
+  assert.equal(lida.imagem, img); assert.equal(lida.versao, r.versao); assert.equal(lida.tipo, "image/jpeg");
+  b.post({ token: "dev", acao: "subirFoto", casa: "Amouage", perfume: "Decision", imagem: "AAAA" });   // trocar: mesma linha, pedaços velhos somem
+  assert.equal(f.length, 2);
+  assert.equal(b.post({ token: "dev", acao: "fotos", itens: [{ casa: "Amouage", perfume: "Decision" }] }).fotos[0].imagem, "AAAA");
+  // renomear o perfume leva a foto junto
+  b.post({ token: "dev", acao: "editarMercado", casa: "Amouage", perfume: "Decision", campos: { Perfume: "Decision EDP" } });
+  assert.equal(b.post({ token: "dev", acao: "fotos", itens: [{ casa: "Amouage", perfume: "Decision EDP" }] }).fotos.length, 1);
+  // Foto não se edita por editarMercado
+  b.post({ token: "dev", acao: "editarMercado", casa: "Amouage", perfume: "Decision EDP", campos: { Foto: "" } });
+  assert.notEqual(b.abas.Mercado[1][cab.indexOf("Foto")], "");
+  // remover a foto apaga a linha e limpa a coluna
+  assert.equal(b.post({ token: "dev", acao: "removerFoto", casa: "Amouage", perfume: "Decision EDP" }).apagada, true);
+  assert.equal(f.length, 1); assert.equal(b.abas.Mercado[1][cab.indexOf("Foto")], "");
+  // tirar o perfume do Mercado apaga a foto dele
+  b.post({ token: "dev", acao: "subirFoto", casa: "Amouage", perfume: "Search", imagem: "AAAA" });
+  b.post({ token: "dev", acao: "removerMercado", casa: "Amouage", perfume: "Search" });
+  assert.equal(f.length, 1);
+});
+
+test("Code.gs não usa o Google Drive (só a permissão da própria planilha)", async () => {
+  const { readFileSync } = await import("node:fs");
+  const codigo = readFileSync(new URL("../backend/Code.gs", import.meta.url), "utf8").replace(/\/\/.*$|\/\*[\s\S]*?\*\//gm, "");
+  assert.doesNotMatch(codigo, /DriveApp|DocumentApp|GmailApp|requireScopes/);
+  assert.match(readFileSync(new URL("../backend/Code.gs", import.meta.url), "utf8"), /^\/\*\* @OnlyCurrentDoc \*\//);
 });
