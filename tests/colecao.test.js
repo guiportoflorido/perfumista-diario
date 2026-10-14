@@ -20,3 +20,14 @@ test("Coleção lista grade, camada custo e fora da grade; filtro Camada separa"
   assert.match(telaColecao(ctx({ camada: "custo" })), /<td class="cc-num">1 <span class="nota">☀︎1 ☾0<\/span><\/td>/);   // uso do custo contado
   assert.match(telaColecao(ctx({ camada: "custo" })), /<td class="cc-num">—<\/td>/);   // sem janelas no playbook
 });
+
+test("Roda: camada custo entra com contorno tracejado e pode ser ocultada; tier D fica fora", async () => {
+  const { rodaSVG, telaRoda } = await import("../app/roda.js");
+  const arquetipos = [{ nome: "Monge", cor: "#123456" }];
+  const pontos = h => [...h.matchAll(/data-fr="([^"]+)"/g)].map(m => m[1]);
+  const com = rodaSVG({ frascos, arquetipos, gaps: [], verGaps: false, usosPor: new Map() });
+  assert.deepEqual(pontos(com).sort(), ["Custo A", "Grade S"]);
+  assert.match(com, /class="r-fr r-custo" data-fr="Custo A"/);
+  assert.deepEqual(pontos(rodaSVG({ frascos, arquetipos, gaps: [], verGaps: false, usosPor: new Map(), comCusto: false })), ["Grade S"]);
+  assert.match(telaRoda({ frascos, arquetipos, gaps: [], verGaps: false, usosPor: new Map(), comCusto: true }), /Ocultar camada custo \(1\)/);
+});

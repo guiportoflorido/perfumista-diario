@@ -71,3 +71,21 @@ test("remover tira só da aba Mercado", () => {
   assert.equal(b.abas.Tiers.length, 2);
   assert.equal(b.post({ token: "dev", acao: "removerMercado", casa: "Amouage", perfume: "Decision" }).ok, false);
 });
+
+test("subirFoto: guarda no Drive (pasta própria, link público de leitura) e grava o link na coluna Foto; remover = Foto vazia", () => {
+  const b = novo();
+  b.post({ token: "dev", acao: "criarMercado", linhas: [L("Amouage", "Decision", "S", "Frasco Gui")] });
+  assert.equal(b.post({ token: "dev", acao: "subirFoto", casa: "Amouage", perfume: "Nada", imagem: "AAAA" }).ok, false);
+  assert.equal(b.post({ token: "dev", acao: "subirFoto", casa: "Amouage", perfume: "Decision", imagem: "AAAA", tipo: "image/gif" }).ok, false);
+  const r = b.post({ token: "dev", acao: "subirFoto", casa: "amouage", perfume: "decision", imagem: Buffer.from("jpeg").toString("base64"), tipo: "image/jpeg" });
+  assert.equal(r.ok, true); assert.match(r.url, /^https:\/\/drive\.google\.com\/thumbnail\?id=arq1&sz=w1200$/);
+  const cab = b.abas.Mercado[0];
+  assert.equal(cab.at(-1), "Foto"); assert.equal(b.abas.Mercado[1][cab.indexOf("Foto")], r.url);
+  const drive = b.ctx.DriveApp;
+  assert.equal(drive.pastas.length, 1); assert.equal(drive.pastas[0].nome, "Perfumista Diário — Fotos");
+  assert.deepEqual(drive.arquivos[0].acesso, ["link", "ver"]); assert.match(drive.arquivos[0].nome, /^Amouage — Decision 2026-10-09\.jpg$/);
+  b.post({ token: "dev", acao: "subirFoto", casa: "Amouage", perfume: "Decision", imagem: "AAAA" });
+  assert.equal(drive.pastas.length, 1);   // reaproveita a pasta
+  assert.equal(b.post({ token: "dev", acao: "editarMercado", casa: "Amouage", perfume: "Decision", campos: { Foto: "" } }).ok, true);
+  assert.equal(b.abas.Mercado[1][cab.indexOf("Foto")], "");
+});

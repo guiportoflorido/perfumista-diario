@@ -12,19 +12,20 @@ import { telaRoda } from "./roda.js";
 import { ordsDe, tocarOrd, mudarOrds } from "./util.js";
 import { definirCores, arqTag, arqIcone, corArq } from "./icones.js";
 import { ceuHTML, abrirRoleta, animarSpray } from "./diversao.js";
-import { chave as mercadoChave, telaMercado, fichaEditavel, camposAlterados, baseComTiers, deLinhas, linhasParaCriar, cachePlanilha, baixarMercado, criarNaPlanilha, editarNaPlanilha, adicionarNaPlanilha, removerNaPlanilha } from "./mercado.js";
+import { chave as mercadoChave, telaMercado, fichaEditavel, camposAlterados, baseComTiers, deLinhas, linhasParaCriar, cachePlanilha, baixarMercado, criarNaPlanilha, editarNaPlanilha, adicionarNaPlanilha, removerNaPlanilha, fotoNoCache } from "./mercado.js";
 import { contagens } from "./estatisticas.js";
 import { telaAmostras, fichaAmostra, deLinhas as amostrasDeLinhas, juntar, semRegistro, camposAmostra, camposAvaliacaoMexidos, cacheAmostras, baixarAmostras,
   adicionarAmostra, editarAmostra, removerAmostra, novoId, normalizar } from "./amostras.js";
 import { ler, gravar } from "./store.js";
+import { fotoFicha, fotoMini, reduzirImagem, subirFoto } from "./fotos.js";
 
-export const APP_VERSAO = "5.14";  // sobe a cada publicação: confere no topo da tela se o celular pegou a versão nova
+export const APP_VERSAO = "5.16";  // sobe a cada publicação: confere no topo da tela se o celular pegou a versão nova
 const S = { aba: "hoje", frascos: [], frascosAtivos: [], avisosTiers: null, fichas: {}, versao: {}, prev: null, prevOffline: false,
   prevErro: null, metar: null, metarMotivo: null, clima: null, resultado: null, erroMotor: null, entrada: "", carregandoClima: true,
   sync: { estado: "ocioso", msg: "" }, hr: ler("hr", { preset: "tudo" }), tokenNovo: null, playbook: null, janelas: new Map(),
   filtro: ler("filtro", {}), pbFaixa: null, arquetipos: [], gaps: [], colModo: ler("colModo", "roda") === "lista" ? "lista" : "roda", sim: null, verGaps: false,
   mercadoBase: null, mercadoErro: null, mf: ler("mf", {}), mfLimite: 60, mercadoBaixado: false, criandoMercado: false, salvandoMercado: false,
-  am: ler("am", {}), amBaixando: false, amBaixadas: false, amErro: null };
+  rodaCusto: ler("rodaCusto", true), am: ler("am", {}), amBaixando: false, amBaixadas: false, amErro: null };
 const ajSpray = () => ler("sprays_ajuste", { ativo: false, geral: 0, por: {} });
 const $ = (s, el = document) => el.querySelector(s);
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
@@ -109,7 +110,19 @@ function erroHTML(e, onde) {
 window.addEventListener("error", e => toast(`Erro: ${e.message}`));
 window.addEventListener("unhandledrejection", e => toast(`Erro: ${e.reason?.message || e.reason}`));
 
+/** Perfumes da aba Mercado (cópia local) por casa+nome, para fotos fora das abas Mercado/Amostras. Refeito a cada render. */
+let mercadoPorChave = null;
+function doMercado(casa, nome) {
+  if (!mercadoPorChave) {
+    const c = cachePlanilha();
+    mercadoPorChave = new Map(c?.existe ? deLinhas(c.linhas, planilha().tiers).map(p => [mercadoChave(p.casa, p.nome), p]) : []);
+  }
+  return mercadoPorChave.get(mercadoChave(casa, nome)) || null;
+}
+const fotoDe = (casa, nome) => doMercado(casa, nome)?.foto || "";
+
 function render() {
+  mercadoPorChave = null;
   document.querySelectorAll("#abas button").forEach(b => {
     if (b.dataset.aba === S.aba) b.setAttribute("aria-current", "page"); else b.removeAttribute("aria-current");
   });
@@ -245,7 +258,7 @@ function blocoSlot(s) {
     const hero = i === 0 && !custo;
     return `<article class="card ${hero ? "top1" : ""}" style="--i:${i};--cor:${corArq(t.arquetipo)}">
       ${hero ? `<span class="pos pos-hero">${arqIcone(t.arquetipo, 30)}<span class="n1">1</span></span>` : `<span class="pos">${i + 1}</span>`}
-      <div style="min-width:0"><button class="nome" data-ficha="${esc(t.nome)}">${esc(t.nome)}</button>${tierHTML(t.tier)}<div class="casa">${esc(t.casa)} · ${arqTag(t.arquetipo, 13)}</div></div>
+      <div style="min-width:0" class="card-tx">${fotoMini(fotoDe(t.casa, t.nome), t.nome, hero ? "foto-hero" : "foto-mini")}<button class="nome" data-ficha="${esc(t.nome)}">${esc(t.nome)}</button>${tierHTML(t.tier)}<div class="casa">${esc(t.casa)} · ${arqTag(t.arquetipo, 13)}</div></div>
       <span class="score" title="Score">${t.score.toFixed(0)}</span>
       <div class="meta">${spraysHTML(t)}<span>vivo até <b>${t.vivo_fim ? "o fim" : "~" + fmtH(t.vivo_ate)}</b></span></div>
       <div class="pq">${esc(t.porque)}</div>
@@ -288,9 +301,8 @@ function telaColecaoTudo(ctx) {
   let corpo;
   if (S.colModo === "lista") corpo = telaColecao(ctx);
   else {
-    const usosPor = new Map([...contagens(ctx.hist, ctx.frascos, ctx.hoje).por.values()].map(c => [c.f.nome, c.n30]));
-    const dia = S.resultado?.slots[0];
-    corpo = telaRoda({ frascos: ctx.frascos, arquetipos: S.arquetipos, gaps: S.gaps, verGaps: S.verGaps, usosPor });
+    const usosPor = new Map([...contagens(ctx.hist, ctx.frascos, ctx.hoje, { todos: true }).por.values()].map(c => [c.f.nome, c.n30]));
+    corpo = telaRoda({ frascos: ctx.frascos, arquetipos: S.arquetipos, gaps: S.gaps, verGaps: S.verGaps, usosPor, comCusto: S.rodaCusto });
   }
   return `<h2>Coleção</h2>
   <div class="segmentos" role="tablist">${modos.map(([v, r]) => `<button role="tab" data-colmodo="${v}" aria-selected="${S.colModo === v}">${r}</button>`).join("")}</div>
@@ -382,6 +394,7 @@ function telaAmostrasAba() {
 }
 
 function abrirAmostra(id, { prefixo = null, confirmarRemover = false } = {}) {
+  if (id !== null) reabrirFicha = () => abrirAmostra(id);
   const novo = id === null;
   let a;
   if (novo) {
@@ -595,13 +608,17 @@ function telaAjustes() {
 }
 
 // ───────────────────────── ficha ─────────────────────────
+let reabrirFicha = null;   // reabre a ficha aberta depois de enviar/remover foto
 function abrirFicha(nome) {
+  reabrirFicha = () => abrirFicha(nome);
   const f = S.frascosAtivos.find(x => x.nome === nome) || S.frascos.find(x => x.nome === nome), fi = S.fichas[nome];
   if (!f || !fi) return;
   const usos = historico().filter(r => r.perfume === nome);
   const ult = usos[usos.length - 1];
   $("#folha").innerHTML = `<div class="veu" data-fechar><div class="folha" role="dialog" aria-modal="true" aria-labelledby="fichaT">
     <div class="linha-flex"><span class="ficha-ic">${arqIcone(f.arquetipo, 34)}</span><h2 id="fichaT">${esc(nome)}</h2>${tierHTML(f.tier)}<span class="esp"></span><button class="btn sec peq" data-fechar>Fechar</button></div>
+    ${(() => { const m = doMercado(f.casa, nome); return fotoFicha(m || { nome }, { editavel: Boolean(m && configurado()), id: m ? m.casa + "||" + m.nome : "",
+      motivo: m ? "" : "Para pôr foto, o frasco precisa estar na aba Mercado da planilha com a mesma casa e nome." }); })()}
     <p class="nota ficha-sub">${esc(f.casa)} · ${esc(fi.conc)} · ${arqTag(f.arquetipo)}</p>
     <dl class="kv">
       <dt>Pirâmide</dt><dd>${esc(fi.perfil)} <span class="nota">· fonte: ${esc(S.versao.fichas)}</span></dd>
@@ -626,6 +643,7 @@ function janelasHTML(nome) {
   return `<ul class="janelas">${[...porFaixa.entries()].sort((a, b) => a[0] - b[0]).map(([i, l]) => `<li>${faixaHTML(i)}: ${l.map(j => `${ROT_OC[j.ocasiao]}${j.papel !== "Também" ? ` <b>(${j.papel})</b>` : ""}`).join(", ")}</li>`).join("")}</ul>`;
 }
 function abrirMercado(id, { confirmarRemover = false } = {}) {
+  if (id !== null) reabrirFicha = () => abrirMercado(id);
   const novo = id === null;
   const p = novo ? {} : (listaMercado().lista || []).find(x => x.casa + "||" + x.nome === id);
   if (!p) return;
@@ -689,11 +707,32 @@ async function criarMercado() {
 
 function fecharFolha() { $("#folha").innerHTML = ""; }
 
+// ───────────────────────── fotos ─────────────────────────
+async function enviarFoto(input) {
+  const arq = input.files?.[0], [casa, nome] = input.dataset.foto.split("||");
+  if (!arq) return;
+  const rot = input.closest("label"); if (rot) rot.firstChild.textContent = "Enviando…";
+  try {
+    const url = await subirFoto(casa, nome, await reduzirImagem(arq));
+    fotoNoCache(casa, nome, url);
+    toast(`Foto de ${nome} salva no seu Drive.`);
+  } catch (e) { toast(`Foto não salva: ${e.message}`); }
+  render(); reabrirFicha?.();
+}
+
+async function removerFoto(id) {
+  const [casa, nome] = id.split("||");
+  try { await editarNaPlanilha(casa, nome, { Foto: "" }); toast(`Foto de ${nome} removida (o arquivo continua no Drive).`); }
+  catch (e) { toast(`Não removi: ${e.message}`); }
+  render(); reabrirFicha?.();
+}
+
 // ───────────────────────── eventos ─────────────────────────
 function mudarDia(fn) { const d = estadoDia(); fn(d); salvarDia(d); recalcular(); }
 
 document.addEventListener("click", async e => {
   if (e.target.closest("label.ed, select[data-ed], select[data-am-status], select[data-am-dono]")) return;   // seletores na linha: não abrir a ficha
+  if (e.target.closest("label")?.querySelector("input[data-foto]")) return;   // seletor de foto: o navegador abre a câmera/galeria
   const b = e.target.closest("button, [data-fechar], [data-ficha], [data-merc], [data-amostra]");
   if (!b) return;
   if (b.closest("#abas")) { S.aba = b.dataset.aba; render(); window.scrollTo(0, 0); return; }
@@ -706,6 +745,7 @@ document.addEventListener("click", async e => {
   if (b.dataset.hr) { S.hr = { ...S.hr, preset: b.dataset.hr }; gravar("hr", S.hr); render(); return; }
   if (b.dataset.edWish) { const p = (listaMercado().lista || []).find(x => x.casa + "||" + x.nome === b.dataset.edWish); if (p) editarCelula(b, p, "Wishlist", p.wish ? "" : "✓"); return; }
   if (b.dataset.merc) { S.confirmandoRemocao = false; abrirMercado(b.dataset.merc); return; }
+  if (b.dataset.fotoRemover) { removerFoto(b.dataset.fotoRemover); return; }
   if (b.dataset.amostra) { S.confirmandoRemocao = false; abrirAmostra(b.dataset.amostra); return; }
   if (b.dataset.amNova) { S.confirmandoRemocao = false; abrirAmostra(null, { prefixo: b.dataset.amNova }); return; }
   if (b.dataset.am) { S.am = { ...S.am, [b.dataset.am]: b.dataset.v }; gravar("am", S.am); render(); return; }
@@ -744,6 +784,7 @@ document.addEventListener("click", async e => {
   else if (acao === "restaurar") { salvarAjustes({}); toast("Ajustes restaurados."); render(); atualizarClima(); }
   else if (acao === "sync") sincronizar();
   else if (acao === "ver-gaps") { S.verGaps = !S.verGaps; render(); }
+  else if (acao === "roda-custo") { S.rodaCusto = !S.rodaCusto; gravar("rodaCusto", S.rodaCusto); render(); }
   else if (acao === "mf-mais") { S.mfLimite += 120; render(); }
   else if (acao === "criar-mercado") criarMercado();
   else if (acao === "novo-mercado") { S.confirmandoRemocao = false; abrirMercado(null); }
@@ -783,6 +824,7 @@ document.addEventListener("click", async e => {
 document.addEventListener("change", e => {
   const el = e.target;
   if (el.dataset.ov) { const k = el.dataset.ov, v = el.value.trim().replace(",", "."); mudarDia(d => { if (v === "") delete d.override[k]; else d.override[k] = v.toLowerCase() === "nd" ? "nd" : v; }); return; }
+  if (el.dataset.foto !== undefined && el.type === "file") { enviarFoto(el); return; }
   if (el.dataset.amStatus) { mudarStatusAmostra(el, el.dataset.amStatus, el.value); return; }
   if (el.id === "am-tipo") { S.am = { ...S.am, tipo: el.value }; gravar("am", S.am); render(); return; }
   if (el.id?.startsWith("amf-")) { S.am = { ...S.am, [el.id.slice(4)]: el.value }; gravar("am", S.am); render(); return; }
@@ -844,12 +886,12 @@ function previaRoda(g) {
   $("#roda")?.classList.add("focando");
   const nome = g.dataset.fr, f = S.frascosAtivos.find(x => x.nome === nome), fi = S.fichas[nome];
   if (!f) return;
-  const k = contagens(historico(), S.frascosAtivos, hojeISO()).por.get(nome);
+  const k = contagens(historico(), S.frascosAtivos, hojeISO(), { todos: true }).por.get(nome);
   const quando = k?.dias == null ? "sem registro" : k.dias === 0 ? "hoje" : k.dias === 1 ? "ontem" : `há ${k.dias} d`;
   box.innerHTML = `<button class="prev-in" data-ficha="${esc(nome)}">
     <span class="prev-ic">${arqIcone(f.arquetipo, 30)}</span>
     <span class="prev-tx"><b>${esc(nome)}</b>${tierHTML(f.tier)}<span class="nota">${esc(f.casa)} · ${esc(f.arquetipo)}</span>
-      <span class="prev-meta">${k?.n30 || 0} uso${k?.n30 === 1 ? "" : "s"} em 30 d · último ${quando} · ${f.janelas} janelas</span>
+      <span class="prev-meta">${k?.n30 || 0} uso${k?.n30 === 1 ? "" : "s"} em 30 d · último ${quando} · ${f.camada === "custo" ? "camada custo (academia/corrida)" : `${f.janelas} janelas`}</span>
       ${fi?.perfil ? `<span class="prev-perfil">${esc(fi.perfil)}</span>` : ""}</span>
     <span class="prev-abrir">Abrir ›</span></button>`;
   box.hidden = false;

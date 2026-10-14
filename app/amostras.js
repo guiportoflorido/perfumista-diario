@@ -6,6 +6,7 @@ import { arqTag, arqIcone } from "./icones.js";
 import { chamar } from "./api.js";
 import { ler, gravar } from "./store.js";
 import { chave, POSSES_EDIT, celTier, celPosse, celArq, celWish, posseRot } from "./mercado.js";
+import { fotoFicha } from "./fotos.js";
 
 export const COLS = ["ID", "Casa", "Perfume", "Tipo", "Volume (ml)", "Origem", "Status", "Entrada", "Saída", "Motivo saída", "Impressão", "Obs", "Atualizado em", "Dono"];
 export const DONOS = ["Gui", "Bia"];
@@ -219,6 +220,7 @@ export function fichaAmostra(a, { arquetipos, nomes, novo, podeAvaliar, confirma
   const posse = m?.posse ?? "", possePadrao = novo && (!posse || posse === "Avaliado") ? "Amostra" : posse;
   const posses = POSSES_EDIT.map(x => [x, x || "—"]).concat(!posse || POSSES_EDIT.includes(posse) ? [] : [[posse, posse]]);
   return `<div class="linha-flex">${m?.arquetipo ? `<span class="ficha-ic">${arqIcone(m.arquetipo, 34)}</span>` : ""}<h2 id="fichaT">${novo ? "Entrada de amostra" : esc(a.nome)}</h2>${m?.tier && !novo ? tierHTML(m.tier) : ""}<span class="esp"></span><button class="btn sec peq" data-fechar>Fechar</button></div>
+    ${novo ? "" : fotoFicha(m || {}, { editavel: Boolean(podeAvaliar && m), id: m ? m.casa + "||" + m.nome : "", motivo: m ? "" : "Sem linha na aba Mercado: a foto fica no perfume do Mercado." })}
     ${novo ? `<p class="nota">Vai para a aba Amostras da planilha. Mesma casa e nome da aba Mercado ligam a avaliação.</p>`
       : `<p class="nota">${esc(a.casa)}${a.atualizado ? ` · editada em ${esc(a.atualizado)}` : ""}${usos ? ` · ${usos} uso${usos > 1 ? "s" : ""} no diário` : ""}</p>`}
     <form class="bloco" id="formAmostra" data-id="${esc(a.id || "")}" data-novo="${novo ? 1 : ""}">
