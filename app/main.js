@@ -18,13 +18,13 @@ import { telaAmostras, fichaAmostra, deLinhas as amostrasDeLinhas, juntar, semRe
   adicionarAmostra, editarAmostra, removerAmostra, novoId, normalizar } from "./amostras.js";
 import { ler, gravar } from "./store.js";
 
-export const APP_VERSAO = "5.14";  // sobe a cada publicação: confere no topo da tela se o celular pegou a versão nova
+export const APP_VERSAO = "5.15";  // sobe a cada publicação: confere no topo da tela se o celular pegou a versão nova
 const S = { aba: "hoje", frascos: [], frascosAtivos: [], avisosTiers: null, fichas: {}, versao: {}, prev: null, prevOffline: false,
   prevErro: null, metar: null, metarMotivo: null, clima: null, resultado: null, erroMotor: null, entrada: "", carregandoClima: true,
   sync: { estado: "ocioso", msg: "" }, hr: ler("hr", { preset: "tudo" }), tokenNovo: null, playbook: null, janelas: new Map(),
   filtro: ler("filtro", {}), pbFaixa: null, arquetipos: [], gaps: [], colModo: ler("colModo", "roda") === "lista" ? "lista" : "roda", sim: null, verGaps: false,
   mercadoBase: null, mercadoErro: null, mf: ler("mf", {}), mfLimite: 60, mercadoBaixado: false, criandoMercado: false, salvandoMercado: false,
-  am: ler("am", {}), amBaixando: false, amBaixadas: false, amErro: null };
+  rodaCusto: ler("rodaCusto", true), am: ler("am", {}), amBaixando: false, amBaixadas: false, amErro: null };
 const ajSpray = () => ler("sprays_ajuste", { ativo: false, geral: 0, por: {} });
 const $ = (s, el = document) => el.querySelector(s);
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
@@ -288,9 +288,8 @@ function telaColecaoTudo(ctx) {
   let corpo;
   if (S.colModo === "lista") corpo = telaColecao(ctx);
   else {
-    const usosPor = new Map([...contagens(ctx.hist, ctx.frascos, ctx.hoje).por.values()].map(c => [c.f.nome, c.n30]));
-    const dia = S.resultado?.slots[0];
-    corpo = telaRoda({ frascos: ctx.frascos, arquetipos: S.arquetipos, gaps: S.gaps, verGaps: S.verGaps, usosPor });
+    const usosPor = new Map([...contagens(ctx.hist, ctx.frascos, ctx.hoje, { todos: true }).por.values()].map(c => [c.f.nome, c.n30]));
+    corpo = telaRoda({ frascos: ctx.frascos, arquetipos: S.arquetipos, gaps: S.gaps, verGaps: S.verGaps, usosPor, comCusto: S.rodaCusto });
   }
   return `<h2>Coleção</h2>
   <div class="segmentos" role="tablist">${modos.map(([v, r]) => `<button role="tab" data-colmodo="${v}" aria-selected="${S.colModo === v}">${r}</button>`).join("")}</div>
@@ -744,6 +743,7 @@ document.addEventListener("click", async e => {
   else if (acao === "restaurar") { salvarAjustes({}); toast("Ajustes restaurados."); render(); atualizarClima(); }
   else if (acao === "sync") sincronizar();
   else if (acao === "ver-gaps") { S.verGaps = !S.verGaps; render(); }
+  else if (acao === "roda-custo") { S.rodaCusto = !S.rodaCusto; gravar("rodaCusto", S.rodaCusto); render(); }
   else if (acao === "mf-mais") { S.mfLimite += 120; render(); }
   else if (acao === "criar-mercado") criarMercado();
   else if (acao === "novo-mercado") { S.confirmandoRemocao = false; abrirMercado(null); }
@@ -844,12 +844,12 @@ function previaRoda(g) {
   $("#roda")?.classList.add("focando");
   const nome = g.dataset.fr, f = S.frascosAtivos.find(x => x.nome === nome), fi = S.fichas[nome];
   if (!f) return;
-  const k = contagens(historico(), S.frascosAtivos, hojeISO()).por.get(nome);
+  const k = contagens(historico(), S.frascosAtivos, hojeISO(), { todos: true }).por.get(nome);
   const quando = k?.dias == null ? "sem registro" : k.dias === 0 ? "hoje" : k.dias === 1 ? "ontem" : `há ${k.dias} d`;
   box.innerHTML = `<button class="prev-in" data-ficha="${esc(nome)}">
     <span class="prev-ic">${arqIcone(f.arquetipo, 30)}</span>
     <span class="prev-tx"><b>${esc(nome)}</b>${tierHTML(f.tier)}<span class="nota">${esc(f.casa)} · ${esc(f.arquetipo)}</span>
-      <span class="prev-meta">${k?.n30 || 0} uso${k?.n30 === 1 ? "" : "s"} em 30 d · último ${quando} · ${f.janelas} janelas</span>
+      <span class="prev-meta">${k?.n30 || 0} uso${k?.n30 === 1 ? "" : "s"} em 30 d · último ${quando} · ${f.camada === "custo" ? "camada custo (academia/corrida)" : `${f.janelas} janelas`}</span>
       ${fi?.perfil ? `<span class="prev-perfil">${esc(fi.perfil)}</span>` : ""}</span>
     <span class="prev-abrir">Abrir ›</span></button>`;
   box.hidden = false;

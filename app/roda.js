@@ -12,8 +12,9 @@ const pol = (r, a) => [CX + r * Math.cos(a), CY + r * Math.sin(a)];
 const f1 = x => x.toFixed(1);
 
 /** SVG da roda: setores dos 16 arquétipos (ícone + contagem), órbitas por tier, um ponto por frasco. */
-export function rodaSVG({ frascos, arquetipos, gaps, verGaps, usosPor }) {
-  const grade = frascos.filter(daGrade);
+export function rodaSVG({ frascos, arquetipos, gaps, verGaps, usosPor, comCusto = true }) {
+  // grade + (opcional) camada custo; custo aparece com contorno tracejado. Tier D fica fora (não há órbita D).
+  const grade = frascos.filter(f => TIERS.includes(f.tier) && (daGrade(f) || (comCusto && f.camada === "custo")));
   const n = arquetipos.length, SEG = (2 * Math.PI) / n, GAP = 0.012;
   const idx = Object.fromEntries(arquetipos.map((a, i) => [a.nome, i]));
   const partes = [];
@@ -52,7 +53,7 @@ export function rodaSVG({ frascos, arquetipos, gaps, verGaps, usosPor }) {
         const r = RAIO_TIER[t] + (fila.length > 3 ? (k % 2 ? -13 : 13) : 0);
         const [x, y] = pol(r, ang);
         const usos = usosPor?.get(f.nome) || 0;
-        partes.push(`<g class="r-fr" data-fr="${esc(f.nome)}" style="transform-origin:${f1(x)}px ${f1(y)}px" role="button" tabindex="0" aria-label="${esc(f.nome)}, tier ${f.tier}">
+        partes.push(`<g class="r-fr${f.camada === "custo" ? " r-custo" : ""}" data-fr="${esc(f.nome)}" style="transform-origin:${f1(x)}px ${f1(y)}px" role="button" tabindex="0" aria-label="${esc(f.nome)}, tier ${f.tier}${f.camada === "custo" ? ", camada custo" : ""}">
           <circle class="r-hit" cx="${f1(x)}" cy="${f1(y)}" r="26"/>
           <circle cx="${f1(x)}" cy="${f1(y)}" r="${12 + Math.min(usos, 6)}" fill="${a.cor}" class="r-ponto" style="--d:${(i * 40 + TIERS.indexOf(t) * 90 + k * 25)}ms"/></g>`);
       });
@@ -61,13 +62,14 @@ export function rodaSVG({ frascos, arquetipos, gaps, verGaps, usosPor }) {
   return `<svg class="roda" id="roda" viewBox="-30 -30 960 960" role="img" aria-label="Roda dos 16 arquétipos: cada ponto é um frasco, órbita externa = tier S">${partes.join("")}</svg>`;
 }
 
-export function telaRoda({ frascos, arquetipos, gaps, verGaps, usosPor }) {
+export function telaRoda({ frascos, arquetipos, gaps, verGaps, usosPor, comCusto = true }) {
+  const nCusto = frascos.filter(f => f.camada === "custo" && TIERS.includes(f.tier)).length;
   return `
   <div class="bloco roda-bloco" id="rodaBloco">
-    ${rodaSVG({ frascos, arquetipos, gaps, verGaps, usosPor })}
+    ${rodaSVG({ frascos, arquetipos, gaps, verGaps, usosPor, comCusto })}
     <div class="roda-prev" id="rodaPrev" hidden></div>
-    <div class="roda-legenda"><span>Passe o dedo ou o mouse sobre as bolas</span><span>Toque na prévia para abrir a ficha</span><span>Órbita externa = tier S · bola maior = mais usado em 30 dias</span></div>
-    <div class="linha-flex" style="justify-content:center"><button class="chip" data-acao="ver-gaps" aria-pressed="${verGaps}">${verGaps ? "Ocultar gaps" : "Mostrar gaps"}</button></div>
+    <div class="roda-legenda"><span>Passe o dedo ou o mouse sobre as bolas</span><span>Toque na prévia para abrir a ficha</span><span>Órbita externa = tier S · bola maior = mais usado em 30 dias</span>${comCusto && nCusto ? "<span>Contorno tracejado = camada custo</span>" : ""}</div>
+    <div class="linha-flex" style="justify-content:center">${nCusto ? `<button class="chip" data-acao="roda-custo" aria-pressed="${comCusto}">${comCusto ? "Ocultar" : "Mostrar"} camada custo (${nCusto})</button>` : ""}<button class="chip" data-acao="ver-gaps" aria-pressed="${verGaps}">${verGaps ? "Ocultar gaps" : "Mostrar gaps"}</button></div>
     ${verGaps ? `<ul class="gaps">${gaps.map(g => `<li><span class="gap-n">${g.n}</span><b>${esc(g.gap)}</b> · ${esc(g.arquetipo)} · <span class="nota">${esc(g.status)}</span></li>`).join("")}</ul>` : ""}
   </div>`;
 }
