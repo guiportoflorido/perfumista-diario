@@ -1,6 +1,6 @@
 // mercado.js — aba Mercado: base da avaliação v51 (1.205 perfumes, inclusive os da coleção) guardada na aba
 // "Mercado" da planilha, com edição. Tier e posse da aba Tiers sempre vencem na exibição (fonte única de tier).
-import { esc, tierHTML, ordsDe, compararMulti, cmpValor, cabOrd, painelOrd } from "./util.js";
+import { esc, tierHTML, ordsDe, compararMulti, cmpValor, cabOrd, painelOrd, OPC_AMOSTRA, passaAmostra, temFiltro } from "./util.js";
 import { arqTag, arqIcone } from "./icones.js";
 import { chamar } from "./api.js";
 import { ler, gravar } from "./store.js";
@@ -90,14 +90,19 @@ export async function removerNaPlanilha(casa, perfume) {
 
 // ───────────────────────── filtros ─────────────────────────
 const ordemTier = t => (t && "SABCD".includes(t) ? "SABCD".indexOf(t) : 9);
-const POSSES_FILTRO = [["", "Toda posse"], ["Frasco Gui", "Na coleção"], ["Frasco Bia", "Frasco Bia"], ["amostra", "Amostras"], ["nao", "Não tenho"]];
+// valores antigos ("amostra" = qualquer amostra, "nao" = nenhum frasco) continuam valendo para filtros já salvos
+const POSSES_FILTRO = [["", "Todas"], ["Frasco Gui", "Na coleção (Frasco Gui)"], ["Frasco Bia", "Frasco Bia"], ["Amostra", "Amostra"], ["Amostra Bia", "Amostra Bia"],
+  ["Avaliado", "Avaliado"], ["a confirmar", "a confirmar"], ["amostra", "Qualquer amostra"], ["nao", "Sem frasco"], ["sem", "Sem posse"]];
+export const FILTROS_MF = ["q", "tier", "posse", "arq", "wish", "casa", "am"];
 
-export function filtrar(lista, f) {
+export function filtrar(lista, f, { amostras = null } = {}) {
   const q = norm(f.q);
   return lista.filter(p => {
     if (f.tier === "sem" ? p.tier : f.tier && p.tier !== f.tier) return false;
-    if (f.posse === "amostra" ? !/amostra/i.test(p.posse) : f.posse === "nao" ? /frasco/i.test(p.posse) : f.posse && p.posse !== f.posse) return false;
-    if (f.arq && p.arquetipo !== f.arq) return false;
+    if (f.posse === "amostra" ? !/amostra/i.test(p.posse) : f.posse === "nao" ? /frasco/i.test(p.posse) : f.posse === "sem" ? p.posse : f.posse && p.posse !== f.posse) return false;
+    if (f.arq === "sem" ? p.arquetipo : f.arq && p.arquetipo !== f.arq) return false;
+    if (f.casa && p.casa !== f.casa) return false;
+    if (f.am && !passaAmostra(f.am, amostras?.get(chave(p.casa, p.nome)))) return false;
     const w = f.wish === "1" ? "sim" : f.wish;   // "1" = valor salvo pela versão anterior
     if (w === "sim" && !p.wish) return false;
     if (w === "nao" && p.wish) return false;
@@ -117,10 +122,10 @@ function comparador(ords) {
 }
 
 // ───────────────────────── tela ─────────────────────────
-export function telaMercado({ lista, fonte, arquetipos, filtro, limite, podeCriar, criando }) {
+export function telaMercado({ lista, fonte, arquetipos, filtro, limite, podeCriar, criando, amostras = null }) {
   if (!lista) return `<div class="bloco"><p class="nota">Carregando a base…</p></div>`;
   const comTier = lista.filter(p => p.tier).length, meus = lista.filter(p => p.posse === "Frasco Gui").length, wish = lista.filter(p => p.wish).length;
-  const res = filtrar(lista, filtro);
+  const res = filtrar(lista, filtro, { amostras });
   const porArq = arquetipos.map(a => ({ a, merc: lista.filter(p => p.arquetipo === a.nome).length, meus: lista.filter(p => p.arquetipo === a.nome && p.posse === "Frasco Gui").length }));
   const maxM = Math.max(...porArq.map(x => x.merc), 1);
   const op = (v, r, at) => `<option value="${esc(v)}" ${String(at ?? "") === String(v) ? "selected" : ""}>${esc(r)}</option>`;
@@ -137,14 +142,15 @@ export function telaMercado({ lista, fonte, arquetipos, filtro, limite, podeCria
   </div>
   <div class="bloco">
     <input type="search" id="mf-q" placeholder="Buscar perfume, casa, nariz ou nota" value="${esc(filtro.q || "")}" aria-label="Buscar no mercado">
-    <div class="chips rolagem">${[["", "Todo tier"], ...["S", "A", "B", "C", "D"].map(t => [t, `Tier ${t}`]), ["sem", "Sem tier"]].map(([v, r]) => `<button class="chip" data-mf="tier" data-v="${v}" aria-pressed="${(filtro.tier || "") === v}">${r}</button>`).join("")}
-      </div>
     <div class="campos">
+      <label>Casa<select id="mf-casa">${op("", "Todas", filtro.casa)}${[...new Set(lista.map(p => p.casa))].sort((x, y) => x.localeCompare(y, "pt")).map(c => op(c, c, filtro.casa)).join("")}</select></label>
+      <label>Arquétipo<select id="mf-arq">${op("", "Todos", filtro.arq)}${arquetipos.map(a => op(a.nome, a.nome, filtro.arq)).join("")}${op("sem", "Sem arquétipo", filtro.arq)}</select></label>
+      <label>Tier<select id="mf-tier">${op("", "Todos", filtro.tier)}${["S", "A", "B", "C", "D"].map(t => op(t, `Tier ${t}`, filtro.tier)).join("")}${op("sem", "Sem tier", filtro.tier)}</select></label>
       <label>Posse<select id="mf-posse">${POSSES_FILTRO.map(([v, r]) => op(v, r, filtro.posse)).join("")}</select></label>
-      <label>Arquétipo<select id="mf-arq">${op("", "Todos", filtro.arq)}${arquetipos.map(a => op(a.nome, a.nome, filtro.arq)).join("")}</select></label>
       <label>Wishlist<select id="mf-wish">${op("", "Todos", filtro.wish === "1" ? "sim" : filtro.wish)}${op("sim", `Só wishlist (${wish})`, filtro.wish === "1" ? "sim" : filtro.wish)}${op("nao", "Fora da wishlist", filtro.wish === "1" ? "sim" : filtro.wish)}</select></label>
+      ${amostras ? `<label>Amostra<select id="mf-am">${OPC_AMOSTRA.map(([v, r]) => op(v, r, filtro.am)).join("")}</select></label>` : ""}
     </div>
-    <p class="nota">${res.length} perfume${res.length === 1 ? "" : "s"}.</p>
+    <p class="nota">${res.length} perfume${res.length === 1 ? "" : "s"}.${temFiltro(filtro, FILTROS_MF) ? ` <button class="btn sec peq" data-acao="mf-limpar">Limpar filtros</button>` : ""}</p>
   </div>
   ${res.length ? tabela(res.slice(0, limite), filtro, { editavel: fonte === "planilha", arquetipos }) : `<div class="bloco"><p class="vazio">Nada com esses filtros.</p></div>`}
   ${res.length > limite ? `<button class="btn sec" data-acao="mf-mais">Mostrar mais (${res.length - limite})</button>` : ""}

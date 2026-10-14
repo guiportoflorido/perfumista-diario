@@ -1,13 +1,14 @@
 // telas.js — Coleção, Playbook e Histórico (fase 4). Recebem o contexto pronto do main.js e devolvem HTML.
 import { FAIXAS } from "../engine/index.js";
-import { esc, ROT_OC, OCAS_TODAS, pinta, faixaHTML, nf, tierHTML, slotNome, md, ordsDe, compararMulti, cmpValor, cabOrd, painelOrd } from "./util.js";
+import { esc, ROT_OC, OCAS_TODAS, pinta, faixaHTML, nf, tierHTML, slotNome, md, ordsDe, compararMulti, cmpValor, cabOrd, painelOrd, OPC_AMOSTRA, passaAmostra, temFiltro } from "./util.js";
+import { chave } from "./mercado.js";
 import { daGrade, contagens, agrupar, esquecidos, usoVsJanelas, calibracao } from "./estatisticas.js";
 import { arqIcone, corArq, ARQ_PATHS } from "./icones.js";
 
 const TIERS = ["S", "A", "B", "C"];
+export const FILTROS_COL = ["q", "tier", "eixo", "arq", "faixa", "oc", "casa", "am"];
 const EIXOS = { P: "P · seco-mineral", S: "S · ambarado-doce", F: "F · fora do eixo" };
 const opt = (v, rot, atual) => `<option value="${esc(v)}" ${String(atual) === String(v) ? "selected" : ""}>${esc(rot)}</option>`;
-const chip = (grupo, v, rot, on) => `<button class="chip" data-filtro="${grupo}" data-v="${esc(v)}" aria-pressed="${on}">${esc(rot)}</button>`;
 const quando = d => (d === null ? "sem registro" : d === 0 ? "hoje" : d === 1 ? "ontem" : `há ${d} d`);
 
 // ───────────────────────── Coleção (tabela) ─────────────────────────
@@ -22,7 +23,7 @@ function ordenarColecao(linhas, ords) {
   return [...linhas].sort(compararMulti(ords, (k, a, b) => cmpValor(v(k, a), v(k, b)), padrao));
 }
 
-export function telaColecao({ frascos, hist, hoje, janelas, filtro, fichas, arqTag }) {
+export function telaColecao({ frascos, hist, hoje, janelas, filtro, fichas, arqTag, amostras = null }) {
   const c = contagens(hist, frascos, hoje);
   const grade = frascos.filter(daGrade);
   const arqs = [...new Set(grade.map(f => f.arquetipo))].sort((a, b) => a.localeCompare(b));
@@ -32,6 +33,8 @@ export function telaColecao({ frascos, hist, hoje, janelas, filtro, fichas, arqT
     if (filtro.tier && f.tier !== filtro.tier) return false;
     if (filtro.eixo && f.eixo !== filtro.eixo) return false;
     if (filtro.arq && f.arquetipo !== filtro.arq) return false;
+    if (filtro.casa && f.casa !== filtro.casa) return false;
+    if (filtro.am && !passaAmostra(filtro.am, amostras?.get(chave(f.casa, f.nome)))) return false;
     if (recorte) {
       const js = janelas.get(f.nome) || [];
       if (!js.some(j => (filtro.faixa === "" || filtro.faixa == null || j.faixaIdx === Number(filtro.faixa)) && (!filtro.oc || j.ocasiao === filtro.oc))) return false;
@@ -44,14 +47,16 @@ export function telaColecao({ frascos, hist, hoje, janelas, filtro, fichas, arqT
   const th = ([k, r]) => `<th class="cc-${k}" scope="col">${cabOrd(k, r, ords, "col-ord")}</th>`;
   return `<div class="bloco">
     <input type="search" id="col-q" placeholder="Buscar frasco, casa ou arquétipo" value="${esc(filtro.q || "")}" aria-label="Buscar">
-    <div class="chips rolagem">${chip("tier", "", "Todos", !filtro.tier)}${TIERS.map(t => chip("tier", t, `Tier ${t}`, filtro.tier === t)).join("")}</div>
-    <div class="chips rolagem">${chip("eixo", "", "Todo eixo", !filtro.eixo)}${Object.entries(EIXOS).map(([k, r]) => chip("eixo", k, r, filtro.eixo === k)).join("")}</div>
     <div class="campos">
+      <label>Casa<select id="col-casa">${opt("", "Todas", filtro.casa)}${[...new Set(grade.map(f => f.casa))].sort((a, b) => a.localeCompare(b, "pt")).map(c => opt(c, c, filtro.casa)).join("")}</select></label>
+      <label>Tier<select id="col-tier">${opt("", "Todos", filtro.tier)}${TIERS.map(t => opt(t, `Tier ${t}`, filtro.tier)).join("")}</select></label>
+      <label>Eixo<select id="col-eixo">${opt("", "Todos", filtro.eixo)}${Object.entries(EIXOS).map(([k, r]) => opt(k, r, filtro.eixo)).join("")}</select></label>
       <label>Arquétipo<select id="col-arq">${opt("", "Todos", filtro.arq)}${arqs.map(a => opt(a, a, filtro.arq)).join("")}</select></label>
       <label>Faixa<select id="col-faixa">${opt("", "Todas", filtro.faixa ?? "")}${FAIXAS.map((x, i) => opt(i, x, filtro.faixa ?? "")).join("")}</select></label>
       <label>Ocasião<select id="col-oc">${opt("", "Todas", filtro.oc)}${OCAS_TODAS.map(o => opt(o, ROT_OC[o], filtro.oc)).join("")}</select></label>
+      ${amostras ? `<label>Amostra<select id="col-am">${OPC_AMOSTRA.map(([v, r]) => opt(v, r, filtro.am)).join("")}</select></label>` : ""}
     </div>
-    <p class="nota">${linhas.length} de ${grade.length} frascos da grade${recorte ? " com janela no playbook nesse recorte" : ""} · ${TIERS.map(t => `${t} ${grade.filter(f => f.tier === t).length}`).join(" · ")}.</p>
+    <p class="nota">${linhas.length} de ${grade.length} frascos da grade${recorte ? " com janela no playbook nesse recorte" : ""} · ${TIERS.map(t => `${t} ${grade.filter(f => f.tier === t).length}`).join(" · ")}.${temFiltro(filtro, FILTROS_COL) ? ` <button class="btn sec peq" data-acao="col-limpar">Limpar filtros</button>` : ""}</p>
   </div>
   ${linhas.length ? `${painelOrd(ords, COLS_COL, "col")}<div class="tabelao" role="region" aria-label="Tabela da coleção" tabindex="0"><table class="t-colecao">
     <thead><tr><th class="c-n" scope="col">#</th>${COLS_COL.map(th).join("")}</tr></thead>
