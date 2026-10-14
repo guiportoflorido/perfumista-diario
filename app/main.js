@@ -18,7 +18,7 @@ import { telaAmostras, fichaAmostra, deLinhas as amostrasDeLinhas, juntar, semRe
   adicionarAmostra, editarAmostra, removerAmostra, novoId, normalizar } from "./amostras.js";
 import { ler, gravar } from "./store.js";
 
-export const APP_VERSAO = "5.13";  // sobe a cada publicação: confere no topo da tela se o celular pegou a versão nova
+export const APP_VERSAO = "5.14";  // sobe a cada publicação: confere no topo da tela se o celular pegou a versão nova
 const S = { aba: "hoje", frascos: [], frascosAtivos: [], avisosTiers: null, fichas: {}, versao: {}, prev: null, prevOffline: false,
   prevErro: null, metar: null, metarMotivo: null, clima: null, resultado: null, erroMotor: null, entrada: "", carregandoClima: true,
   sync: { estado: "ocioso", msg: "" }, hr: ler("hr", { preset: "tudo" }), tokenNovo: null, playbook: null, janelas: new Map(),
@@ -793,7 +793,7 @@ document.addEventListener("change", e => {
   if (el.dataset.ordSel) { mudarOrdem(el.dataset.ordSel, Number(el.dataset.n), { k: el.value }); return; }
   if (el.id === "hr-de" || el.id === "hr-ate") { S.hr = { ...S.hr, [el.id === "hr-de" ? "de" : "ate"]: el.value }; gravar("hr", S.hr); render(); return; }
   if (/^mf-(posse|arq|wish|casa|tier|am)$/.test(el.id || "")) { S.mf = { ...S.mf, [el.id.slice(3)]: el.value }; S.mfLimite = 60; gravar("mf", S.mf); render(); return; }
-  if (/^col-(arq|faixa|oc|casa|tier|eixo|am)$/.test(el.id || "")) { S.filtro = { ...S.filtro, [el.id.slice(4)]: el.value }; gravar("filtro", S.filtro); render(); return; }
+  if (/^col-(arq|faixa|oc|casa|tier|eixo|am|camada)$/.test(el.id || "")) { S.filtro = { ...S.filtro, [el.id.slice(4)]: el.value }; gravar("filtro", S.filtro); render(); return; }
   if (el.id === "testar") mudarDia(d => { d.testar = el.value.trim(); });
   if (el.id === "roupa") mudarDia(d => { d.roupa = el.value.trim(); });
 });
