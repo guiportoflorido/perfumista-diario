@@ -2,11 +2,15 @@
 import { FAIXAS } from "../engine/index.js";
 import { esc, ROT_OC, OCAS_TODAS, pinta, faixaHTML, nf, tierHTML, slotNome, md, ordsDe, compararMulti, cmpValor, cabOrd, painelOrd, OPC_AMOSTRA, passaAmostra, temFiltro } from "./util.js";
 import { chave } from "./mercado.js";
-import { daGrade, contagens, agrupar, esquecidos, usoVsJanelas, calibracao } from "./estatisticas.js";
+import { contagens, agrupar, esquecidos, usoVsJanelas, calibracao } from "./estatisticas.js";
 import { arqIcone, corArq, ARQ_PATHS } from "./icones.js";
 
 const TIERS = ["S", "A", "B", "C"];
-export const FILTROS_COL = ["q", "tier", "eixo", "arq", "faixa", "oc", "casa", "am"];
+export const FILTROS_COL = ["q", "tier", "eixo", "arq", "faixa", "oc", "casa", "am", "camada"];
+// camada do frasco: grade (playbook), custo (só academia/corrida) ou fora da grade (tier D)
+export const camadaDe = f => (f.camada === "custo" ? "custo" : f.tier === "D" ? "fora" : "grade");
+const CAMADAS = [["", "Todas"], ["grade", "Grade"], ["custo", "Camada custo"], ["fora", "Fora da grade (D)"]];
+const TIERS_ORD = ["S", "A", "B", "C", "D"];
 const EIXOS = { P: "P · seco-mineral", S: "S · ambarado-doce", F: "F · fora do eixo" };
 const opt = (v, rot, atual) => `<option value="${esc(v)}" ${String(atual) === String(v) ? "selected" : ""}>${esc(rot)}</option>`;
 const quando = d => (d === null ? "sem registro" : d === 0 ? "hoje" : d === 1 ? "ontem" : `há ${d} d`);
@@ -17,19 +21,20 @@ const COLS_COL = [["nome", "Perfume"], ["casa", "Casa"], ["tier", "Tier"], ["arq
 const TD_ROT = { C: "C · carregado", S: "S · seco", N: "N · indiferente" };
 
 function ordenarColecao(linhas, ords) {
-  const v = (k, x) => ({ tier: TIERS.indexOf(x.f.tier), nome: x.f.nome, casa: x.f.casa, arquetipo: x.f.arquetipo, eixo: x.f.eixo, td: x.f.td,
-    peso: x.f.peso, doc: x.f.doc, envelope: x.f.env_hot * 10 + x.f.env_cold, janelas: x.f.janelas || 0, usos: x.k.n, ultimo: x.k.ultimo || "" }[k]);
-  const padrao = (a, b) => TIERS.indexOf(a.f.tier) - TIERS.indexOf(b.f.tier) || a.f.nome.localeCompare(b.f.nome, "pt");
+  const v = (k, x) => ({ tier: TIERS_ORD.indexOf(x.f.tier), nome: x.f.nome, casa: x.f.casa, arquetipo: x.f.arquetipo, eixo: x.f.eixo, td: x.f.td,
+    peso: x.f.peso, doc: x.f.doc, envelope: x.f.env_hot * 10 + x.f.env_cold, janelas: x.f.janelas ?? "", usos: x.k.n, ultimo: x.k.ultimo || "" }[k]);
+  const padrao = (a, b) => TIERS_ORD.indexOf(a.f.tier) - TIERS_ORD.indexOf(b.f.tier) || a.f.nome.localeCompare(b.f.nome, "pt");
   return [...linhas].sort(compararMulti(ords, (k, a, b) => cmpValor(v(k, a), v(k, b)), padrao));
 }
 
 export function telaColecao({ frascos, hist, hoje, janelas, filtro, fichas, arqTag, amostras = null }) {
-  const c = contagens(hist, frascos, hoje);
-  const grade = frascos.filter(daGrade);
-  const arqs = [...new Set(grade.map(f => f.arquetipo))].sort((a, b) => a.localeCompare(b));
+  const c = contagens(hist, frascos, hoje, { todos: true });
+  const nCam = k => frascos.filter(f => camadaDe(f) === k).length;
+  const arqs = [...new Set(frascos.map(f => f.arquetipo))].sort((a, b) => a.localeCompare(b));
   const q = (filtro.q || "").toLowerCase();
   const recorte = filtro.faixa !== "" && filtro.faixa != null || filtro.oc;
-  const filtrados = grade.filter(f => {
+  const filtrados = frascos.filter(f => {
+    if (filtro.camada && camadaDe(f) !== filtro.camada) return false;
     if (filtro.tier && f.tier !== filtro.tier) return false;
     if (filtro.eixo && f.eixo !== filtro.eixo) return false;
     if (filtro.arq && f.arquetipo !== filtro.arq) return false;
@@ -48,21 +53,22 @@ export function telaColecao({ frascos, hist, hoje, janelas, filtro, fichas, arqT
   return `<div class="bloco">
     <input type="search" id="col-q" placeholder="Buscar frasco, casa ou arquétipo" value="${esc(filtro.q || "")}" aria-label="Buscar">
     <div class="campos">
-      <label>Casa<select id="col-casa">${opt("", "Todas", filtro.casa)}${[...new Set(grade.map(f => f.casa))].sort((a, b) => a.localeCompare(b, "pt")).map(c => opt(c, c, filtro.casa)).join("")}</select></label>
-      <label>Tier<select id="col-tier">${opt("", "Todos", filtro.tier)}${TIERS.map(t => opt(t, `Tier ${t}`, filtro.tier)).join("")}</select></label>
+      <label>Camada<select id="col-camada">${CAMADAS.map(([v, r]) => opt(v, r, filtro.camada)).join("")}</select></label>
+      <label>Casa<select id="col-casa">${opt("", "Todas", filtro.casa)}${[...new Set(frascos.map(f => f.casa))].sort((a, b) => a.localeCompare(b, "pt")).map(c => opt(c, c, filtro.casa)).join("")}</select></label>
+      <label>Tier<select id="col-tier">${opt("", "Todos", filtro.tier)}${TIERS_ORD.map(t => opt(t, `Tier ${t}`, filtro.tier)).join("")}</select></label>
       <label>Eixo<select id="col-eixo">${opt("", "Todos", filtro.eixo)}${Object.entries(EIXOS).map(([k, r]) => opt(k, r, filtro.eixo)).join("")}</select></label>
       <label>Arquétipo<select id="col-arq">${opt("", "Todos", filtro.arq)}${arqs.map(a => opt(a, a, filtro.arq)).join("")}</select></label>
       <label>Faixa<select id="col-faixa">${opt("", "Todas", filtro.faixa ?? "")}${FAIXAS.map((x, i) => opt(i, x, filtro.faixa ?? "")).join("")}</select></label>
       <label>Ocasião<select id="col-oc">${opt("", "Todas", filtro.oc)}${OCAS_TODAS.map(o => opt(o, ROT_OC[o], filtro.oc)).join("")}</select></label>
       ${amostras ? `<label>Amostra<select id="col-am">${OPC_AMOSTRA.map(([v, r]) => opt(v, r, filtro.am)).join("")}</select></label>` : ""}
     </div>
-    <p class="nota">${linhas.length} de ${grade.length} frascos da grade${recorte ? " com janela no playbook nesse recorte" : ""} · ${TIERS.map(t => `${t} ${grade.filter(f => f.tier === t).length}`).join(" · ")}.${temFiltro(filtro, FILTROS_COL) ? ` <button class="btn sec peq" data-acao="col-limpar">Limpar filtros</button>` : ""}</p>
+    <p class="nota">${linhas.length} de ${frascos.length} frascos (grade ${nCam("grade")} · custo ${nCam("custo")} · fora da grade ${nCam("fora")})${recorte ? " com janela no playbook nesse recorte" : ""} · ${TIERS_ORD.map(t => `${t} ${frascos.filter(f => f.tier === t).length}`).join(" · ")}.${temFiltro(filtro, FILTROS_COL) ? ` <button class="btn sec peq" data-acao="col-limpar">Limpar filtros</button>` : ""}</p>
   </div>
   ${linhas.length ? `${painelOrd(ords, COLS_COL, "col")}<div class="tabelao" role="region" aria-label="Tabela da coleção" tabindex="0"><table class="t-colecao">
     <thead><tr><th class="c-n" scope="col">#</th>${COLS_COL.map(th).join("")}</tr></thead>
     <tbody>${linhas.map(({ f, k }, i) => `<tr data-ficha="${esc(f.nome)}" tabindex="0">
       <td class="c-n">${i + 1}</td>
-      <td class="c-nome">${esc(f.nome)}${f.janelas_estimadas ? ` <span class="selo aviso" title="janelas estimadas">est.</span>` : ""}</td>
+      <td class="c-nome">${esc(f.nome)}${f.janelas_estimadas ? ` <span class="selo aviso" title="janelas estimadas">est.</span>` : ""}${camadaDe(f) === "custo" ? ` <span class="selo" title="Camada custo: só academia e corrida, fora da grade">custo</span>` : camadaDe(f) === "fora" ? ` <span class="selo aviso" title="Fora da grade">fora</span>` : ""}</td>
       <td class="cc-casa">${esc(f.casa)}</td>
       <td class="c-tier">${tierHTML(f.tier)}</td>
       <td class="cc-arquetipo">${arqTag(f.arquetipo)}</td>
@@ -70,7 +76,7 @@ export function telaColecao({ frascos, hist, hoje, janelas, filtro, fichas, arqT
       <td class="cc-td">${esc(TD_ROT[f.td] || f.td)}</td>
       <td class="cc-num">${f.peso}</td><td class="cc-num">${f.doc}</td>
       <td class="cc-env">${esc(fichas[f.nome]?.envelope || "")}</td>
-      <td class="cc-num">${f.janelas}</td>
+      <td class="cc-num">${f.janelas ?? "—"}</td>
       <td class="cc-num">${k.n}${k.n ? ` <span class="nota">☀︎${k.M} ☾${k.N}</span>` : ""}</td>
       <td class="cc-ult">${quando(k.dias)}</td>
     </tr>`).join("")}</tbody></table></div>

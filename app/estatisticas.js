@@ -18,9 +18,10 @@ export function janelasPorFrasco(playbook) {
   return m;
 }
 
-/** Contagens por frasco da grade a partir do histórico (planilha + fila). */
-export function contagens(hist, frascos, hoje) {
-  const grade = frascos.filter(daGrade);
+/** Contagens por frasco da grade a partir do histórico (planilha + fila). `todos`: inclui camada custo e fora da grade
+ *  (só para a lista da Coleção; análises e estatísticas seguem só com a grade). */
+export function contagens(hist, frascos, hoje, { todos = false } = {}) {
+  const grade = todos ? frascos : frascos.filter(daGrade);
   const nomes = new Set(grade.map(f => f.nome));
   const regs = hist.filter(r => nomes.has(r.perfume) && r.data <= hoje);
   const por = new Map(grade.map(f => [f.nome, { f, n: 0, n30: 0, M: 0, N: 0, ultimo: null }]));
