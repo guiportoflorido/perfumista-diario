@@ -22,7 +22,14 @@ export async function chamar(acao, extra = {}, { timeoutMs = 20000 } = {}) {
       throw Object.assign(new Error(auth ? "O Apps Script pede autorização: no editor, rode “configurar”, autorize e implante uma nova versão."
         : `Resposta inesperada do Apps Script: ${limpo || "(vazia)"}`), { codigo: "recusado" });
     }
-    if (!j.ok) throw Object.assign(new Error(j.erro || "erro no Apps Script"), { codigo: "recusado" });
+    if (!j.ok) {
+      // código antigo implantado no Apps Script: não conhece a ação nova
+      const msg = j.erro === "ação desconhecida"
+        ? `O Apps Script da planilha está desatualizado (não conhece “${acao}”): cole o Code.gs novo, rode “configurar” e implante uma nova versão.`
+        : /authoriz|autoriz|permission|permiss/i.test(j.erro || "") ? `O Apps Script precisa de autorização nova: no editor, rode “configurar”, autorize e implante uma nova versão. (${j.erro})`
+        : j.erro || "erro no Apps Script";
+      throw Object.assign(new Error(msg), { codigo: "recusado" });
+    }
     return j;
   } catch (e) {
     if (e.name === "AbortError") throw Object.assign(new Error("Sem resposta da planilha (tempo esgotado)"), { codigo: "rede" });

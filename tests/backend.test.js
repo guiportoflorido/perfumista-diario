@@ -95,3 +95,11 @@ test("configurar: cria TOKEN uma vez e devolve a URL do App da Web", () => {
   assert.equal(r1.url, "https://script.google.com/macros/s/X/exec");
   assert.ok(logs.some(l => l.includes("Token: 1234abcd1234abcd")));
 });
+
+test("app: “ação desconhecida” vira instrução de atualizar o Apps Script", async () => {
+  const store = new Map([["pd.ajustes", JSON.stringify({ backend: "https://script.google.com/x/exec", token: "t" })]]);
+  globalThis.localStorage = { getItem: k => store.get(k) ?? null, setItem: (k, v) => store.set(k, v) };
+  globalThis.fetch = async () => ({ ok: true, text: async () => JSON.stringify({ ok: false, erro: "ação desconhecida" }) });
+  const { chamar } = await import("../app/api.js");
+  await assert.rejects(chamar("subirFoto"), /desatualizado \(não conhece “subirFoto”\).*implante uma nova versão/);
+});
