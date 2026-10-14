@@ -13,14 +13,16 @@
  *        inclusive casa/nome; tier e posse também vão para a aba Tiers) · adicionarMercado · removerMercado
  *        (tira só da aba Mercado; Tiers e Diário não mudam) · amostras (lê a aba Amostras) · adicionarAmostra (cria a
  *        aba no primeiro registro) · editarAmostra · removerAmostra (por ID; avaliação — tier, arquétipo etc. — fica
- *        na aba Mercado, ligada pela Casa + Perfume).
+ *        na aba Mercado, ligada pela Casa + Perfume) · subirFoto (guarda a foto no Drive, na pasta "Perfumista Diário —
+ *        Fotos", e grava o link na coluna Foto da aba Mercado; remover = editarMercado com Foto vazia).
  * Regras da planilha: data como texto AAAA-MM-DD; campo vazio = ""; nunca editar ou apagar linhas existentes;
  * aba Frascos é só fórmula (nunca escrita aqui).
  */
 
 var ABA_TIERS = 'Tiers', ABA_DIARIO = 'Diário', ABA_FRASCOS = 'Frascos', ABA_MERCADO = 'Mercado';
 var COLS_MERCADO = ['Casa', 'Perfume', 'Tier', 'Posse', 'Arquétipo', 'Resumo', 'Topo', 'Coração', 'Base', 'Nariz', 'Wishlist', 'Atualizado em'];
-var EDITAVEIS = ['Tier', 'Posse', 'Arquétipo', 'Resumo', 'Topo', 'Coração', 'Base', 'Nariz', 'Wishlist', 'Notas'];
+var EDITAVEIS = ['Tier', 'Posse', 'Arquétipo', 'Resumo', 'Topo', 'Coração', 'Base', 'Nariz', 'Wishlist', 'Notas', 'Foto'];
+var PASTA_FOTOS = 'Perfumista Diário — Fotos';
 var COLS_DIARIO = ['Data', 'Slot', 'Perfume', 'Ocasião', 'Temp (°C)', 'Td (°C)', 'Sprays', 'NotaDia', 'Obs'];
 var ABA_AMOSTRAS = 'Amostras';
 var COLS_AMOSTRAS = ['ID', 'Casa', 'Perfume', 'Tipo', 'Volume (ml)', 'Origem', 'Status', 'Entrada', 'Saída', 'Motivo saída', 'Impressão', 'Obs', 'Atualizado em', 'Dono'];
@@ -47,6 +49,7 @@ function doPost(e) {
       case 'adicionarAmostra': return saida_(adicionarAmostra_(req.campos || {}));
       case 'editarAmostra': return saida_(editarAmostra_(req.id, req.campos || {}));
       case 'removerAmostra': return saida_(removerAmostra_(req.id));
+      case 'subirFoto': return saida_(subirFoto_(req.casa, req.perfume, req.imagem, req.tipo));
       default: return saida_({ ok: false, erro: 'ação desconhecida' });
     }
   } catch (err) {
@@ -204,6 +207,7 @@ function editarMercado_(casa, perfume, campos) {
     var aba = ss.getSheetByName(ABA_MERCADO);
     if (!aba) throw new Error('a aba Mercado ainda não existe');
     if (campos.Notas !== undefined) garantirColuna_(aba, 'Notas');
+    if (campos.Foto !== undefined) garantirColuna_(aba, 'Foto');
     var vals = aba.getDataRange().getDisplayValues(), cab = vals[0];
     var linha = acharLinha_(vals, casa, perfume);
     if (linha === -1) throw new Error('perfume não encontrado na aba Mercado: ' + casa + ' — ' + perfume);
@@ -425,5 +429,38 @@ function removerAmostra_(id) {
     aba.deleteRow(linha);
     SpreadsheetApp.flush();
     return { ok: true, removida: linha };
+  } finally { lock.releaseLock(); }
+}
+
+// ───────────────────────── fotos ─────────────────────────
+// A foto (JPEG já reduzido pelo app) vai para uma pasta do Drive do dono da planilha, com acesso "qualquer pessoa com o
+// link pode ver" (o app precisa carregar a imagem). O link vai para a coluna Foto da aba Mercado.
+function pastaFotos_() {
+  var it = DriveApp.getFoldersByName(PASTA_FOTOS);
+  return it.hasNext() ? it.next() : DriveApp.createFolder(PASTA_FOTOS);
+}
+
+function subirFoto_(casa, perfume, imagem, tipo) {
+  if (!casa || !perfume) throw new Error('casa e perfume são obrigatórios');
+  tipo = String(tipo || 'image/jpeg');
+  if (['image/jpeg', 'image/png', 'image/webp'].indexOf(tipo) === -1) throw new Error('tipo de imagem não aceito: ' + tipo);
+  imagem = String(imagem || '');
+  if (!imagem || imagem.length > 8000000) throw new Error('imagem vazia ou grande demais');
+  var lock = LockService.getScriptLock(); lock.waitLock(20000);
+  try {
+    var aba = SpreadsheetApp.getActive().getSheetByName(ABA_MERCADO);
+    if (!aba) throw new Error('a aba Mercado ainda não existe');
+    var vals = aba.getDataRange().getDisplayValues(), linha = acharLinha_(vals, casa, perfume);
+    if (linha === -1) throw new Error('perfume não encontrado na aba Mercado: ' + casa + ' — ' + perfume);
+    var nomeArq = (vals[linha - 1][0] + ' — ' + vals[linha - 1][1]).replace(/[\\/:*?"<>|]/g, ' ') + ' ' + hoje_() + (tipo === 'image/png' ? '.png' : tipo === 'image/webp' ? '.webp' : '.jpg');
+    var arq = pastaFotos_().createFile(Utilities.newBlob(Utilities.base64Decode(imagem), tipo, nomeArq));
+    arq.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+    var url = 'https://drive.google.com/thumbnail?id=' + arq.getId() + '&sz=w1200';
+    garantirColuna_(aba, 'Foto');
+    var cab = aba.getRange(1, 1, 1, aba.getLastColumn()).getDisplayValues()[0];
+    aba.getRange(linha, cab.indexOf('Foto') + 1).setNumberFormat('@').setValue(url);
+    aba.getRange(linha, cab.indexOf('Atualizado em') + 1).setNumberFormat('@').setValue(hoje_());
+    SpreadsheetApp.flush();
+    return { ok: true, url: url, linha: linha };
   } finally { lock.releaseLock(); }
 }

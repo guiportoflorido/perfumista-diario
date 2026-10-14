@@ -3,6 +3,7 @@
 import { esc, tierHTML, ordsDe, compararMulti, cmpValor, cabOrd, painelOrd, OPC_AMOSTRA, passaAmostra, temFiltro } from "./util.js";
 import { arqTag, arqIcone } from "./icones.js";
 import { chamar } from "./api.js";
+import { fotoFicha } from "./fotos.js";
 import { ler, gravar } from "./store.js";
 
 export const COLS = ["Casa", "Perfume", "Tier", "Posse", "Arquétipo", "Resumo", "Topo", "Coração", "Base", "Nariz", "Wishlist", "Atualizado em"];
@@ -34,7 +35,7 @@ export function deLinhas(linhas, tiers) {
     casa: r[i("Casa")], nome: r[i("Perfume")], tier: (r[i("Tier")] || "").trim().toUpperCase(), posse: r[i("Posse")] || "",
     arquetipo: r[i("Arquétipo")] || "", resumo: r[i("Resumo")] || "", topo: r[i("Topo")] || "", coracao: r[i("Coração")] || "",
     base: r[i("Base")] || "", nariz: r[i("Nariz")] || "", wish: /✓|sim|x/i.test(r[i("Wishlist")] || ""), atualizado: r[i("Atualizado em")] || "",
-    notas: i("Notas") >= 0 ? r[i("Notas")] || "" : "" }));
+    notas: i("Notas") >= 0 ? r[i("Notas")] || "" : "", foto: i("Foto") >= 0 ? r[i("Foto")] || "" : "" }));
   return baseComTiers(objs, tiers);
 }
 
@@ -62,12 +63,21 @@ const garantirCol = (linhas, cab, n) => { if (!cab.includes(n)) { cab.push(n); l
 export async function editarNaPlanilha(casa, perfume, campos) {
   const j = await chamar("editarMercado", { casa, perfume, campos }, { timeoutMs: 25000 });
   mexerCache((linhas, cab) => {
-    if (campos.Notas !== undefined) garantirCol(linhas, cab, "Notas");
+    for (const n of Object.keys(campos)) if (n !== "Casa" && n !== "Perfume") garantirCol(linhas, cab, n);
     const k = chave(casa, perfume);
     const row = linhas.find((r, i) => i > 0 && chave(r[cab.indexOf("Casa")], r[cab.indexOf("Perfume")]) === k);
     if (row) { for (const [n, v] of Object.entries(campos)) if (cab.includes(n)) row[cab.indexOf(n)] = String(v); row[cab.indexOf("Atualizado em")] = hojeISO(); }
   });
   return j;
+}
+
+/** Depois do upload: grava o link da foto na cópia local da aba Mercado (sem baixar tudo de novo). */
+export function fotoNoCache(casa, perfume, url) {
+  mexerCache((linhas, cab) => {
+    garantirCol(linhas, cab, "Foto");
+    const k = chave(casa, perfume), row = linhas.find((r, i) => i > 0 && chave(r[cab.indexOf("Casa")], r[cab.indexOf("Perfume")]) === k);
+    if (row) row[cab.indexOf("Foto")] = url;
+  });
 }
 
 export async function adicionarNaPlanilha(campos) {
@@ -208,6 +218,7 @@ export function fichaEditavel(p, { arquetipos, editavel, novo = false, confirmar
   const sel = (id, opcoes, at) => `<select id="${id}" ${editavel ? "" : "disabled"}>${opcoes.map(([v, r]) => `<option value="${esc(v)}" ${String(at) === String(v) ? "selected" : ""}>${esc(r)}</option>`).join("")}</select>`;
   const txt = (id, v, linhas = 1, extra = "") => linhas > 1 ? `<textarea id="${id}" rows="${linhas}" ${editavel ? "" : "readonly"}>${esc(v)}</textarea>` : `<input id="${id}" value="${esc(v)}" ${editavel ? "" : "readonly"} autocomplete="off" ${extra}>`;
   return `<div class="linha-flex">${p.arquetipo ? `<span class="ficha-ic">${arqIcone(p.arquetipo, 34)}</span>` : ""}<h2 id="fichaT">${novo ? "Novo perfume" : esc(p.nome)}</h2>${p.tier && !novo ? tierHTML(p.tier) : ""}<span class="esp"></span><button class="btn sec peq" data-fechar>Fechar</button></div>
+    ${novo ? "" : fotoFicha(p, { editavel, id: p.casa + "||" + p.nome, motivo: editavel ? "" : "Fotos ficam na aba Mercado da planilha: conecte e crie a aba para adicionar." })}
     ${novo ? `<p class="nota">Entra na aba Mercado da planilha. Tier e posse, se preenchidos, também vão para a aba Tiers.</p>` : `<p class="nota">${esc(p.casa)}${p.atualizado ? ` · editado em ${esc(p.atualizado)}` : ""}</p>`}
     <form class="bloco" id="formMercado" data-casa="${esc(p.casa || "")}" data-nome="${esc(p.nome || "")}" data-novo="${novo ? 1 : ""}">
       <div class="campos">
