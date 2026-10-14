@@ -439,6 +439,10 @@ function removerAmostra_(id) {
 /** Rode uma vez no editor (Executar ▶ autorizarFotos): pede a permissão do Google Drive que as fotos usam e cria a
  *  pasta. Depois, implante uma nova versão. */
 function autorizarFotos() {
+  // Na tela de consentimento com caixinhas, força o pedido do Drive se ele ficou desmarcado.
+  if (typeof ScriptApp.requireScopes === 'function') {
+    ScriptApp.requireScopes(ScriptApp.AuthMode.FULL, ['https://www.googleapis.com/auth/drive']);
+  }
   var pasta = pastaFotos_();
   Logger.log('Pasta das fotos: ' + pasta.getUrl());
   return pasta.getUrl();
