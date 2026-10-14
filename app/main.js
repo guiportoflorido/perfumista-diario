@@ -18,7 +18,7 @@ import { telaAmostras, fichaAmostra, deLinhas as amostrasDeLinhas, juntar, semRe
   adicionarAmostra, editarAmostra, removerAmostra, novoId, normalizar } from "./amostras.js";
 import { ler, gravar } from "./store.js";
 
-export const APP_VERSAO = "5.12";  // sobe a cada publicação: confere no topo da tela se o celular pegou a versão nova
+export const APP_VERSAO = "5.13";  // sobe a cada publicação: confere no topo da tela se o celular pegou a versão nova
 const S = { aba: "hoje", frascos: [], frascosAtivos: [], avisosTiers: null, fichas: {}, versao: {}, prev: null, prevOffline: false,
   prevErro: null, metar: null, metarMotivo: null, clima: null, resultado: null, erroMotor: null, entrada: "", carregandoClima: true,
   sync: { estado: "ocioso", msg: "" }, hr: ler("hr", { preset: "tudo" }), tokenNovo: null, playbook: null, janelas: new Map(),
@@ -118,7 +118,8 @@ function render() {
   const arqDe = new Map(S.frascos.map(f => [f.nome, f.arquetipo]));
   const ctx = { fichas: S.fichas, arqTag, arqIcone, arqDe, hr: S.hr,
     frascos: S.frascosAtivos, hist: historico(), hoje: hojeISO(), janelas: S.janelas, filtro: S.filtro, playbook: S.playbook,
-    faixaSel: S.pbFaixa ?? S.clima?.faixaDia?.idx ?? 2, fila: fila(), ajSpray: ajSpray() };
+    faixaSel: S.pbFaixa ?? S.clima?.faixaDia?.idx ?? 2, fila: fila(), ajSpray: ajSpray(),
+    amostras: S.aba === "colecao" ? amostrasEmMaos() : null };
   // mesma aba: guarda rolagem da página, das tabelas e painéis abertos para restaurar depois de redesenhar
   const antes = trocouAba ? null : {
     y: window.scrollY,
@@ -282,6 +283,7 @@ function blocoAvancado(dia) {
 
 // ───────────────────────── coleção: roda · lista · mercado ─────────────────────────
 function telaColecaoTudo(ctx) {
+  lerAmostras();
   const modos = [["roda", "Roda"], ["lista", "Lista"]];
   let corpo;
   if (S.colModo === "lista") corpo = telaColecao(ctx);
@@ -312,10 +314,11 @@ function garantirMercado() {
 
 function telaMercadoAba() {
   garantirMercado();
+  lerAmostras();
   const { lista, fonte } = listaMercado();
   return `<h2>Mercado</h2>
   ${S.mercadoErro && !lista ? `<div class="bloco"><p class="erro-txt">Não consegui carregar a base: ${esc(S.mercadoErro)}</p></div>`
-    : telaMercado({ lista, fonte, arquetipos: S.arquetipos, filtro: S.mf, limite: S.mfLimite,
+    : telaMercado({ lista, fonte, arquetipos: S.arquetipos, filtro: S.mf, limite: S.mfLimite, amostras: amostrasEmMaos(),
       podeCriar: configurado() && cachePlanilha()?.existe === false, criando: S.criandoMercado })}`;
 }
 
@@ -326,6 +329,20 @@ async function carregarMercado() {
 }
 
 // ───────────────────────── amostras ─────────────────────────
+/** Amostras em mãos (não esgotadas) por perfume: chave → Set("Gui"/"Bia"). null se a aba Amostras ainda não foi lida. */
+function amostrasEmMaos() {
+  const c = cacheAmostras();
+  if (!c?.existe) return null;
+  const m = new Map();
+  for (const a of amostrasDeLinhas(c.linhas)) {
+    if (a.status === "Esgotado") continue;
+    const k = mercadoChave(a.casa, a.nome);
+    if (!m.has(k)) m.set(k, new Set());
+    m.get(k).add(a.dono || "Gui");
+  }
+  return m;
+}
+
 function listaAmostras() {
   const c = cacheAmostras();
   if (!c) return null;
@@ -338,7 +355,7 @@ async function lerAmostras({ forcar = false } = {}) {
   try { await baixarAmostras(); S.amErro = null; S.amBaixadas = true; }
   catch (e) { S.amErro = e.message; }
   S.amBaixando = false;
-  if (S.aba === "amostras") render();
+  if (["amostras", "mercado", "colecao"].includes(S.aba)) render();   // Coleção e Mercado usam as amostras no filtro "Amostra"
 }
 
 /** Usos no Diário por amostra: pelo "Nome no diário" da aba Tiers ou pelo próprio nome. Lê planilha e diário uma vez só. */
@@ -733,6 +750,8 @@ document.addEventListener("click", async e => {
   else if (acao === "remover-mercado") removerMercado();
   else if (acao === "nova-amostra") { S.confirmandoRemocao = false; abrirAmostra(null); }
   else if (acao === "remover-amostra") excluirAmostra();
+  else if (acao === "mf-limpar") { S.mf = { ords: S.mf.ords }; S.mfLimite = 60; gravar("mf", S.mf); render(); }
+  else if (acao === "col-limpar") { S.filtro = { ords: S.filtro.ords }; gravar("filtro", S.filtro); render(); }
   else if (acao === "am-limpar") { S.am = { ords: S.am.ords }; gravar("am", S.am); render(); }
   else if (acao === "ler-planilha") {
     const m = $("#lerMsg"); m.textContent = "Lendo a planilha…";
@@ -773,10 +792,8 @@ document.addEventListener("change", e => {
   if (el.dataset.ed) { const p = (listaMercado().lista || []).find(x => x.casa + "||" + x.nome === el.dataset.id); if (p) editarCelula(el, p, el.dataset.ed, el.value); return; }
   if (el.dataset.ordSel) { mudarOrdem(el.dataset.ordSel, Number(el.dataset.n), { k: el.value }); return; }
   if (el.id === "hr-de" || el.id === "hr-ate") { S.hr = { ...S.hr, [el.id === "hr-de" ? "de" : "ate"]: el.value }; gravar("hr", S.hr); render(); return; }
-  if (el.id === "mf-posse" || el.id === "mf-arq" || el.id === "mf-wish") { S.mf = { ...S.mf, [{ "mf-posse": "posse", "mf-arq": "arq", "mf-wish": "wish" }[el.id]]: el.value }; S.mfLimite = 60; gravar("mf", S.mf); render(); return; }
-  if (el.id === "col-arq" || el.id === "col-faixa" || el.id === "col-oc") {
-    S.filtro = { ...S.filtro, [{ "col-arq": "arq", "col-faixa": "faixa", "col-oc": "oc" }[el.id]]: el.value }; gravar("filtro", S.filtro); render(); return;
-  }
+  if (/^mf-(posse|arq|wish|casa|tier|am)$/.test(el.id || "")) { S.mf = { ...S.mf, [el.id.slice(3)]: el.value }; S.mfLimite = 60; gravar("mf", S.mf); render(); return; }
+  if (/^col-(arq|faixa|oc|casa|tier|eixo|am)$/.test(el.id || "")) { S.filtro = { ...S.filtro, [el.id.slice(4)]: el.value }; gravar("filtro", S.filtro); render(); return; }
   if (el.id === "testar") mudarDia(d => { d.testar = el.value.trim(); });
   if (el.id === "roupa") mudarDia(d => { d.roupa = el.value.trim(); });
 });

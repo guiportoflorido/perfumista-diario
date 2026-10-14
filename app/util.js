@@ -87,3 +87,13 @@ export function mudarOrds(ords, n, { k, inverter }) {
   r[n] = { k, dir: r[n]?.dir || "asc" };
   return r.filter((o, i) => o && (o.k !== k || i === n)).slice(0, 3);
 }
+
+// ───────────────────────── filtro "Amostra" (Coleção e Mercado) ─────────────────────────
+export const OPC_AMOSTRA = [["", "Todas"], ["tem", "Com amostra em mãos"], ["gui", "Amostra do Gui"], ["bia", "Amostra da Bia"], ["nao", "Sem amostra"]];
+/** donos = Set("Gui"/"Bia") das amostras em mãos daquele perfume (ou undefined). */
+export function passaAmostra(v, donos) {
+  if (!v) return true;
+  const tem = Boolean(donos && donos.size);
+  return v === "tem" ? tem : v === "nao" ? !tem : v === "gui" ? Boolean(donos?.has("Gui")) : v === "bia" ? Boolean(donos?.has("Bia")) : true;
+}
+export const temFiltro = (f, chaves) => chaves.some(k => f[k] !== undefined && f[k] !== null && f[k] !== "");

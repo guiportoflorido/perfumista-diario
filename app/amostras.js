@@ -81,6 +81,7 @@ export function filtrar(lista, f = {}, { usosDe = null, hoje = hojeISO() } = {})
     if (f.arq === "sem" ? a.m?.arquetipo : f.arq && a.m?.arquetipo !== f.arq) return false;
     if (f.tier === "sem" ? a.m?.tier : f.tier && a.m?.tier !== f.tier) return false;
     if (f.posse === "sem" ? a.m?.posse : f.posse && a.m?.posse !== f.posse) return false;
+    if (f.wish === "sim" ? !a.m?.wish : f.wish === "nao" && a.m?.wish) return false;
     if (q && !norm(`${a.nome} ${a.casa} ${a.origem} ${a.impressao} ${a.obs} ${a.m?.arquetipo || ""}`).includes(q)) return false;
     return true;
   });
@@ -165,9 +166,10 @@ export function telaAmostras({ lista, filtro, configurado, existe, erro, sem, us
       <label>Arquétipo<select id="amf-arq">${op("", "Todos", filtro.arq)}${arquetipos.map(x => op(x.nome, x.nome, filtro.arq)).join("")}${op("sem", "Sem arquétipo", filtro.arq)}</select></label>
       <label>Tier<select id="amf-tier">${op("", "Todos", filtro.tier)}${["S", "A", "B", "C", "D"].map(t => op(t, `Tier ${t}`, filtro.tier)).join("")}${op("sem", "Sem tier", filtro.tier)}</select></label>
       <label>Posse (Mercado)<select id="amf-posse">${op("", "Todas", filtro.posse)}${POSSES_EDIT.filter(Boolean).map(p => op(p, posseRot(p), filtro.posse)).join("")}${op("sem", "Sem posse", filtro.posse)}</select></label>
+      <label>Wishlist<select id="amf-wish">${op("", "Todos", filtro.wish)}${op("sim", "Só wishlist", filtro.wish)}${op("nao", "Fora da wishlist", filtro.wish)}</select></label>
       <label>Tipo<select id="am-tipo">${op("", "Amostra e decant", filtro.tipo)}${TIPOS.map(t => op(t, t, filtro.tipo)).join("")}</select></label>
     </div>
-    <p class="nota">${res.length} de ${lista.length}.${["dono", "casa", "arq", "tier", "posse", "tipo", "q", "status"].some(k => filtro[k]) ? ` <button class="btn sec peq" data-acao="am-limpar">Limpar filtros</button>` : ""}</p>
+    <p class="nota">${res.length} de ${lista.length}.${["dono", "casa", "arq", "tier", "posse", "wish", "tipo", "q", "status"].some(k => filtro[k]) ? ` <button class="btn sec peq" data-acao="am-limpar">Limpar filtros</button>` : ""}</p>
   </div>
   ${res.length ? tabela(res, filtro, { usosDe, hoje, editavel, arquetipos })
     : `<div class="bloco"><p class="vazio">${lista.length ? "Nada com esses filtros." : "Nenhuma amostra lançada ainda. Toque em “+ Entrada”."}</p></div>`}

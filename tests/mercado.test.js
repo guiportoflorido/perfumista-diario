@@ -1,7 +1,7 @@
 // Aba Mercado no app: tier/posse da aba Tiers vencem, linhas para criar a aba, filtros e ordem, campos alterados.
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { baseComTiers, linhasParaCriar, deLinhas, filtrar, camposAlterados, COLS } from "../app/mercado.js";
+import { baseComTiers, linhasParaCriar, deLinhas, filtrar, camposAlterados, COLS, telaMercado } from "../app/mercado.js";
 
 const base = [
   { casa: "Amouage", nome: "Decision", tier: "A", posse: "", arquetipo: "Monge", resumo: "incenso", topo: "a", coracao: "b", base: "c", nariz: "", wish: false },
@@ -74,4 +74,23 @@ test("ordenação em 3 níveis: tocar no cabeçalho empurra os critérios; paine
   const m = baseComTiers([...base, { casa: "Amouage", nome: "Beach Hut", tier: "A", posse: "", arquetipo: "Botânico", wish: true }], tiers);
   const r = filtrar(m, { ords: [{ k: "casa", dir: "asc" }, { k: "wish", dir: "asc" }, { k: "nome", dir: "desc" }] }).map(p => p.nome);
   assert.deepEqual(r, ["Search", "Beach Hut", "Decision", "Gypsy Water"]);
+});
+
+test("filtros iguais aos de Amostras: casa, arquétipo/tier/posse “sem”, amostra em mãos (G/B), posse antiga ainda vale", async () => {
+  const { passaAmostra } = await import("../app/util.js");
+  const { chave } = await import("../app/mercado.js");
+  const l = baseComTiers(base, tiers);
+  const nomes = f => filtrar(l, f, { amostras: new Map([[chave("Amouage", "Search"), new Set(["Bia"])]]) }).map(p => p.nome).sort();
+  assert.deepEqual(nomes({ casa: "Byredo" }), ["Gypsy Water"]);
+  assert.deepEqual(nomes({ posse: "sem" }), ["Search"]);
+  assert.deepEqual(nomes({ posse: "Avaliado" }), ["Gypsy Water"]);
+  assert.deepEqual(nomes({ posse: "nao" }), ["Gypsy Water", "Search"]);   // valor salvo antes continua funcionando
+  assert.deepEqual(nomes({ arq: "sem" }), []);
+  assert.deepEqual(nomes({ am: "tem" }), ["Search"]);
+  assert.deepEqual(nomes({ am: "bia" }), ["Search"]);
+  assert.deepEqual(nomes({ am: "gui" }), []);
+  assert.deepEqual(nomes({ am: "nao" }), ["Decision", "Gypsy Water"]);
+  assert.equal(passaAmostra("", undefined), true);
+  const h = telaMercado({ lista: l, fonte: "planilha", arquetipos: [{ nome: "Monge", cor: "#000" }], filtro: { casa: "Amouage" }, limite: 60, amostras: new Map() });
+  assert.match(h, /id="mf-casa"/); assert.match(h, /id="mf-tier"/); assert.match(h, /id="mf-am"/); assert.match(h, /data-acao="mf-limpar"/);
 });
