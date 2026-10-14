@@ -48,8 +48,8 @@ def extrair_frascos():
             "janelas_estimadas": f["nome"] in JANELAS_ESTIMADAS,
         })
     grade = [f for f in out if f["camada"] == "grade" and f["tier"] != "D"]
-    assert len(out) == 79 and len(grade) == 69, (len(out), len(grade))
-    assert sum(f["janelas"] or 0 for f in out) == 651
+    assert len(out) == 79 and len(grade) == 70, (len(out), len(grade))
+    assert sum(f["janelas"] or 0 for f in out) == 654
     return out
 
 
@@ -118,7 +118,7 @@ def extrair_playbook(frascos):
             total += (1 if c["seguro"] else 0) + (1 if c["jogada"] else 0) + len(c["tambem"])
             celulas[OCAS_PLAYBOOK[oc_txt]] = c
         grade[faixa] = {"nota": nota, "celulas": celulas}
-    assert total == 651, total
+    assert total == 654, total
     n_cel = sum(len(g["celulas"]) for g in grade.values())
     assert n_cel == 38, n_cel  # 42 nominais − Cozy D/N em Muito Quente e Quente (Cozy só de Ameno para baixo)
     # contagem de janelas por frasco = coluna Janelas das fichas

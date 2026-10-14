@@ -32,7 +32,7 @@
 | Item | Valor |
 |---|---|
 | Grade | **69 frascos** — S 31 · A 26 · B 10 · C 2 (Oud Kyphi, Bleu de Chanel) |
-| Fora da grade | Bedouin Rose (D, 0 janelas) |
+| Fora da grade | nenhum desde 14/out/2026 (Bedouin Rose D → C, 3 janelas: Frio × N.For e Cozy N, Muito Frio × N.Inf) |
 | Camada custo | 9 frascos — **usada só em academia e corrida; ignorada em qualquer análise ou framework** (regra dele, 25/set/2026). Aparece no modelo diário só com `Extra: corrida` ou `Extra: academia` |
 | Total próprio | 79 frascos (= Frasco Gui na aba Tiers) |
 | Frascos de 10 ml experimentais | Oud Kyphi, Bedouin Rose, K-Musk — não tratar como frasco cheio em custo por uso ou desbaste |
@@ -49,7 +49,7 @@
 | **Longevidade** | O perfume do Dia **não precisa durar até a noite** (25/set/2026). Longevidade não é critério |
 | **Custo por uso** | Noite Ameno/Fresco ≈ 300 noites/ano: noturno denso não reprova por clima, reprova por redundância no slot Noite e por tier. Frio/Muito Frio seguem escassos (~31 noites, ~5 dias). O gargalo é o slot Dia. Noite de calor é rara (~37/ano) |
 | **Janelas decididas por ele** | **Vibrato:** só dia e trabalho (Lazer, Trab. Informal, Trab. Formal em MQ/Q/A), 9 janelas — saiu das noites em 05/out/2026. **Tygar Extrait:** noites de MQ/Q/A. **Les Sables Roses:** noites exceto as quentes (Ameno–MF). **Favonius, Omnia Omnibus Ubique, Scarlet Sands:** janelas estimadas pelo Claude pela pirâmide — não declaradas |
-| **Desbaste** | Os C ficam ("têm valor em circunstâncias"). Único fora: Bedouin Rose. B redundantes só se decide com ≥90 dias de diário 2x/dia |
+| **Desbaste** | Os C ficam ("têm valor em circunstâncias"). Bedouin Rose saiu do D para C em 14/out/2026. B redundantes só se decide com ≥90 dias de diário 2x/dia |
 | **Alteração da grade** | Só por script (gerador), nunca editando célula à mão. Reabre com: mudança de tier na aba Tiers, aptidão/envelope declarado por ele, frasco novo ou saída |
 | **Descrição de notas** | Sempre com fonte (Fragrantica, Parfumo, site da marca); nunca inventar pirâmide |
 

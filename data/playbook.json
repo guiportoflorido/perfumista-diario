@@ -857,9 +857,10 @@
       "Carved Oud",
       "Bois du Portugal",
       "Serenity",
-      "Monarch"
+      "Monarch",
+      "Bedouin Rose"
      ],
-     "texto": "**Seguro: Ombre Nomade** (3). Oud-rosa-incenso-framboesa-açafrão-amberwood-benjoim-birch-gerânio — tier S. **A jogada: Radical Rose** — Rosa dark-mineral com chili-imortelle: a rosa que não é rosa de mulher (tier S). **Também:** Brompton, Favonius, Les Sables Roses, Purpose 50, Aventus Absolu, Oud Satin Mood, Outlands, Liwa, Amyris Homme Extrait, Decision, Omnia Omnibus Ubique, Blonde Amber, Grand Soir, Bijou Zafran, Imperial, Royal Oud, Carved Oud, Bois du Portugal, Serenity, Monarch."
+     "texto": "**Seguro: Ombre Nomade** (3). Oud-rosa-incenso-framboesa-açafrão-amberwood-benjoim-birch-gerânio — tier S. **A jogada: Radical Rose** — Rosa dark-mineral com chili-imortelle: a rosa que não é rosa de mulher (tier S). **Também:** Brompton, Favonius, Les Sables Roses, Purpose 50, Aventus Absolu, Oud Satin Mood, Outlands, Liwa, Amyris Homme Extrait, Decision, Omnia Omnibus Ubique, Blonde Amber, Grand Soir, Bijou Zafran, Imperial, Royal Oud, Carved Oud, Bois du Portugal, Serenity, Monarch, Bedouin Rose."
     },
     "Cozy D": {
      "seguro": "Gris Charnel",
@@ -908,9 +909,10 @@
       "Intoxicated",
       "Black Saffron Absolu",
       "Serenity",
-      "Apotecário"
+      "Apotecário",
+      "Bedouin Rose"
      ],
-     "texto": "**Seguro: Grand Soir** (3). Labdanum espanhol-âmbar-benjoim de Sião-baunilha-tonka-lavanda — tier S. **A jogada: Bijou Zafran** — O açafrão estranho e macio — aresta indecifrável (tier S). **Também:** African Leather, Amyris Homme Extrait, Blonde Amber, Odéon, Oud Satin Mood, Brompton, Gris Charnel, Les Sables Roses, Liwa, Omnia Omnibus Ubique, Ombre Nomade, Outlands, Caden, Intoxicated, Black Saffron Absolu, Serenity, Apotecário."
+     "texto": "**Seguro: Grand Soir** (3). Labdanum espanhol-âmbar-benjoim de Sião-baunilha-tonka-lavanda — tier S. **A jogada: Bijou Zafran** — O açafrão estranho e macio — aresta indecifrável (tier S). **Também:** African Leather, Amyris Homme Extrait, Blonde Amber, Odéon, Oud Satin Mood, Brompton, Gris Charnel, Les Sables Roses, Liwa, Omnia Omnibus Ubique, Ombre Nomade, Outlands, Caden, Intoxicated, Black Saffron Absolu, Serenity, Apotecário, Bedouin Rose."
     }
    }
   },
@@ -993,9 +995,10 @@
       "Intoxicated",
       "Apotecário",
       "Monarch",
+      "Bedouin Rose",
       "Oud Kyphi"
      ],
-     "texto": "**Seguro: Outlands** (3). Olíbano-cardamomo-elemi-limão-bergamota-pimenta Sichuan / patchouli-anis-coentro-cominho-açafrão-flor de laranjeira-absinto-gerânio-rosa / olíbano-baunilha-âmbar-benjoim-oud-opoponax-birch-ambergris-maltol-labdanum-musk — tier S. **A jogada: Brompton** — Opulência floral-resinosa em extrait — S (tier S). **Também:** Grand Soir, Ombre Nomade, Radical Rose, Favonius, Les Sables Roses, Aventus Absolu, Bijou Zafran, Omnia Omnibus Ubique, Oud Satin Mood, Blonde Amber, African Leather, Liwa, Purpose 50, Caden, Imperial, Intoxicated, Apotecário, Monarch, Oud Kyphi."
+     "texto": "**Seguro: Outlands** (3). Olíbano-cardamomo-elemi-limão-bergamota-pimenta Sichuan / patchouli-anis-coentro-cominho-açafrão-flor de laranjeira-absinto-gerânio-rosa / olíbano-baunilha-âmbar-benjoim-oud-opoponax-birch-ambergris-maltol-labdanum-musk — tier S. **A jogada: Brompton** — Opulência floral-resinosa em extrait — S (tier S). **Também:** Grand Soir, Ombre Nomade, Radical Rose, Favonius, Les Sables Roses, Aventus Absolu, Bijou Zafran, Omnia Omnibus Ubique, Oud Satin Mood, Blonde Amber, African Leather, Liwa, Purpose 50, Caden, Imperial, Intoxicated, Apotecário, Monarch, Bedouin Rose, Oud Kyphi."
     },
     "N.For": {
      "seguro": "Ombre Nomade",
@@ -1075,6 +1078,6 @@
   "Custo por uso com dois slots": "Dias e noites por faixa: normais INMET 1991–2020 (Mirante de Santana); slot Noite medido a ~21h. Frascos alocados = frascos distintos que aparecem em alguma célula da faixa na grade v59 (Dia = Lazer, Trab. Informal, Trab. Formal, Cozy Dia; Noite = Noite Informal, Noite Formal, Cozy Noite).\n\n| Faixa | Dias/ano (slot Dia) | Noites/ano (slot Noite) | Frascos alocados Dia / Noite | Dias por frasco / Noites por frasco |\n|---|---|---|---|---|\n| 🔴 Muito Quente | 27 | 1 | 23 / 15 | 1,2 / 0,1 |\n| 🟠 Quente | 124 | 36 | 34 / 27 | 3,6 / 1,3 |\n| 🟡 Ameno | 154 | 154 | 49 / 38 | 3,1 / 4,1 |\n| 🔵 Fresco | 55 | 143 | 44 / 41 | 1,2 / 3,5 |\n| 🟣 Frio | 5 | 30 | 28 / 32 | 0,2 / 0,9 |\n| ⚫ Muito Frio | 0 | 1 | 19 / 24 | 0,0 / 0,0 |\n\n**Regras (vigentes desde 19/set/2026; substituem o antigo \"slot frio congelado\"):**\n\n1. **Noite Ameno/Fresco (~300 noites/ano) é a janela mais abundante da coleção.** Noturno denso não reprova por clima; reprova, se reprovar, por **redundância dentro do slot Noite** e por tier — hoje 38 frascos disputam a noite de Ameno e 41 a de Fresco.\n2. **Frio e Muito Frio seguem escassos nos dois slots** (~31 noites e ~5 dias/ano). Candidato cujo envelope não inclua o Fresco tem custo por uso alto.\n3. **O gargalo é o slot Dia** (~12h, AC/trabalho, Ameno–Quente). Compra por gap se defende de dia. Fresco de dia: 44 frascos para ~55 dias.\n4. **Noite de calor é rara** (~37 noites/ano Quente/Muito Quente a 21h).",
   "Notas de uso": "- **Também** = ordem de prioridade dentro da célula (tier → aptidão → nome). Com 31 S na grade, o tier separa pouco dentro das células de noite; na dúvida entre S do *Também*, pesa o uso real registrado no diário.\n- **Dois slots:** célula do Dia de manhã (7h00–7h30) e célula da Noite antes do banho (19h–20h). O perfume da noite é o segundo do dia — não repetir o da manhã; evitar dois densos (peso ≥4) no mesmo dia; mesmo arquétipo nos dois slots é aceitável. Em casa à noite, −1 spray. O perfume do Dia **não precisa durar até a noite** (decisão dele, 25/set/2026).\n- **Sprays das células são valores finais.** Em extraits e beasts, primeira vez numa faixa nova: comece 1 abaixo. Désobéissant: 6–7. Ombre Nomade e Outlands no Fresco: 2.\n- Cozy Dia/Noite não existem em Muito Quente/Quente.\n- **Faixa do slot Dia:** máxima prevista para as horas restantes do dia. **Slot Noite:** temperatura prevista para ~20–22h (em SP, tipicamente uma faixa abaixo da máxima).\n- **Td:** coluna Td da ficha do frasco para o modificador ±2.\n- **O que reabre o playbook:** mudança de tier na aba *Tiers*, mudança de aptidão/envelope declarada por ele, ou frasco novo — sempre por script, nunca editando célula à mão. **Pendências que reabrem:** (1) onde ele de fato usa Favonius, Omnia Omnibus Ubique e Scarlet Sands (envelopes hoje estimados pelo Claude); (2) se ele quiser que os Seguros reflitam os novos S (hoje vale incumbência, por decisão dele)."
  },
- "total_alocacoes": 651,
+ "total_alocacoes": 654,
  "celulas": 38
 }

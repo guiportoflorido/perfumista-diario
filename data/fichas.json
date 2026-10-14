@@ -216,7 +216,7 @@
    "casa": "BYNOMADS",
    "conc": "n/d",
    "arquetipo": "Rosal",
-   "tier": "D",
+   "tier": "C",
    "perfil": "tâmaras-canela-açafrão-bergamota / rosa Taif-imortelle-osmanthus-artemísia / âmbar-olíbano-cedro-tonka-vetiver-patchouli-oud",
    "eixo": "S",
    "doc": "2",
@@ -225,9 +225,9 @@
    "envelope": "🔵F–⚫MF",
    "aptidao": "N.Inf 2 · N.For 2 · Cozy N 2",
    "sprays_base": "3",
-   "janelas": "0",
+   "janelas": "3",
    "vizinhos": "Brompton (rosa-açafrão-imortelle-incenso), Radical Rose, Odéon, OSM",
-   "leitura": "Descrição literal do Brompton. Tier D: fora da grade (0 janelas). Frasco de 10 ml experimental."
+   "leitura": "Descrição literal do Brompton. **Tier C desde 14/out/2026** (era D, fora da grade): 3 janelas, só em *Também* — Frio × Noite Formal, Frio × Cozy Noite e Muito Frio × Noite Informal (células escolhidas por ele; o ideal térmico de 12 °C cai na fronteira Frio/Muito Frio). Frasco de 10 ml experimental."
   },
   "Bijou Zafran": {
    "n": 13,
@@ -758,7 +758,7 @@
    "aptidao": "N.Inf 3 · N.For 3 · Cozy N 2",
    "sprays_base": "3",
    "janelas": "12",
-   "vizinhos": "Radical Rose, Brompton, Odéon, Oud Satin Mood (rosa oriental); Ombre Nomade (rosa-oud da mesma casa); Bedouin Rose (D)",
+   "vizinhos": "Radical Rose, Brompton, Odéon, Oud Satin Mood (rosa oriental); Ombre Nomade (rosa-oud da mesma casa); Bedouin Rose (C)",
    "leitura": "Rosa centifolia realista com açafrão e pimenta preta sobre oud discreto e ambergris — a rosa-oud mais limpa e menos doce do território (sem baunilha, sem framboesa). **Tier S dado pelo usuário a partir da amostra (tabelão v2, 12/set) e confirmado para o frasco em 19/set/2026.** Envelope e ocasiões por declaração dele: \"noites em geral, exceto as quentes\" → Noite Informal, Noite Formal e Cozy Noite de Ameno a Muito Frio = 12 células = teto S. **Registro franco (na compra):** 7º frasco do território rosa oriental e 13º oud nomeado — categoria que ele recusou 5× por redundância (Roja Amber Aoud, Roja Aoud, Aquilaria, FM Promise e este mesmo Les Sables Roses) sob o princípio \"múltiplos rosa-oud são desejo, não guarda-roupa\". Não ataca nenhum dos 5 gaps: compra por prazer, chamada pelo nome. O que a diferencia dos vizinhos é textura, não território: Radical Rose é seca-mineral, Brompton é opulenta-floral, Odéon é geleia, OSM é caramelo; esta é a rosa polida de ambergris. Sprays 3 (EDP de longevidade forte, projeção que assenta); Frio/MF 4."
   },
   "Liwa": {
