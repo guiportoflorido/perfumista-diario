@@ -17,9 +17,9 @@ import { contagens } from "./estatisticas.js";
 import { telaAmostras, fichaAmostra, deLinhas as amostrasDeLinhas, juntar, semRegistro, camposAmostra, camposAvaliacaoMexidos, cacheAmostras, baixarAmostras,
   adicionarAmostra, editarAmostra, removerAmostra, novoId, normalizar } from "./amostras.js";
 import { ler, gravar } from "./store.js";
-import { fotoFicha, fotoMini, reduzirImagem, subirFoto, removerFotoPlanilha, iniciarFotos } from "./fotos.js";
+import { fotoFicha, iconeFicha, fotoMini, reduzirImagem, subirFoto, removerFotoPlanilha, iniciarFotos } from "./fotos.js";
 
-export const APP_VERSAO = "5.19";  // sobe a cada publicação: confere no topo da tela se o celular pegou a versão nova
+export const APP_VERSAO = "5.20";  // sobe a cada publicação: confere no topo da tela se o celular pegou a versão nova
 const S = { aba: "hoje", frascos: [], frascosAtivos: [], avisosTiers: null, fichas: {}, versao: {}, prev: null, prevOffline: false,
   prevErro: null, metar: null, metarMotivo: null, clima: null, resultado: null, erroMotor: null, entrada: "", carregandoClima: true,
   sync: { estado: "ocioso", msg: "" }, hr: ler("hr", { preset: "tudo" }), tokenNovo: null, playbook: null, janelas: new Map(),
@@ -615,7 +615,7 @@ function abrirFicha(nome) {
   const usos = historico().filter(r => r.perfume === nome);
   const ult = usos[usos.length - 1];
   $("#folha").innerHTML = `<div class="veu" data-fechar><div class="folha" role="dialog" aria-modal="true" aria-labelledby="fichaT">
-    <div class="linha-flex"><span class="ficha-ic">${arqIcone(f.arquetipo, 34)}</span><h2 id="fichaT">${esc(nome)}</h2>${tierHTML(f.tier)}<span class="esp"></span><button class="btn sec peq" data-fechar>Fechar</button></div>
+    <div class="linha-flex">${iconeFicha(doMercado(f.casa, nome), arqIcone(f.arquetipo, 34))}<h2 id="fichaT">${esc(nome)}</h2>${tierHTML(f.tier)}<span class="esp"></span><button class="btn sec peq" data-fechar>Fechar</button></div>
     ${(() => { const m = doMercado(f.casa, nome); return fotoFicha(m || { nome }, { editavel: Boolean(m && configurado()), id: m ? m.casa + "||" + m.nome : "",
       motivo: m ? "" : "Para pôr foto, o frasco precisa estar na aba Mercado da planilha com a mesma casa e nome." }); })()}
     <p class="nota ficha-sub">${esc(f.casa)} · ${esc(fi.conc)} · ${arqTag(f.arquetipo)}</p>

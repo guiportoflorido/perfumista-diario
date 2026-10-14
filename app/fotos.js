@@ -1,7 +1,8 @@
 // fotos.js — foto de cada perfume: tirada ou escolhida no aparelho, reduzida aqui (JPEG) e guardada pelo Apps Script na
 // aba Fotos da própria planilha (sem Google Drive). Na aba Mercado, a coluna Foto tem só a versão ("aba Fotos · data");
 // a imagem é buscada à parte (ação "fotos") e guardada no aparelho (Cache Storage), uma vez por versão.
-// Uma foto por perfume, vale para frasco e amostra. Aparece na ficha (Coleção, Mercado, Amostras) e nos cartões de Hoje.
+// Uma foto por perfume, vale para frasco e amostra. Aparece em círculo no cabeçalho da ficha (no lugar do ícone do
+// arquétipo) e nos cartões de Hoje.
 import { esc } from "./util.js";
 import { chamar } from "./api.js";
 
@@ -21,15 +22,19 @@ function fonte(p) {
   return `data-foto-planilha="${esc(p.casa + "||" + p.nome)}" data-foto-v="${esc(v)}"`;
 }
 
-/** Bloco da ficha: foto (ou espaço vazio) + botões. `p` = perfume da aba Mercado; `id` = casa||perfume. */
-export function fotoFicha(p, { editavel = false, id = "", motivo = "" } = {}) {
+/** Ícone do cabeçalho da ficha: a foto recortada em círculo, ou o ícone do arquétipo (`icone`, HTML) se não houver foto. */
+export function iconeFicha(p, icone = "") {
   const src = fonte(p);
-  const botoes = editavel && id
-    ? `<div class="foto-acoes"><label class="btn sec peq">${src ? "Trocar foto" : "Adicionar foto"}<input type="file" accept="image/*" data-foto="${esc(id)}" hidden></label>
-        ${src ? `<button class="btn sec peq" type="button" data-foto-remover="${esc(id)}">Remover</button>` : ""}</div>`
-    : motivo ? `<p class="nota">${esc(motivo)}</p>` : "";
-  if (!src && !botoes) return "";
-  return `<div class="foto-ficha">${src ? `<img ${src} alt="Foto de ${esc(p.nome || "")}" decoding="async" referrerpolicy="no-referrer">` : ""}${botoes}</div>`;
+  if (src) return `<span class="ficha-ic ficha-foto"><img ${src} alt="Foto de ${esc(p.nome || "")}" decoding="async" referrerpolicy="no-referrer"></span>`;
+  return icone ? `<span class="ficha-ic">${icone}</span>` : "";
+}
+
+/** Botões da foto na ficha (a foto em si fica no cabeçalho, ver iconeFicha). `p` = perfume da aba Mercado; `id` = casa||perfume. */
+export function fotoFicha(p, { editavel = false, id = "", motivo = "" } = {}) {
+  const tem = Boolean(fonte(p));
+  if (editavel && id) return `<div class="foto-acoes"><label class="btn sec peq">${tem ? "Trocar foto" : "Adicionar foto"}<input type="file" accept="image/*" data-foto="${esc(id)}" hidden></label>
+        ${tem ? `<button class="btn sec peq" type="button" data-foto-remover="${esc(id)}">Remover foto</button>` : ""}</div>`;
+  return motivo ? `<p class="nota">${esc(motivo)}</p>` : "";
 }
 
 /** Miniatura para cartões e listas (nada se não houver foto). `p` = perfume da aba Mercado. */
