@@ -384,7 +384,7 @@
    "nome": "Bedouin Rose",
    "casa": "BYNOMADS",
    "camada": "grade",
-   "tier": "D",
+   "tier": "C",
    "arquetipo": "Rosal",
    "eixo": "S",
    "doc": 2,
@@ -403,7 +403,7 @@
     "Cozy N": 2
    },
    "sprays_base": 3,
-   "janelas": 0,
+   "janelas": 3,
    "chuva": 0.88,
    "sem_piramide": false,
    "longev": 10,

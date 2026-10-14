@@ -8,10 +8,11 @@ const frascos = JSON.parse(readFileSync(new URL("../data/frascos.json", import.m
 const playbook = JSON.parse(readFileSync(new URL("../data/playbook.json", import.meta.url)));
 const f = n => frascos.find(x => x.nome === n);
 
-test("janelas por frasco = coluna Janelas (651 no total, 69 frascos)", () => {
+test("janelas por frasco = coluna Janelas (654 no total, 70 frascos — Bedouin Rose C desde 14/out)", () => {
   const j = janelasPorFrasco(playbook);
   for (const x of frascos.filter(daGrade)) assert.equal((j.get(x.nome) || []).length, x.janelas, x.nome);
-  assert.equal([...j.values()].reduce((s, a) => s + a.length, 0), 651);
+  assert.equal([...j.values()].reduce((s, a) => s + a.length, 0), 654);
+  assert.equal(j.get("Bedouin Rose").map(w => `${w.faixa}×${w.ocasiao}`).sort().join(" | "), "Frio×Cozy N | Frio×N.For | Muito Frio×N.Inf");
   assert.ok(j.get("Désobéissant").some(w => w.faixa === "Muito Quente" && w.ocasiao === "Lazer" && w.papel === "Seguro"));
 });
 
@@ -19,14 +20,14 @@ test("contagens: só grade (camada custo e fora da coleção não contam), 30 di
   const hist = [{ data: "2026-09-01", slot: "M", perfume: "Odéon" }, { data: "2026-10-08", slot: "N", perfume: "Odéon" },
     { data: "2026-10-08", slot: "M", perfume: "Sky" }, { data: "2026-10-04", slot: "M", perfume: "Acqua Viva" }];
   const c = contagens(hist, frascos, "2026-10-09");
-  assert.equal(c.por.size, 69); assert.equal(c.total, 2); assert.equal(c.foraDaGrade, 2);
+  assert.equal(c.por.size, 70); assert.equal(c.total, 2); assert.equal(c.foraDaGrade, 2);
   assert.deepEqual((({ n, n30, M, N, ultimo, dias }) => ({ n, n30, M, N, ultimo, dias }))(c.por.get("Odéon")), { n: 2, n30: 1, M: 1, N: 1, ultimo: "2026-10-08", dias: 1 });
   assert.equal(c.cobertura, 39);
   const esq = esquecidos(c.por);
-  assert.ok(!esq.some(x => x.f.nome === "Odéon")); assert.equal(esq.length, 68);
+  assert.ok(!esq.some(x => x.f.nome === "Odéon")); assert.equal(esq.length, 69);
   assert.equal(esq[0].f.tier, "S");
   const u = usoVsJanelas(c.por).find(x => x.nome === "Odéon");
-  assert.ok(Math.abs(u.esperado - 2 * 9 / 651) < 1e-12);
+  assert.ok(Math.abs(u.esperado - 2 * 9 / 654) < 1e-12);
 });
 
 test("calibração: real − sugerido por frasco e geral, ignorando registros sem sugestão", () => {

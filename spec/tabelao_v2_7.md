@@ -15,7 +15,7 @@
 | D | 13 | 1 | 2 | 1 | 0 | 8 | 1 |
 | **Total** | **336** | **79** | **15** | **5** | **42** | **177** | **18** |
 
-Frasco Gui = 79 (69 grade + Bedouin Rose em D + 9 camada custo) · por tier: S 33 · A 30 · B 13 · C 2 · D 1.
+Frasco Gui = 79 (70 grade + 9 camada custo) · por tier: S 33 · A 30 · B 13 · C 3 · D 0 (Bedouin Rose D → C em 14/out/2026, aba Tiers).
 
 ## Tabelão
 
@@ -81,7 +81,7 @@ Frasco Gui = 79 (69 grade + Bedouin Rose em D + 9 camada custo) · por tier: S 3
 | 58 | Bvlgari | Le Gemme Tygar Extrait | Frasco Gui | S | — |
 | 59 | By Kilian | Angels' Share | Amostra | B | 186 |
 | 60 | By Kilian | Intoxicated | Frasco Gui | A | 187 |
-| 61 | BYNOMADS | Bedouin Rose | Frasco Gui | D | 188 |
+| 61 | BYNOMADS | Bedouin Rose | Frasco Gui | C | 188 |
 | 62 | BYNOMADS | K-Musk | Frasco Gui | B | 189 |
 | 63 | BYNOMADS | Oud Kyphi | Frasco Gui | C | 190 |
 | 64 | Byredo | Alto Astral | Avaliado | B | 193 |

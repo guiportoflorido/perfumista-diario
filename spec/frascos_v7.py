@@ -3,7 +3,7 @@
 frascos_v7.py — base de dados dos 79 frascos para o modelo diário (v7, 05/out/2026)
 
 v7: só limpeza de cabeçalho e comentários. Nenhum dado muda vs v6. Tiers conferidos com a aba Tiers do Google Sheets
-"Diário de Uso — Perfumes" (fonte única de tier desde 04/out/2026). Janelas = playbook v59 (651; Vibrato 9, só dia,
+"Diário de Uso — Perfumes" (fonte única de tier desde 04/out/2026). Janelas = playbook v59 (654 desde 14/out com Bedouin Rose C; Vibrato 9, só dia,
 desde 05/out/2026). A camada custo (9) fica aqui só para o modelo sugerir quando a entrada traz "Extra: corrida" ou
 "Extra: academia" — fora de qualquer análise da coleção (regra dele, 25/set/2026).
 
@@ -13,7 +13,9 @@ Fontes, por campo:
         chuva = índice hipótese do Claude (nota a nota sobre a pirâmide), não dado medido.
   FICHA (conc, eixo, aptidão, sprays_base, janelas)
         = transcritos das fichas_tecnicas_v9.md (grade 69 + Bedouin Rose + camada custo 9).
-        Validação embutida: 79 frascos · Td grade C21/S25/N24 · janelas = 651.
+        Validação embutida: 79 frascos · Td grade C21/S25/N24 · janelas = 654.
+        14/out/2026: Bedouin Rose D → C (aba Tiers, decisão dele) com 3 janelas — Frio × N.For e Cozy N,
+        Muito Frio × N.Inf (células escolhidas por ele; ideal térmico 12 °C cai na fronteira Frio/Muito Frio).
   NOVO  (longevidade_h, projecao, curva)
         = ESTIMATIVA derivada por regra (concentração × peso × doçura) + overrides onde a
         Leitura da ficha traz dado (beast, projeção íntima, relatos de horas). Nada aqui é
@@ -40,7 +42,7 @@ MAPA = [
  {"n":"Aventus","casa":"Creed","arq":"Chiprista","t":"A","td":"N","p":3,"d":1,"a":0,"b":3,"c":0,"r":0.14,"u":0},
  {"n":"Aventus Absolu","casa":"Creed","arq":"Chiprista","t":"S","td":"N","p":3,"d":1,"a":1,"b":5,"c":0,"r":0.11,"u":0},
  {"n":"Beach Hut Man","casa":"Amouage","arq":"Botânico","t":"A","td":"C","p":2,"d":0,"a":0,"b":4,"c":0,"r":1.66,"u":0},
- {"n":"Bedouin Rose","casa":"BYNOMADS","arq":"Rosal","t":"D","td":"S","p":4,"d":2,"a":3,"b":5,"c":0,"r":0.88,"u":0},
+ {"n":"Bedouin Rose","casa":"BYNOMADS","arq":"Rosal","t":"C","td":"S","p":4,"d":2,"a":3,"b":5,"c":0,"r":0.88,"u":0},
  {"n":"Bijou Zafran","casa":"Ormonde Jayne","arq":"Curtidor","t":"S","td":"S","p":3,"d":1,"a":2,"b":5,"c":0,"r":1.21,"u":0},
  {"n":"Black Saffron Absolu","casa":"Byredo","arq":"Curtidor","t":"A","td":"N","p":3,"d":1,"a":2,"b":4,"c":0,"r":0.75,"u":0},
  {"n":"Bleu de Chanel","casa":"Chanel","arq":"Mediterrâneo","t":"C","td":"C","p":2,"d":0,"a":0,"b":2,"c":0,"r":-0.11,"u":0},
@@ -124,7 +126,7 @@ FICHA = {
  "Aventus": ("EDP", "F", "Lazer 3 · T.Inf 3 · N.Inf 3 · N.For 1", 3, 9),
  "Aventus Absolu": ("EDP", "F", "Lazer 2 · T.Inf 1 · N.Inf 3 · N.For 3", 3, 12),
  "Beach Hut Man": ("EDP", "P", "Lazer 3 · T.Inf 3", 3, 9),
- "Bedouin Rose": ("n/d", "S", "N.Inf 2 · N.For 2 · Cozy N 2", 3, 0),
+ "Bedouin Rose": ("n/d", "S", "N.Inf 2 · N.For 2 · Cozy N 2", 3, 3),
  "Bijou Zafran": ("EDP", "P", "T.Inf 1 · N.Inf 3 · N.For 1 · Cozy N 3", 3, 12),
  "Black Saffron Absolu": ("Absolu de Parfum", "P", "T.Inf 1 · N.Inf 3 · Cozy D 2 · Cozy N 2", 3, 9),
  "Bleu de Chanel": ("EDP", "F", "T.Inf 3 · T.For 2 · N.Inf 2", 4, 3),
@@ -285,13 +287,13 @@ def carregar():
     assert len(grade) == 70
     td_cnt = {k: sum(1 for f in grade if f["td"] == k) for k in "CSN"}
     assert td_cnt == {"C": 21, "S": 25, "N": 24}, td_cnt
-    assert sum(f["janelas"] or 0 for f in grade) == 651, sum(f["janelas"] or 0 for f in grade)
+    assert sum(f["janelas"] or 0 for f in grade) == 654, sum(f["janelas"] or 0 for f in grade)
     tiers = {k: sum(1 for f in frascos if f["tier"] == k) for k in "SABCD"}
-    assert tiers == {"S": 33, "A": 30, "B": 13, "C": 2, "D": 1}, tiers
+    assert tiers == {"S": 33, "A": 30, "B": 13, "C": 3, "D": 0}, tiers
     return frascos
 
 
 if __name__ == "__main__":
     fr = carregar()
-    print("OK — 79 frascos · Td grade C21/S25/N24 · janelas 651 · tiers", {k: sum(1 for f in fr if f['tier']==k) for k in 'SABCD'})
+    print("OK — 79 frascos · Td grade C21/S25/N24 · janelas 654 · tiers", {k: sum(1 for f in fr if f['tier']==k) for k in 'SABCD'})
     print("perf por leitura:", sum(1 for f in fr if f["perf_origem"] == "leitura"), "· por regra:", sum(1 for f in fr if f["perf_origem"] == "regra"))

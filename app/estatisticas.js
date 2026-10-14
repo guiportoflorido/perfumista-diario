@@ -49,7 +49,7 @@ export function esquecidos(por, limite = 45) {
     .sort((a, b) => "SABC".indexOf(a.f.tier) - "SABC".indexOf(b.f.tier) || (b.dias ?? 1e9) - (a.dias ?? 1e9) || a.f.nome.localeCompare(b.f.nome));
 }
 
-/** Uso × janelas: participação de cada frasco nos usos vs. participação nas 651 janelas do playbook. */
+/** Uso × janelas: participação de cada frasco nos usos vs. participação nas janelas do playbook (654 desde 14/out/2026). */
 export function usoVsJanelas(por) {
   const totJ = [...por.values()].reduce((s, c) => s + (c.f.janelas || 0), 0);
   const totU = [...por.values()].reduce((s, c) => s + c.n, 0);
