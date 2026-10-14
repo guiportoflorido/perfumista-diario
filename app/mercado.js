@@ -3,7 +3,7 @@
 import { esc, tierHTML, ordsDe, compararMulti, cmpValor, cabOrd, painelOrd, OPC_AMOSTRA, passaAmostra, temFiltro } from "./util.js";
 import { arqTag, arqIcone } from "./icones.js";
 import { chamar } from "./api.js";
-import { fotoFicha } from "./fotos.js";
+import { fotoFicha, iconeFicha } from "./fotos.js";
 import { ler, gravar } from "./store.js";
 
 export const COLS = ["Casa", "Perfume", "Tier", "Posse", "Arquétipo", "Resumo", "Topo", "Coração", "Base", "Nariz", "Wishlist", "Atualizado em"];
@@ -217,7 +217,7 @@ function tabela(linhas, f, { editavel = false, arquetipos = [] } = {}) {
 export function fichaEditavel(p, { arquetipos, editavel, novo = false, confirmarRemover = false }) {
   const sel = (id, opcoes, at) => `<select id="${id}" ${editavel ? "" : "disabled"}>${opcoes.map(([v, r]) => `<option value="${esc(v)}" ${String(at) === String(v) ? "selected" : ""}>${esc(r)}</option>`).join("")}</select>`;
   const txt = (id, v, linhas = 1, extra = "") => linhas > 1 ? `<textarea id="${id}" rows="${linhas}" ${editavel ? "" : "readonly"}>${esc(v)}</textarea>` : `<input id="${id}" value="${esc(v)}" ${editavel ? "" : "readonly"} autocomplete="off" ${extra}>`;
-  return `<div class="linha-flex">${p.arquetipo ? `<span class="ficha-ic">${arqIcone(p.arquetipo, 34)}</span>` : ""}<h2 id="fichaT">${novo ? "Novo perfume" : esc(p.nome)}</h2>${p.tier && !novo ? tierHTML(p.tier) : ""}<span class="esp"></span><button class="btn sec peq" data-fechar>Fechar</button></div>
+  return `<div class="linha-flex">${novo ? (p.arquetipo ? `<span class="ficha-ic">${arqIcone(p.arquetipo, 34)}</span>` : "") : iconeFicha(p, p.arquetipo ? arqIcone(p.arquetipo, 34) : "")}<h2 id="fichaT">${novo ? "Novo perfume" : esc(p.nome)}</h2>${p.tier && !novo ? tierHTML(p.tier) : ""}<span class="esp"></span><button class="btn sec peq" data-fechar>Fechar</button></div>
     ${novo ? "" : fotoFicha(p, { editavel, id: p.casa + "||" + p.nome, motivo: editavel ? "" : "Fotos ficam na aba Mercado da planilha: conecte e crie a aba para adicionar." })}
     ${novo ? `<p class="nota">Entra na aba Mercado da planilha. Tier e posse, se preenchidos, também vão para a aba Tiers.</p>` : `<p class="nota">${esc(p.casa)}${p.atualizado ? ` · editado em ${esc(p.atualizado)}` : ""}</p>`}
     <form class="bloco" id="formMercado" data-casa="${esc(p.casa || "")}" data-nome="${esc(p.nome || "")}" data-novo="${novo ? 1 : ""}">
