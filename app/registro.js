@@ -50,3 +50,44 @@ export async function baixarPlanilha() {
   gravar("planilha", j.dados);
   return j.dados;
 }
+
+// ───────────── editar / apagar registros recentes ─────────────
+// Só os últimos DIAS_EDITAVEIS dias (a mesma regra vale no Apps Script). Registro ainda na fila (não enviado) muda só
+// no aparelho; o que já está na planilha muda lá (aba Diário) e na cópia local, sem esperar o próximo download.
+export const DIAS_EDITAVEIS = 30;
+export function limiteEdicao(hoje) {
+  const d = new Date(hoje + "T12:00:00Z");
+  d.setUTCDate(d.getUTCDate() - DIAS_EDITAVEIS);
+  return d.toISOString().slice(0, 10);
+}
+const chaveReg = r => `${r.data}|${r.slot}|${r.perfume}`;
+const CAMPOS = ["data", "slot", "perfume", "ocasiao", "temp", "td", "sprays", "notaDia", "obs"];
+const soNaFila = r => Boolean(r.id && r.pendente);
+
+/** Na cópia local da aba Diário: índice da linha do registro (usa a linha conhecida se ainda bater). */
+function idxNaCopia(rows, r) {
+  const bate = x => x && String(x[0]) === r.data && String(x[1]) === r.slot && String(x[2]) === r.perfume;
+  if (r.linha && bate(rows[r.linha - 1])) return r.linha - 1;
+  return rows.findIndex((x, i) => i > 0 && bate(x));
+}
+
+/** r = item do histórico unificado; campos = os 9 campos do Diário (data, slot, perfume, ocasiao, temp, td, sprays, notaDia, obs). */
+export async function editarRegistro(r, campos) {
+  if (soNaFila(r)) { atualizar(r.id, { ...campos, estado: "pendente", erro: null }); return { local: true }; }
+  const j = await chamar("editarRegistro", { orig: { data: r.data, slot: r.slot, perfume: r.perfume }, linha: r.linha || 0, campos }, { timeoutMs: 25000 });
+  const k = chaveReg(r), novo = Object.fromEntries(CAMPOS.map((c, i) => [c, j.registro[i]]));
+  salvarFila(fila().map(x => (x.estado === "enviado" && chaveReg(x) === k ? { ...x, ...novo } : x)));
+  const p = planilhaCache();
+  if (p?.diario) { const i = idxNaCopia(p.diario, r); if (i > 0) { p.diario[i] = [...j.registro]; gravar("planilha", p); } }
+  return { local: false };
+}
+
+export async function removerRegistro(r) {
+  if (soNaFila(r)) { descartar(r.id); return { local: true }; }
+  await chamar("removerRegistro", { orig: { data: r.data, slot: r.slot, perfume: r.perfume }, linha: r.linha || 0 }, { timeoutMs: 25000 });
+  const k = chaveReg(r);
+  salvarFila(fila().map(x => (x.estado === "enviado" && chaveReg(x) === k ? { ...x, estado: "descartado" } : x)));
+  const p = planilhaCache();
+  if (p?.diario) { const i = idxNaCopia(p.diario, r); if (i > 0) { p.diario.splice(i, 1); gravar("planilha", p); } }
+  return { local: false };
+}

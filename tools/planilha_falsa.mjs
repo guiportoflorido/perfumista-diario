@@ -2,7 +2,7 @@
 import vm from "node:vm";
 import { readFileSync } from "node:fs";
 
-export function carregarBackend(abas, { token = "dev", metar } = {}) {
+export function carregarBackend(abas, { token = "dev", metar, hoje = "2026-10-09" } = {}) {
   const aba = nome => {
     const rows = abas[nome];
     const range = (r, c, nr = 1, nc = 1) => {
@@ -31,7 +31,8 @@ export function carregarBackend(abas, { token = "dev", metar } = {}) {
     PropertiesService: { getScriptProperties: () => ({ getProperty: () => token }) },
     LockService: { getScriptLock: () => ({ waitLock() {}, releaseLock() {} }) },
     ContentService: { MimeType: { JSON: "json" }, createTextOutput: t => ({ setMimeType: () => t }) },
-    Utilities: { formatDate: () => "2026-10-09", getUuid: () => "x", base64Decode: s => Buffer.from(s, "base64") },
+    Utilities: { formatDate: d => new Date(Date.parse(hoje + "T12:00:00Z") - (Date.now() - d.getTime())).toISOString().slice(0, 10),   // "agora" = hoje
+      getUuid: () => "x", base64Decode: s => Buffer.from(s, "base64") },
     UrlFetchApp: { fetch: () => metar ? metar() : { getResponseCode: () => 503, getContentText: () => "" } },
   };
   vm.createContext(ctx);
