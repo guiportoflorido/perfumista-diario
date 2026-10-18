@@ -2,6 +2,9 @@
 // A camada custo fica fora de toda estatística (regra dele); Bedouin Rose (D) fica fora da grade.
 import { diasEntre } from "../engine/index.js";
 
+/** Análises só contam Dia (M) e Noite (N); Esportes (E) e 2ª aplicação (M2/N2) ficam só no registro (decisão dele, 18/out/2026). */
+export const deAnalise = r => r.slot === "M" || r.slot === "N";
+
 export const daGrade = f => f.camada === "grade" && f.tier !== "D";
 
 /** Janelas de cada frasco no playbook: [{faixa, faixaIdx, ocasiao, papel}] */
@@ -23,6 +26,7 @@ export function janelasPorFrasco(playbook) {
 export function contagens(hist, frascos, hoje, { todos = false } = {}) {
   const grade = todos ? frascos : frascos.filter(daGrade);
   const nomes = new Set(grade.map(f => f.nome));
+  hist = hist.filter(deAnalise);
   const regs = hist.filter(r => nomes.has(r.perfume) && r.data <= hoje);
   const por = new Map(grade.map(f => [f.nome, { f, n: 0, n30: 0, M: 0, N: 0, ultimo: null }]));
   for (const r of regs) {

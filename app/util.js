@@ -10,7 +10,13 @@ export const pinta = idx => `<span class="pinta f${idx}" aria-hidden="true"></sp
 export const nf = (x, d = 1) => (x == null || x === "" || Number.isNaN(Number(x)) ? "—" : Number(x).toLocaleString("pt-BR", { maximumFractionDigits: d }));
 export const virg = x => String(x).replace(".", ",");
 export const tierHTML = t => `<span class="tier ${esc(t)}" title="Tier ${esc(t)}">${esc(t)}</span>`;
-export const slotNome = s => (s === "M" ? "Dia" : s === "N" ? "Noite" : "?");
+// Slots do Diário: M (Dia) · M2 (2ª aplicação do Dia) · E (Esportes) · N (Noite) · N2 (2ª aplicação da Noite)
+export const SLOTS = [["M", "☀︎ Dia (M)"], ["M2", "☀︎ Dia · 2ª aplicação (M2)"], ["E", "🏃 Esportes (E)"], ["N", "☾ Noite (N)"], ["N2", "☾ Noite · 2ª aplicação (N2)"]];
+export const ORDEM_SLOT = { M: 0, M2: 1, E: 2, N: 3, N2: 4 };   // ordem dentro do dia
+export const slotBase = s => (s === "M2" ? "M" : s === "N2" ? "N" : s);
+export const slotNome = s => ({ M: "Dia", M2: "Dia · 2ª aplicação", E: "Esportes", N: "Noite", N2: "Noite · 2ª aplicação" })[s] || "?";
+export const slotIcone = s => (s === "E" ? "🏃" : slotBase(s) === "N" ? "☾" : "☀︎");
+export const opcoesSlot = sel => SLOTS.map(([v, r]) => `<option value="${v}" ${sel === v ? "selected" : ""}>${r}</option>`).join("");
 
 /** Markdown mínimo do playbook (tabelas, listas, negrito/itálico, parágrafos). Entrada é arquivo do projeto, escapada. */
 export function md(txt) {

@@ -6,10 +6,10 @@ import { montarEntrada, OCAS_DIA, OCAS_NOITE, AMBIENTES, EXTRAS } from "./entrad
 import { configurado, chamar } from "./api.js";
 import { fila, adicionar, descartar, enviar, planilhaCache, baixarPlanilha, limiteEdicao, editarRegistro, removerRegistro } from "./registro.js";
 import { lerTiers, lerDiario, aplicarTiers, diarioUnificado, nomesRegistraveis } from "./planilha.js";
-import { janelasPorFrasco, ajustarSprays } from "./estatisticas.js";
+import { janelasPorFrasco, ajustarSprays, deAnalise } from "./estatisticas.js";
 import { telaColecao, telaPlaybook, telaHistorico, idRegistro } from "./telas.js";
 import { telaRoda } from "./roda.js";
-import { ordsDe, tocarOrd, mudarOrds } from "./util.js";
+import { ordsDe, tocarOrd, mudarOrds, slotNome, slotBase, slotIcone, opcoesSlot } from "./util.js";
 import { definirCores, arqTag, arqIcone, corArq } from "./icones.js";
 import { ceuHTML, abrirRoleta, animarSpray } from "./diversao.js";
 import { chave as mercadoChave, telaMercado, fichaEditavel, camposAlterados, baseComTiers, deLinhas, linhasParaCriar, cachePlanilha, baixarMercado, criarNaPlanilha, editarNaPlanilha, adicionarNaPlanilha, removerNaPlanilha, fotoNoCache } from "./mercado.js";
@@ -19,7 +19,7 @@ import { telaAmostras, fichaAmostra, deLinhas as amostrasDeLinhas, juntar, semRe
 import { ler, gravar } from "./store.js";
 import { fotoFicha, iconeFicha, fotoMini, reduzirImagem, subirFoto, removerFotoPlanilha, iniciarFotos } from "./fotos.js";
 
-export const APP_VERSAO = "5.22";  // sobe a cada publicação: confere no topo da tela se o celular pegou a versão nova
+export const APP_VERSAO = "5.23";  // sobe a cada publicação: confere no topo da tela se o celular pegou a versão nova
 const S = { aba: "hoje", frascos: [], frascosAtivos: [], avisosTiers: null, fichas: {}, versao: {}, prev: null, prevOffline: false,
   prevErro: null, metar: null, metarMotivo: null, clima: null, resultado: null, erroMotor: null, entrada: "", carregandoClima: true,
   sync: { estado: "ocioso", msg: "" }, hr: ler("hr", { preset: "tudo" }), tokenNovo: null, playbook: null, janelas: new Map(),
@@ -41,7 +41,6 @@ const faixaHTML = idx => `<span class="pinta f${idx}" aria-hidden="true"></span>
 const nf = x => (x == null || x === "" ? "—" : Number(x).toLocaleString("pt-BR", { maximumFractionDigits: 1 }));
 const virg = x => String(x).replace(".", ",");
 const tierHTML = t => `<span class="tier ${esc(t)}" title="Tier ${esc(t)}">${esc(t)}</span>`;
-const slotNome = s => (s === "M" ? "Dia" : s === "N" ? "Noite" : "?");
 
 // ───────────────────────── dados ─────────────────────────
 async function carregarDados() {
@@ -91,8 +90,8 @@ function recalcular() {
   S.clima = derivarClima({ prev: S.prev, metar: S.metar, override: dia.override, data, aplico: aj.aplico,
     noite: dia.soUm ? null : aj.noite, tiro: aj.tiro, metarHoras: aj.metar_horas, metarTol: aj.metar_tol });
   const h = historico().filter(r => r.data <= data);
-  const manha = h.filter(r => r.data === data && r.slot === "M").at(-1);   // depois de uma troca, vale a última
-  const diario = h.slice(-150).reverse();
+  const manha = h.filter(r => r.data === data && slotBase(r.slot) === "M").at(-1);   // depois de troca ou 2ª aplicação, vale a última
+  const diario = h.filter(deAnalise).slice(-150).reverse();   // rotação: só Dia e Noite (Esportes e 2ª aplicação não entram)
   S.entrada = dia.textoManual ?? montarEntrada({ data, clima: S.clima, aj, dia, manha: manha?.perfume, diario });
   try { S.resultado = rodar(S.entrada, S.frascosAtivos); S.erroMotor = null; }
   catch (e) { S.resultado = null; S.erroMotor = e.message; }
@@ -251,7 +250,7 @@ function spraysHTML(t) {
 function blocoSlot(s) {
   const dia = estadoDia();
   const slotCod = s.nome === "Dia" ? "M" : "N";
-  const usado = historico().filter(r => r.data === dia.data && r.slot === slotCod).at(-1);
+  const usado = historico().filter(r => r.data === dia.data && slotBase(r.slot) === slotCod).at(-1);
   const card = (t, i, custo = false) => {
     const ja = usado && usado.perfume === t.nome;
     const hero = i === 0 && !custo;
@@ -372,7 +371,7 @@ async function lerAmostras({ forcar = false } = {}) {
 /** Usos no Diário por amostra: pelo "Nome no diário" da aba Tiers ou pelo próprio nome. Lê planilha e diário uma vez só. */
 function contadorUsos() {
   const porNome = new Map();
-  for (const r of historico()) porNome.set(r.perfume, (porNome.get(r.perfume) || 0) + 1);
+  for (const r of historico().filter(deAnalise)) porNome.set(r.perfume, (porNome.get(r.perfume) || 0) + 1);
   const tiers = new Map(planilha().tiers.map(t => [mercadoChave(t.casa, t.perfume), t]));
   const memo = new Map();
   return a => {
@@ -502,7 +501,7 @@ function formRegistro(p = {}) {
   return `<form class="bloco" id="formRegistro" autocomplete="off">
     <div class="campos">
       <label>Data<input type="date" id="rg-data" value="${esc(p.data || hoje)}" max="${hoje}" required></label>
-      <label>Slot<select id="rg-slot"><option value="M" ${slot === "M" ? "selected" : ""}>☀︎ Dia (M)</option><option value="N" ${slot === "N" ? "selected" : ""}>☾ Noite (N)</option></select></label>
+      <label>Slot<select id="rg-slot">${opcoesSlot(slot)}</select></label>
       <label class="largo">Perfume<input id="rg-perfume" list="rg-nomes" value="${esc(p.perfume || "")}" placeholder="Nome no diário" required></label>
       <label>Ocasião<select id="rg-ocasiao"><option value="">—</option>${OCAS_TODAS.map(o => `<option value="${o}" ${p.ocasiao === o ? "selected" : ""}>${ROT_OC[o]}</option>`).join("")}</select></label>
       <label>Sprays reais<input id="rg-sprays" inputmode="numeric" value="${esc(p.sprays ?? "")}" placeholder="${p.sugerido ? `sugerido ${p.sugerido}` : ""}"></label>
@@ -524,12 +523,12 @@ function telaRegistrar() {
   ${blocoSync()}
   ${formRegistro()}
   ${abertos.length ? `<div class="bloco"><h3>Na fila · ${abertos.length}</h3><div class="lista">${abertos.map(r => `
-    <div class="card"><span class="pos">${r.slot}</span><div style="min-width:0"><b>${esc(r.perfume)}</b><div class="casa">${esc(r.data)} · ${slotNome(r.slot)}${r.sprays ? ` · ${esc(r.sprays)} sprays` : ""}</div></div><span></span>
-      <div class="pq">${r.estado === "conflito" ? `Na planilha já existe <b>${esc(r.existente)}</b> neste slot. Foi uma 2ª aplicação ou uma troca?` : r.estado === "erro" ? `<span class="erro-txt">${esc(r.erro)}</span>` : configurado() ? "Aguardando envio." : "Configure a planilha em Ajustes para enviar."}</div>
-      <div class="acoes"><span class="esp"></span>${r.estado === "conflito" ? `<button class="btn peq" data-troca="${esc(r.id)}" data-tipo="segunda">2ª aplicação</button><button class="btn peq" data-troca="${esc(r.id)}" data-tipo="troca">Troca</button>` : ""}<button class="btn sec peq" data-descartar="${esc(r.id)}">Descartar</button></div>
+    <div class="card"><span class="pos" title="${esc(slotNome(r.slot))}">${slotIcone(r.slot)}</span><div style="min-width:0"><b>${esc(r.perfume)}</b><div class="casa">${esc(r.data)} · ${slotNome(r.slot)}${r.sprays ? ` · ${esc(r.sprays)} sprays` : ""}</div></div><span></span>
+      <div class="pq">${r.estado === "conflito" ? (r.slot === "M" || r.slot === "N" ? `Na planilha já existe <b>${esc(r.existente)}</b> neste slot. Foi uma 2ª aplicação ou uma troca?` : `Na planilha já existe <b>${esc(r.existente)}</b> neste slot. Foi uma troca?`) : r.estado === "erro" ? `<span class="erro-txt">${esc(r.erro)}</span>` : configurado() ? "Aguardando envio." : "Configure a planilha em Ajustes para enviar."}</div>
+      <div class="acoes"><span class="esp"></span>${r.estado === "conflito" && (r.slot === "M" || r.slot === "N") ? `<button class="btn peq" data-troca="${esc(r.id)}" data-tipo="segunda">2ª aplicação</button>` : ""}${r.estado === "conflito" ? `<button class="btn peq" data-troca="${esc(r.id)}" data-tipo="troca">Troca</button>` : ""}<button class="btn sec peq" data-descartar="${esc(r.id)}">Descartar</button></div>
     </div>`).join("")}</div></div>` : ""}
   <div class="bloco"><h3>Últimos registros</h3>${h.length ? `<div class="lista">${h.map(r => `
-    <div class="card"><span class="pos">${esc(r.slot)}</span><div style="min-width:0"><b>${esc(r.perfume)}</b><div class="casa">${esc(r.data)}${r.ocasiao ? ` · ${esc(ROT_OC[r.ocasiao] || r.ocasiao)}` : ""}${r.sprays ? ` · ${esc(r.sprays)} sprays` : ""}${r.pendente ? " · na fila" : ""}</div></div><span></span></div>`).join("")}</div>` : `<p class="vazio">Nenhum registro ainda.</p>`}</div>`;
+    <div class="card"><span class="pos" title="${esc(slotNome(r.slot))}">${slotIcone(r.slot)}</span><div style="min-width:0"><b>${esc(r.perfume)}</b><div class="casa">${esc(r.data)}${r.slot !== "M" && r.slot !== "N" ? ` · ${esc(slotNome(r.slot))}` : ""}${r.ocasiao ? ` · ${esc(ROT_OC[r.ocasiao] || r.ocasiao)}` : ""}${r.sprays ? ` · ${esc(r.sprays)} sprays` : ""}${r.pendente ? " · na fila" : ""}</div></div><span></span></div>`).join("")}</div>` : `<p class="vazio">Nenhum registro ainda.</p>`}</div>`;
 }
 
 function abrirRegistro(p) {
@@ -539,7 +538,7 @@ function abrirRegistro(p) {
 }
 
 function sugeridoHoje(slot, perfume) {
-  const so = S.resultado?.slots.find(x => (x.nome === "Dia" ? "M" : "N") === slot);
+  const so = S.resultado?.slots.find(x => (x.nome === "Dia" ? "M" : "N") === slotBase(slot));
   const t = so && [...so.top, ...(so.custo || [])].find(x => x.nome === perfume);
   return t ? String(t.sprays) : "";
 }
@@ -581,7 +580,7 @@ function desenharEdicaoRegistro(salvando = "") {
     <form class="bloco" id="formEditarReg" autocomplete="off">
       <div class="campos">
         <label>Data<input type="date" id="ed-data" value="${esc(r.data)}" min="${lim}" max="${hoje}" required></label>
-        <label>Slot<select id="ed-slot"><option value="M" ${r.slot === "M" ? "selected" : ""}>☀︎ Dia (M)</option><option value="N" ${r.slot === "N" ? "selected" : ""}>☾ Noite (N)</option></select></label>
+        <label>Slot<select id="ed-slot">${opcoesSlot(r.slot)}</select></label>
         <label class="largo">Perfume<input id="ed-perfume" list="ed-nomes" value="${esc(r.perfume)}" required></label>
         <label>Ocasião<select id="ed-ocasiao"><option value="">—</option>${OCAS_TODAS.map(o => `<option value="${o}" ${r.ocasiao === o ? "selected" : ""}>${ROT_OC[o]}</option>`).join("")}</select></label>
         <label>Sprays<input id="ed-sprays" inputmode="numeric" value="${esc(r.sprays || "")}"></label>
@@ -687,7 +686,7 @@ function abrirFicha(nome) {
   reabrirFicha = () => abrirFicha(nome);
   const f = S.frascosAtivos.find(x => x.nome === nome) || S.frascos.find(x => x.nome === nome), fi = S.fichas[nome];
   if (!f || !fi) return;
-  const usos = historico().filter(r => r.perfume === nome);
+  const usos = historico().filter(r => r.perfume === nome && deAnalise(r));
   const ult = usos[usos.length - 1];
   $("#folha").innerHTML = `<div class="veu" data-fechar><div class="folha" role="dialog" aria-modal="true" aria-labelledby="fichaT">
     <div class="linha-flex">${iconeFicha(doMercado(f.casa, nome), arqIcone(f.arquetipo, 34))}<h2 id="fichaT">${esc(nome)}</h2>${tierHTML(f.tier)}<span class="esp"></span><button class="btn sec peq" data-fechar>Fechar</button></div>
