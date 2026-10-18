@@ -19,7 +19,7 @@ import { telaAmostras, fichaAmostra, deLinhas as amostrasDeLinhas, juntar, semRe
 import { ler, gravar } from "./store.js";
 import { fotoFicha, iconeFicha, fotoMini, reduzirImagem, subirFoto, removerFotoPlanilha, iniciarFotos } from "./fotos.js";
 
-export const APP_VERSAO = "5.24";  // sobe a cada publicação: confere no topo da tela se o celular pegou a versão nova
+export const APP_VERSAO = "5.25";  // sobe a cada publicação: confere no topo da tela se o celular pegou a versão nova
 const S = { aba: "hoje", frascos: [], frascosAtivos: [], avisosTiers: null, fichas: {}, versao: {}, prev: null, prevOffline: false,
   prevErro: null, metar: null, metarMotivo: null, clima: null, resultado: null, erroMotor: null, entrada: "", carregandoClima: true,
   sync: { estado: "ocioso", msg: "" }, hr: ler("hr", { preset: "tudo" }), tokenNovo: null, playbook: null, janelas: new Map(),
@@ -963,7 +963,8 @@ function previaRoda(g) {
   const k = contagens(historico(), S.frascosAtivos, hojeISO(), { todos: true }).por.get(nome);
   const quando = k?.dias == null ? "sem registro" : k.dias === 0 ? "hoje" : k.dias === 1 ? "ontem" : `há ${k.dias} d`;
   box.innerHTML = `<button class="prev-in" data-ficha="${esc(nome)}">
-    <span class="prev-ic">${arqIcone(f.arquetipo, 30)}</span>
+    ${(() => { const ft = fotoMini(doMercado(f.casa, nome), "prev-foto");   // foto do perfume no lugar do ícone do arquétipo, se houver
+      return `<span class="prev-ic${ft ? " com-foto" : ""}">${ft || arqIcone(f.arquetipo, 30)}</span>`; })()}
     <span class="prev-tx"><b>${esc(nome)}</b>${tierHTML(f.tier)}<span class="nota">${esc(f.casa)} · ${esc(f.arquetipo)}</span>
       <span class="prev-meta">${k?.n30 || 0} uso${k?.n30 === 1 ? "" : "s"} em 30 d · último ${quando} · ${f.camada === "custo" ? "camada custo (academia/corrida)" : `${f.janelas} janelas`}</span>
       ${fi?.perfil ? `<span class="prev-perfil">${esc(fi.perfil)}</span>` : ""}</span>
