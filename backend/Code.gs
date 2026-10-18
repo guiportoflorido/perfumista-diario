@@ -9,13 +9,15 @@
  *
  * Toda chamada é POST com corpo JSON em text/plain (evita preflight de CORS) e precisa do TOKEN.
  * Ações: ping · metar · dados (Tiers + Diário + Frascos) · registrar (linhas no formato da aba Diário) ·
+ *        editarRegistro · removerRegistro (só registros dos últimos DIAS_EDITAVEIS dias da aba Diário) ·
  *        mercado (lê a aba Mercado) · criarMercado (cria a aba uma vez) · editarMercado (edita um perfume,
  *        inclusive casa/nome; tier e posse também vão para a aba Tiers) · adicionarMercado · removerMercado
  *        (tira só da aba Mercado; Tiers e Diário não mudam) · amostras (lê a aba Amostras) · adicionarAmostra (cria a
  *        aba no primeiro registro) · editarAmostra · removerAmostra (por ID; avaliação — tier, arquétipo etc. — fica
  *        na aba Mercado, ligada pela Casa + Perfume) · subirFoto (guarda a foto na aba Fotos desta planilha — nada de
  *        Google Drive — e marca a coluna Foto da aba Mercado) · fotos (devolve as fotos pedidas) · removerFoto.
- * Regras da planilha: data como texto AAAA-MM-DD; campo vazio = ""; nunca editar ou apagar linhas existentes;
+ * Regras da planilha: data como texto AAAA-MM-DD; campo vazio = ""; linhas existentes do Diário só mudam por
+ *   editarRegistro/removerRegistro (pedido explícito do usuário no app, só registros recentes);
  * aba Frascos é só fórmula (nunca escrita aqui).
  */
 
@@ -28,6 +30,7 @@ var COLS_DIARIO = ['Data', 'Slot', 'Perfume', 'Ocasião', 'Temp (°C)', 'Td (°C
 var ABA_AMOSTRAS = 'Amostras';
 var COLS_AMOSTRAS = ['ID', 'Casa', 'Perfume', 'Tipo', 'Volume (ml)', 'Origem', 'Status', 'Entrada', 'Saída', 'Motivo saída', 'Impressão', 'Obs', 'Atualizado em', 'Dono'];
 var DONOS_AMOSTRA = ['', 'Gui', 'Bia'], TIPOS_AMOSTRA = ['Amostra', 'Decant'], STATUS_AMOSTRA = ['Pendente', 'Em teste', 'Realizado', 'Esgotado'];
+var DIAS_EDITAVEIS = 30;   // editar/apagar no Diário: só registros com data a partir de hoje − 30 dias
 var OCASIOES = ['Lazer', 'T.Inf', 'T.For', 'N.Inf', 'N.For', 'Cozy D', 'Cozy N'];
 
 function doPost(e) {
@@ -41,6 +44,8 @@ function doPost(e) {
       case 'metar': return saida_({ ok: true, metar: metar_() });
       case 'dados': return saida_({ ok: true, dados: dados_() });
       case 'registrar': return saida_(registrar_(req.linhas || [], !!req.forcar));
+      case 'editarRegistro': return saida_(editarRegistro_(req.orig || {}, req.campos || {}, Number(req.linha) || 0));
+      case 'removerRegistro': return saida_(removerRegistro_(req.orig || {}, Number(req.linha) || 0));
       case 'mercado': return saida_({ ok: true, mercado: lerMercado_() });
       case 'criarMercado': return saida_(criarMercado_(req.linhas || []));
       case 'editarMercado': return saida_(editarMercado_(req.casa, req.perfume, req.campos || {}));
@@ -151,19 +156,81 @@ function registrar_(linhas, forcar) {
         gravadas.push({ id: linhas[k].id, duplicada: true }); continue;   // reenvio da fila: já está lá
       }
       if (mesmo.length && !forcar) { conflitos.push({ id: linhas[k].id, existente: mesmo[0][2] }); continue; }
-      var depois = posicaoInsercao_(exist, linha[0], linha[1]);
-      var alvo;
-      if (depois >= aba.getLastRow()) { alvo = aba.getLastRow() + 1; }
-      else { aba.insertRowAfter(depois); alvo = depois + 1; }
-      aba.getRange(alvo, 1).setNumberFormat('@');   // data como texto AAAA-MM-DD (não vira data do Sheets)
-      aba.getRange(alvo, 1, 1, COLS_DIARIO.length).setValues([linha]);
-      gravadas.push({ id: linhas[k].id, linha: alvo });
+      gravadas.push({ id: linhas[k].id, linha: inserirDiario_(aba, exist, linha) });
     }
     SpreadsheetApp.flush();
     return { ok: true, gravadas: gravadas, conflitos: conflitos };
   } finally {
     lock.releaseLock();
   }
+}
+
+/** Insere a linha na posição cronológica (data, depois M antes de N). exist = colunas A:C a partir da linha 2. */
+function inserirDiario_(aba, exist, linha) {
+  var depois = posicaoInsercao_(exist, linha[0], linha[1]), alvo;
+  if (depois >= aba.getLastRow()) { alvo = aba.getLastRow() + 1; }
+  else { aba.insertRowAfter(depois); alvo = depois + 1; }
+  aba.getRange(alvo, 1).setNumberFormat('@');   // data como texto AAAA-MM-DD (não vira data do Sheets)
+  aba.getRange(alvo, 1, 1, COLS_DIARIO.length).setValues([linha]);
+  return alvo;
+}
+
+// ─────────────── editar / apagar registros recentes do Diário ───────────────
+// O app manda o registro como ele o conhece (data, slot, perfume) e a linha que ele viu. A linha só é usada se ainda
+// tiver exatamente esse conteúdo; senão procura pelo conteúdo. Duas linhas iguais = recusa (resolver na planilha).
+function limiteEditavel_() { return Utilities.formatDate(new Date(Date.now() - DIAS_EDITAVEIS * 864e5), 'America/Sao_Paulo', 'yyyy-MM-dd'); }
+
+function acharRegistro_(exist, orig, dica) {
+  var bate = function (r) { return r[0] === String(orig.data) && r[1] === String(orig.slot) && r[2] === String(orig.perfume); };
+  if (dica >= 2 && dica - 2 < exist.length && bate(exist[dica - 2])) return dica;
+  var achados = [];
+  exist.forEach(function (r, i) { if (bate(r)) achados.push(i + 2); });
+  if (achados.length > 1) throw new Error('há ' + achados.length + ' linhas iguais (' + orig.data + ' ' + orig.slot + ' ' + orig.perfume + ') na aba Diário: corrija direto na planilha');
+  if (!achados.length) throw new Error('registro não encontrado na aba Diário (' + orig.data + ' ' + orig.slot + ' ' + orig.perfume + '): talvez já tenha sido mudado; sincronize e tente de novo');
+  return achados[0];
+}
+
+function editarRegistro_(orig, campos, dica) {
+  var lock = LockService.getScriptLock(); lock.waitLock(20000);
+  try {
+    var ss = SpreadsheetApp.getActive(), aba = ss.getSheetByName(ABA_DIARIO), limite = limiteEditavel_();
+    if (String(orig.data) < limite) throw new Error('só dá para editar registros a partir de ' + limite + ' (últimos ' + DIAS_EDITAVEIS + ' dias)');
+    var ult = aba.getLastRow(), exist = ult > 1 ? aba.getRange(2, 1, ult - 1, 3).getDisplayValues() : [];
+    var linha = acharRegistro_(exist, orig, dica);
+    var atual = aba.getRange(linha, 1, 1, COLS_DIARIO.length).getDisplayValues()[0];
+    var chaves = ['data', 'slot', 'perfume', 'ocasiao', 'temp', 'td', 'sprays', 'notaDia', 'obs'], l = {};
+    chaves.forEach(function (k, i) { l[k] = campos[k] !== undefined ? campos[k] : atual[i]; });
+    var tiers = valores_(ABA_TIERS), iNome = tiers[0].indexOf('Nome no diário'), iPerf = tiers[0].indexOf('Perfume'), nomes = [];
+    tiers.slice(1).forEach(function (r) { if (r[iNome]) nomes.push(r[iNome]); if (r[iPerf]) nomes.push(r[iPerf]); });
+    var nova = normalizarLinha_(l, nomes);
+    if (nova[0] < limite || nova[0] > hoje_()) throw new Error('data fora do período editável (' + limite + ' a ' + hoje_() + ')');
+    var mudouSlot = nova[0] !== atual[0] || nova[1] !== atual[1];
+    if (mudouSlot) {
+      var ocup = exist.filter(function (r, i) { return i + 2 !== linha && r[0] === nova[0] && r[1] === nova[1]; });
+      if (ocup.length) throw new Error('nesse dia e slot já existe ' + ocup[0][2] + ': apague ou edite aquele registro primeiro');
+      aba.deleteRow(linha);
+      exist.splice(linha - 2, 1);
+      linha = inserirDiario_(aba, exist, nova);
+    } else {
+      aba.getRange(linha, 1).setNumberFormat('@');
+      aba.getRange(linha, 1, 1, COLS_DIARIO.length).setValues([nova]);
+    }
+    SpreadsheetApp.flush();
+    return { ok: true, linha: linha, registro: nova };
+  } finally { lock.releaseLock(); }
+}
+
+function removerRegistro_(orig, dica) {
+  var lock = LockService.getScriptLock(); lock.waitLock(20000);
+  try {
+    var aba = SpreadsheetApp.getActive().getSheetByName(ABA_DIARIO), limite = limiteEditavel_();
+    if (String(orig.data) < limite) throw new Error('só dá para apagar registros a partir de ' + limite + ' (últimos ' + DIAS_EDITAVEIS + ' dias)');
+    var ult = aba.getLastRow(), exist = ult > 1 ? aba.getRange(2, 1, ult - 1, 3).getDisplayValues() : [];
+    var linha = acharRegistro_(exist, orig, dica);
+    aba.deleteRow(linha);
+    SpreadsheetApp.flush();
+    return { ok: true, removida: linha };
+  } finally { lock.releaseLock(); }
 }
 
 // ───────────────────────── mercado ─────────────────────────

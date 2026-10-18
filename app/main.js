@@ -4,10 +4,10 @@ import { ajustes, salvarAjustes, AJUSTES_PADRAO, estadoDia, salvarDia, hojeISO }
 import { buscarPrevisao, buscarMetar, derivarClima } from "./clima.js";
 import { montarEntrada, OCAS_DIA, OCAS_NOITE, AMBIENTES, EXTRAS } from "./entrada.js";
 import { configurado, chamar } from "./api.js";
-import { fila, adicionar, descartar, enviar, planilhaCache, baixarPlanilha } from "./registro.js";
+import { fila, adicionar, descartar, enviar, planilhaCache, baixarPlanilha, limiteEdicao, editarRegistro, removerRegistro } from "./registro.js";
 import { lerTiers, lerDiario, aplicarTiers, diarioUnificado, nomesRegistraveis } from "./planilha.js";
 import { janelasPorFrasco, ajustarSprays } from "./estatisticas.js";
-import { telaColecao, telaPlaybook, telaHistorico } from "./telas.js";
+import { telaColecao, telaPlaybook, telaHistorico, idRegistro } from "./telas.js";
 import { telaRoda } from "./roda.js";
 import { ordsDe, tocarOrd, mudarOrds } from "./util.js";
 import { definirCores, arqTag, arqIcone, corArq } from "./icones.js";
@@ -19,7 +19,7 @@ import { telaAmostras, fichaAmostra, deLinhas as amostrasDeLinhas, juntar, semRe
 import { ler, gravar } from "./store.js";
 import { fotoFicha, iconeFicha, fotoMini, reduzirImagem, subirFoto, removerFotoPlanilha, iniciarFotos } from "./fotos.js";
 
-export const APP_VERSAO = "5.21";  // sobe a cada publicação: confere no topo da tela se o celular pegou a versão nova
+export const APP_VERSAO = "5.22";  // sobe a cada publicação: confere no topo da tela se o celular pegou a versão nova
 const S = { aba: "hoje", frascos: [], frascosAtivos: [], avisosTiers: null, fichas: {}, versao: {}, prev: null, prevOffline: false,
   prevErro: null, metar: null, metarMotivo: null, clima: null, resultado: null, erroMotor: null, entrada: "", carregandoClima: true,
   sync: { estado: "ocioso", msg: "" }, hr: ler("hr", { preset: "tudo" }), tokenNovo: null, playbook: null, janelas: new Map(),
@@ -130,7 +130,7 @@ function render() {
   const arqDe = new Map(S.frascos.map(f => [f.nome, f.arquetipo]));
   const ctx = { fichas: S.fichas, arqTag, arqIcone, arqDe, hr: S.hr,
     frascos: S.frascosAtivos, hist: historico(), hoje: hojeISO(), janelas: S.janelas, filtro: S.filtro, playbook: S.playbook,
-    faixaSel: S.pbFaixa ?? S.clima?.faixaDia?.idx ?? 2, fila: fila(), ajSpray: ajSpray(),
+    faixaSel: S.pbFaixa ?? S.clima?.faixaDia?.idx ?? 2, fila: fila(), ajSpray: ajSpray(), limiteEdicao: limiteEdicao(hojeISO()),
     amostras: S.aba === "colecao" ? amostrasEmMaos() : null };
   // mesma aba: guarda rolagem da página, das tabelas e painéis abertos para restaurar depois de redesenhar
   const antes = trocouAba ? null : {
@@ -564,6 +564,81 @@ async function salvarRegistro() {
   if (configurado()) await sincronizar({ silencioso: true });
 }
 
+// ───────────────────────── editar / apagar registro (Histórico) ─────────────────────────
+let regEditando = null;
+function abrirEdicaoRegistro(id) {
+  const r = historico().find(x => idRegistro(x) === id);
+  if (!r) { toast("Registro não encontrado: sincronize e tente de novo."); return; }
+  regEditando = r; S.confirmandoRemocao = false;
+  desenharEdicaoRegistro();
+}
+function desenharEdicaoRegistro(salvando = "") {
+  const r = regEditando, hoje = hojeISO(), lim = limiteEdicao(hoje);
+  const nomes = nomesRegistraveis(planilha().tiers, S.frascosAtivos);
+  const naFila = Boolean(r.id && r.pendente);
+  $("#folha").innerHTML = `<div class="veu" data-fechar><div class="folha" role="dialog" aria-modal="true" aria-labelledby="edRegT">
+    <div class="linha-flex"><h2 id="edRegT">Editar registro</h2><span class="esp"></span><button class="btn sec peq" data-fechar>Fechar</button></div>
+    <form class="bloco" id="formEditarReg" autocomplete="off">
+      <div class="campos">
+        <label>Data<input type="date" id="ed-data" value="${esc(r.data)}" min="${lim}" max="${hoje}" required></label>
+        <label>Slot<select id="ed-slot"><option value="M" ${r.slot === "M" ? "selected" : ""}>☀︎ Dia (M)</option><option value="N" ${r.slot === "N" ? "selected" : ""}>☾ Noite (N)</option></select></label>
+        <label class="largo">Perfume<input id="ed-perfume" list="ed-nomes" value="${esc(r.perfume)}" required></label>
+        <label>Ocasião<select id="ed-ocasiao"><option value="">—</option>${OCAS_TODAS.map(o => `<option value="${o}" ${r.ocasiao === o ? "selected" : ""}>${ROT_OC[o]}</option>`).join("")}</select></label>
+        <label>Sprays<input id="ed-sprays" inputmode="numeric" value="${esc(r.sprays || "")}"></label>
+        <label>NotaDia<input id="ed-nota" inputmode="decimal" value="${esc(r.notaDia || "")}"></label>
+        <label>Temp (°C)<input id="ed-temp" inputmode="decimal" value="${esc(r.temp || "")}"></label>
+        <label>Td (°C)<input id="ed-td" inputmode="decimal" value="${esc(r.td || "")}"></label>
+        <label class="largo">Obs<input id="ed-obs" value="${esc(r.obs || "")}"></label>
+      </div>
+      <datalist id="ed-nomes">${nomes.map(n => `<option value="${esc(n)}">`).join("")}</datalist>
+      <p class="nota">${naFila ? "Ainda na fila (não enviado): a mudança fica no aparelho e vai para a planilha no próximo envio."
+        : "Já está na planilha: salvar ou apagar muda a linha na aba Diário."}</p>
+      <div class="linha-flex"><button class="btn" type="submit" ${salvando ? "disabled" : ""}>${salvando === "salvar" ? "Salvando…" : "Salvar"}</button>
+        <button class="btn sec" type="button" data-acao="apagar-reg" ${salvando ? "disabled" : ""}>${salvando === "apagar" ? "Apagando…" : S.confirmandoRemocao ? "Confirmar: apagar" : "Apagar registro"}</button>
+        <button class="btn sec" type="button" data-fechar>Cancelar</button></div>
+      ${S.confirmandoRemocao && !salvando ? `<p class="nota erro-txt">Apagar não tem desfazer. Toque de novo em “Confirmar: apagar”.</p>` : ""}
+    </form></div></div>`;
+}
+
+async function salvarEdicaoRegistro() {
+  const r = regEditando; if (!r) return;
+  const hoje = hojeISO(), lim = limiteEdicao(hoje);
+  const campos = { data: $("#ed-data").value, slot: $("#ed-slot").value, perfume: $("#ed-perfume").value.trim(), ocasiao: $("#ed-ocasiao").value,
+    temp: virg($("#ed-temp").value.trim()), td: virg($("#ed-td").value.trim()), sprays: $("#ed-sprays").value.trim(),
+    notaDia: virg($("#ed-nota").value.trim()), obs: $("#ed-obs").value.trim() };
+  if (!campos.data || !campos.perfume) { toast("Preencha data e perfume."); return; }
+  if (campos.data < lim || campos.data > hoje) { toast(`A data precisa ficar entre ${campos.data < lim ? lim.split("-").reverse().join("/") : "hoje"} e hoje.`); return; }
+  const nomes = nomesRegistraveis(planilha().tiers, S.frascosAtivos);
+  if (planilha().tiers.length && !nomes.includes(campos.perfume)) { toast(`“${campos.perfume}” não está na aba Tiers. Use o nome exato da lista.`); return; }
+  if (Object.keys(campos).every(k => String(campos[k]) === String(r[k] ?? ""))) { fecharFolha(); return; }
+  if ((campos.data !== r.data || campos.slot !== r.slot)) {
+    const ocup = historico().find(x => x !== r && idRegistro(x) !== idRegistro(r) && x.data === campos.data && x.slot === campos.slot);
+    if (ocup) { toast(`Nesse dia e slot já existe ${ocup.perfume}: apague ou edite aquele registro primeiro.`); return; }
+  }
+  desenharEdicaoRegistro("salvar");
+  try {
+    const j = await editarRegistro(r, campos);
+    fecharFolha(); regEditando = null;
+    toast(j.local ? "Registro da fila alterado." : "Registro alterado na planilha.");
+    recalcular();
+    if (configurado()) await sincronizar({ silencioso: true });
+  } catch (e) { toast(`Não salvei: ${e.message}`); desenharEdicaoRegistro(); }
+}
+
+async function apagarRegistroEditando() {
+  const r = regEditando; if (!r) return;
+  if (!S.confirmandoRemocao) { S.confirmandoRemocao = true; desenharEdicaoRegistro(); return; }
+  S.confirmandoRemocao = false;
+  desenharEdicaoRegistro("apagar");
+  try {
+    const j = await removerRegistro(r);
+    fecharFolha(); regEditando = null;
+    toast(j.local ? `Registro da fila apagado: ${r.perfume}.` : `Registro apagado da planilha: ${r.perfume} · ${r.data.split("-").reverse().join("/")}.`);
+    recalcular();
+    if (configurado()) await sincronizar({ silencioso: true });
+  } catch (e) { toast(`Não apaguei: ${e.message}`); desenharEdicaoRegistro(); }
+}
+
 // ───────────────────────── ajustes ─────────────────────────
 function telaAjustes() {
   const a = ajustes();
@@ -736,6 +811,7 @@ document.addEventListener("click", async e => {
   if (b.closest("#abas")) { S.aba = b.dataset.aba; render(); window.scrollTo(0, 0); return; }
   if (b.hasAttribute("data-fechar") && (e.target === b || b.tagName === "BUTTON")) { fecharFolha(); return; }
   if (b.dataset.ficha) { abrirFicha(b.dataset.ficha); return; }
+  if (b.dataset.editarReg) { abrirEdicaoRegistro(b.dataset.editarReg); return; }
   if (b.dataset.colmodo) { S.colModo = b.dataset.colmodo; gravar("colModo", S.colModo); render(); return; }
   if (b.dataset.colOrd) { S.filtro = { ...S.filtro, ords: tocarOrd(ordsDe(S.filtro, "tier"), b.dataset.colOrd) }; gravar("filtro", S.filtro); render(); return; }
   if (b.dataset.ordDir) { mudarOrdem(b.dataset.ordDir, Number(b.dataset.n), { inverter: true }); return; }
@@ -781,6 +857,7 @@ document.addEventListener("click", async e => {
   else if (acao === "soltar-texto") mudarDia(d => { d.textoManual = null; });
   else if (acao === "restaurar") { salvarAjustes({}); toast("Ajustes restaurados."); render(); atualizarClima(); }
   else if (acao === "sync") sincronizar();
+  else if (acao === "apagar-reg") apagarRegistroEditando();
   else if (acao === "ver-gaps") { S.verGaps = !S.verGaps; render(); }
   else if (acao === "roda-custo") { S.rodaCusto = !S.rodaCusto; gravar("rodaCusto", S.rodaCusto); render(); }
   else if (acao === "mf-mais") { S.mfLimite += 120; render(); }
@@ -848,6 +925,7 @@ document.addEventListener("input", e => {
 document.addEventListener("submit", e => {
   e.preventDefault();
   if (e.target.id === "formRegistro") { salvarRegistro(); return; }
+  if (e.target.id === "formEditarReg") { salvarEdicaoRegistro(); return; }
   if (e.target.id === "formMercado") { salvarMercado(e.target); return; }
   if (e.target.id === "formAmostra") { salvarAmostra(e.target); return; }
   if (e.target.id !== "formAjustes") return;

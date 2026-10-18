@@ -19,7 +19,7 @@ const fx = new URL("tests/fixtures/diario_inicial.json", raiz);
 if (existsSync(fx)) abas["Diário"].push(...JSON.parse(readFileSync(fx)));
 
 const agora = () => Math.floor(Date.now() / 1000) - 20 * 60;
-const { ctx } = carregarBackend(abas, { token: "dev", metar: () => ({ getResponseCode: () => 200,
+const { ctx } = carregarBackend(abas, { token: "dev", hoje: new Date().toISOString().slice(0, 10), metar: () => ({ getResponseCode: () => 200,
   getContentText: () => JSON.stringify([{ temp: 24, dewp: 11, obsTime: agora(), rawOb: "METAR SBSP (simulado)" }]) }) });
 
 http.createServer((req, res) => {

@@ -26,6 +26,7 @@ function ambiente({ diario, metarJson }) {
         setNumberFormat: f => formatos.push([r, c, f]),
       }),
       insertRowAfter: n => rows.splice(n, 0, []),
+      deleteRow: n => rows.splice(n - 1, 1),
     };
   };
   const ctx = {
@@ -33,6 +34,8 @@ function ambiente({ diario, metarJson }) {
     PropertiesService: { getScriptProperties: () => ({ getProperty: () => "segredo" }) },
     LockService: { getScriptLock: () => ({ waitLock() {}, releaseLock() {} }) },
     ContentService: { MimeType: { JSON: "json" }, createTextOutput: t => ({ setMimeType: () => ({ texto: t }) }) },
+    // relógio fixo: "agora" = 18/out/2026; datas relativas a agora (hoje − 30 dias) andam junto
+    Utilities: { formatDate: d => new Date(Date.UTC(2026, 9, 18, 12) - (Date.now() - d.getTime())).toISOString().slice(0, 10) },
     UrlFetchApp: { fetch: () => ({ getResponseCode: () => 200, getContentText: () => JSON.stringify(metarJson) }) },
   };
   vm.createContext(ctx);
@@ -102,4 +105,36 @@ test("app: “ação desconhecida” vira instrução de atualizar o Apps Script
   globalThis.fetch = async () => ({ ok: true, text: async () => JSON.stringify({ ok: false, erro: "ação desconhecida" }) });
   const { chamar } = await import("../app/api.js");
   await assert.rejects(chamar("subirFoto"), /desatualizado \(não conhece “subirFoto”\).*implante uma nova versão/);
+});
+
+test("editarRegistro: muda campos no lugar; trocar data/slot reposiciona; slot ocupado e nome fora da Tiers são recusados", () => {
+  const { post, abas } = ambiente({ diario: [CAB, ["2026-10-15", "M", "Odéon", "Lazer", "", "", "3"], ["2026-10-16", "N", "Odéon"], ["2026-10-17", "M", "Gentle Fluidity Silver"]] });
+  let r = post({ token: "segredo", acao: "editarRegistro", orig: { data: "2026-10-15", slot: "M", perfume: "Odéon" }, linha: 2, campos: { sprays: "4", notaDia: "8,5", ocasiao: "T.Inf" } });
+  assert.equal(r.ok, true); assert.equal(r.linha, 2);
+  assert.deepEqual(abas["Diário"][1], ["2026-10-15", "M", "Odéon", "T.Inf", "", "", "4", "8,5", ""]);
+  // linha errada (planilha mudou): acha pelo conteúdo
+  r = post({ token: "segredo", acao: "editarRegistro", orig: { data: "2026-10-16", slot: "N", perfume: "Odéon" }, linha: 2, campos: { perfume: "Gentle Fluidity Silver" } });
+  assert.equal(r.ok, true); assert.equal(abas["Diário"][2][2], "Gentle Fluidity Silver");
+  // mudar a data reposiciona em ordem cronológica
+  r = post({ token: "segredo", acao: "editarRegistro", orig: { data: "2026-10-15", slot: "M", perfume: "Odéon" }, campos: { data: "2026-10-17", slot: "N" } });
+  assert.equal(r.ok, true);
+  assert.deepEqual(abas["Diário"].slice(1).map(x => x[0] + x[1] + x[2]), ["2026-10-16NGentle Fluidity Silver", "2026-10-17MGentle Fluidity Silver", "2026-10-17NOdéon"]);
+  assert.equal(abas["Diário"][3][6], "4");   // demais campos vão junto
+  assert.match(post({ token: "segredo", acao: "editarRegistro", orig: { data: "2026-10-17", slot: "N", perfume: "Odéon" }, campos: { slot: "M" } }).erro, /já existe Gentle Fluidity Silver/);
+  assert.match(post({ token: "segredo", acao: "editarRegistro", orig: { data: "2026-10-17", slot: "N", perfume: "Odéon" }, campos: { perfume: "Inventado" } }).erro, /não está na aba Tiers/);
+  assert.match(post({ token: "segredo", acao: "editarRegistro", orig: { data: "2026-10-17", slot: "N", perfume: "Odéon" }, campos: { data: "2026-10-19" } }).erro, /fora do período/);
+  assert.match(post({ token: "segredo", acao: "editarRegistro", orig: { data: "2026-10-01", slot: "N", perfume: "Odéon" }, campos: {} }).erro, /não encontrado/);
+  assert.equal(abas["Diário"].length, 4);
+});
+
+test("removerRegistro: apaga só aquela linha; antigos (>30 dias) e duplicados ambíguos são recusados", () => {
+  const { post, abas } = ambiente({ diario: [CAB, ["2026-09-01", "M", "Odéon"], ["2026-10-16", "N", "Odéon"], ["2026-10-17", "M", "Odéon"], ["2026-10-17", "M", "Odéon"]] });
+  assert.match(post({ token: "segredo", acao: "removerRegistro", orig: { data: "2026-09-01", slot: "M", perfume: "Odéon" } }).erro, /a partir de 2026-09-18/);
+  assert.match(post({ token: "segredo", acao: "editarRegistro", orig: { data: "2026-09-01", slot: "M", perfume: "Odéon" }, campos: { sprays: "2" } }).erro, /a partir de 2026-09-18/);
+  assert.match(post({ token: "segredo", acao: "removerRegistro", orig: { data: "2026-10-17", slot: "M", perfume: "Odéon" } }).erro, /2 linhas iguais/);
+  assert.equal(post({ token: "segredo", acao: "removerRegistro", orig: { data: "2026-10-17", slot: "M", perfume: "Odéon" }, linha: 5 }).removida, 5);   // com a linha certa, sem ambiguidade
+  const r = post({ token: "segredo", acao: "removerRegistro", orig: { data: "2026-10-16", slot: "N", perfume: "Odéon" }, linha: 3 });
+  assert.equal(r.ok, true);
+  assert.deepEqual(abas["Diário"].slice(1).map(x => x[0] + x[1]), ["2026-09-01M", "2026-10-17M"]);
+  assert.equal(post({ token: "segredo", acao: "removerRegistro", orig: { data: "2026-10-16", slot: "N", perfume: "Odéon" } }).ok, false);
 });

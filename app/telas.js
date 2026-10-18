@@ -123,7 +123,22 @@ export function periodo(preset, hoje, de, ate) {
 const PRESETS = [["tudo", "Tudo"], ["7", "7 dias"], ["30", "30 dias"], ["90", "90 dias"], ["mes", "Este mês"], ["mesant", "Mês passado"], ["livre", "Escolher datas"]];
 const dataBR = iso => (iso ? iso.split("-").reverse().join("/") : "—");
 
-export function telaHistorico({ frascos, hist: histTodo, hoje, fila: filaToda, ajSpray, limiteEsq = 45, hr = {}, arqTag }) {
+/** Identifica um item do histórico unificado para os botões (data|slot|perfume|linha|id). */
+export const idRegistro = r => [r.data, r.slot, r.perfume, r.linha || "", r.id || ""].join("|");
+
+/** Registros dos últimos dias (a partir de `limite`), mais recentes primeiro, com botão Editar. */
+export function registrosRecentes(hist, limite) {
+  const rec = hist.filter(r => r.data >= limite).reverse();
+  const item = r => `<article class="card compacto"><span class="pos" title="${r.slot === "N" ? "Noite" : "Dia"}">${r.slot === "N" ? "☾" : "☀︎"}</span>
+    <div style="min-width:0"><b>${esc(r.perfume)}</b><div class="casa">${dataBR(r.data)}${r.ocasiao ? ` · ${esc(ROT_OC[r.ocasiao] || r.ocasiao)}` : ""}${r.sprays ? ` · ${esc(r.sprays)} spray${r.sprays === "1" ? "" : "s"}` : ""}${r.notaDia ? ` · nota ${esc(r.notaDia)}` : ""}${r.pendente ? " · na fila" : ""}</div></div>
+    <button class="btn sec peq" data-editar-reg="${esc(idRegistro(r))}">Editar</button></article>`;
+  return `<div class="bloco"><h3>Registros recentes · desde ${dataBR(limite)}</h3>
+    ${rec.length ? `<div class="lista">${rec.slice(0, 10).map(item).join("")}</div>${rec.length > 10 ? `<details><summary>Ver os outros ${rec.length - 10}</summary><div class="lista" style="margin-top:8px">${rec.slice(10).map(item).join("")}</div></details>` : ""}`
+      : `<p class="vazio">Nenhum registro nos últimos dias.</p>`}
+    <p class="nota">Editar ou apagar vale só para os últimos 30 dias. O que já está na planilha muda também na aba Diário.</p></div>`;
+}
+
+export function telaHistorico({ frascos, hist: histTodo, hoje, fila: filaToda, ajSpray, limiteEsq = 45, hr = {}, arqTag, limiteEdicao = "" }) {
   const preset = hr.preset || "tudo";
   const { de, ate } = periodo(preset, hoje, hr.de, hr.ate);
   const dentro = r => (!de || r.data >= de) && r.data <= ate;
@@ -134,7 +149,8 @@ export function telaHistorico({ frascos, hist: histTodo, hoje, fila: filaToda, a
     <p class="nota">${de ? `${dataBR(de)} a ${dataBR(ate)}` : `Todo o diário até ${dataBR(ate)}`} · ${hist.length} registro${hist.length === 1 ? "" : "s"}</p>
   </div>`;
   const c = contagens(hist, frascos, ate);
-  if (!hist.length) return `<h2>Histórico</h2>${seletor}<div class="bloco"><p class="vazio">${histTodo.length ? "Nenhum registro nesse período." : "Sem registros ainda. Conecte a planilha em Ajustes ou registre um uso."}</p></div>`;
+  const recentes = limiteEdicao ? registrosRecentes(histTodo, limiteEdicao) : "";
+  if (!hist.length) return `<h2>Histórico</h2>${seletor}${histTodo.length ? recentes : ""}<div class="bloco"><p class="vazio">${histTodo.length ? "Nenhum registro nesse período." : "Sem registros ainda. Conecte a planilha em Ajustes ou registre um uso."}</p></div>`;
   const doPeriodo = preset !== "tudo";
   const barras = (pares, max) => `<div class="barras">${pares.map(([k, v]) => `<div class="barra"><span class="t">${k}</span><span class="trilho"><span style="width:${max ? (v / max) * 100 : 0}%"></span></span><span class="n">${v}</span></div>`).join("")}</div>`;
   const usados = [...c.por.values()].filter(x => x.n).sort((a, b) => b.n - a.n || (a.ultimo < b.ultimo ? 1 : -1));
@@ -155,6 +171,7 @@ export function telaHistorico({ frascos, hist: histTodo, hoje, fila: filaToda, a
     <div class="kpi"><span class="v">${usados.length}/${c.por.size}</span><span class="l">frascos usados ao menos 1×</span></div>
   </div>
   ${!doPeriodo && c.cobertura < 90 ? `<p class="nota">Diário com menos de 90 dias: não serve ainda para conclusões de desbaste sobre os B.</p>` : ""}
+  ${recentes}
   ${calendario(histTodo, frascos, ate, de)}
   ${passaporte(c.por, hist, frascos)}
   <div class="bloco"><h3>Mais usados</h3>${usados.length ? barras(usados.slice(0, 15).map(x => [`<button class="nome-inline" data-ficha="${esc(x.f.nome)}">${esc(x.f.nome)}</button>`, x.n]), usados[0].n) : `<p class="nota">Nenhum.</p>`}</div>
