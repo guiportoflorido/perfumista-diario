@@ -345,6 +345,8 @@ select[disabled], input[readonly], textarea[readonly] { opacity: .75; }
 .prev-in { all: unset; cursor: pointer; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 4px 10px; align-items: start; width: 100%; box-sizing: border-box;
   background: var(--sup); border-radius: 16px; padding: 12px 14px; box-shadow: 0 10px 30px rgba(0, 0, 0, .35); border: .5px solid var(--linha); }
 .prev-ic { grid-row: span 2; display: grid; place-items: center; width: 44px; height: 44px; border-radius: 12px; background: var(--afund); }
+.prev-ic.com-foto { width: 52px; height: 52px; border-radius: 50%; overflow: hidden; }
+.prev-foto { width: 100%; height: 100%; object-fit: cover; display: block; }
 .prev-tx { display: flex; flex-direction: column; gap: 2px; min-width: 0; font-size: 13px; }
 .prev-tx b { font: 700 16px/1.25 var(--f); }
 .prev-tx .tier { position: absolute; top: 12px; right: 14px; }
