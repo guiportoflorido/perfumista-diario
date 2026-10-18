@@ -2,7 +2,7 @@
 // campos alterados e avaliação só com o que foi mexido.
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { COLS, deLinhas, juntar, resumo, filtrar, normalizar, camposAmostra, camposAvaliacao, camposAvaliacaoMexidos, semRegistro, diasDesde, telaAmostras, fichaAmostra } from "../app/amostras.js";
+import { COLS, COLUNAS, deLinhas, juntar, resumo, filtrar, camposAmostra, camposAvaliacao, camposAvaliacaoMexidos, semRegistro, diasDesde, telaAmostras, fichaAmostra } from "../app/amostras.js";
 
 const linha = o => COLS.map(c => o[c] ?? "");
 const linhas = [COLS,
@@ -44,12 +44,10 @@ test("filtrar: pendentes primeiro (mais antiga antes), em mãos, tipo e busca", 
   assert.deepEqual(filtrar(l, { q: "monge" }).map(a => a.id), ["a4", "a2"]);   // arquétipo vem do Mercado
 });
 
-test("ordenar pelo cabeçalho: até 3 critérios, vazios no fim; usos e dias calculados", () => {
+test("ordenar pelo cabeçalho: até 3 critérios, vazios no fim", () => {
   const l = juntar(deLinhas(linhas), mercado);
   assert.deepEqual(filtrar(l, { ords: [{ k: "tier", dir: "asc" }] }).map(a => a.id), ["a4", "a2", "a3", "a1"]);   // A, A, C, sem tier
-  assert.deepEqual(filtrar(l, { ords: [{ k: "tier", dir: "desc" }, { k: "entrada", dir: "desc" }] }).map(a => a.id), ["a3", "a2", "a4", "a1"]);
-  assert.deepEqual(filtrar(l, { ords: [{ k: "usos", dir: "desc" }] }, { usosDe: a => (a.id === "a1" ? 5 : 0) }).map(a => a.id)[0], "a1");
-  assert.deepEqual(filtrar(l, { ords: [{ k: "dias", dir: "desc" }] }, { hoje: "2026-10-13" }).map(a => a.id), ["a3", "a4", "a1", "a2"]);   // 31 (entrada→saída), 28, 23, 12
+  assert.deepEqual(filtrar(l, { ords: [{ k: "tier", dir: "desc" }, { k: "ml", dir: "desc" }] }).map(a => a.id).slice(0, 3), ["a3", "a2", "a4"]);
 });
 
 test("Em teste: conta à parte, vem primeiro na ordem padrão, entra em Em mãos e no filtro próprio", () => {
@@ -80,17 +78,17 @@ test("filtros: dono (G/B), casa, arquétipo, tier e posse do Mercado, inclusive 
   assert.match(h, /id="amf-casa"/); assert.match(h, /id="amf-posse"/); assert.match(h, /data-am-dono="a3"/); assert.match(h, /data-acao="am-limpar"/);
 });
 
-test("normalizar: saída ⇒ Esgotado; Esgotado sem data ⇒ hoje; voltar limpa saída e motivo", () => {
-  assert.deepEqual(normalizar({ status: "Pendente", saida: "2026-10-02" }, "2026-10-13"), { status: "Esgotado", saida: "2026-10-02" });
-  assert.equal(normalizar({ status: "Esgotado", saida: "" }, "2026-10-13").saida, "2026-10-13");
-  assert.deepEqual(normalizar({ status: "Realizado", saida: "", motivo: "Acabou" }), { status: "Realizado", saida: "", motivo: "" });
+test("Origem, Entrada, Dias, Saída, Motivo e Usos saíram da tabela; ordenação salva nessas colunas é ignorada", () => {
+  assert.deepEqual(COLUNAS.map(c => c[0]), ["status", "dono", "tier", "wish", "arquetipo", "posse", "tipo", "ml", "impressao", "obs"]);
+  const l = juntar(deLinhas(linhas), []);
+  assert.deepEqual(filtrar(l, { ords: [{ k: "entrada", dir: "desc" }] }).map(a => a.id), filtrar(l, {}).map(a => a.id));
 });
 
 test("camposAmostra: nova manda o preenchido; edição só o que mudou (nomes das colunas)", () => {
-  const novo = camposAmostra(null, { casa: "Nishane", nome: "Ani", tipo: "Amostra", ml: "2", status: "Pendente", entrada: "2026-10-13" });
-  assert.deepEqual(novo, { Casa: "Nishane", Perfume: "Ani", Tipo: "Amostra", "Volume (ml)": "2", Status: "Pendente", Entrada: "2026-10-13" });
-  const a = deLinhas(linhas)[0];
-  assert.deepEqual(camposAmostra(a, { ...a, status: "Esgotado", motivo: "Doada" }, "2026-10-13"), { Status: "Esgotado", "Saída": "2026-10-13", "Motivo saída": "Doada" });
+  const novo = camposAmostra(null, { casa: "Nishane", nome: "Ani", tipo: "Amostra", ml: "2", status: "Pendente", entrada: "2026-10-13", origem: "loja" });
+  assert.deepEqual(novo, { Casa: "Nishane", Perfume: "Ani", Tipo: "Amostra", "Volume (ml)": "2", Status: "Pendente" });   // Entrada/Origem não são mais gravadas
+  const a = deLinhas(linhas)[2];   // Esgotado, com saída e motivo antigos na planilha
+  assert.deepEqual(camposAmostra(a, { ...a, status: "Realizado" }), { Status: "Realizado" });   // não mexe em Saída/Motivo
   assert.deepEqual(camposAmostra(a, { ...a }), {});
 });
 
@@ -111,7 +109,8 @@ test("diasDesde e telas renderizam sem erro (inclusive sem dados)", () => {
   assert.equal(diasDesde("2026-10-01", "2026-10-13"), 12); assert.equal(diasDesde(""), null);
   const l = juntar(deLinhas(linhas), mercado);
   const h = telaAmostras({ lista: l, filtro: {}, configurado: true, existe: true, erro: null, sem: semRegistro(l, mercado), usosDe: () => 2, hoje: "2026-10-13" });
-  assert.match(h, /28 d esperando/); assert.match(h, /Naxos/); assert.match(h, /<td class="c-usos">2<\/td>/); assert.match(h, /class="tabelao am-tab"/);
+  assert.match(h, /Naxos/); assert.match(h, /class="tabelao am-tab"/);
+  assert.doesNotMatch(h, /c-origem|c-entrada|c-dias|c-saida|c-motivo|c-usos/);
   assert.doesNotMatch(h, /data-ed=/);   // sem aba Mercado na planilha: tier/arquétipo só leitura
   assert.match(telaAmostras({ lista: l, filtro: {}, configurado: true, existe: true, sem: [], editavel: true, arquetipos: [{ nome: "Monge" }] }), /data-ed="Tier" data-id="Amouage\|\|Search"/);
   assert.match(telaAmostras({ lista: null, filtro: {}, configurado: false, sem: [] }), /Conecte a planilha/);
