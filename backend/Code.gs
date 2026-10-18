@@ -8,7 +8,7 @@
  * token para colar em Ajustes do app.
  *
  * Toda chamada é POST com corpo JSON em text/plain (evita preflight de CORS) e precisa do TOKEN.
- * Ações: ping · metar · dados (Tiers + Diário + Frascos) · registrar (linhas no formato da aba Diário) ·
+ * Ações: ping · metar · dados (Tiers + Diário + Frascos) · registrar (linhas no formato da aba Diário; slots M, M2, E, N, N2) ·
  *        editarRegistro · removerRegistro (só registros dos últimos DIAS_EDITAVEIS dias da aba Diário) ·
  *        mercado (lê a aba Mercado) · criarMercado (cria a aba uma vez) · editarMercado (edita um perfume,
  *        inclusive casa/nome; tier e posse também vão para a aba Tiers) · adicionarMercado · removerMercado
@@ -31,6 +31,8 @@ var ABA_AMOSTRAS = 'Amostras';
 var COLS_AMOSTRAS = ['ID', 'Casa', 'Perfume', 'Tipo', 'Volume (ml)', 'Origem', 'Status', 'Entrada', 'Saída', 'Motivo saída', 'Impressão', 'Obs', 'Atualizado em', 'Dono'];
 var DONOS_AMOSTRA = ['', 'Gui', 'Bia'], TIPOS_AMOSTRA = ['Amostra', 'Decant'], STATUS_AMOSTRA = ['Pendente', 'Em teste', 'Realizado', 'Esgotado'];
 var DIAS_EDITAVEIS = 30;   // editar/apagar no Diário: só registros com data a partir de hoje − 30 dias
+// Slot: M (Dia) · M2 (2ª aplicação do Dia) · E (Esportes) · N (Noite) · N2 (2ª aplicação da Noite) — nesta ordem no dia
+var SLOTS = ['M', 'M2', 'E', 'N', 'N2'];
 var OCASIOES = ['Lazer', 'T.Inf', 'T.For', 'N.Inf', 'N.For', 'Cozy D', 'Cozy N'];
 
 function doPost(e) {
@@ -115,7 +117,7 @@ function normalizarLinha_(l, nomesValidos) {
   var data = String(l.data || '');
   if (!/^\d{4}-\d{2}-\d{2}$/.test(data)) throw new Error('data inválida: ' + data);
   var slot = String(l.slot || '');
-  if (slot !== 'M' && slot !== 'N') throw new Error('slot inválido: ' + slot);
+  if (SLOTS.indexOf(slot) === -1) throw new Error('slot inválido: ' + slot + ' (use M, M2, E, N ou N2)');
   var perfume = String(l.perfume || '').trim();
   if (!perfume) throw new Error('perfume vazio');
   if (nomesValidos && nomesValidos.indexOf(perfume) === -1) throw new Error('"' + perfume + '" não está na aba Tiers (Nome no diário ou Perfume)');
@@ -125,12 +127,13 @@ function normalizarLinha_(l, nomesValidos) {
   return [data, slot, perfume, oc, txt(l.temp), txt(l.td), txt(l.sprays), txt(l.notaDia), txt(l.obs)];
 }
 
-/** Linha (1-based) depois da qual inserir para manter a ordem cronológica (data, depois M antes de N). */
+/** Linha (1-based) depois da qual inserir para manter a ordem cronológica (data, depois a ordem de SLOTS). */
 function posicaoInsercao_(existentes, data, slot) {
   // existentes: [[data, slot], ...] a partir da linha 2
-  var chave = data + (slot === 'M' ? '0' : '1');
+  var ordem = function (s) { return Math.max(0, SLOTS.indexOf(String(s))); };
+  var chave = data + ordem(slot);
   for (var i = existentes.length - 1; i >= 0; i--) {
-    var e = existentes[i], k = String(e[0]) + (e[1] === 'N' ? '1' : '0');
+    var e = existentes[i], k = String(e[0]) + ordem(e[1]);
     if (k <= chave) return i + 2; // linha da planilha (cabeçalho = 1)
   }
   return 1;

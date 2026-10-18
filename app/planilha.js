@@ -1,5 +1,6 @@
 // planilha.js — regras puras sobre os dados da planilha (sem rede): tier da aba Tiers vence o JSON da grade,
 // frascos sem "Frasco Gui" saem da recomendação, diário da planilha + fila local viram o histórico do modelo.
+import { ORDEM_SLOT } from "./util.js";
 
 const idx = (cab, nome) => cab.indexOf(nome);
 
@@ -46,7 +47,8 @@ export function diarioUnificado(diarioPlanilha, local) {
   // enviados que a cópia da planilha ainda não traz continuam valendo; conflito e descartado não entram
   const pend = local.filter(r => r.estado !== "descartado" && r.estado !== "conflito" && !vistos.has(chave(r)))
     .map(r => ({ ...r, pendente: r.estado !== "enviado" }));
-  return [...diarioPlanilha, ...pend].sort((a, b) => (a.data < b.data ? -1 : a.data > b.data ? 1 : (a.slot === "N") - (b.slot === "N")));
+  const ord = s => ORDEM_SLOT[s] ?? 9;
+  return [...diarioPlanilha, ...pend].sort((a, b) => (a.data < b.data ? -1 : a.data > b.data ? 1 : ord(a.slot) - ord(b.slot)));
 }
 
 /** Nomes aceitos no registro: "Nome no diário" e "Perfume" da aba Tiers (decants e amostras inclusive). */

@@ -1,8 +1,8 @@
 // telas.js — Coleção, Playbook e Histórico (fase 4). Recebem o contexto pronto do main.js e devolvem HTML.
 import { FAIXAS } from "../engine/index.js";
-import { esc, ROT_OC, OCAS_TODAS, pinta, faixaHTML, nf, tierHTML, slotNome, md, ordsDe, compararMulti, cmpValor, cabOrd, painelOrd, OPC_AMOSTRA, passaAmostra, temFiltro } from "./util.js";
+import { esc, ROT_OC, OCAS_TODAS, pinta, faixaHTML, nf, tierHTML, slotNome, slotIcone, md, ordsDe, compararMulti, cmpValor, cabOrd, painelOrd, OPC_AMOSTRA, passaAmostra, temFiltro } from "./util.js";
 import { chave } from "./mercado.js";
-import { contagens, agrupar, esquecidos, usoVsJanelas, calibracao } from "./estatisticas.js";
+import { contagens, agrupar, esquecidos, usoVsJanelas, calibracao, deAnalise } from "./estatisticas.js";
 import { arqIcone, corArq, ARQ_PATHS } from "./icones.js";
 
 const TIERS = ["S", "A", "B", "C"];
@@ -129,8 +129,8 @@ export const idRegistro = r => [r.data, r.slot, r.perfume, r.linha || "", r.id |
 /** Registros dos últimos dias (a partir de `limite`), mais recentes primeiro, com botão Editar. */
 export function registrosRecentes(hist, limite) {
   const rec = hist.filter(r => r.data >= limite).reverse();
-  const item = r => `<article class="card compacto"><span class="pos" title="${r.slot === "N" ? "Noite" : "Dia"}">${r.slot === "N" ? "☾" : "☀︎"}</span>
-    <div style="min-width:0"><b>${esc(r.perfume)}</b><div class="casa">${dataBR(r.data)}${r.ocasiao ? ` · ${esc(ROT_OC[r.ocasiao] || r.ocasiao)}` : ""}${r.sprays ? ` · ${esc(r.sprays)} spray${r.sprays === "1" ? "" : "s"}` : ""}${r.notaDia ? ` · nota ${esc(r.notaDia)}` : ""}${r.pendente ? " · na fila" : ""}</div></div>
+  const item = r => `<article class="card compacto"><span class="pos" title="${esc(slotNome(r.slot))}">${slotIcone(r.slot)}</span>
+    <div style="min-width:0"><b>${esc(r.perfume)}</b><div class="casa">${dataBR(r.data)}${r.slot !== "M" && r.slot !== "N" ? ` · ${esc(slotNome(r.slot))}` : ""}${r.ocasiao ? ` · ${esc(ROT_OC[r.ocasiao] || r.ocasiao)}` : ""}${r.sprays ? ` · ${esc(r.sprays)} spray${r.sprays === "1" ? "" : "s"}` : ""}${r.notaDia ? ` · nota ${esc(r.notaDia)}` : ""}${r.pendente ? " · na fila" : ""}</div></div>
     <button class="btn sec peq" data-editar-reg="${esc(idRegistro(r))}">Editar</button></article>`;
   return `<div class="bloco"><h3>Registros recentes · desde ${dataBR(limite)}</h3>
     ${rec.length ? `<div class="lista">${rec.slice(0, 10).map(item).join("")}</div>${rec.length > 10 ? `<details><summary>Ver os outros ${rec.length - 10}</summary><div class="lista" style="margin-top:8px">${rec.slice(10).map(item).join("")}</div></details>` : ""}`
@@ -142,11 +142,12 @@ export function telaHistorico({ frascos, hist: histTodo, hoje, fila: filaToda, a
   const preset = hr.preset || "tudo";
   const { de, ate } = periodo(preset, hoje, hr.de, hr.ate);
   const dentro = r => (!de || r.data >= de) && r.data <= ate;
-  const hist = histTodo.filter(dentro), fila = filaToda.filter(dentro);
+  // análises: só Dia (M) e Noite (N); Esportes e 2ª aplicação aparecem só nas listas de registros
+  const hist = histTodo.filter(dentro).filter(deAnalise), fila = filaToda.filter(dentro);
   const seletor = `<div class="bloco periodo">
     <div class="chips rolagem">${PRESETS.map(([v, r]) => `<button class="chip" data-hr="${v}" aria-pressed="${preset === v}">${r}</button>`).join("")}</div>
     ${preset === "livre" ? `<div class="campos"><label>De<input type="date" id="hr-de" value="${esc(hr.de || "")}" max="${hoje}"></label><label>Até<input type="date" id="hr-ate" value="${esc(hr.ate || hoje)}" max="${hoje}"></label></div>` : ""}
-    <p class="nota">${de ? `${dataBR(de)} a ${dataBR(ate)}` : `Todo o diário até ${dataBR(ate)}`} · ${hist.length} registro${hist.length === 1 ? "" : "s"}</p>
+    <p class="nota">${de ? `${dataBR(de)} a ${dataBR(ate)}` : `Todo o diário até ${dataBR(ate)}`} · ${hist.length} registro${hist.length === 1 ? "" : "s"} de Dia/Noite</p>
   </div>`;
   const c = contagens(hist, frascos, ate);
   const recentes = limiteEdicao ? registrosRecentes(histTodo, limiteEdicao) : "";
@@ -172,7 +173,7 @@ export function telaHistorico({ frascos, hist: histTodo, hoje, fila: filaToda, a
   </div>
   ${!doPeriodo && c.cobertura < 90 ? `<p class="nota">Diário com menos de 90 dias: não serve ainda para conclusões de desbaste sobre os B.</p>` : ""}
   ${recentes}
-  ${calendario(histTodo, frascos, ate, de)}
+  ${calendario(histTodo.filter(deAnalise), frascos, ate, de)}
   ${passaporte(c.por, hist, frascos)}
   <div class="bloco"><h3>Mais usados</h3>${usados.length ? barras(usados.slice(0, 15).map(x => [`<button class="nome-inline" data-ficha="${esc(x.f.nome)}">${esc(x.f.nome)}</button>`, x.n]), usados[0].n) : `<p class="nota">Nenhum.</p>`}</div>
   <div class="duas">
@@ -203,7 +204,7 @@ export function telaHistorico({ frascos, hist: histTodo, hoje, fila: filaToda, a
     <p class="nota">Desligado por padrão. O número do modelo continua visível; o ajuste nunca passa do teto do frasco (EDP/extrait 4, EDT 5, beasts com teto próprio) e não mexe no Désobéissant (6–7).</p>
     <div class="linha-flex"><button class="btn peq" data-acao="salvar-spr">Salvar ajuste</button>${cal.n ? `<button class="btn sec peq" data-acao="spr-sugerir">Usar o desvio medido</button>` : ""}</div>
   </div>
-  <div class="bloco"><h3>Registros ${doPeriodo ? "do período" : "recentes"}</h3><div class="lista">${hist.slice(-30).reverse().map(r => `<article class="card compacto"><span class="pos">${esc(r.slot)}</span><div style="min-width:0"><b>${esc(r.perfume)}</b><div class="casa">${esc(r.data)} · ${slotNome(r.slot)}${r.sprays ? ` · ${esc(r.sprays)} sprays` : ""}${r.pendente ? " · na fila" : ""}</div></div><span></span></article>`).join("")}</div></div>`;
+  <div class="bloco"><h3>${doPeriodo ? "Registros do período" : "Últimos 30 registros"} · Dia e Noite</h3><div class="lista">${hist.slice(-30).reverse().map(r => `<article class="card compacto"><span class="pos">${slotIcone(r.slot)}</span><div style="min-width:0"><b>${esc(r.perfume)}</b><div class="casa">${esc(r.data)} · ${slotNome(r.slot)}${r.sprays ? ` · ${esc(r.sprays)} sprays` : ""}${r.pendente ? " · na fila" : ""}</div></div><span></span></article>`).join("")}</div></div>`;
 }
 
 // ───────────────────────── calendário de cheiros ─────────────────────────

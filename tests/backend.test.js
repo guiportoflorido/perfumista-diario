@@ -138,3 +138,19 @@ test("removerRegistro: apaga só aquela linha; antigos (>30 dias) e duplicados a
   assert.deepEqual(abas["Diário"].slice(1).map(x => x[0] + x[1]), ["2026-09-01M", "2026-10-17M"]);
   assert.equal(post({ token: "segredo", acao: "removerRegistro", orig: { data: "2026-10-16", slot: "N", perfume: "Odéon" } }).ok, false);
 });
+
+test("slots M2 (2ª do Dia), E (Esportes) e N2 (2ª da Noite): aceitos, na ordem M · M2 · E · N · N2; outro código é recusado", () => {
+  const { post, abas } = ambiente({ diario: [CAB, ["2026-10-16", "N", "Odéon"], ["2026-10-17", "M", "Odéon"], ["2026-10-17", "N", "Odéon"]] });
+  const r = post({ token: "segredo", acao: "registrar", linhas: [
+    { id: "a", data: "2026-10-17", slot: "N2", perfume: "Gentle Fluidity Silver" },
+    { id: "b", data: "2026-10-17", slot: "E", perfume: "Odéon" },
+    { id: "c", data: "2026-10-17", slot: "M2", perfume: "Odéon" },
+    { id: "d", data: "2026-10-16", slot: "E", perfume: "Odéon" },
+  ] });
+  assert.equal(r.ok, true); assert.equal(r.gravadas.length, 4); assert.equal(r.conflitos.length, 0);
+  assert.deepEqual(abas["Diário"].slice(1).map(x => x[0].slice(8) + x[1]), ["16E", "16N", "17M", "17M2", "17E", "17N", "17N2"]);
+  assert.match(post({ token: "segredo", acao: "registrar", linhas: [{ data: "2026-10-17", slot: "X", perfume: "Odéon" }] }).erro, /slot inválido: X/);
+  // editar para um slot novo reposiciona
+  assert.equal(post({ token: "segredo", acao: "editarRegistro", orig: { data: "2026-10-16", slot: "N", perfume: "Odéon" }, campos: { slot: "N2" } }).ok, true);
+  assert.deepEqual(abas["Diário"].slice(1, 3).map(x => x[0].slice(8) + x[1]), ["16E", "16N2"]);
+});

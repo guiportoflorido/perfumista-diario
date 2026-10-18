@@ -22,14 +22,17 @@ export function descartar(id) { atualizar(id, { estado: "descartado" }); }
 const paraPlanilha = r => ({ id: r.id, data: r.data, slot: r.slot, perfume: r.perfume, ocasiao: r.ocasiao, temp: r.temp, td: r.td,
   sprays: r.sprays, notaDia: r.notaDia, obs: r.obs });
 
-/** Envia os pendentes (e os com erro). Com `trocaId`, grava aquele registro mesmo com o slot ocupado:
- *  tipo "troca" (trocou de perfume) ou "segunda" (2ª aplicação no mesmo slot, como já aparece no diário). */
+/** Envia os pendentes (e os com erro). Com `trocaId`, resolve o conflito daquele registro: tipo "troca" (trocou de
+ *  perfume: grava mesmo com o slot ocupado) ou "segunda" (2ª aplicação: o registro passa para o slot M2/N2). */
 export async function enviar({ trocaId = null, tipo = "troca" } = {}) {
   if (!configurado()) return { enviadas: 0, semConfig: true };
+  if (trocaId && tipo === "segunda") {
+    salvarFila(fila().map(r => (r.id === trocaId && (r.slot === "M" || r.slot === "N") ? { ...r, slot: r.slot + "2", estado: "pendente", existente: null } : r)));
+    return enviar();
+  }
   let alvo = fila().filter(r => (trocaId ? r.id === trocaId : r.estado === "pendente" || r.estado === "erro"));
   if (!alvo.length) return { enviadas: 0 };
-  const marca = r => (tipo === "segunda" ? `2ª aplicação do slot ${r.slot === "M" ? "Dia" : "Noite"}; ${r.existente} antes` : "troca");
-  if (trocaId) alvo = alvo.map(r => ({ ...r, obs: r.obs ? `${r.obs}; ${marca(r)}` : marca(r) }));
+  if (trocaId) alvo = alvo.map(r => ({ ...r, obs: r.obs ? `${r.obs}; troca` : "troca" }));
   try {
     const j = await chamar("registrar", { linhas: alvo.map(paraPlanilha), forcar: Boolean(trocaId) });
     const ok = new Set(j.gravadas.map(g => g.id)), conf = new Map(j.conflitos.map(c => [c.id, c.existente]));
