@@ -1,11 +1,11 @@
 // main.js — orquestra as telas: Hoje, Registrar e Ajustes (Coleção, Playbook e Histórico entram na fase 4).
-import { rodar, avaliar, vivoAte, porque, CFG, FAIXAS, fmtH } from "../engine/index.js";
+import { rodar, avaliar, vivoAte, porque, CFG, FAIXAS, OCASIOES, fmtH } from "../engine/index.js";
 import { ajustes, salvarAjustes, AJUSTES_PADRAO, estadoDia, salvarDia, hojeISO } from "./store.js";
 import { buscarPrevisao, buscarMetar, derivarClima, horaNum } from "./clima.js";
 import { montarEntrada, OCAS_DIA, OCAS_NOITE, AMBIENTES, EXTRAS } from "./entrada.js";
 import { configurado, chamar } from "./api.js";
 import { fila, adicionar, descartar, enviar, planilhaCache, baixarPlanilha, limiteEdicao, editarRegistro, removerRegistro, exportarDiario } from "./registro.js";
-import { lerTiers, lerDiario, aplicarTiers, diarioUnificado, nomesRegistraveis } from "./planilha.js";
+import { lerTiers, lerDiario, aplicarTiers, aplicarMedicoes, MEDICOES_PADRAO, diarioUnificado, nomesRegistraveis } from "./planilha.js";
 import { janelasPorFrasco, ajustarSprays, deAnalise, notaPorFrascoFaixa, sobrevivencia } from "./estatisticas.js";
 import { telaColecao, telaPlaybook, telaHistorico, idRegistro, periodo } from "./telas.js";
 import { telaRoda } from "./roda.js";
@@ -19,8 +19,8 @@ import { telaAmostras, fichaAmostra, deLinhas as amostrasDeLinhas, juntar, semRe
 import { ler, gravar } from "./store.js";
 import { fotoFicha, iconeFicha, fotoMini, reduzirImagem, subirFoto, removerFotoPlanilha, iniciarFotos } from "./fotos.js";
 
-export const APP_VERSAO = "5.30";  // sobe a cada publicação: confere no topo da tela se o celular pegou a versão nova
-const S = { aba: "hoje", frascos: [], frascosAtivos: [], avisosTiers: null, fichas: {}, versao: {}, prev: null, prevOffline: false,
+export const APP_VERSAO = "5.31";  // sobe a cada publicação: confere no topo da tela se o celular pegou a versão nova
+const S = { aba: "hoje", frascos: [], frascosAtivos: [], avisosTiers: null, medidos: [], fichas: {}, versao: {}, prev: null, prevOffline: false,
   prevErro: null, metar: null, metarMotivo: null, clima: null, resultado: null, erroMotor: null, entrada: "", carregandoClima: true,
   sync: { estado: "ocioso", msg: "" }, hr: ler("hr", { preset: "tudo" }), tokenNovo: null, playbook: null, janelas: new Map(),
   filtro: ler("filtro", {}), pbFaixa: null, arquetipos: [], gaps: [], sub: carregarSub(), exp: ler("exp", "tudo"), sim: null, verGaps: false,
@@ -90,9 +90,12 @@ function planilha() {
   const p = planilhaCache();
   return { tiers: lerTiers(p?.tiers), diario: lerDiario(p?.diario), lido: p?.lido || null };
 }
+// tiers da planilha e depois as medições na pele: Hoje, Testar, ficha, Coleção e Playbook veem o mesmo frasco
+const opcoesMedicoes = () => ({ ...MEDICOES_PADRAO, ...(ajustes().medicoes || {}) });
 function aplicarPlanilha() {
   const r = aplicarTiers(S.frascos, planilha().tiers);
-  S.frascosAtivos = r.frascos; S.avisosTiers = r.aplicado ? r.avisos : null;
+  const m = aplicarMedicoes(r.frascos, historico(), opcoesMedicoes());
+  S.frascosAtivos = m.frascos; S.medidos = m.medidos; S.avisosTiers = r.aplicado ? r.avisos : null;
 }
 const historico = () => diarioUnificado(planilha().diario, fila());
 
@@ -121,6 +124,7 @@ async function atualizarClima() {
 }
 
 function recalcular() {
+  aplicarPlanilha();   // registro novo (vivo/fraco/morto, NotaDia) já entra nas medições
   const aj = ajustes(), dia = estadoDia(), data = dia.data;
   S.clima = derivarClima({ prev: S.prev, metar: S.metar, override: dia.override, data, aplico: aj.aplico,
     noite: dia.soUm ? null : aj.noite, tiro: aj.tiro, metarHoras: aj.metar_horas, metarTol: aj.metar_tol });
@@ -318,6 +322,7 @@ function spraysHTML(t) {
 // ───────────────────────── "por que este?" ─────────────────────────
 const n2 = x => Number(x).toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 const vivoTxt = t => (t.vivo_fim ? "o fim" : "~" + fmtH(t.vivo_ate));
+const seloMedido = f => (f.perf_origem === "medido" ? ` <span class="nota">(medido, n=${f.longev_n})</span>` : "");
 /** A linha do porquê vira um <details>: tocar abre a decomposição do score (componentes do avaliar() do engine). */
 function porqueHTML(t) {
   const r = t.r, f = r.f, linhas = [];
@@ -326,7 +331,7 @@ function porqueHTML(t) {
   L("Td", n2(r.td_mod));
   if (r.chuva_eff) L("Chuva", n2(r.chuva_eff));
   L("Clima (w_clima)", `${n2(r.clima)} × ${n2(CFG.w_clima)} = ${n2(r.clima * CFG.w_clima)}`);
-  L("Aptidão", n2(r.apt));
+  L("Aptidão", `${n2(r.apt)}${f.apt_original ? ` <span class="nota">ajustado por NotaDia</span>` : ""}`);
   if (r.fech) L("Fechado", n2(r.fech));
   L("Contexto (w_ctx)", `${n2(r.ctx)} × ${n2(CFG.w_ctx)} = ${n2(r.ctx * CFG.w_ctx)}`);
   L("Base", n2(r.base));
@@ -334,7 +339,7 @@ function porqueHTML(t) {
   L("Rotação", `×${n2(r.rot)} · ${r.dias === "45+" ? "45+" : r.dias != null ? `usado há ${r.dias}d` : "sem histórico"}${r.adapt ? " · adaptação" : ""}`);
   if (r.res_txt) L("Resíduo", `${esc(r.res_txt)}${r.residuo !== 1 ? ` · ×${n2(r.residuo)}` : ""}`);
   if (r.intent !== 1) L("Intenção", `×${n2(r.intent)}`);
-  L("Vivo até", vivoTxt(t));
+  L("Vivo até", vivoTxt(t) + seloMedido(f));
   L("<b>Score</b>", `<b>${t.score.toFixed(0)}</b>`);
   return `<details class="pq"><summary>${esc(t.porque)}</summary><table class="pq-tab"><tbody>${linhas.join("")}</tbody></table></details>`;
 }
@@ -365,7 +370,7 @@ function blocoSlot(s, expandido = true) {
       ${hero ? `<span class="pos pos-hero">${arqIcone(t.arquetipo, 30)}<span class="n1">1</span></span>` : `<span class="pos">${i + 1}</span>`}
       <div style="min-width:0" class="card-tx">${fotoMini(doMercado(t.casa, t.nome), hero ? "foto-hero" : "foto-mini")}<button class="nome" data-ficha="${esc(t.nome)}">${esc(t.nome)}</button>${tierHTML(t.tier)}<div class="casa">${esc(t.casa)} · ${arqTag(t.arquetipo, 13)}</div></div>
       <span class="score" title="Score">${t.score.toFixed(0)}</span>
-      <div class="meta">${spraysHTML(t)}<span>vivo até <b>${t.vivo_fim ? "o fim" : "~" + fmtH(t.vivo_ate)}</b></span></div>
+      <div class="meta">${spraysHTML(t)}<span>vivo até <b>${vivoTxt(t)}</b>${seloMedido(t.r.f)}</span></div>
       ${porqueHTML(t)}
       <div class="acoes"><span class="esp"></span><button class="btn peq ${ja ? "feito" : "sec"}" data-usei="${esc(t.nome)}" data-slot="${slotCod}" data-sprays="${t.sprays}" data-ajustado="${ajustarSprays(t.r.f, t.sprays, ajSpray())}" ${usado ? "disabled" : ""}>${ja ? "✓ Registrado" : "Usei este"}</button></div>
     </article>`;
@@ -800,7 +805,26 @@ function telaAjustes() {
   </dl>
   <div class="linha-flex"><button class="btn sec peq" data-acao="ler-planilha">Ler planilha agora</button></div>
   <p class="nota" id="lerMsg"></p></div>
+  ${blocoMedicoes()}
   ${blocoAvisosTiers()}`;
+}
+
+/** Ajustes › Medições na pele: liga/desliga a correção de longevidade e aptidão e mostra o que já foi corrigido. */
+function blocoMedicoes() {
+  const o = opcoesMedicoes(), h = x => `${virg(x)} h`;
+  const linha = m => [esc(m.nome), m.longev ? `longev ${h(m.longev.de)} → ${h(m.longev.para)} (${m.longev.n} noites)` : "",
+    ...m.apt.map(a => `${ROT_OC[a.ocasiao]} apt ${a.de} → ${a.para} (média ${nf(a.media)} em ${a.n} usos)`)].filter(Boolean).join(" · ");
+  return `<div class="bloco" id="medicoes"><h3>Medições na pele</h3>
+    <p class="nota">Corrige, por frasco, a longevidade (vivo/fraco/morto respondido na Noite: vivo 12 h · fraco 8 h · morto 5 h) e a aptidão por ocasião (NotaDia: média ≥ 4,5 sobe 1, ≤ 2,5 desce 1). Entra antes do modelo, como os tiers da planilha.</p>
+    <label class="linha-flex"><input type="checkbox" id="med-ativo" ${o.ativo ? "checked" : ""} style="width:auto"> Usar medições para corrigir o modelo</label>
+    <div class="campos">
+      <label>Mínimo de noites para longevidade<input id="med-sobrev" inputmode="numeric" value="${esc(o.minSobrev)}"></label>
+      <label>Mínimo de usos por ocasião para aptidão<input id="med-nota" inputmode="numeric" value="${esc(o.minNota)}"></label>
+    </div>
+    <div class="linha-flex"><button class="btn peq" data-acao="salvar-medicoes">Salvar</button></div>
+    <h3 style="margin-top:6px">O que já foi corrigido</h3>
+    ${!o.ativo ? `<p class="nota">Desligado: o modelo usa só a ficha.</p>` : S.medidos.length ? `<ul class="nota" style="padding-left:18px;margin:0">${S.medidos.map(m => `<li>${linha(m)}</li>`).join("")}</ul>` : `<p class="nota">Ainda sem frasco com dados suficientes.</p>`}
+  </div>`;
 }
 
 // ───────────────────────── ficha ─────────────────────────
@@ -819,14 +843,15 @@ function abrirFicha(nome) {
     <dl class="kv">
       <dt>Pirâmide</dt><dd>${esc(fi.perfil)} <span class="nota">· fonte: ${esc(S.versao.fichas)}</span></dd>
       <dt>Envelope</dt><dd>${esc(fi.envelope)}</dd>
-      <dt>Aptidão</dt><dd>${esc(fi.aptidao)}</dd>
+      <dt>Aptidão</dt><dd>${f.apt_original ? `${OCASIOES.filter(o => o in f.apt).map(o => f.apt[o] !== f.apt_original[o]
+        ? `${o} <b>${f.apt[o]}</b> <span class="nota">(${f.apt_original[o]})</span>` : `${o} ${f.apt[o]}`).join(" · ")} <span class="selo">ajustado por NotaDia</span>` : esc(fi.aptidao)}</dd>
       <dt>Eixo · doçura · peso</dt><dd>${esc(fi.eixo)} · ${esc(fi.doc)} · ${esc(fi.peso)}</dd>
       <dt>Td</dt><dd>${{ C: "sobe no ar carregado", S: "sobe no ar seco", N: "indiferente" }[f.td]}</dd>
       <dt>Sprays-base</dt><dd>${esc(fi.sprays_base)}</dd>
       <dt>Janelas</dt><dd>${esc(fi.janelas)}${f.janelas_estimadas ? `<span class="selo aviso">estimado</span>` : ""}${janelasHTML(nome)}</dd>
       ${(() => { const nt = notaPorFrascoFaixa(historico(), S.frascosAtivos.length ? S.frascosAtivos : S.frascos).get(nome);
         return nt ? `<dt>NotaDia</dt><dd>média ${nf(nt.media)} em ${nt.n} uso${nt.n > 1 ? "s" : ""}</dd>` : ""; })()}
-      <dt>Performance</dt><dd>~${f.longev} h · projeção ${f.proj}/5 · curva ${{ S: "saída manda", L: "linear", F: "fundo manda" }[f.curva]}${f.perf_estimada ? `<span class="selo aviso">estimado por regra</span>` : `<span class="selo">da leitura da ficha</span>`}${(() => {
+      <dt>Performance</dt><dd>${f.perf_origem === "medido" ? `Longevidade: ${virg(f.longev)} h medida em ${f.longev_n} noites (estimativa era ${virg(f.longev_estimada_original)} h)<br>` : `~${f.longev} h · `}projeção ${f.proj}/5 · curva ${{ S: "saída manda", L: "linear", F: "fundo manda" }[f.curva]}${f.perf_origem === "medido" ? `<span class="selo">medido</span>` : f.perf_estimada ? `<span class="selo aviso">estimado por regra</span>` : `<span class="selo">da leitura da ficha</span>`}${(() => {
         const sv = sobrevivencia(historico(), S.frascos).get(nome);
         return sv ? `<br>Na pele: ${sv.vivo} vivo · ${sv.fraco} fraco · ${sv.morto} morto <span class="nota">(${sv.n} noite${sv.n > 1 ? "s" : ""})</span>` : ""; })()}</dd>
       ${(() => { const its = (S.resultado?.slots || []).map(so => [so, itemDoDia(so, nome)]).filter(([, t]) => t);
@@ -965,6 +990,14 @@ document.addEventListener("click", async e => {
   if (b.dataset.dia) { const el = $("#calInfo"); if (el) el.innerHTML = b.dataset.info; document.querySelectorAll(".cal .dia.sel").forEach(x => x.classList.remove("sel")); b.classList.add("sel"); return; }
   if (b.dataset.exp) { S.exp = b.dataset.exp; gravar("exp", S.exp); render(); return; }
   if (b.dataset.acao === "copiar-diario") { copiarDiario(); return; }
+  if (b.dataset.acao === "salvar-medicoes") {
+    const n = id => Math.max(3, Math.round(Number($(id).value.replace(",", "."))) || 3);
+    const med = { ativo: $("#med-ativo").checked, minSobrev: n("#med-sobrev"), minNota: n("#med-nota") };
+    salvarAjustes({ ...ler("ajustes", {}), medicoes: med });
+    recalcular();
+    toast(`Medições ${med.ativo ? "ligadas" : "desligadas"}${med.ativo ? ` · ${S.medidos.length} frasco${S.medidos.length === 1 ? "" : "s"} corrigido${S.medidos.length === 1 ? "" : "s"}` : ""}.`);
+    return;
+  }
   if (b.dataset.hr) { S.hr = { ...S.hr, preset: b.dataset.hr }; gravar("hr", S.hr); render(); return; }
   if (b.dataset.edWish) { const p = (listaMercado().lista || []).find(x => x.casa + "||" + x.nome === b.dataset.edWish); if (p) editarCelula(b, p, "Wishlist", p.wish ? "" : "✓"); return; }
   if (b.dataset.merc) { S.confirmandoRemocao = false; abrirMercado(b.dataset.merc); return; }
@@ -1083,7 +1116,7 @@ document.addEventListener("submit", e => {
   if (e.target.id === "formMercado") { salvarMercado(e.target); return; }
   if (e.target.id === "formAmostra") { salvarAmostra(e.target); return; }
   if (e.target.id !== "formAjustes") return;
-  const a = {};
+  const a = { medicoes: ajustes().medicoes };   // o formulário não tem os campos das medições: preserva
   for (const k of Object.keys(AJUSTES_PADRAO)) {
     const el = $("#aj-" + k); if (!el) continue;
     const v = el.value.trim();
