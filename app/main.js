@@ -6,7 +6,7 @@ import { montarEntrada, OCAS_DIA, OCAS_NOITE, AMBIENTES, EXTRAS } from "./entrad
 import { configurado, chamar } from "./api.js";
 import { fila, adicionar, descartar, enviar, planilhaCache, baixarPlanilha, limiteEdicao, editarRegistro, removerRegistro } from "./registro.js";
 import { lerTiers, lerDiario, aplicarTiers, diarioUnificado, nomesRegistraveis } from "./planilha.js";
-import { janelasPorFrasco, ajustarSprays, deAnalise } from "./estatisticas.js";
+import { janelasPorFrasco, ajustarSprays, deAnalise, notaPorFrascoFaixa, sobrevivencia } from "./estatisticas.js";
 import { telaColecao, telaPlaybook, telaHistorico, idRegistro } from "./telas.js";
 import { telaRoda } from "./roda.js";
 import { ordsDe, tocarOrd, mudarOrds, slotNome, slotBase, slotIcone, opcoesSlot } from "./util.js";
@@ -19,7 +19,7 @@ import { telaAmostras, fichaAmostra, deLinhas as amostrasDeLinhas, juntar, semRe
 import { ler, gravar } from "./store.js";
 import { fotoFicha, iconeFicha, fotoMini, reduzirImagem, subirFoto, removerFotoPlanilha, iniciarFotos } from "./fotos.js";
 
-export const APP_VERSAO = "5.25";  // sobe a cada publicação: confere no topo da tela se o celular pegou a versão nova
+export const APP_VERSAO = "5.26";  // sobe a cada publicação: confere no topo da tela se o celular pegou a versão nova
 const S = { aba: "hoje", frascos: [], frascosAtivos: [], avisosTiers: null, fichas: {}, versao: {}, prev: null, prevOffline: false,
   prevErro: null, metar: null, metarMotivo: null, clima: null, resultado: null, erroMotor: null, entrada: "", carregandoClima: true,
   sync: { estado: "ocioso", msg: "" }, hr: ler("hr", { preset: "tudo" }), tokenNovo: null, playbook: null, janelas: new Map(),
@@ -223,6 +223,27 @@ function blocoClima(c, dia) {
   </section>`;
 }
 const campo = (k, rot, v) => `<label>${rot}<input data-ov="${k}" type="text" inputmode="decimal" value="${esc(v ?? "")}" autocomplete="off"></label>`;
+
+/** NotaDia em chips 1–5 (fit do slot). O valor fica num campo escondido; tocar de novo no mesmo chip limpa.
+ *  Nota antiga fora de 1–5 (ex.: "8,5") aparece como chip extra e é mantida se ninguém mexer. */
+function chipsNota(id, atual = "") {
+  const v = String(atual ?? "").trim();
+  const extra = v && !["1", "2", "3", "4", "5"].includes(v) ? [[v, v]] : [];
+  return `<div class="chips nota-chips" role="group" aria-label="NotaDia de 1 a 5" data-nota-alvo="${id}">
+    ${[...[1, 2, 3, 4, 5].map(n => [String(n), String(n)]), ...extra].map(([k, r]) => `<button type="button" class="chip" data-nota="${esc(k)}" aria-pressed="${v === k}">${esc(r)}</button>`).join("")}
+    <input type="hidden" id="${id}" value="${esc(v)}"></div>`;
+}
+
+/** No registro da Noite: como estava o perfume da manhã do mesmo dia (opcional, sem padrão). Some se não houver manhã. */
+function blocoVivo(prefixo, data, slot, atual = "") {
+  const manha = slot === "N" ? historico().filter(r => r.data === data && slotBase(r.slot) === "M").at(-1) : null;
+  if (!manha) return `<input type="hidden" id="${prefixo}-vivo" value="">`;
+  const v = String(atual || "");
+  return `<div class="campo largo"><span>O <b>${esc(manha.perfume)}</b> da manhã ainda estava:</span>
+    <div class="chips" role="group" data-vivo-alvo="${prefixo}-vivo">${[["vivo", "Vivo"], ["fraco", "Fraco"], ["morto", "Morto"]].map(([k, r]) =>
+      `<button type="button" class="chip" data-vivo="${k}" aria-pressed="${v === k}">${r}</button>`).join("")}
+    <input type="hidden" id="${prefixo}-vivo" value="${esc(v)}"></div></div>`;
+}
 
 function chips(nome, opcoes, atual) {
   return `<div class="chips rolagem" role="group">${opcoes.map(([v, r]) => `<button class="chip" data-chip="${nome}" data-v="${v}" aria-pressed="${atual === v}">${r}</button>`).join("")}</div>`;
@@ -504,7 +525,8 @@ function formRegistro(p = {}) {
       <label class="largo">Perfume<input id="rg-perfume" list="rg-nomes" value="${esc(p.perfume || "")}" placeholder="Nome no diário" required></label>
       <label>Ocasião<select id="rg-ocasiao"><option value="">—</option>${OCAS_TODAS.map(o => `<option value="${o}" ${p.ocasiao === o ? "selected" : ""}>${ROT_OC[o]}</option>`).join("")}</select></label>
       <label>Sprays reais<input id="rg-sprays" inputmode="numeric" value="${esc(p.sprays ?? "")}" placeholder="${p.sugerido ? `sugerido ${p.sugerido}` : ""}"></label>
-      <label>NotaDia (fit do slot)<input id="rg-nota" inputmode="decimal" value=""></label>
+      <div class="campo largo"><span>NotaDia (fit do slot, 1–5)</span>${chipsNota("rg-nota")}</div>
+      <div class="largo" id="rg-vivo-box" style="display:contents">${blocoVivo("rg", p.data || hoje, slot)}</div>
       <label class="largo">Obs<input id="rg-obs" value=""></label>
     </div>
     <datalist id="rg-nomes">${nomes.map(n => `<option value="${esc(n)}">`).join("")}</datalist>
@@ -551,7 +573,7 @@ async function salvarRegistro() {
   const hoje = data === hojeISO(), c = S.clima;
   const f = !c ? null : slot === "M" ? c.faixaDia : c.faixaNoite;
   const reg = { data, slot, perfume, ocasiao: $("#rg-ocasiao").value, sprays: $("#rg-sprays").value.trim(),
-    notaDia: virg($("#rg-nota").value.trim()), obs: $("#rg-obs").value.trim(), sugerido: $("#rg-sugerido").value || (hoje ? sugeridoHoje(slot, perfume) : ""),
+    notaDia: virg($("#rg-nota").value.trim()), obs: $("#rg-obs").value.trim(), vivo: $("#rg-vivo")?.value || "", sugerido: $("#rg-sugerido").value || (hoje ? sugeridoHoje(slot, perfume) : ""),
     temp: hoje && f ? virg(f.T) : "", td: hoje && c && (c.Td.tipo === "observado" || c.Td.tipo === "manual") && c.Td.v != null ? virg(c.Td.v) : "" };
   adicionar(reg);
   fecharFolha();
@@ -583,7 +605,8 @@ function desenharEdicaoRegistro(salvando = "") {
         <label class="largo">Perfume<input id="ed-perfume" list="ed-nomes" value="${esc(r.perfume)}" required></label>
         <label>Ocasião<select id="ed-ocasiao"><option value="">—</option>${OCAS_TODAS.map(o => `<option value="${o}" ${r.ocasiao === o ? "selected" : ""}>${ROT_OC[o]}</option>`).join("")}</select></label>
         <label>Sprays<input id="ed-sprays" inputmode="numeric" value="${esc(r.sprays || "")}"></label>
-        <label>NotaDia<input id="ed-nota" inputmode="decimal" value="${esc(r.notaDia || "")}"></label>
+        <div class="campo largo"><span>NotaDia (1–5)</span>${chipsNota("ed-nota", r.notaDia || "")}</div>
+        <div class="largo" id="ed-vivo-box" style="display:contents">${blocoVivo("ed", r.data, r.slot, r.vivo)}</div>
         <label>Temp (°C)<input id="ed-temp" inputmode="decimal" value="${esc(r.temp || "")}"></label>
         <label>Td (°C)<input id="ed-td" inputmode="decimal" value="${esc(r.td || "")}"></label>
         <label class="largo">Obs<input id="ed-obs" value="${esc(r.obs || "")}"></label>
@@ -603,7 +626,7 @@ async function salvarEdicaoRegistro() {
   const hoje = hojeISO(), lim = limiteEdicao(hoje);
   const campos = { data: $("#ed-data").value, slot: $("#ed-slot").value, perfume: $("#ed-perfume").value.trim(), ocasiao: $("#ed-ocasiao").value,
     temp: virg($("#ed-temp").value.trim()), td: virg($("#ed-td").value.trim()), sprays: $("#ed-sprays").value.trim(),
-    notaDia: virg($("#ed-nota").value.trim()), obs: $("#ed-obs").value.trim() };
+    notaDia: virg($("#ed-nota").value.trim()), obs: $("#ed-obs").value.trim(), vivo: $("#ed-vivo")?.value || "" };
   if (!campos.data || !campos.perfume) { toast("Preencha data e perfume."); return; }
   if (campos.data < lim || campos.data > hoje) { toast(`A data precisa ficar entre ${campos.data < lim ? lim.split("-").reverse().join("/") : "hoje"} e hoje.`); return; }
   const nomes = nomesRegistraveis(planilha().tiers, S.frascosAtivos);
@@ -700,7 +723,11 @@ function abrirFicha(nome) {
       <dt>Td</dt><dd>${{ C: "sobe no ar carregado", S: "sobe no ar seco", N: "indiferente" }[f.td]}</dd>
       <dt>Sprays-base</dt><dd>${esc(fi.sprays_base)}</dd>
       <dt>Janelas</dt><dd>${esc(fi.janelas)}${f.janelas_estimadas ? `<span class="selo aviso">estimado</span>` : ""}${janelasHTML(nome)}</dd>
-      <dt>Performance</dt><dd>~${f.longev} h · projeção ${f.proj}/5 · curva ${{ S: "saída manda", L: "linear", F: "fundo manda" }[f.curva]}${f.perf_estimada ? `<span class="selo aviso">estimado por regra</span>` : `<span class="selo">da leitura da ficha</span>`}</dd>
+      ${(() => { const nt = notaPorFrascoFaixa(historico(), S.frascosAtivos.length ? S.frascosAtivos : S.frascos).get(nome);
+        return nt ? `<dt>NotaDia</dt><dd>média ${nf(nt.media)} em ${nt.n} uso${nt.n > 1 ? "s" : ""}</dd>` : ""; })()}
+      <dt>Performance</dt><dd>~${f.longev} h · projeção ${f.proj}/5 · curva ${{ S: "saída manda", L: "linear", F: "fundo manda" }[f.curva]}${f.perf_estimada ? `<span class="selo aviso">estimado por regra</span>` : `<span class="selo">da leitura da ficha</span>`}${(() => {
+        const sv = sobrevivencia(historico(), S.frascos).get(nome);
+        return sv ? `<br>Na pele: ${sv.vivo} vivo · ${sv.fraco} fraco · ${sv.morto} morto <span class="nota">(${sv.n} noite${sv.n > 1 ? "s" : ""})</span>` : ""; })()}</dd>
       <dt>Vizinhos</dt><dd>${esc(fi.vizinhos)}</dd>
       <dt>Leitura</dt><dd>${esc(fi.leitura)}</dd>
       <dt>Uso</dt><dd>${ult ? `último em ${esc(ult.data)} (${slotNome(ult.slot)}) · ${usos.length} registro${usos.length > 1 ? "s" : ""} no diário` : "sem registro no diário"}</dd>
@@ -809,6 +836,20 @@ document.addEventListener("click", async e => {
   if (b.closest("#abas")) { S.aba = b.dataset.aba; render(); window.scrollTo(0, 0); return; }
   if (b.hasAttribute("data-fechar") && (e.target === b || b.tagName === "BUTTON")) { fecharFolha(); return; }
   if (b.dataset.ficha) { abrirFicha(b.dataset.ficha); return; }
+  if (b.dataset.vivo && b.closest("[data-vivo-alvo]")) {
+    const g = b.closest("[data-vivo-alvo]"), alvo = document.getElementById(g.dataset.vivoAlvo);
+    const novo = alvo.value === b.dataset.vivo ? "" : b.dataset.vivo;   // tocar de novo limpa (é opcional)
+    alvo.value = novo;
+    g.querySelectorAll("button[data-vivo]").forEach(x => x.setAttribute("aria-pressed", String(x.dataset.vivo === novo)));
+    return;
+  }
+  if (b.dataset.nota !== undefined && b.closest("[data-nota-alvo]")) {
+    const g = b.closest("[data-nota-alvo]"), alvo = document.getElementById(g.dataset.notaAlvo);
+    const novo = alvo.value === b.dataset.nota ? "" : b.dataset.nota;
+    alvo.value = novo;
+    g.querySelectorAll("button[data-nota]").forEach(x => x.setAttribute("aria-pressed", String(x.dataset.nota === novo && novo !== "")));
+    return;
+  }
   if (b.dataset.editarReg) { abrirEdicaoRegistro(b.dataset.editarReg); return; }
   if (b.dataset.colmodo) { S.colModo = b.dataset.colmodo; gravar("colModo", S.colModo); render(); return; }
   if (b.dataset.colOrd) { S.filtro = { ...S.filtro, ords: tocarOrd(ordsDe(S.filtro, "tier"), b.dataset.colOrd) }; gravar("filtro", S.filtro); render(); return; }
@@ -881,7 +922,7 @@ document.addEventListener("click", async e => {
     toast($("#spr-ativo").checked ? "Ajuste de sprays ligado." : "Ajuste de sprays salvo (desligado)."); recalcular();
   } else if (acao === "spr-sugerir") {
     const { calibracao } = await import("./estatisticas.js");
-    const cal = calibracao(fila());
+    const cal = calibracao([...historico(), ...fila()]);
     $("#spr-geral").value = String(Math.round(cal.geral));
     $("#spr-por").value = cal.por.filter(p => p.n >= 3 && Math.round(p.media) !== Math.round(cal.geral)).map(p => `${p.nome} = ${Math.round(p.media)}`).join("\n");
     toast("Preenchido com o desvio medido (frascos com 3+ registros). Revise e salve.");
@@ -896,6 +937,11 @@ document.addEventListener("click", async e => {
 
 document.addEventListener("change", e => {
   const el = e.target;
+  // trocar data/slot no registro ou na edição: mostra (ou some) a pergunta sobre o perfume da manhã
+  if (["rg-data", "rg-slot", "ed-data", "ed-slot"].includes(el.id)) {
+    const px = el.id.slice(0, 2), box = document.getElementById(`${px}-vivo-box`);
+    if (box) box.innerHTML = blocoVivo(px, $(`#${px}-data`).value, $(`#${px}-slot`).value, $(`#${px}-vivo`)?.value || "");
+  }
   if (el.dataset.ov) { const k = el.dataset.ov, v = el.value.trim().replace(",", "."); mudarDia(d => { if (v === "") delete d.override[k]; else d.override[k] = v.toLowerCase() === "nd" ? "nd" : v; }); return; }
   if (el.dataset.foto !== undefined && el.type === "file") { enviarFoto(el); return; }
   if (el.dataset.amStatus) { mudarStatusAmostra(el, el.dataset.amStatus, el.value); return; }

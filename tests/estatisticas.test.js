@@ -31,11 +31,26 @@ test("contagens: só grade (camada custo e fora da coleção não contam), 30 di
 });
 
 test("calibração: real − sugerido por frasco e geral, ignorando registros sem sugestão", () => {
-  const cal = calibracao([{ perfume: "Odéon", sprays: "4", sugerido: "2", estado: "enviado" }, { perfume: "Odéon", sprays: "3", sugerido: "2", estado: "enviado" },
-    { perfume: "Liwa", sprays: "3", sugerido: "3", estado: "pendente" }, { perfume: "Liwa", sprays: "5", sugerido: "", estado: "enviado" },
-    { perfume: "Liwa", sprays: "9", sugerido: "2", estado: "descartado" }]);
+  const cal = calibracao([{ data: "2026-10-01", slot: "M", perfume: "Odéon", sprays: "4", sugerido: "2", estado: "enviado" },
+    { data: "2026-10-02", slot: "M", perfume: "Odéon", sprays: "3", sugerido: "2", estado: "enviado" },
+    { data: "2026-10-03", slot: "N", perfume: "Liwa", sprays: "3", sugerido: "3", estado: "pendente" },
+    { data: "2026-10-04", slot: "N", perfume: "Liwa", sprays: "5", sugerido: "", estado: "enviado" },
+    { data: "2026-10-05", slot: "N", perfume: "Liwa", sprays: "9", sugerido: "2", estado: "descartado" }]);
   assert.equal(cal.n, 3); assert.equal(cal.geral, 1);
   assert.deepEqual(cal.por, [{ nome: "Odéon", n: 2, media: 1.5 }, { nome: "Liwa", n: 1, media: 0 }]);
+});
+
+test("calibração com o histórico unificado: lê a coluna Sugerido da planilha e não conta duas vezes o mesmo registro", () => {
+  const planilha = [
+    { data: "2026-10-10", slot: "M", perfume: "Odéon", sprays: "4", sugerido: "2", linha: 2 },      // já tem Sugerido na planilha
+    { data: "2026-10-11", slot: "N", perfume: "Liwa", sprays: "5", sugerido: "", linha: 3 },        // gravado antes da coluna existir
+    { data: "2026-10-12", slot: "M", perfume: "Liwa", sprays: "3,5", sugerido: "3", linha: 4 }];
+  const filaLocal = [
+    { data: "2026-10-10", slot: "M", perfume: "Odéon", sprays: "4", sugerido: "2", estado: "enviado" },   // mesmo do 1º: não duplica
+    { data: "2026-10-11", slot: "N", perfume: "Liwa", sprays: "5", sugerido: "3", estado: "enviado" }];  // a cópia local tem o sugerido
+  const cal = calibracao([...planilha, ...filaLocal]);
+  assert.equal(cal.n, 3);
+  assert.deepEqual(cal.por, [{ nome: "Odéon", n: 1, media: 2 }, { nome: "Liwa", n: 2, media: 1.25 }]);
 });
 
 test("ajuste +N: desligado por padrão, respeita tetos dos beasts e não mexe no Désobéissant", () => {
@@ -47,4 +62,37 @@ test("ajuste +N: desligado por padrão, respeita tetos dos beasts e não mexe no
   assert.equal(ajustarSprays(f("Oud Satin Mood"), 1, { ativo: true, geral: 3 }), 2);   // beast: 2
   assert.equal(ajustarSprays(f("Désobéissant"), 6, { ativo: true, geral: 2 }), 6);
   assert.equal(ajustarSprays(f("Liwa"), 3, { ativo: true, geral: 0, por: { Liwa: 1 } }), 4);
+});
+
+import { notaPorFrascoFaixa, notaNum } from "../app/estatisticas.js";
+test("NotaDia: média geral e por faixa de temperatura; sem Temp só na geral; só Dia/Noite e só a grade", () => {
+  const hist = [
+    { data: "2026-10-01", slot: "M", perfume: "Odéon", notaDia: "4", temp: "24" },      // Ameno
+    { data: "2026-10-02", slot: "N", perfume: "Odéon", notaDia: "2", temp: "23,5" },    // Ameno
+    { data: "2026-10-03", slot: "M", perfume: "Odéon", notaDia: "3", temp: "29" },      // Quente
+    { data: "2026-10-04", slot: "N", perfume: "Odéon", notaDia: "5", temp: "" },        // sem Temp: só na geral
+    { data: "2026-10-05", slot: "M2", perfume: "Odéon", notaDia: "1", temp: "24" },     // 2ª aplicação: fora
+    { data: "2026-10-06", slot: "M", perfume: "Odéon", notaDia: "8,5", temp: "24" },    // escala antiga: fora
+    { data: "2026-10-07", slot: "M", perfume: "Sky", notaDia: "2", temp: "30" },        // camada custo: fora
+    { data: "2026-10-08", slot: "N", perfume: "Liwa", notaDia: "", temp: "20" }];       // sem nota
+  const m = notaPorFrascoFaixa(hist, frascos);
+  assert.deepEqual([...m.keys()], ["Odéon"]);
+  const o = m.get("Odéon");
+  assert.equal(o.n, 4); assert.equal(o.media, 3.5);
+  assert.deepEqual([...o.faixas], [[1, { n: 1, media: 3 }], [2, { n: 2, media: 3 }]]);   // 1 = Quente, 2 = Ameno
+  assert.equal(notaNum("3,5"), 3.5); assert.equal(notaNum("0"), null); assert.equal(notaNum(""), null);
+});
+
+import { sobrevivencia } from "../app/estatisticas.js";
+test("sobrevivência: a resposta da Noite conta para o último perfume do Dia da mesma data", () => {
+  const hist = [
+    { data: "2026-10-01", slot: "M", perfume: "Odéon" }, { data: "2026-10-01", slot: "N", perfume: "Liwa", vivo: "vivo" },
+    { data: "2026-10-02", slot: "M", perfume: "Odéon" }, { data: "2026-10-02", slot: "N", perfume: "Liwa", vivo: "fraco" },
+    { data: "2026-10-03", slot: "M", perfume: "Odéon" }, { data: "2026-10-03", slot: "M2", perfume: "Hacivat" },   // 2ª do Dia: vale a última
+    { data: "2026-10-03", slot: "N", perfume: "Liwa", vivo: "morto" },
+    { data: "2026-10-04", slot: "N", perfume: "Liwa", vivo: "vivo" },                                             // sem manhã: não conta
+    { data: "2026-10-05", slot: "M", perfume: "Odéon" }, { data: "2026-10-05", slot: "N", perfume: "Liwa", vivo: "" },   // sem resposta
+    { data: "2026-10-06", slot: "M", perfume: "Acqua Viva" }, { data: "2026-10-06", slot: "N", perfume: "Liwa", vivo: "vivo" }];   // fora dos frascos
+  const s = sobrevivencia(hist, frascos);
+  assert.deepEqual(Object.fromEntries(s), { "Odéon": { n: 2, vivo: 1, fraco: 1, morto: 0 }, "Hacivat": { n: 1, vivo: 0, fraco: 0, morto: 1 } });
 });

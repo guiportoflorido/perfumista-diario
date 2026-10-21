@@ -1,6 +1,6 @@
 // estatisticas.js — contas do Histórico, Coleção e calibração de sprays. Só dados do Diário: nada projetado.
 // A camada custo fica fora de toda estatística (regra dele); Bedouin Rose (D) fica fora da grade.
-import { diasEntre } from "../engine/index.js";
+import { diasEntre, faixaIdx } from "../engine/index.js";
 
 /** Análises só contam Dia (M) e Noite (N); Esportes (E) e 2ª aplicação (M2/N2) ficam só no registro (decisão dele, 18/out/2026). */
 export const deAnalise = r => r.slot === "M" || r.slot === "N";
@@ -62,16 +62,69 @@ export function usoVsJanelas(por) {
     .map(x => ({ ...x, desvio: x.usos - x.esperado }));
 }
 
-/** Calibração: desvio real − sugerido, só para registros feitos pelo app com sugestão do modelo. */
-export function calibracao(fila) {
-  const pares = fila.filter(r => r.estado !== "descartado" && r.sugerido !== "" && r.sugerido != null && r.sprays !== "" && r.sprays != null)
-    .map(r => ({ nome: r.perfume, real: Number(String(r.sprays).replace(",", ".")), sug: Number(r.sugerido) }))
+/** Calibração: desvio real − sugerido. Recebe o histórico unificado (planilha + fila do aparelho) — pode vir com o mesmo
+ *  registro duas vezes (linha da planilha e cópia local): deduplica por data|slot|perfume, ficando com a versão que tem
+ *  sugerido. Só pares com sprays e sugerido numéricos; descartados e conflitos não contam. */
+export function calibracao(regs) {
+  const num = v => (v === "" || v == null ? NaN : Number(String(v).replace(",", ".")));
+  const porChave = new Map();
+  for (const r of regs) {
+    if (r.estado === "descartado" || r.estado === "conflito") continue;
+    const k = `${r.data}|${r.slot}|${r.perfume}`, ja = porChave.get(k);
+    if (!ja || (!Number.isFinite(num(ja.sugerido)) && Number.isFinite(num(r.sugerido)))) porChave.set(k, r);
+  }
+  const pares = [...porChave.values()].map(r => ({ nome: r.perfume, real: num(r.sprays), sug: num(r.sugerido) }))
     .filter(p => Number.isFinite(p.real) && Number.isFinite(p.sug));
   const media = a => a.reduce((s, x) => s + x, 0) / a.length;
   const por = new Map();
   for (const p of pares) { if (!por.has(p.nome)) por.set(p.nome, []); por.get(p.nome).push(p.real - p.sug); }
   return { n: pares.length, geral: pares.length ? media(pares.map(p => p.real - p.sug)) : null,
     por: [...por.entries()].map(([nome, d]) => ({ nome, n: d.length, media: media(d) })).sort((a, b) => b.media - a.media || b.n - a.n) };
+}
+
+/** NotaDia (fit do slot, 1–5) como número; aceita vírgula. Fora de 1–5 (notas antigas em outra escala) não entra na conta. */
+export function notaNum(v) {
+  const n = v === "" || v == null ? NaN : Number(String(v).replace(",", "."));
+  return Number.isFinite(n) && n >= 1 && n <= 5 ? n : null;
+}
+
+/** NotaDia por frasco da grade: média geral, n e média por faixa de temperatura (pela Temp do registro; sem Temp entra
+ *  só na média geral). Só Dia e Noite (deAnalise). Devolve Map nome → {f, n, media, faixas: Map idx → {n, media}}. */
+export function notaPorFrascoFaixa(hist, frascos) {
+  const grade = new Map(frascos.filter(daGrade).map(f => [f.nome, f]));
+  const acc = new Map();
+  for (const r of hist) {
+    if (!deAnalise(r) || !grade.has(r.perfume)) continue;
+    const nota = notaNum(r.notaDia);
+    if (nota == null) continue;
+    if (!acc.has(r.perfume)) acc.set(r.perfume, { f: grade.get(r.perfume), soma: 0, n: 0, faixas: new Map() });
+    const a = acc.get(r.perfume); a.soma += nota; a.n++;
+    const t = r.temp === "" || r.temp == null ? NaN : Number(String(r.temp).replace(",", "."));
+    if (Number.isFinite(t)) {
+      const i = faixaIdx(t), fx = a.faixas.get(i) || { soma: 0, n: 0 };
+      fx.soma += nota; fx.n++; a.faixas.set(i, fx);
+    }
+  }
+  return new Map([...acc].map(([nome, a]) => [nome, { f: a.f, n: a.n, media: a.soma / a.n,
+    faixas: new Map([...a.faixas].sort((x, y) => x[0] - y[0]).map(([i, fx]) => [i, { n: fx.n, media: fx.soma / fx.n }])) }]));
+}
+
+/** Sobrevivência na pele: a resposta "vivo / fraco / morto" vem no registro da Noite (N) e vale para o último perfume
+ *  do Dia (M ou M2) da mesma data. Devolve Map perfume → {n, vivo, fraco, morto} (só perfumes que estão em `frascos`).
+ *  Mede; não mexe na longevidade estimada do engine. */
+export function sobrevivencia(hist, frascos) {
+  const nomes = new Set(frascos.map(f => f.nome));
+  const manhaDe = new Map();
+  for (const r of hist) if (r.slot === "M" || r.slot === "M2") manhaDe.set(r.data, r);   // hist em ordem: fica o último do Dia
+  const out = new Map();
+  for (const r of hist) {
+    if (r.slot !== "N" || !["vivo", "fraco", "morto"].includes(r.vivo)) continue;
+    const m = manhaDe.get(r.data);
+    if (!m || !nomes.has(m.perfume)) continue;
+    const c = out.get(m.perfume) || { n: 0, vivo: 0, fraco: 0, morto: 0 };
+    c.n++; c[r.vivo]++; out.set(m.perfume, c);
+  }
+  return out;
 }
 
 // Tetos próprios dos beasts (playbook v59, regra 4) — o ajuste opcional nunca passa deles.

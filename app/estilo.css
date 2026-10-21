@@ -544,3 +544,8 @@ select[disabled], input[readonly], textarea[readonly] { opacity: .75; }
 .foto-acoes label.btn { cursor: pointer; }
 .card-tx .foto-mini { float: left; width: 40px; height: 40px; object-fit: cover; border-radius: 50%; margin: 1px 10px 2px 0; background: var(--afund); }
 .card-tx .foto-hero { float: left; width: 56px; height: 56px; object-fit: cover; border-radius: 50%; margin: 0 12px 4px 0; background: var(--afund); }
+
+/* ── NotaDia em chips 1–5 ── */
+.campo > span { font: 600 12.5px var(--f); color: var(--suave); }
+.nota-chips { flex-wrap: nowrap; }
+.nota-chips .chip { flex: 1 1 0; min-width: 0; text-align: center; justify-content: center; padding-inline: 6px; }

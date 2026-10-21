@@ -24,6 +24,7 @@ function ambiente({ diario, metarJson }) {
         getDisplayValues: () => rows.slice(r - 1, r - 1 + nr).map(x => Array.from({ length: nc }, (_, j) => String(x[c - 1 + j] ?? ""))),
         setValues: v => { v.forEach((linha, i) => { rows[r - 1 + i] = [...linha]; }); },
         setNumberFormat: f => formatos.push([r, c, f]),
+        setValue: v => { (rows[r - 1] || (rows[r - 1] = []))[c - 1] = v; },
       }),
       insertRowAfter: n => rows.splice(n, 0, []),
       deleteRow: n => rows.splice(n - 1, 1),
@@ -51,16 +52,18 @@ test("token errado é recusado", () => {
   assert.equal(post({ token: "segredo", acao: "ping" }).ok, true);
 });
 
-test("registrar mantém ordem cronológica (M antes de N) e grava 9 colunas como texto", () => {
+test("registrar mantém ordem cronológica (M antes de N) e grava as colunas do Diário (com Sugerido no fim)", () => {
   const { post, abas, formatos } = ambiente({ diario: [CAB, ["2026-10-07", "M", "Odéon"], ["2026-10-09", "M", "Odéon"]] });
   const r = post({ token: "segredo", acao: "registrar", linhas: [
-    { id: "a", data: "2026-10-09", slot: "N", perfume: "Gentle Fluidity Silver", ocasiao: "Cozy N", temp: "22,4", sprays: "3" },
+    { id: "a", data: "2026-10-09", slot: "N", perfume: "Gentle Fluidity Silver", ocasiao: "Cozy N", temp: "22,4", sprays: "3", sugerido: "2" },
     { id: "b", data: "2026-10-08", slot: "N", perfume: "Odéon", ocasiao: "", temp: "", td: "", sprays: "" },
   ] });
   assert.equal(r.ok, true); assert.equal(r.gravadas.length, 2);
   assert.deepEqual(abas["Diário"].map(x => x[0] + x[1]), ["DataSlot", "2026-10-07M", "2026-10-08N", "2026-10-09M", "2026-10-09N"]);
-  assert.deepEqual(abas["Diário"][4], ["2026-10-09", "N", "Gentle Fluidity Silver", "Cozy N", "22,4", "", "3", "", ""]);
-  assert.deepEqual(abas["Diário"][2], ["2026-10-08", "N", "Odéon", "", "", "", "", "", ""]);
+  assert.deepEqual(abas["Diário"][4], ["2026-10-09", "N", "Gentle Fluidity Silver", "Cozy N", "22,4", "", "3", "", "", "2", ""]);
+  assert.deepEqual(abas["Diário"][2], ["2026-10-08", "N", "Odéon", "", "", "", "", "", "", "", ""]);
+  assert.deepEqual(abas["Diário"][0].slice(9), ["Sugerido", "Vivo"]);   // aba com 9 colunas: cabeçalhos novos escritos em J1 e K1, sem recriar
+  assert.deepEqual(abas["Diário"][1], ["2026-10-07", "M", "Odéon"]);   // linhas antigas não mudam
   assert.ok(formatos.every(([, c, f]) => c === 1 && f === "@"));
 });
 
@@ -111,7 +114,9 @@ test("editarRegistro: muda campos no lugar; trocar data/slot reposiciona; slot o
   const { post, abas } = ambiente({ diario: [CAB, ["2026-10-15", "M", "Odéon", "Lazer", "", "", "3"], ["2026-10-16", "N", "Odéon"], ["2026-10-17", "M", "Gentle Fluidity Silver"]] });
   let r = post({ token: "segredo", acao: "editarRegistro", orig: { data: "2026-10-15", slot: "M", perfume: "Odéon" }, linha: 2, campos: { sprays: "4", notaDia: "8,5", ocasiao: "T.Inf" } });
   assert.equal(r.ok, true); assert.equal(r.linha, 2);
-  assert.deepEqual(abas["Diário"][1], ["2026-10-15", "M", "Odéon", "T.Inf", "", "", "4", "8,5", ""]);
+  assert.deepEqual(abas["Diário"][1], ["2026-10-15", "M", "Odéon", "T.Inf", "", "", "4", "8,5", "", "", ""]);
+  r = post({ token: "segredo", acao: "editarRegistro", orig: { data: "2026-10-15", slot: "M", perfume: "Odéon" }, linha: 2, campos: { sugerido: "3" } });
+  assert.equal(abas["Diário"][1][9], "3"); assert.equal(abas["Diário"][1][6], "4");   // só o campo pedido muda
   // linha errada (planilha mudou): acha pelo conteúdo
   r = post({ token: "segredo", acao: "editarRegistro", orig: { data: "2026-10-16", slot: "N", perfume: "Odéon" }, linha: 2, campos: { perfume: "Gentle Fluidity Silver" } });
   assert.equal(r.ok, true); assert.equal(abas["Diário"][2][2], "Gentle Fluidity Silver");
@@ -153,4 +158,14 @@ test("slots M2 (2ª do Dia), E (Esportes) e N2 (2ª da Noite): aceitos, na ordem
   // editar para um slot novo reposiciona
   assert.equal(post({ token: "segredo", acao: "editarRegistro", orig: { data: "2026-10-16", slot: "N", perfume: "Odéon" }, campos: { slot: "N2" } }).ok, true);
   assert.deepEqual(abas["Diário"].slice(1, 3).map(x => x[0].slice(8) + x[1]), ["16E", "16N2"]);
+});
+
+test("Vivo (11ª coluna): só vivo / fraco / morto ou vazio; editável depois", () => {
+  const { post, abas } = ambiente({ diario: [CAB, ["2026-10-15", "M", "Odéon"]] });
+  assert.match(post({ token: "segredo", acao: "registrar", linhas: [{ id: "x", data: "2026-10-15", slot: "N", perfume: "Gentle Fluidity Silver", vivo: "talvez" }] }).erro, /vivo inválido/);
+  const r = post({ token: "segredo", acao: "registrar", linhas: [{ id: "a", data: "2026-10-15", slot: "N", perfume: "Gentle Fluidity Silver", vivo: "fraco", sugerido: "3" }] });
+  assert.equal(r.ok, true);
+  assert.deepEqual(abas["Diário"][2].slice(9), ["3", "fraco"]);
+  post({ token: "segredo", acao: "editarRegistro", orig: { data: "2026-10-15", slot: "N", perfume: "Gentle Fluidity Silver" }, linha: 3, campos: { vivo: "morto" } });
+  assert.equal(abas["Diário"][2][10], "morto"); assert.equal(abas["Diário"][2][9], "3");
 });

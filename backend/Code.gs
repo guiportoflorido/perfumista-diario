@@ -26,7 +26,11 @@ var COLS_MERCADO = ['Casa', 'Perfume', 'Tier', 'Posse', 'Arquétipo', 'Resumo', 
 var EDITAVEIS = ['Tier', 'Posse', 'Arquétipo', 'Resumo', 'Topo', 'Coração', 'Base', 'Nariz', 'Wishlist', 'Notas'];   // Foto: só por subirFoto/removerFoto
 var ABA_FOTOS = 'Fotos', COLS_FOTOS = ['Casa', 'Perfume', 'Versão', 'Tipo'];
 var PARTES_FOTO = 10, TAM_PARTE = 45000;   // célula aceita até 50 mil caracteres: a imagem (base64) vai em pedaços
-var COLS_DIARIO = ['Data', 'Slot', 'Perfume', 'Ocasião', 'Temp (°C)', 'Td (°C)', 'Sprays', 'NotaDia', 'Obs'];
+// colunas novas entram sempre no fim (o app lê o Diário por posição): Sugerido = sprays sugeridos pelo modelo na hora do
+// registro · Vivo = no registro da Noite, como estava o perfume da manhã do mesmo dia (vivo / fraco / morto)
+var COLS_DIARIO = ['Data', 'Slot', 'Perfume', 'Ocasião', 'Temp (°C)', 'Td (°C)', 'Sprays', 'NotaDia', 'Obs', 'Sugerido', 'Vivo'];
+var CHAVES_DIARIO = ['data', 'slot', 'perfume', 'ocasiao', 'temp', 'td', 'sprays', 'notaDia', 'obs', 'sugerido', 'vivo'];
+var VIVO = ['', 'vivo', 'fraco', 'morto'];
 var ABA_AMOSTRAS = 'Amostras';
 var COLS_AMOSTRAS = ['ID', 'Casa', 'Perfume', 'Tipo', 'Volume (ml)', 'Origem', 'Status', 'Entrada', 'Saída', 'Motivo saída', 'Impressão', 'Obs', 'Atualizado em', 'Dono'];
 var DONOS_AMOSTRA = ['', 'Gui', 'Bia'], TIPOS_AMOSTRA = ['Amostra', 'Decant'], STATUS_AMOSTRA = ['Pendente', 'Em teste', 'Realizado', 'Esgotado'];
@@ -112,7 +116,7 @@ function dados_() {
 }
 
 // ───────────────────────── gravação ─────────────────────────
-/** Valida uma linha do diário vinda do app; devolve a linha normalizada (array de 9 textos) ou lança erro. */
+/** Valida uma linha do diário vinda do app; devolve a linha normalizada (um texto por coluna de COLS_DIARIO) ou lança erro. */
 function normalizarLinha_(l, nomesValidos) {
   var data = String(l.data || '');
   if (!/^\d{4}-\d{2}-\d{2}$/.test(data)) throw new Error('data inválida: ' + data);
@@ -123,8 +127,11 @@ function normalizarLinha_(l, nomesValidos) {
   if (nomesValidos && nomesValidos.indexOf(perfume) === -1) throw new Error('"' + perfume + '" não está na aba Tiers (Nome no diário ou Perfume)');
   var oc = String(l.ocasiao || '');
   if (oc && OCASIOES.indexOf(oc) === -1) throw new Error('ocasião inválida: ' + oc);
+  if (VIVO.indexOf(String(l.vivo || '')) === -1) throw new Error('vivo inválido: ' + l.vivo + ' (use vivo, fraco ou morto)');
   var txt = function (v) { return v === null || v === undefined ? '' : String(v); };
-  return [data, slot, perfume, oc, txt(l.temp), txt(l.td), txt(l.sprays), txt(l.notaDia), txt(l.obs)];
+  var linha = [data, slot, perfume, oc];
+  for (var c = 4; c < CHAVES_DIARIO.length; c++) linha.push(txt(l[CHAVES_DIARIO[c]]));
+  return linha;
 }
 
 /** Linha (1-based) depois da qual inserir para manter a ordem cronológica (data, depois a ordem de SLOTS). */
@@ -149,6 +156,7 @@ function registrar_(linhas, forcar) {
     var iNome = tiers[0].indexOf('Nome no diário'), iPerf = tiers[0].indexOf('Perfume');
     var nomes = [];
     tiers.slice(1).forEach(function (r) { if (r[iNome]) nomes.push(r[iNome]); if (r[iPerf]) nomes.push(r[iPerf]); });
+    garantirCabecalhoDiario_(aba);
     var gravadas = [], conflitos = [];
     for (var k = 0; k < linhas.length; k++) {
       var linha = normalizarLinha_(linhas[k], nomes);
@@ -166,6 +174,12 @@ function registrar_(linhas, forcar) {
   } finally {
     lock.releaseLock();
   }
+}
+
+/** Aba criada com menos colunas (ex.: só até Obs): escreve no cabeçalho os nomes que faltam (J1, K1…), sem recriar a aba. */
+function garantirCabecalhoDiario_(aba) {
+  var cab = aba.getRange(1, 1, 1, COLS_DIARIO.length).getDisplayValues()[0];
+  for (var c = 0; c < COLS_DIARIO.length; c++) if (!cab[c]) aba.getRange(1, c + 1).setValue(COLS_DIARIO[c]);
 }
 
 /** Insere a linha na posição cronológica (data, depois M antes de N). exist = colunas A:C a partir da linha 2. */
@@ -201,8 +215,9 @@ function editarRegistro_(orig, campos, dica) {
     var ult = aba.getLastRow(), exist = ult > 1 ? aba.getRange(2, 1, ult - 1, 3).getDisplayValues() : [];
     var linha = acharRegistro_(exist, orig, dica);
     var atual = aba.getRange(linha, 1, 1, COLS_DIARIO.length).getDisplayValues()[0];
-    var chaves = ['data', 'slot', 'perfume', 'ocasiao', 'temp', 'td', 'sprays', 'notaDia', 'obs'], l = {};
-    chaves.forEach(function (k, i) { l[k] = campos[k] !== undefined ? campos[k] : atual[i]; });
+    garantirCabecalhoDiario_(aba);
+    var l = {};
+    CHAVES_DIARIO.forEach(function (k, i) { l[k] = campos[k] !== undefined ? campos[k] : atual[i]; });
     var tiers = valores_(ABA_TIERS), iNome = tiers[0].indexOf('Nome no diário'), iPerf = tiers[0].indexOf('Perfume'), nomes = [];
     tiers.slice(1).forEach(function (r) { if (r[iNome]) nomes.push(r[iNome]); if (r[iPerf]) nomes.push(r[iPerf]); });
     var nova = normalizarLinha_(l, nomes);
