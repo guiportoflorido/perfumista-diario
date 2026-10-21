@@ -881,7 +881,7 @@ document.addEventListener("click", async e => {
     toast($("#spr-ativo").checked ? "Ajuste de sprays ligado." : "Ajuste de sprays salvo (desligado)."); recalcular();
   } else if (acao === "spr-sugerir") {
     const { calibracao } = await import("./estatisticas.js");
-    const cal = calibracao(fila());
+    const cal = calibracao([...historico(), ...fila()]);
     $("#spr-geral").value = String(Math.round(cal.geral));
     $("#spr-por").value = cal.por.filter(p => p.n >= 3 && Math.round(p.media) !== Math.round(cal.geral)).map(p => `${p.nome} = ${Math.round(p.media)}`).join("\n");
     toast("Preenchido com o desvio medido (frascos com 3+ registros). Revise e salve.");

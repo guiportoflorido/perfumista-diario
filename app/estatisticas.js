@@ -62,10 +62,18 @@ export function usoVsJanelas(por) {
     .map(x => ({ ...x, desvio: x.usos - x.esperado }));
 }
 
-/** Calibração: desvio real − sugerido, só para registros feitos pelo app com sugestão do modelo. */
-export function calibracao(fila) {
-  const pares = fila.filter(r => r.estado !== "descartado" && r.sugerido !== "" && r.sugerido != null && r.sprays !== "" && r.sprays != null)
-    .map(r => ({ nome: r.perfume, real: Number(String(r.sprays).replace(",", ".")), sug: Number(r.sugerido) }))
+/** Calibração: desvio real − sugerido. Recebe o histórico unificado (planilha + fila do aparelho) — pode vir com o mesmo
+ *  registro duas vezes (linha da planilha e cópia local): deduplica por data|slot|perfume, ficando com a versão que tem
+ *  sugerido. Só pares com sprays e sugerido numéricos; descartados e conflitos não contam. */
+export function calibracao(regs) {
+  const num = v => (v === "" || v == null ? NaN : Number(String(v).replace(",", ".")));
+  const porChave = new Map();
+  for (const r of regs) {
+    if (r.estado === "descartado" || r.estado === "conflito") continue;
+    const k = `${r.data}|${r.slot}|${r.perfume}`, ja = porChave.get(k);
+    if (!ja || (!Number.isFinite(num(ja.sugerido)) && Number.isFinite(num(r.sugerido)))) porChave.set(k, r);
+  }
+  const pares = [...porChave.values()].map(r => ({ nome: r.perfume, real: num(r.sprays), sug: num(r.sugerido) }))
     .filter(p => Number.isFinite(p.real) && Number.isFinite(p.sug));
   const media = a => a.reduce((s, x) => s + x, 0) / a.length;
   const por = new Map();

@@ -162,7 +162,7 @@ export function telaHistorico({ frascos, hist: histTodo, hoje, fila: filaToda, a
   const esq = doPeriodo ? [...c.por.values()].filter(x => !x.n).sort((a, b) => TIERS.indexOf(a.f.tier) - TIERS.indexOf(b.f.tier) || a.f.nome.localeCompare(b.f.nome)) : esquecidos(c.por, limiteEsq);
   const uv = usoVsJanelas(c.por).filter(x => x.usos || x.janelas);
   const acima = uv.filter(x => x.desvio >= 1).sort((a, b) => b.desvio - a.desvio).slice(0, 8);
-  const cal = calibracao(fila);
+  const cal = calibracao([...histTodo.filter(dentro), ...fila]);   // planilha (coluna Sugerido) + fila do aparelho
   const diasPeriodo = de ? Math.round((new Date(ate) - new Date(de)) / 864e5) + 1 : c.cobertura;
   return `<h2>Histórico</h2>
   ${seletor}
@@ -194,7 +194,6 @@ export function telaHistorico({ frascos, hist: histTodo, hoje, fila: filaToda, a
     ${cal.n ? `<p>Desvio médio geral: <b>${cal.geral > 0 ? "+" : ""}${nf(cal.geral)}</b> spray${Math.abs(cal.geral) === 1 ? "" : "s"} em ${cal.n} registro${cal.n === 1 ? "" : "s"}.</p>
       <div class="tabela"><table><thead><tr><th>Frasco</th><th>Registros</th><th>Desvio médio</th></tr></thead><tbody>${cal.por.map(p => `<tr><td>${esc(p.nome)}</td><td>${p.n}</td><td>${p.media > 0 ? "+" : ""}${nf(p.media)}</td></tr>`).join("")}</tbody></table></div>`
       : `<p class="nota">Ainda sem pares para comparar. Ao usar “Usei este” e informar os sprays reais, o app guarda o sugerido ao lado.</p>`}
-    <p class="nota">Só conta registros feitos pelo app neste aparelho (a planilha não guarda o sugerido).</p>
     <h3 style="margin-top:6px">Ajuste opcional</h3>
     <label class="linha-flex"><input type="checkbox" id="spr-ativo" ${ajSpray.ativo ? "checked" : ""} style="width:auto"> Somar sprays ao número do modelo</label>
     <div class="campos">

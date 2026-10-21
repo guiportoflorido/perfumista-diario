@@ -31,11 +31,26 @@ test("contagens: só grade (camada custo e fora da coleção não contam), 30 di
 });
 
 test("calibração: real − sugerido por frasco e geral, ignorando registros sem sugestão", () => {
-  const cal = calibracao([{ perfume: "Odéon", sprays: "4", sugerido: "2", estado: "enviado" }, { perfume: "Odéon", sprays: "3", sugerido: "2", estado: "enviado" },
-    { perfume: "Liwa", sprays: "3", sugerido: "3", estado: "pendente" }, { perfume: "Liwa", sprays: "5", sugerido: "", estado: "enviado" },
-    { perfume: "Liwa", sprays: "9", sugerido: "2", estado: "descartado" }]);
+  const cal = calibracao([{ data: "2026-10-01", slot: "M", perfume: "Odéon", sprays: "4", sugerido: "2", estado: "enviado" },
+    { data: "2026-10-02", slot: "M", perfume: "Odéon", sprays: "3", sugerido: "2", estado: "enviado" },
+    { data: "2026-10-03", slot: "N", perfume: "Liwa", sprays: "3", sugerido: "3", estado: "pendente" },
+    { data: "2026-10-04", slot: "N", perfume: "Liwa", sprays: "5", sugerido: "", estado: "enviado" },
+    { data: "2026-10-05", slot: "N", perfume: "Liwa", sprays: "9", sugerido: "2", estado: "descartado" }]);
   assert.equal(cal.n, 3); assert.equal(cal.geral, 1);
   assert.deepEqual(cal.por, [{ nome: "Odéon", n: 2, media: 1.5 }, { nome: "Liwa", n: 1, media: 0 }]);
+});
+
+test("calibração com o histórico unificado: lê a coluna Sugerido da planilha e não conta duas vezes o mesmo registro", () => {
+  const planilha = [
+    { data: "2026-10-10", slot: "M", perfume: "Odéon", sprays: "4", sugerido: "2", linha: 2 },      // já tem Sugerido na planilha
+    { data: "2026-10-11", slot: "N", perfume: "Liwa", sprays: "5", sugerido: "", linha: 3 },        // gravado antes da coluna existir
+    { data: "2026-10-12", slot: "M", perfume: "Liwa", sprays: "3,5", sugerido: "3", linha: 4 }];
+  const filaLocal = [
+    { data: "2026-10-10", slot: "M", perfume: "Odéon", sprays: "4", sugerido: "2", estado: "enviado" },   // mesmo do 1º: não duplica
+    { data: "2026-10-11", slot: "N", perfume: "Liwa", sprays: "5", sugerido: "3", estado: "enviado" }];  // a cópia local tem o sugerido
+  const cal = calibracao([...planilha, ...filaLocal]);
+  assert.equal(cal.n, 3);
+  assert.deepEqual(cal.por, [{ nome: "Odéon", n: 1, media: 2 }, { nome: "Liwa", n: 2, media: 1.25 }]);
 });
 
 test("ajuste +N: desligado por padrão, respeita tetos dos beasts e não mexe no Désobéissant", () => {

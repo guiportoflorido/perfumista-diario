@@ -35,3 +35,9 @@ test("diário: planilha + fila local, sem duplicar o que já foi gravado, em ord
   const u = diarioUnificado(plan, local);
   assert.deepEqual(u.map(x => `${x.data}${x.slot} ${x.perfume}${x.pendente ? "*" : ""}`), ["2026-10-07N Liwa", "2026-10-08N Tygar Extrait", "2026-10-09M Météore", "2026-10-09N Odéon*"]);
 });
+
+test("lerDiario lê a coluna Sugerido (10ª); linhas antigas, sem ela, chegam com \"\"", () => {
+  const d = lerDiario([["Data", "Slot", "Perfume", "Ocasião", "Temp (°C)", "Td (°C)", "Sprays", "NotaDia", "Obs", "Sugerido"],
+    ["2026-10-08", "N", "Tygar Extrait"], ["2026-10-09", "M", "Météore", "T.Inf", "29", "", "4", "", "", "3"]]);
+  assert.equal(d[0].sugerido, ""); assert.equal(d[1].sugerido, "3"); assert.equal(d[1].sprays, "4"); assert.equal(d[1].obs, "");
+});

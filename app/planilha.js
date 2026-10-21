@@ -12,11 +12,12 @@ export function lerTiers(rows) {
   return rows.slice(1).filter(r => r[iP]).map(r => ({ casa: r[iC] || "", perfume: r[iP], nomeDiario: r[iN] || "", posse: r[iPo] || "", tier: (r[iT] || "").trim().toUpperCase() }));
 }
 
-/** Linhas da aba Diário → [{data, slot, perfume, ocasiao, temp, td, sprays, notaDia, obs, linha}] (só datas válidas). */
+/** Linhas da aba Diário → [{data, slot, perfume, ocasiao, temp, td, sprays, notaDia, obs, sugerido, linha}] (só datas válidas).
+ *  Lê por posição; colunas novas ficam no fim e as linhas antigas, sem elas, chegam com "". */
 export function lerDiario(rows) {
   if (!rows || rows.length < 2) return [];
   return rows.slice(1).map((r, i) => ({ data: String(r[0] || "").trim(), slot: String(r[1] || "").trim(), perfume: String(r[2] || "").trim(),
-    ocasiao: r[3] || "", temp: r[4] || "", td: r[5] || "", sprays: r[6] || "", notaDia: r[7] || "", obs: r[8] || "", linha: i + 2 }))
+    ocasiao: r[3] || "", temp: r[4] || "", td: r[5] || "", sprays: r[6] || "", notaDia: r[7] || "", obs: r[8] || "", sugerido: r[9] || "", linha: i + 2 }))
     .filter(x => /^\d{4}-\d{2}-\d{2}$/.test(x.data) && x.perfume);
 }
 
