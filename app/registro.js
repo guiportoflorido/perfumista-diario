@@ -2,6 +2,7 @@
 // Estados de um registro local: pendente → enviado | conflito (slot já ocupado por outro perfume) | erro | descartado.
 import { ler, gravar } from "./store.js";
 import { chamar, configurado } from "./api.js";
+import { ORDEM_SLOT } from "./util.js";
 
 export function fila() {
   // migração da fase 2 (campo booleano "enviado")
@@ -94,4 +95,21 @@ export async function removerRegistro(r) {
   const p = planilhaCache();
   if (p?.diario) { const i = idxNaCopia(p.diario, r); if (i > 0) { p.diario.splice(i, 1); gravar("planilha", p); } }
   return { local: false };
+}
+
+// ───────────── exportar para o Claude ─────────────
+export const CAB_EXPORTAR = "Data | Slot | Perfume | Ocasião | Temp | Td | Sprays | NotaDia | Obs | Sugerido | Vivo";
+const NUMERICOS = new Set(["temp", "td", "sprays", "notaDia", "sugerido"]);
+
+/** Diário em texto fixo para colar no projeto do Claude: cabeçalho + uma linha por registro, campos separados por " | ",
+ *  na ordem das colunas da aba Diário. Cronológico, sem duplicatas (data|slot|perfume), vírgula decimal, vazio fica vazio.
+ *  `desde`/`ate` (AAAA-MM-DD, inclusivos) recortam o período; null = sem limite. */
+export function exportarDiario(hist, { desde = null, ate = null } = {}) {
+  const limpa = v => String(v ?? "").replace(/[\r\n]+/g, " ").replace(/\|/g, "/").trim();
+  const campo = (r, c) => { const v = limpa(r[c]); return NUMERICOS.has(c) && /^-?\d+(\.\d+)?$/.test(v) ? v.replace(".", ",") : v; };
+  const ord = s => ORDEM_SLOT[s] ?? 9, vistos = new Set();
+  const regs = hist.filter(r => r.estado !== "descartado" && r.estado !== "conflito" && (!desde || r.data >= desde) && (!ate || r.data <= ate))
+    .filter(r => { const k = chaveReg(r); if (vistos.has(k)) return false; vistos.add(k); return true; })
+    .sort((a, b) => (a.data < b.data ? -1 : a.data > b.data ? 1 : ord(a.slot) - ord(b.slot)));
+  return [CAB_EXPORTAR, ...regs.map(r => CAMPOS.map(c => campo(r, c)).join(" | "))].join("\n");
 }

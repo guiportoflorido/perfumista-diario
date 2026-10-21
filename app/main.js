@@ -4,10 +4,10 @@ import { ajustes, salvarAjustes, AJUSTES_PADRAO, estadoDia, salvarDia, hojeISO }
 import { buscarPrevisao, buscarMetar, derivarClima, horaNum } from "./clima.js";
 import { montarEntrada, OCAS_DIA, OCAS_NOITE, AMBIENTES, EXTRAS } from "./entrada.js";
 import { configurado, chamar } from "./api.js";
-import { fila, adicionar, descartar, enviar, planilhaCache, baixarPlanilha, limiteEdicao, editarRegistro, removerRegistro } from "./registro.js";
+import { fila, adicionar, descartar, enviar, planilhaCache, baixarPlanilha, limiteEdicao, editarRegistro, removerRegistro, exportarDiario } from "./registro.js";
 import { lerTiers, lerDiario, aplicarTiers, diarioUnificado, nomesRegistraveis } from "./planilha.js";
 import { janelasPorFrasco, ajustarSprays, deAnalise, notaPorFrascoFaixa, sobrevivencia } from "./estatisticas.js";
-import { telaColecao, telaPlaybook, telaHistorico, idRegistro } from "./telas.js";
+import { telaColecao, telaPlaybook, telaHistorico, idRegistro, periodo } from "./telas.js";
 import { telaRoda } from "./roda.js";
 import { ordsDe, tocarOrd, mudarOrds, slotNome, slotBase, slotIcone, opcoesSlot, slotExpandido } from "./util.js";
 import { definirCores, arqTag, arqIcone, corArq } from "./icones.js";
@@ -19,11 +19,11 @@ import { telaAmostras, fichaAmostra, deLinhas as amostrasDeLinhas, juntar, semRe
 import { ler, gravar } from "./store.js";
 import { fotoFicha, iconeFicha, fotoMini, reduzirImagem, subirFoto, removerFotoPlanilha, iniciarFotos } from "./fotos.js";
 
-export const APP_VERSAO = "5.28";  // sobe a cada publicação: confere no topo da tela se o celular pegou a versão nova
+export const APP_VERSAO = "5.29";  // sobe a cada publicação: confere no topo da tela se o celular pegou a versão nova
 const S = { aba: "hoje", frascos: [], frascosAtivos: [], avisosTiers: null, fichas: {}, versao: {}, prev: null, prevOffline: false,
   prevErro: null, metar: null, metarMotivo: null, clima: null, resultado: null, erroMotor: null, entrada: "", carregandoClima: true,
   sync: { estado: "ocioso", msg: "" }, hr: ler("hr", { preset: "tudo" }), tokenNovo: null, playbook: null, janelas: new Map(),
-  filtro: ler("filtro", {}), pbFaixa: null, arquetipos: [], gaps: [], sub: carregarSub(), sim: null, verGaps: false,
+  filtro: ler("filtro", {}), pbFaixa: null, arquetipos: [], gaps: [], sub: carregarSub(), exp: ler("exp", "tudo"), sim: null, verGaps: false,
   mercadoBase: null, mercadoErro: null, mf: ler("mf", {}), mfLimite: 60, mercadoBaixado: false, criandoMercado: false, salvandoMercado: false,
   rodaCusto: ler("rodaCusto", true), am: ler("am", {}), amBaixando: false, amBaixadas: false, amErro: null };
 const ajSpray = () => ler("sprays_ajuste", { ativo: false, geral: 0, por: {} });
@@ -167,7 +167,7 @@ function render() {
   const arqDe = new Map(S.frascos.map(f => [f.nome, f.arquetipo]));
   const ctx = { fichas: S.fichas, arqTag, arqIcone, arqDe, hr: S.hr,
     frascos: S.frascosAtivos, hist: historico(), hoje: hojeISO(), janelas: S.janelas, filtro: S.filtro, playbook: S.playbook,
-    faixaSel: S.pbFaixa ?? S.clima?.faixaDia?.idx ?? 2, fila: fila(), ajSpray: ajSpray(), limiteEdicao: limiteEdicao(hojeISO()),
+    faixaSel: S.pbFaixa ?? S.clima?.faixaDia?.idx ?? 2, fila: fila(), ajSpray: ajSpray(), limiteEdicao: limiteEdicao(hojeISO()), exp: S.exp,
     amostras: S.aba === "colecao" ? amostrasEmMaos() : null };
   // mesma aba: guarda rolagem da página, das tabelas e painéis abertos para restaurar depois de redesenhar
   const antes = trocouAba ? null : {
@@ -711,6 +711,19 @@ async function apagarRegistroEditando() {
 }
 
 // ───────────────────────── ajustes ─────────────────────────
+/** Copia o diário do período escolhido; sem permissão de área de transferência (iOS), mostra o texto selecionado. */
+async function copiarDiario() {
+  const { de, ate } = periodo(S.exp, hojeISO());
+  const txt = exportarDiario(historico(), { desde: de, ate });
+  const n = txt.split("\n").length - 1, msg = `${n} registro${n === 1 ? "" : "s"} copiado${n === 1 ? "" : "s"}`;
+  try { await navigator.clipboard.writeText(txt); toast(msg + "."); }
+  catch {
+    const box = $("#expSaida"); if (!box) return;
+    box.innerHTML = `<p class="nota">Não consegui copiar direto: o texto está selecionado abaixo, use Copiar.</p><textarea readonly rows="8" spellcheck="false">${esc(txt)}</textarea>`;
+    const ta = box.querySelector("textarea"); ta.focus(); ta.select(); ta.setSelectionRange(0, txt.length);
+  }
+}
+
 function telaAjustes() {
   const a = ajustes();
   const c = (k, rot, extra = "") => `<label>${rot}<input id="aj-${k}" type="text" value="${esc(a[k])}" ${extra} autocomplete="off"></label>`;
@@ -910,6 +923,8 @@ document.addEventListener("click", async e => {
   if (b.dataset.colOrd) { S.filtro = { ...S.filtro, ords: tocarOrd(ordsDe(S.filtro, "tier"), b.dataset.colOrd) }; gravar("filtro", S.filtro); render(); return; }
   if (b.dataset.ordDir) { mudarOrdem(b.dataset.ordDir, Number(b.dataset.n), { inverter: true }); return; }
   if (b.dataset.dia) { const el = $("#calInfo"); if (el) el.innerHTML = b.dataset.info; document.querySelectorAll(".cal .dia.sel").forEach(x => x.classList.remove("sel")); b.classList.add("sel"); return; }
+  if (b.dataset.exp) { S.exp = b.dataset.exp; gravar("exp", S.exp); render(); return; }
+  if (b.dataset.acao === "copiar-diario") { copiarDiario(); return; }
   if (b.dataset.hr) { S.hr = { ...S.hr, preset: b.dataset.hr }; gravar("hr", S.hr); render(); return; }
   if (b.dataset.edWish) { const p = (listaMercado().lista || []).find(x => x.casa + "||" + x.nome === b.dataset.edWish); if (p) editarCelula(b, p, "Wishlist", p.wish ? "" : "✓"); return; }
   if (b.dataset.merc) { S.confirmandoRemocao = false; abrirMercado(b.dataset.merc); return; }
