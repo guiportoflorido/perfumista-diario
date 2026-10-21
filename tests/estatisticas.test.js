@@ -96,3 +96,14 @@ test("sobrevivência: a resposta da Noite conta para o último perfume do Dia da
   const s = sobrevivencia(hist, frascos);
   assert.deepEqual(Object.fromEntries(s), { "Odéon": { n: 2, vivo: 1, fraco: 1, morto: 0 }, "Hacivat": { n: 1, vivo: 0, fraco: 0, morto: 1 } });
 });
+
+test("NotaDia por ocasião: código do engine ou rótulo de tela, só Dia/Noite e grade", async () => {
+  const { notaPorFrascoOcasiao } = await import("../app/estatisticas.js");
+  const hist = [{ data: "2026-10-01", slot: "M", perfume: "Odéon", ocasiao: "T.Inf", notaDia: "4" },
+    { data: "2026-10-02", slot: "N", perfume: "Odéon", ocasiao: "Trab. Informal", notaDia: "5" },
+    { data: "2026-10-03", slot: "M2", perfume: "Odéon", ocasiao: "T.Inf", notaDia: "1" },
+    { data: "2026-10-04", slot: "M", perfume: "Odéon", ocasiao: "", notaDia: "1" },
+    { data: "2026-10-05", slot: "M", perfume: "Odéon", ocasiao: "Cozy N", notaDia: "3" }];
+  const m = notaPorFrascoOcasiao(hist, frascos).get("Odéon");
+  assert.deepEqual([...m], [["T.Inf", { n: 2, media: 4.5 }], ["Cozy N", { n: 1, media: 3 }]]);
+});

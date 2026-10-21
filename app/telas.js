@@ -138,7 +138,19 @@ export function registrosRecentes(hist, limite) {
     <p class="nota">Editar ou apagar vale só para os últimos 30 dias. O que já está na planilha muda também na aba Diário.</p></div>`;
 }
 
-export function telaHistorico({ frascos, hist: histTodo, hoje, fila: filaToda, ajSpray, limiteEsq = 45, hr = {}, arqTag, limiteEdicao = "" }) {
+/** Períodos do "Exportar" do Histórico (mesmos atalhos de periodo()). */
+export const PRESETS_EXPORTAR = [["tudo", "Tudo"], ["90", "90 dias"], ["30", "30 dias"], ["mes", "Este mês"]];
+
+/** Bloco "Exportar": copia o diário em texto fixo para colar no projeto do Claude. O texto é montado no clique. */
+export function blocoExportar(preset = "tudo") {
+  return `<div class="bloco" id="exportar"><h3>Exportar</h3>
+    <p class="nota">Copia o diário (planilha + fila do aparelho) em texto fixo, uma linha por registro, para colar no projeto do Claude.</p>
+    <div class="chips rolagem">${PRESETS_EXPORTAR.map(([v, r]) => `<button class="chip" data-exp="${v}" aria-pressed="${preset === v}">${r}</button>`).join("")}</div>
+    <div class="linha-flex"><button class="btn peq" data-acao="copiar-diario">Copiar diário</button></div>
+    <div id="expSaida"></div></div>`;
+}
+
+export function telaHistorico({ frascos, hist: histTodo, hoje, fila: filaToda, ajSpray, limiteEsq = 45, hr = {}, arqTag, limiteEdicao = "", exp = "tudo" }) {
   const preset = hr.preset || "tudo";
   const { de, ate } = periodo(preset, hoje, hr.de, hr.ate);
   const dentro = r => (!de || r.data >= de) && r.data <= ate;
@@ -151,7 +163,7 @@ export function telaHistorico({ frascos, hist: histTodo, hoje, fila: filaToda, a
   </div>`;
   const c = contagens(hist, frascos, ate);
   const recentes = limiteEdicao ? registrosRecentes(histTodo, limiteEdicao) : "";
-  if (!hist.length) return `<h2>Histórico</h2>${seletor}${histTodo.length ? recentes : ""}<div class="bloco"><p class="vazio">${histTodo.length ? "Nenhum registro nesse período." : "Sem registros ainda. Conecte a planilha em Ajustes ou registre um uso."}</p></div>`;
+  if (!hist.length) return `<h2>Histórico</h2>${seletor}${histTodo.length ? recentes : ""}<div class="bloco"><p class="vazio">${histTodo.length ? "Nenhum registro nesse período." : "Sem registros ainda. Conecte a planilha em Ajustes ou registre um uso."}</p></div>${histTodo.length ? blocoExportar(exp) : ""}`;
   const doPeriodo = preset !== "tudo";
   const barras = (pares, max) => `<div class="barras">${pares.map(([k, v]) => `<div class="barra"><span class="t">${k}</span><span class="trilho"><span style="width:${max ? (v / max) * 100 : 0}%"></span></span><span class="n">${v}</span></div>`).join("")}</div>`;
   const usados = [...c.por.values()].filter(x => x.n).sort((a, b) => b.n - a.n || (a.ultimo < b.ultimo ? 1 : -1));
@@ -213,7 +225,8 @@ export function telaHistorico({ frascos, hist: histTodo, hoje, fila: filaToda, a
     <p class="nota">Desligado por padrão. O número do modelo continua visível; o ajuste nunca passa do teto do frasco (EDP/extrait 4, EDT 5, beasts com teto próprio) e não mexe no Désobéissant (6–7).</p>
     <div class="linha-flex"><button class="btn peq" data-acao="salvar-spr">Salvar ajuste</button>${cal.n ? `<button class="btn sec peq" data-acao="spr-sugerir">Usar o desvio medido</button>` : ""}</div>
   </div>
-  <div class="bloco"><h3>${doPeriodo ? "Registros do período" : "Últimos 30 registros"} · Dia e Noite</h3><div class="lista">${hist.slice(-30).reverse().map(r => `<article class="card compacto"><span class="pos">${slotIcone(r.slot)}</span><div style="min-width:0"><b>${esc(r.perfume)}</b><div class="casa">${esc(r.data)} · ${slotNome(r.slot)}${r.sprays ? ` · ${esc(r.sprays)} sprays` : ""}${r.pendente ? " · na fila" : ""}</div></div><span></span></article>`).join("")}</div></div>`;
+  <div class="bloco"><h3>${doPeriodo ? "Registros do período" : "Últimos 30 registros"} · Dia e Noite</h3><div class="lista">${hist.slice(-30).reverse().map(r => `<article class="card compacto"><span class="pos">${slotIcone(r.slot)}</span><div style="min-width:0"><b>${esc(r.perfume)}</b><div class="casa">${esc(r.data)} · ${slotNome(r.slot)}${r.sprays ? ` · ${esc(r.sprays)} sprays` : ""}${r.pendente ? " · na fila" : ""}</div></div><span></span></article>`).join("")}</div></div>
+  ${blocoExportar(exp)}`;
 }
 
 // ───────────────────────── calendário de cheiros ─────────────────────────

@@ -1,6 +1,7 @@
 // estatisticas.js — contas do Histórico, Coleção e calibração de sprays. Só dados do Diário: nada projetado.
 // A camada custo fica fora de toda estatística (regra dele); Bedouin Rose (D) fica fora da grade.
-import { diasEntre, faixaIdx } from "../engine/index.js";
+import { diasEntre, faixaIdx, OCASIOES } from "../engine/index.js";
+import { ROT_OC } from "./util.js";
 
 /** Análises só contam Dia (M) e Noite (N); Esportes (E) e 2ª aplicação (M2/N2) ficam só no registro (decisão dele, 18/out/2026). */
 export const deAnalise = r => r.slot === "M" || r.slot === "N";
@@ -109,9 +110,29 @@ export function notaPorFrascoFaixa(hist, frascos) {
     faixas: new Map([...a.faixas].sort((x, y) => x[0] - y[0]).map(([i, fx]) => [i, { n: fx.n, media: fx.soma / fx.n }])) }]));
 }
 
+const OC_DO_ROTULO = Object.fromEntries(Object.entries(ROT_OC).map(([k, v]) => [v, k]));
+/** Ocasião do registro no código do engine (T.Inf, Cozy N…); aceita o rótulo de tela (“Trab. Informal”). */
+export const ocasiaoCod = v => { const s = String(v ?? "").trim(); return OCASIOES.includes(s) ? s : OC_DO_ROTULO[s] || null; };
+
+/** NotaDia por frasco da grade e por OCASIÃO do registro (mesma lógica de notaPorFrascoFaixa; só Dia e Noite).
+ *  Devolve Map nome → Map ocasião → {n, media}. Registro sem ocasião reconhecida não entra. */
+export function notaPorFrascoOcasiao(hist, frascos) {
+  const grade = new Set(frascos.filter(daGrade).map(f => f.nome));
+  const acc = new Map();
+  for (const r of hist) {
+    if (!deAnalise(r) || !grade.has(r.perfume)) continue;
+    const nota = notaNum(r.notaDia), oc = ocasiaoCod(r.ocasiao);
+    if (nota == null || !oc) continue;
+    if (!acc.has(r.perfume)) acc.set(r.perfume, new Map());
+    const m = acc.get(r.perfume), c = m.get(oc) || { soma: 0, n: 0 };
+    c.soma += nota; c.n++; m.set(oc, c);
+  }
+  return new Map([...acc].map(([nome, m]) => [nome, new Map([...m].map(([oc, c]) => [oc, { n: c.n, media: c.soma / c.n }]))]));
+}
+
 /** Sobrevivência na pele: a resposta "vivo / fraco / morto" vem no registro da Noite (N) e vale para o último perfume
  *  do Dia (M ou M2) da mesma data. Devolve Map perfume → {n, vivo, fraco, morto} (só perfumes que estão em `frascos`).
- *  Mede; não mexe na longevidade estimada do engine. */
+ *  Mede; quem corrige a longevidade do frasco (antes do engine) é aplicarMedicoes, em planilha.js. */
 export function sobrevivencia(hist, frascos) {
   const nomes = new Set(frascos.map(f => f.nome));
   const manhaDe = new Map();
