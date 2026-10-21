@@ -36,7 +36,7 @@ export async function buscarMetar() {
 }
 
 const r1 = x => Math.round(x * 10) / 10;
-const horaNum = s => { const [h, m] = String(s).replace("h", ":").split(":"); return Number(h) + (Number(m) || 0) / 60; };
+export const horaNum = s => { const [h, m] = String(s).replace("h", ":").split(":"); return Number(h) + (Number(m) || 0) / 60; };
 
 /** Junta previsão + METAR + override num quadro com fonte por número. */
 export function derivarClima({ prev, metar, override = {}, data, aplico, noite, tiro, metarHoras = 3, metarTol = 3, agora = new Date() }) {

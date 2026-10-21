@@ -23,3 +23,13 @@ test("roleta: só sorteia entre os 3 primeiros, com peso pelo score", () => {
   const vistos = new Set(Array.from({ length: 200 }, () => sortear(top).nome));
   assert.ok(!vistos.has("D"));
 });
+
+import { slotExpandido } from "../app/util.js";
+test("Hoje: slot da hora expandido; se o slot da hora já foi usado, abre o outro", () => {
+  assert.equal(slotExpandido({ agoraH: 7.25, noiteH: 19.5 }), "M");                         // manhã
+  assert.equal(slotExpandido({ agoraH: 19.5, noiteH: 19.5 }), "N");                         // na hora da noite
+  assert.equal(slotExpandido({ agoraH: 21, noiteH: 19.5 }), "N");
+  assert.equal(slotExpandido({ agoraH: 10, noiteH: 19.5, usadoM: true }), "N");             // Dia já registrado: abre a Noite
+  assert.equal(slotExpandido({ agoraH: 21, noiteH: 19.5, usadoN: true }), "M");             // Noite já registrada (Dia não): abre o Dia
+  assert.equal(slotExpandido({ agoraH: 21, noiteH: 19.5, usadoM: true, usadoN: true }), "N");   // os dois usados: fica o da hora
+});
