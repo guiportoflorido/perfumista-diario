@@ -19,14 +19,49 @@ import { telaAmostras, fichaAmostra, deLinhas as amostrasDeLinhas, juntar, semRe
 import { ler, gravar } from "./store.js";
 import { fotoFicha, iconeFicha, fotoMini, reduzirImagem, subirFoto, removerFotoPlanilha, iniciarFotos } from "./fotos.js";
 
-export const APP_VERSAO = "5.27";  // sobe a cada publicação: confere no topo da tela se o celular pegou a versão nova
+export const APP_VERSAO = "5.28";  // sobe a cada publicação: confere no topo da tela se o celular pegou a versão nova
 const S = { aba: "hoje", frascos: [], frascosAtivos: [], avisosTiers: null, fichas: {}, versao: {}, prev: null, prevOffline: false,
   prevErro: null, metar: null, metarMotivo: null, clima: null, resultado: null, erroMotor: null, entrada: "", carregandoClima: true,
   sync: { estado: "ocioso", msg: "" }, hr: ler("hr", { preset: "tudo" }), tokenNovo: null, playbook: null, janelas: new Map(),
-  filtro: ler("filtro", {}), pbFaixa: null, arquetipos: [], gaps: [], colModo: ler("colModo", "roda") === "lista" ? "lista" : "roda", sim: null, verGaps: false,
+  filtro: ler("filtro", {}), pbFaixa: null, arquetipos: [], gaps: [], sub: carregarSub(), sim: null, verGaps: false,
   mercadoBase: null, mercadoErro: null, mf: ler("mf", {}), mfLimite: 60, mercadoBaixado: false, criandoMercado: false, salvandoMercado: false,
   rodaCusto: ler("rodaCusto", true), am: ler("am", {}), amBaixando: false, amBaixadas: false, amErro: null };
 const ajSpray = () => ler("sprays_ajuste", { ativo: false, geral: 0, por: {} });
+
+// ───────────────────────── 5 abas na barra; S.aba continua com os 8 valores de sempre ─────────────────────────
+// Grupos com sub-abas: Coleção (Roda · Lista · Playbook) · Mercado (Mercado · Amostras) · Mais (Histórico · Ajustes).
+// S.sub guarda a última sub-aba de cada grupo (reabre nela). Coleção absorve o antigo colModo (roda/lista).
+const SUBS = { colecao: [["roda", "Roda"], ["lista", "Lista"], ["playbook", "Playbook"]],
+  mercado: [["mercado", "Mercado"], ["amostras", "Amostras"]], mais: [["historico", "Histórico"], ["ajustes", "Ajustes"]] };
+function carregarSub() {
+  const s = ler("sub", null);
+  if (s && s.colecao && s.mercado && s.mais) return s;
+  const antigo = ler("colModo", "roda");                       // migração única do colModo antigo
+  const novo = { colecao: antigo === "lista" ? "lista" : "roda", mercado: "mercado", mais: "historico" };
+  gravar("sub", novo);
+  return novo;
+}
+function grupoDe(aba) {
+  return { colecao: "colecao", playbook: "colecao", mercado: "mercado", amostras: "mercado", historico: "mais", ajustes: "mais" }[aba] || aba;
+}
+function abaDe(grupo, sub) {
+  if (grupo === "colecao") return sub === "playbook" ? "playbook" : "colecao";
+  if (grupo === "mercado" || grupo === "mais") return SUBS[grupo].some(([v]) => v === sub) ? sub : SUBS[grupo][0][0];
+  return grupo;
+}
+/** Vai para uma aba (valor de S.aba) e lembra a sub-aba do grupo dela. */
+function irPara(aba) {
+  S.aba = aba;
+  const g = grupoDe(aba);
+  if (SUBS[g] && aba !== "colecao") { S.sub = { ...S.sub, [g]: aba }; gravar("sub", S.sub); }
+  else if (aba === "colecao" && S.sub.colecao === "playbook") { S.sub = { ...S.sub, colecao: "roda" }; gravar("sub", S.sub); }
+}
+/** Controle segmentado logo abaixo do h2 das telas agrupadas. */
+function segmentosGrupo(grupo) {
+  const atual = S.sub[grupo];
+  return `<div class="segmentos" role="tablist" aria-label="Seções de ${grupo}">${SUBS[grupo].map(([v, r]) =>
+    `<button role="tab" data-sub-grupo="${grupo}" data-sub="${v}" aria-selected="${atual === v}">${r}</button>`).join("")}</div>`;
+}
 const $ = (s, el = document) => el.querySelector(s);
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 const ROT_OC = { Lazer: "Lazer", "T.Inf": "Trab. Informal", "T.For": "Trab. Formal", "N.Inf": "Noite Informal", "N.For": "Noite Formal", "Cozy D": "Cozy Dia", "Cozy N": "Cozy Noite" };
@@ -123,8 +158,9 @@ function render() {
   mercadoPorChave = null;
   const selo = $("#seloGrade");
   if (selo) selo.hidden = !(S.aba === "hoje" && S.avisosTiers?.divergentes?.length);
+  const grupo = grupoDe(S.aba);
   document.querySelectorAll("#abas button").forEach(b => {
-    if (b.dataset.aba === S.aba) b.setAttribute("aria-current", "page"); else b.removeAttribute("aria-current");
+    if (b.dataset.aba === grupo) b.setAttribute("aria-current", "page"); else b.removeAttribute("aria-current");
   });
   const foco = document.activeElement?.id;
   const trocouAba = S.abaRenderizada !== S.aba; S.abaRenderizada = S.aba;
@@ -140,8 +176,11 @@ function render() {
     abertos: [...document.querySelectorAll("#tela details")].map(d => d.open),
   };
   try {
-    $("#tela").innerHTML = ({ hoje: telaHoje, registrar: telaRegistrar, ajustes: telaAjustes,
+    let html = ({ hoje: telaHoje, registrar: telaRegistrar, ajustes: telaAjustes,
       colecao: () => telaColecaoTudo(ctx), mercado: telaMercadoAba, amostras: telaAmostrasAba, playbook: () => telaPlaybook(ctx), historico: () => telaHistorico(ctx) }[S.aba])();
+    // telas agrupadas: segmentos (sub-abas) logo abaixo do 1º h2; o h2 continua com o nome da sub-aba
+    if (SUBS[grupo]) html = html.replace("</h2>", `</h2>${segmentosGrupo(grupo)}`);
+    $("#tela").innerHTML = html;
   } catch (e) { $("#tela").innerHTML = erroHTML(e, S.aba); console.error(e); }
   if (trocouAba) { const t = $("#tela"); t.classList.remove("entra"); void t.offsetWidth; t.classList.add("entra"); }
   else if (antes) {
@@ -329,15 +368,13 @@ function blocoAvancado(dia) {
 // ───────────────────────── coleção: roda · lista · mercado ─────────────────────────
 function telaColecaoTudo(ctx) {
   lerAmostras();
-  const modos = [["roda", "Roda"], ["lista", "Lista"]];
   let corpo;
-  if (S.colModo === "lista") corpo = telaColecao(ctx);
+  if (S.sub.colecao === "lista") corpo = telaColecao(ctx);
   else {
     const usosPor = new Map([...contagens(ctx.hist, ctx.frascos, ctx.hoje, { todos: true }).por.values()].map(c => [c.f.nome, c.n30]));
     corpo = telaRoda({ frascos: ctx.frascos, arquetipos: S.arquetipos, gaps: S.gaps, verGaps: S.verGaps, usosPor, comCusto: S.rodaCusto });
   }
   return `<h2>Coleção</h2>
-  <div class="segmentos" role="tablist">${modos.map(([v, r]) => `<button role="tab" data-colmodo="${v}" aria-selected="${S.colModo === v}">${r}</button>`).join("")}</div>
   ${corpo}`;
 }
 
@@ -847,8 +884,12 @@ document.addEventListener("click", async e => {
   if (e.target.closest("label")?.querySelector("input[data-foto]")) return;   // seletor de foto: o navegador abre a câmera/galeria
   const b = e.target.closest("button, [data-fechar], [data-ficha], [data-merc], [data-amostra]");
   if (!b) return;
-  if (b.id === "seloGrade") { S.aba = "ajustes"; render(); window.scrollTo(0, 0); setTimeout(() => $("#avisosTiers")?.scrollIntoView({ block: "center" }), 50); return; }
-  if (b.closest("#abas")) { S.aba = b.dataset.aba; render(); window.scrollTo(0, 0); return; }
+  if (b.id === "seloGrade") { irPara("ajustes"); render(); window.scrollTo(0, 0); setTimeout(() => $("#avisosTiers")?.scrollIntoView({ block: "center" }), 50); return; }
+  if (b.closest("#abas")) { const g = b.dataset.aba; S.aba = abaDe(g, S.sub[g]); render(); window.scrollTo(0, 0); return; }
+  if (b.dataset.subGrupo) {   // trocar de sub-aba sem rolar para o topo
+    const g = b.dataset.subGrupo; S.sub = { ...S.sub, [g]: b.dataset.sub }; gravar("sub", S.sub);
+    S.aba = abaDe(g, b.dataset.sub); render(); return;
+  }
   if (b.hasAttribute("data-fechar") && (e.target === b || b.tagName === "BUTTON")) { fecharFolha(); return; }
   if (b.dataset.ficha) { abrirFicha(b.dataset.ficha); return; }
   if (b.dataset.vivo && b.closest("[data-vivo-alvo]")) {
@@ -866,7 +907,6 @@ document.addEventListener("click", async e => {
     return;
   }
   if (b.dataset.editarReg) { abrirEdicaoRegistro(b.dataset.editarReg); return; }
-  if (b.dataset.colmodo) { S.colModo = b.dataset.colmodo; gravar("colModo", S.colModo); render(); return; }
   if (b.dataset.colOrd) { S.filtro = { ...S.filtro, ords: tocarOrd(ordsDe(S.filtro, "tier"), b.dataset.colOrd) }; gravar("filtro", S.filtro); render(); return; }
   if (b.dataset.ordDir) { mudarOrdem(b.dataset.ordDir, Number(b.dataset.n), { inverter: true }); return; }
   if (b.dataset.dia) { const el = $("#calInfo"); if (el) el.innerHTML = b.dataset.info; document.querySelectorAll(".cal .dia.sel").forEach(x => x.classList.remove("sel")); b.classList.add("sel"); return; }
