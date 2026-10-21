@@ -63,3 +63,22 @@ test("ajuste +N: desligado por padrão, respeita tetos dos beasts e não mexe no
   assert.equal(ajustarSprays(f("Désobéissant"), 6, { ativo: true, geral: 2 }), 6);
   assert.equal(ajustarSprays(f("Liwa"), 3, { ativo: true, geral: 0, por: { Liwa: 1 } }), 4);
 });
+
+import { notaPorFrascoFaixa, notaNum } from "../app/estatisticas.js";
+test("NotaDia: média geral e por faixa de temperatura; sem Temp só na geral; só Dia/Noite e só a grade", () => {
+  const hist = [
+    { data: "2026-10-01", slot: "M", perfume: "Odéon", notaDia: "4", temp: "24" },      // Ameno
+    { data: "2026-10-02", slot: "N", perfume: "Odéon", notaDia: "2", temp: "23,5" },    // Ameno
+    { data: "2026-10-03", slot: "M", perfume: "Odéon", notaDia: "3", temp: "29" },      // Quente
+    { data: "2026-10-04", slot: "N", perfume: "Odéon", notaDia: "5", temp: "" },        // sem Temp: só na geral
+    { data: "2026-10-05", slot: "M2", perfume: "Odéon", notaDia: "1", temp: "24" },     // 2ª aplicação: fora
+    { data: "2026-10-06", slot: "M", perfume: "Odéon", notaDia: "8,5", temp: "24" },    // escala antiga: fora
+    { data: "2026-10-07", slot: "M", perfume: "Sky", notaDia: "2", temp: "30" },        // camada custo: fora
+    { data: "2026-10-08", slot: "N", perfume: "Liwa", notaDia: "", temp: "20" }];       // sem nota
+  const m = notaPorFrascoFaixa(hist, frascos);
+  assert.deepEqual([...m.keys()], ["Odéon"]);
+  const o = m.get("Odéon");
+  assert.equal(o.n, 4); assert.equal(o.media, 3.5);
+  assert.deepEqual([...o.faixas], [[1, { n: 1, media: 3 }], [2, { n: 2, media: 3 }]]);   // 1 = Quente, 2 = Ameno
+  assert.equal(notaNum("3,5"), 3.5); assert.equal(notaNum("0"), null); assert.equal(notaNum(""), null);
+});

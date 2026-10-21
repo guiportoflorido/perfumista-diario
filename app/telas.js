@@ -2,7 +2,7 @@
 import { FAIXAS } from "../engine/index.js";
 import { esc, ROT_OC, OCAS_TODAS, pinta, faixaHTML, nf, tierHTML, slotNome, slotIcone, md, ordsDe, compararMulti, cmpValor, cabOrd, painelOrd, OPC_AMOSTRA, passaAmostra, temFiltro } from "./util.js";
 import { chave } from "./mercado.js";
-import { contagens, agrupar, esquecidos, usoVsJanelas, calibracao, deAnalise } from "./estatisticas.js";
+import { contagens, agrupar, esquecidos, usoVsJanelas, calibracao, deAnalise, notaPorFrascoFaixa } from "./estatisticas.js";
 import { arqIcone, corArq, ARQ_PATHS } from "./icones.js";
 
 const TIERS = ["S", "A", "B", "C"];
@@ -163,6 +163,9 @@ export function telaHistorico({ frascos, hist: histTodo, hoje, fila: filaToda, a
   const uv = usoVsJanelas(c.por).filter(x => x.usos || x.janelas);
   const acima = uv.filter(x => x.desvio >= 1).sort((a, b) => b.desvio - a.desvio).slice(0, 8);
   const cal = calibracao([...histTodo.filter(dentro), ...fila]);   // planilha (coluna Sugerido) + fila do aparelho
+  // NotaDia: piores médias primeiro (é para desbaste); mínimo 2 notas; por faixa só com n ≥ 2
+  const notas = [...notaPorFrascoFaixa(hist, frascos).values()].filter(x => x.n >= 2)
+    .sort((a, b) => a.media - b.media || b.n - a.n || a.f.nome.localeCompare(b.f.nome, "pt"));
   const diasPeriodo = de ? Math.round((new Date(ate) - new Date(de)) / 864e5) + 1 : c.cobertura;
   return `<h2>Histórico</h2>
   ${seletor}
@@ -189,6 +192,13 @@ export function telaHistorico({ frascos, hist: histTodo, hoje, fila: filaToda, a
   <div class="bloco"><h3>Uso × janelas do playbook</h3>
     <p class="nota">Esperado = seus ${c.total} usos repartidos pelas janelas de cada frasco. Mostra quem você usa mais do que o playbook prevê.</p>
     ${acima.length ? `<div class="tabela"><table><thead><tr><th>Frasco</th><th>Janelas</th><th>Usos</th><th>Esperado</th></tr></thead><tbody>${acima.map(x => `<tr><td>${esc(x.nome)} ${tierHTML(x.tier)}</td><td>${x.janelas}</td><td>${x.usos}</td><td>${nf(x.esperado)}</td></tr>`).join("")}</tbody></table></div>` : `<p class="nota">Poucos usos para comparar.</p>`}
+  </div>
+  <div class="bloco"><h3>NotaDia · fit por frasco</h3>
+    <p class="nota">Média da NotaDia (1–5, quanto o perfume combinou com o slot) no período, por frasco e por faixa de temperatura do registro. Piores médias em cima. Só frascos com 2+ notas; faixa só com 2+.</p>
+    ${notas.length ? `<div class="tabela"><table><thead><tr><th>Frasco</th><th>n</th><th>Média</th><th>Por faixa</th></tr></thead><tbody>${notas.map(x => {
+      const fx = [...x.faixas].filter(([, v]) => v.n >= 2).map(([i, v]) => `${pinta(i)}${esc(FAIXAS[i])} ${nf(v.media)} <span class="nota">(${v.n})</span>`).join(" · ");
+      return `<tr><td><button class="nome-inline" data-ficha="${esc(x.f.nome)}">${esc(x.f.nome)}</button> ${tierHTML(x.f.tier)}</td><td>${x.n}</td><td><b>${nf(x.media)}</b></td><td>${fx || `<span class="nota">—</span>`}</td></tr>`;
+    }).join("")}</tbody></table></div>` : `<p class="nota">Ainda sem frascos com 2 ou mais notas no período. Dê a NotaDia ao registrar o uso.</p>`}
   </div>
   <div class="bloco"><h3>Sprays · real × sugerido pelo modelo</h3>
     ${cal.n ? `<p>Desvio médio geral: <b>${cal.geral > 0 ? "+" : ""}${nf(cal.geral)}</b> spray${Math.abs(cal.geral) === 1 ? "" : "s"} em ${cal.n} registro${cal.n === 1 ? "" : "s"}.</p>

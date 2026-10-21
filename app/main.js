@@ -6,7 +6,7 @@ import { montarEntrada, OCAS_DIA, OCAS_NOITE, AMBIENTES, EXTRAS } from "./entrad
 import { configurado, chamar } from "./api.js";
 import { fila, adicionar, descartar, enviar, planilhaCache, baixarPlanilha, limiteEdicao, editarRegistro, removerRegistro } from "./registro.js";
 import { lerTiers, lerDiario, aplicarTiers, diarioUnificado, nomesRegistraveis } from "./planilha.js";
-import { janelasPorFrasco, ajustarSprays, deAnalise } from "./estatisticas.js";
+import { janelasPorFrasco, ajustarSprays, deAnalise, notaPorFrascoFaixa } from "./estatisticas.js";
 import { telaColecao, telaPlaybook, telaHistorico, idRegistro } from "./telas.js";
 import { telaRoda } from "./roda.js";
 import { ordsDe, tocarOrd, mudarOrds, slotNome, slotBase, slotIcone, opcoesSlot } from "./util.js";
@@ -223,6 +223,16 @@ function blocoClima(c, dia) {
   </section>`;
 }
 const campo = (k, rot, v) => `<label>${rot}<input data-ov="${k}" type="text" inputmode="decimal" value="${esc(v ?? "")}" autocomplete="off"></label>`;
+
+/** NotaDia em chips 1–5 (fit do slot). O valor fica num campo escondido; tocar de novo no mesmo chip limpa.
+ *  Nota antiga fora de 1–5 (ex.: "8,5") aparece como chip extra e é mantida se ninguém mexer. */
+function chipsNota(id, atual = "") {
+  const v = String(atual ?? "").trim();
+  const extra = v && !["1", "2", "3", "4", "5"].includes(v) ? [[v, v]] : [];
+  return `<div class="chips nota-chips" role="group" aria-label="NotaDia de 1 a 5" data-nota-alvo="${id}">
+    ${[...[1, 2, 3, 4, 5].map(n => [String(n), String(n)]), ...extra].map(([k, r]) => `<button type="button" class="chip" data-nota="${esc(k)}" aria-pressed="${v === k}">${esc(r)}</button>`).join("")}
+    <input type="hidden" id="${id}" value="${esc(v)}"></div>`;
+}
 
 function chips(nome, opcoes, atual) {
   return `<div class="chips rolagem" role="group">${opcoes.map(([v, r]) => `<button class="chip" data-chip="${nome}" data-v="${v}" aria-pressed="${atual === v}">${r}</button>`).join("")}</div>`;
@@ -504,7 +514,7 @@ function formRegistro(p = {}) {
       <label class="largo">Perfume<input id="rg-perfume" list="rg-nomes" value="${esc(p.perfume || "")}" placeholder="Nome no diário" required></label>
       <label>Ocasião<select id="rg-ocasiao"><option value="">—</option>${OCAS_TODAS.map(o => `<option value="${o}" ${p.ocasiao === o ? "selected" : ""}>${ROT_OC[o]}</option>`).join("")}</select></label>
       <label>Sprays reais<input id="rg-sprays" inputmode="numeric" value="${esc(p.sprays ?? "")}" placeholder="${p.sugerido ? `sugerido ${p.sugerido}` : ""}"></label>
-      <label>NotaDia (fit do slot)<input id="rg-nota" inputmode="decimal" value=""></label>
+      <div class="campo largo"><span>NotaDia (fit do slot, 1–5)</span>${chipsNota("rg-nota")}</div>
       <label class="largo">Obs<input id="rg-obs" value=""></label>
     </div>
     <datalist id="rg-nomes">${nomes.map(n => `<option value="${esc(n)}">`).join("")}</datalist>
@@ -583,7 +593,7 @@ function desenharEdicaoRegistro(salvando = "") {
         <label class="largo">Perfume<input id="ed-perfume" list="ed-nomes" value="${esc(r.perfume)}" required></label>
         <label>Ocasião<select id="ed-ocasiao"><option value="">—</option>${OCAS_TODAS.map(o => `<option value="${o}" ${r.ocasiao === o ? "selected" : ""}>${ROT_OC[o]}</option>`).join("")}</select></label>
         <label>Sprays<input id="ed-sprays" inputmode="numeric" value="${esc(r.sprays || "")}"></label>
-        <label>NotaDia<input id="ed-nota" inputmode="decimal" value="${esc(r.notaDia || "")}"></label>
+        <div class="campo largo"><span>NotaDia (1–5)</span>${chipsNota("ed-nota", r.notaDia || "")}</div>
         <label>Temp (°C)<input id="ed-temp" inputmode="decimal" value="${esc(r.temp || "")}"></label>
         <label>Td (°C)<input id="ed-td" inputmode="decimal" value="${esc(r.td || "")}"></label>
         <label class="largo">Obs<input id="ed-obs" value="${esc(r.obs || "")}"></label>
@@ -700,6 +710,8 @@ function abrirFicha(nome) {
       <dt>Td</dt><dd>${{ C: "sobe no ar carregado", S: "sobe no ar seco", N: "indiferente" }[f.td]}</dd>
       <dt>Sprays-base</dt><dd>${esc(fi.sprays_base)}</dd>
       <dt>Janelas</dt><dd>${esc(fi.janelas)}${f.janelas_estimadas ? `<span class="selo aviso">estimado</span>` : ""}${janelasHTML(nome)}</dd>
+      ${(() => { const nt = notaPorFrascoFaixa(historico(), S.frascosAtivos.length ? S.frascosAtivos : S.frascos).get(nome);
+        return nt ? `<dt>NotaDia</dt><dd>média ${nf(nt.media)} em ${nt.n} uso${nt.n > 1 ? "s" : ""}</dd>` : ""; })()}
       <dt>Performance</dt><dd>~${f.longev} h · projeção ${f.proj}/5 · curva ${{ S: "saída manda", L: "linear", F: "fundo manda" }[f.curva]}${f.perf_estimada ? `<span class="selo aviso">estimado por regra</span>` : `<span class="selo">da leitura da ficha</span>`}</dd>
       <dt>Vizinhos</dt><dd>${esc(fi.vizinhos)}</dd>
       <dt>Leitura</dt><dd>${esc(fi.leitura)}</dd>
@@ -809,6 +821,13 @@ document.addEventListener("click", async e => {
   if (b.closest("#abas")) { S.aba = b.dataset.aba; render(); window.scrollTo(0, 0); return; }
   if (b.hasAttribute("data-fechar") && (e.target === b || b.tagName === "BUTTON")) { fecharFolha(); return; }
   if (b.dataset.ficha) { abrirFicha(b.dataset.ficha); return; }
+  if (b.dataset.nota !== undefined && b.closest("[data-nota-alvo]")) {
+    const g = b.closest("[data-nota-alvo]"), alvo = document.getElementById(g.dataset.notaAlvo);
+    const novo = alvo.value === b.dataset.nota ? "" : b.dataset.nota;
+    alvo.value = novo;
+    g.querySelectorAll("button[data-nota]").forEach(x => x.setAttribute("aria-pressed", String(x.dataset.nota === novo && novo !== "")));
+    return;
+  }
   if (b.dataset.editarReg) { abrirEdicaoRegistro(b.dataset.editarReg); return; }
   if (b.dataset.colmodo) { S.colModo = b.dataset.colmodo; gravar("colModo", S.colModo); render(); return; }
   if (b.dataset.colOrd) { S.filtro = { ...S.filtro, ords: tocarOrd(ordsDe(S.filtro, "tier"), b.dataset.colOrd) }; gravar("filtro", S.filtro); render(); return; }

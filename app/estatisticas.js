@@ -1,6 +1,6 @@
 // estatisticas.js — contas do Histórico, Coleção e calibração de sprays. Só dados do Diário: nada projetado.
 // A camada custo fica fora de toda estatística (regra dele); Bedouin Rose (D) fica fora da grade.
-import { diasEntre } from "../engine/index.js";
+import { diasEntre, faixaIdx } from "../engine/index.js";
 
 /** Análises só contam Dia (M) e Noite (N); Esportes (E) e 2ª aplicação (M2/N2) ficam só no registro (decisão dele, 18/out/2026). */
 export const deAnalise = r => r.slot === "M" || r.slot === "N";
@@ -80,6 +80,33 @@ export function calibracao(regs) {
   for (const p of pares) { if (!por.has(p.nome)) por.set(p.nome, []); por.get(p.nome).push(p.real - p.sug); }
   return { n: pares.length, geral: pares.length ? media(pares.map(p => p.real - p.sug)) : null,
     por: [...por.entries()].map(([nome, d]) => ({ nome, n: d.length, media: media(d) })).sort((a, b) => b.media - a.media || b.n - a.n) };
+}
+
+/** NotaDia (fit do slot, 1–5) como número; aceita vírgula. Fora de 1–5 (notas antigas em outra escala) não entra na conta. */
+export function notaNum(v) {
+  const n = v === "" || v == null ? NaN : Number(String(v).replace(",", "."));
+  return Number.isFinite(n) && n >= 1 && n <= 5 ? n : null;
+}
+
+/** NotaDia por frasco da grade: média geral, n e média por faixa de temperatura (pela Temp do registro; sem Temp entra
+ *  só na média geral). Só Dia e Noite (deAnalise). Devolve Map nome → {f, n, media, faixas: Map idx → {n, media}}. */
+export function notaPorFrascoFaixa(hist, frascos) {
+  const grade = new Map(frascos.filter(daGrade).map(f => [f.nome, f]));
+  const acc = new Map();
+  for (const r of hist) {
+    if (!deAnalise(r) || !grade.has(r.perfume)) continue;
+    const nota = notaNum(r.notaDia);
+    if (nota == null) continue;
+    if (!acc.has(r.perfume)) acc.set(r.perfume, { f: grade.get(r.perfume), soma: 0, n: 0, faixas: new Map() });
+    const a = acc.get(r.perfume); a.soma += nota; a.n++;
+    const t = r.temp === "" || r.temp == null ? NaN : Number(String(r.temp).replace(",", "."));
+    if (Number.isFinite(t)) {
+      const i = faixaIdx(t), fx = a.faixas.get(i) || { soma: 0, n: 0 };
+      fx.soma += nota; fx.n++; a.faixas.set(i, fx);
+    }
+  }
+  return new Map([...acc].map(([nome, a]) => [nome, { f: a.f, n: a.n, media: a.soma / a.n,
+    faixas: new Map([...a.faixas].sort((x, y) => x[0] - y[0]).map(([i, fx]) => [i, { n: fx.n, media: fx.soma / fx.n }])) }]));
 }
 
 // Tetos próprios dos beasts (playbook v59, regra 4) — o ajuste opcional nunca passa deles.
