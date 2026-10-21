@@ -129,6 +129,14 @@ h3 { font: 600 13px/1.3 var(--f); letter-spacing: .01em; color: var(--suave); ma
 .card .meta { grid-column: 2 / 4; display: flex; gap: 4px 14px; flex-wrap: wrap; font-size: 13.5px; font-variant-numeric: tabular-nums; margin-top: 4px; }
 .card .meta b { font-weight: 650; }
 .card .pq { grid-column: 2 / 4; font-size: 12px; color: var(--leve); }
+/* "por que este?": a linha do porquê abre a decomposição do score */
+details.pq { font-size: 12px; color: var(--leve); }
+details.pq > summary { font: 400 12px/1.45 var(--f); color: var(--leve); display: block; }
+details.pq > summary::after { display: inline-block; width: 5px; height: 5px; margin: 0 0 2px 6px; border-width: 1.5px; }
+.pq-tab { border-collapse: collapse; margin: 6px 0 2px; font-size: 11.5px; font-variant-numeric: tabular-nums; color: var(--suave); }
+.pq-tab th { font-weight: 400; text-align: left; padding: 1px 14px 1px 0; color: var(--leve); white-space: nowrap; }
+.pq-tab td { padding: 1px 0; }
+.onde + details.pq, .ficha-pq details.pq { margin: -4px 0 8px; }
 .card .acoes { grid-column: 2 / 4; display: flex; gap: 8px; margin-top: 6px; }
 .score { font: 700 15px/1.45 var(--f-num); text-align: right; color: var(--suave); font-variant-numeric: tabular-nums; }
 

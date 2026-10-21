@@ -1,5 +1,5 @@
 // main.js — orquestra as telas: Hoje, Registrar e Ajustes (Coleção, Playbook e Histórico entram na fase 4).
-import { rodar, FAIXAS, fmtH } from "../engine/index.js";
+import { rodar, avaliar, vivoAte, porque, CFG, FAIXAS, fmtH } from "../engine/index.js";
 import { ajustes, salvarAjustes, AJUSTES_PADRAO, estadoDia, salvarDia, hojeISO } from "./store.js";
 import { buscarPrevisao, buscarMetar, derivarClima, horaNum } from "./clima.js";
 import { montarEntrada, OCAS_DIA, OCAS_NOITE, AMBIENTES, EXTRAS } from "./entrada.js";
@@ -19,7 +19,7 @@ import { telaAmostras, fichaAmostra, deLinhas as amostrasDeLinhas, juntar, semRe
 import { ler, gravar } from "./store.js";
 import { fotoFicha, iconeFicha, fotoMini, reduzirImagem, subirFoto, removerFotoPlanilha, iniciarFotos } from "./fotos.js";
 
-export const APP_VERSAO = "5.29";  // sobe a cada publicação: confere no topo da tela se o celular pegou a versão nova
+export const APP_VERSAO = "5.30";  // sobe a cada publicação: confere no topo da tela se o celular pegou a versão nova
 const S = { aba: "hoje", frascos: [], frascosAtivos: [], avisosTiers: null, fichas: {}, versao: {}, prev: null, prevOffline: false,
   prevErro: null, metar: null, metarMotivo: null, clima: null, resultado: null, erroMotor: null, entrada: "", carregandoClima: true,
   sync: { estado: "ocioso", msg: "" }, hr: ler("hr", { preset: "tudo" }), tokenNovo: null, playbook: null, janelas: new Map(),
@@ -315,6 +315,43 @@ function spraysHTML(t) {
   return `<span><b>${adj}</b> sprays <span class="selo manual">seu ajuste</span> <span class="nota">modelo ${t.sprays}${t.nota ? `, ${esc(t.nota)}` : ""}</span></span>`;
 }
 
+// ───────────────────────── "por que este?" ─────────────────────────
+const n2 = x => Number(x).toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const vivoTxt = t => (t.vivo_fim ? "o fim" : "~" + fmtH(t.vivo_ate));
+/** A linha do porquê vira um <details>: tocar abre a decomposição do score (componentes do avaliar() do engine). */
+function porqueHTML(t) {
+  const r = t.r, f = r.f, linhas = [];
+  const L = (k, v) => linhas.push(`<tr><th>${k}</th><td>${v}</td></tr>`);
+  L("Térmico", n2(r.termico));
+  L("Td", n2(r.td_mod));
+  if (r.chuva_eff) L("Chuva", n2(r.chuva_eff));
+  L("Clima (w_clima)", `${n2(r.clima)} × ${n2(CFG.w_clima)} = ${n2(r.clima * CFG.w_clima)}`);
+  L("Aptidão", n2(r.apt));
+  if (r.fech) L("Fechado", n2(r.fech));
+  L("Contexto (w_ctx)", `${n2(r.ctx)} × ${n2(CFG.w_ctx)} = ${n2(r.ctx * CFG.w_ctx)}`);
+  L("Base", n2(r.base));
+  L("Tier", `${esc(f.tier)} → ×${n2(r.tier_mult)}`);
+  L("Rotação", `×${n2(r.rot)} · ${r.dias === "45+" ? "45+" : r.dias != null ? `usado há ${r.dias}d` : "sem histórico"}${r.adapt ? " · adaptação" : ""}`);
+  if (r.res_txt) L("Resíduo", `${esc(r.res_txt)}${r.residuo !== 1 ? ` · ×${n2(r.residuo)}` : ""}`);
+  if (r.intent !== 1) L("Intenção", `×${n2(r.intent)}`);
+  L("Vivo até", vivoTxt(t));
+  L("<b>Score</b>", `<b>${t.score.toFixed(0)}</b>`);
+  return `<details class="pq"><summary>${esc(t.porque)}</summary><table class="pq-tab"><tbody>${linhas.join("")}</tbody></table></details>`;
+}
+
+/** Item do dia (com r) de um frasco num slot: top, camada custo, "testar" ou, se só está no ranking, avaliado de novo
+ *  com o mesmo frasco, os mesmos passos e a mesma entrada (dá o mesmo número que o engine deu). */
+function itemDoDia(so, nome) {
+  const t = so.top.find(x => x.nome === nome) || so.custo?.find(x => x.nome === nome) || (so.testar?.r && so.testar.nome === nome ? so.testar : null);
+  if (t) return t;
+  if (!so.ranking.some(x => x.nome === nome)) return null;
+  const f = S.frascosAtivos.find(x => x.nome === nome), d = S.resultado.entrada, slot = { nome: so.nome, ini: so.ini, fim: so.fim };
+  const r = f && avaliar(f, so.passos, d, slot);
+  if (!r) return null;
+  const va = vivoAte(r, slot);
+  return { nome, score: r.score, vivo_ate: va, vivo_fim: va >= slot.fim, porque: porque(r, d, new Set(so.passos.map(p => p.ocas))), r };
+}
+
 /** Um slot da tela Hoje. `expandido` falso: o bloco inteiro vai dentro de um <details> recolhido, com o top 3 (ou o
  *  perfume já usado) no resumo. A restauração de <details> abertos do render() mantém o que ele abrir. */
 function blocoSlot(s, expandido = true) {
@@ -329,7 +366,7 @@ function blocoSlot(s, expandido = true) {
       <div style="min-width:0" class="card-tx">${fotoMini(doMercado(t.casa, t.nome), hero ? "foto-hero" : "foto-mini")}<button class="nome" data-ficha="${esc(t.nome)}">${esc(t.nome)}</button>${tierHTML(t.tier)}<div class="casa">${esc(t.casa)} · ${arqTag(t.arquetipo, 13)}</div></div>
       <span class="score" title="Score">${t.score.toFixed(0)}</span>
       <div class="meta">${spraysHTML(t)}<span>vivo até <b>${t.vivo_fim ? "o fim" : "~" + fmtH(t.vivo_ate)}</b></span></div>
-      <div class="pq">${esc(t.porque)}</div>
+      ${porqueHTML(t)}
       <div class="acoes"><span class="esp"></span><button class="btn peq ${ja ? "feito" : "sec"}" data-usei="${esc(t.nome)}" data-slot="${slotCod}" data-sprays="${t.sprays}" data-ajustado="${ajustarSprays(t.r.f, t.sprays, ajSpray())}" ${usado ? "disabled" : ""}>${ja ? "✓ Registrado" : "Usei este"}</button></div>
     </article>`;
   };
@@ -341,7 +378,7 @@ function blocoSlot(s, expandido = true) {
     <p class="nota">${esc(segs.join(" · "))}</p>
     ${usado ? `<p class="nota">Registrado hoje: <b>${esc(usado.perfume)}</b>${estadoUso(usado)}.${usado.pendente && usado.estado !== "enviado" ? ` <button class="btn sec peq" data-descartar="${esc(usado.id)}">Desfazer</button>` : ""}</p>` : ""}
     <p class="onde">🧴 ${esc(s.onde)}</p>
-    ${s.testar ? `<p class="onde">★ ${s.testar.nao_encontrado ? `“${esc(s.testar.nao_encontrado)}” não está na base.` : s.testar.fora ? `Testar ${esc(s.testar.nome)}: reprovado neste slot — ${esc(s.testar.fora)}.` : `Testar <b>${esc(s.testar.nome)}</b>: passa nos filtros · ${s.testar.sprays} sprays · score ${s.testar.score.toFixed(0)}${s.testar.pos ? ` (#${s.testar.pos})` : ""} · ${esc(s.testar.porque)}`}</p>` : ""}
+    ${s.testar ? `<p class="onde">★ ${s.testar.nao_encontrado ? `“${esc(s.testar.nao_encontrado)}” não está na base.` : s.testar.fora ? `Testar ${esc(s.testar.nome)}: reprovado neste slot — ${esc(s.testar.fora)}.` : `Testar <b>${esc(s.testar.nome)}</b>: passa nos filtros · ${s.testar.sprays} sprays · score ${s.testar.score.toFixed(0)}${s.testar.pos ? ` (#${s.testar.pos})` : ""}`}</p>${s.testar.r ? porqueHTML(s.testar) : ""}` : ""}
     <div class="lista">${s.top.length ? s.top.map((t, i) => card(t, i)).join("") : `<p class="vazio">Nenhum frasco passa nos filtros deste slot.</p>`}</div>
     ${s.custo ? `<div class="bloco"><h3>Camada custo · corrida/academia</h3>${s.custo.length ? `<div class="lista">${s.custo.map((t, i) => card(t, i, true)).join("")}</div>` : `<p class="nota">Nenhum frasco da camada passa nos filtros.</p>`}</div>` : ""}
     ${s.fora_sa.length ? `<details class="fora"><summary>S/A fora neste slot (${s.fora_sa.length})</summary><ul>${s.fora_sa.map(f => `<li><b>${esc(f.nome)}</b> (${f.tier}): ${esc(f.motivo)}</li>`).join("")}</ul></details>` : ""}
@@ -792,6 +829,9 @@ function abrirFicha(nome) {
       <dt>Performance</dt><dd>~${f.longev} h · projeção ${f.proj}/5 · curva ${{ S: "saída manda", L: "linear", F: "fundo manda" }[f.curva]}${f.perf_estimada ? `<span class="selo aviso">estimado por regra</span>` : `<span class="selo">da leitura da ficha</span>`}${(() => {
         const sv = sobrevivencia(historico(), S.frascos).get(nome);
         return sv ? `<br>Na pele: ${sv.vivo} vivo · ${sv.fraco} fraco · ${sv.morto} morto <span class="nota">(${sv.n} noite${sv.n > 1 ? "s" : ""})</span>` : ""; })()}</dd>
+      ${(() => { const its = (S.resultado?.slots || []).map(so => [so, itemDoDia(so, nome)]).filter(([, t]) => t);
+        return its.length ? `<dt>Hoje</dt><dd class="ficha-pq">${its.map(([so, t]) => { const pos = so.ranking.findIndex(x => x.nome === nome) + 1;
+          return `${so.nome === "Dia" ? "☀︎ Dia" : "☾ Noite"}${pos ? ` · #${pos}` : ""} · score <b>${t.score.toFixed(0)}</b>${porqueHTML(t)}`; }).join("")}</dd>` : ""; })()}
       <dt>Vizinhos</dt><dd>${esc(fi.vizinhos)}</dd>
       <dt>Leitura</dt><dd>${esc(fi.leitura)}</dd>
       <dt>Uso</dt><dd>${ult ? `último em ${esc(ult.data)} (${slotNome(ult.slot)}) · ${usos.length} registro${usos.length > 1 ? "s" : ""} no diário` : "sem registro no diário"}</dd>
