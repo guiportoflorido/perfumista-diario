@@ -26,9 +26,11 @@ var COLS_MERCADO = ['Casa', 'Perfume', 'Tier', 'Posse', 'Arquétipo', 'Resumo', 
 var EDITAVEIS = ['Tier', 'Posse', 'Arquétipo', 'Resumo', 'Topo', 'Coração', 'Base', 'Nariz', 'Wishlist', 'Notas'];   // Foto: só por subirFoto/removerFoto
 var ABA_FOTOS = 'Fotos', COLS_FOTOS = ['Casa', 'Perfume', 'Versão', 'Tipo'];
 var PARTES_FOTO = 10, TAM_PARTE = 45000;   // célula aceita até 50 mil caracteres: a imagem (base64) vai em pedaços
-// colunas novas entram sempre no fim (o app lê o Diário por posição): Sugerido = sprays sugeridos pelo modelo na hora do registro
-var COLS_DIARIO = ['Data', 'Slot', 'Perfume', 'Ocasião', 'Temp (°C)', 'Td (°C)', 'Sprays', 'NotaDia', 'Obs', 'Sugerido'];
-var CHAVES_DIARIO = ['data', 'slot', 'perfume', 'ocasiao', 'temp', 'td', 'sprays', 'notaDia', 'obs', 'sugerido'];
+// colunas novas entram sempre no fim (o app lê o Diário por posição): Sugerido = sprays sugeridos pelo modelo na hora do
+// registro · Vivo = no registro da Noite, como estava o perfume da manhã do mesmo dia (vivo / fraco / morto)
+var COLS_DIARIO = ['Data', 'Slot', 'Perfume', 'Ocasião', 'Temp (°C)', 'Td (°C)', 'Sprays', 'NotaDia', 'Obs', 'Sugerido', 'Vivo'];
+var CHAVES_DIARIO = ['data', 'slot', 'perfume', 'ocasiao', 'temp', 'td', 'sprays', 'notaDia', 'obs', 'sugerido', 'vivo'];
+var VIVO = ['', 'vivo', 'fraco', 'morto'];
 var ABA_AMOSTRAS = 'Amostras';
 var COLS_AMOSTRAS = ['ID', 'Casa', 'Perfume', 'Tipo', 'Volume (ml)', 'Origem', 'Status', 'Entrada', 'Saída', 'Motivo saída', 'Impressão', 'Obs', 'Atualizado em', 'Dono'];
 var DONOS_AMOSTRA = ['', 'Gui', 'Bia'], TIPOS_AMOSTRA = ['Amostra', 'Decant'], STATUS_AMOSTRA = ['Pendente', 'Em teste', 'Realizado', 'Esgotado'];
@@ -125,6 +127,7 @@ function normalizarLinha_(l, nomesValidos) {
   if (nomesValidos && nomesValidos.indexOf(perfume) === -1) throw new Error('"' + perfume + '" não está na aba Tiers (Nome no diário ou Perfume)');
   var oc = String(l.ocasiao || '');
   if (oc && OCASIOES.indexOf(oc) === -1) throw new Error('ocasião inválida: ' + oc);
+  if (VIVO.indexOf(String(l.vivo || '')) === -1) throw new Error('vivo inválido: ' + l.vivo + ' (use vivo, fraco ou morto)');
   var txt = function (v) { return v === null || v === undefined ? '' : String(v); };
   var linha = [data, slot, perfume, oc];
   for (var c = 4; c < CHAVES_DIARIO.length; c++) linha.push(txt(l[CHAVES_DIARIO[c]]));

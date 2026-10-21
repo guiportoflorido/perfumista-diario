@@ -12,7 +12,7 @@ function novoId() { return Date.now().toString(36) + Math.random().toString(36).
 
 export function adicionar(reg) {
   const l = fila();
-  const r = { id: novoId(), ocasiao: "", temp: "", td: "", sprays: "", notaDia: "", obs: "", sugerido: "", ...reg, estado: "pendente", criado: new Date().toISOString() };
+  const r = { id: novoId(), ocasiao: "", temp: "", td: "", sprays: "", notaDia: "", obs: "", sugerido: "", vivo: "", ...reg, estado: "pendente", criado: new Date().toISOString() };
   l.push(r); salvarFila(l);
   return r;
 }
@@ -20,7 +20,7 @@ export function atualizar(id, mud) { salvarFila(fila().map(r => (r.id === id ? {
 export function descartar(id) { atualizar(id, { estado: "descartado" }); }
 
 const paraPlanilha = r => ({ id: r.id, data: r.data, slot: r.slot, perfume: r.perfume, ocasiao: r.ocasiao, temp: r.temp, td: r.td,
-  sprays: r.sprays, notaDia: r.notaDia, obs: r.obs, sugerido: r.sugerido ?? "" });
+  sprays: r.sprays, notaDia: r.notaDia, obs: r.obs, sugerido: r.sugerido ?? "", vivo: r.vivo ?? "" });
 
 /** Envia os pendentes (e os com erro). Com `trocaId`, resolve o conflito daquele registro: tipo "troca" (trocou de
  *  perfume: grava mesmo com o slot ocupado) ou "segunda" (2ª aplicação: o registro passa para o slot M2/N2). */
@@ -65,7 +65,7 @@ export function limiteEdicao(hoje) {
 }
 const chaveReg = r => `${r.data}|${r.slot}|${r.perfume}`;
 // mesma ordem das colunas da aba Diário (COLS_DIARIO no Code.gs); colunas novas vão no fim
-const CAMPOS = ["data", "slot", "perfume", "ocasiao", "temp", "td", "sprays", "notaDia", "obs", "sugerido"];
+const CAMPOS = ["data", "slot", "perfume", "ocasiao", "temp", "td", "sprays", "notaDia", "obs", "sugerido", "vivo"];
 const soNaFila = r => Boolean(r.id && r.pendente);
 
 /** Na cópia local da aba Diário: índice da linha do registro (usa a linha conhecida se ainda bater). */

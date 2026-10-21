@@ -82,3 +82,17 @@ test("NotaDia: média geral e por faixa de temperatura; sem Temp só na geral; s
   assert.deepEqual([...o.faixas], [[1, { n: 1, media: 3 }], [2, { n: 2, media: 3 }]]);   // 1 = Quente, 2 = Ameno
   assert.equal(notaNum("3,5"), 3.5); assert.equal(notaNum("0"), null); assert.equal(notaNum(""), null);
 });
+
+import { sobrevivencia } from "../app/estatisticas.js";
+test("sobrevivência: a resposta da Noite conta para o último perfume do Dia da mesma data", () => {
+  const hist = [
+    { data: "2026-10-01", slot: "M", perfume: "Odéon" }, { data: "2026-10-01", slot: "N", perfume: "Liwa", vivo: "vivo" },
+    { data: "2026-10-02", slot: "M", perfume: "Odéon" }, { data: "2026-10-02", slot: "N", perfume: "Liwa", vivo: "fraco" },
+    { data: "2026-10-03", slot: "M", perfume: "Odéon" }, { data: "2026-10-03", slot: "M2", perfume: "Hacivat" },   // 2ª do Dia: vale a última
+    { data: "2026-10-03", slot: "N", perfume: "Liwa", vivo: "morto" },
+    { data: "2026-10-04", slot: "N", perfume: "Liwa", vivo: "vivo" },                                             // sem manhã: não conta
+    { data: "2026-10-05", slot: "M", perfume: "Odéon" }, { data: "2026-10-05", slot: "N", perfume: "Liwa", vivo: "" },   // sem resposta
+    { data: "2026-10-06", slot: "M", perfume: "Acqua Viva" }, { data: "2026-10-06", slot: "N", perfume: "Liwa", vivo: "vivo" }];   // fora dos frascos
+  const s = sobrevivencia(hist, frascos);
+  assert.deepEqual(Object.fromEntries(s), { "Odéon": { n: 2, vivo: 1, fraco: 1, morto: 0 }, "Hacivat": { n: 1, vivo: 0, fraco: 0, morto: 1 } });
+});

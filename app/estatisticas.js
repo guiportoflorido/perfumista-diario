@@ -109,6 +109,24 @@ export function notaPorFrascoFaixa(hist, frascos) {
     faixas: new Map([...a.faixas].sort((x, y) => x[0] - y[0]).map(([i, fx]) => [i, { n: fx.n, media: fx.soma / fx.n }])) }]));
 }
 
+/** Sobrevivência na pele: a resposta "vivo / fraco / morto" vem no registro da Noite (N) e vale para o último perfume
+ *  do Dia (M ou M2) da mesma data. Devolve Map perfume → {n, vivo, fraco, morto} (só perfumes que estão em `frascos`).
+ *  Mede; não mexe na longevidade estimada do engine. */
+export function sobrevivencia(hist, frascos) {
+  const nomes = new Set(frascos.map(f => f.nome));
+  const manhaDe = new Map();
+  for (const r of hist) if (r.slot === "M" || r.slot === "M2") manhaDe.set(r.data, r);   // hist em ordem: fica o último do Dia
+  const out = new Map();
+  for (const r of hist) {
+    if (r.slot !== "N" || !["vivo", "fraco", "morto"].includes(r.vivo)) continue;
+    const m = manhaDe.get(r.data);
+    if (!m || !nomes.has(m.perfume)) continue;
+    const c = out.get(m.perfume) || { n: 0, vivo: 0, fraco: 0, morto: 0 };
+    c.n++; c[r.vivo]++; out.set(m.perfume, c);
+  }
+  return out;
+}
+
 // Tetos próprios dos beasts (playbook v59, regra 4) — o ajuste opcional nunca passa deles.
 export const TETO_BEAST = { "Ombre Nomade": 3, "Oud Satin Mood": 2, "Purpose 50": 3, "Brompton": 3, "Vibrato": 3, "Tygar Extrait": 3,
   "Beach Hut Man": 3, "Hacivat": 3, "Outlands": 3, "Caden": 3, "Grand Soir": 3 };

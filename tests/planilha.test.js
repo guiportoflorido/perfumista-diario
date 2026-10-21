@@ -41,3 +41,8 @@ test("lerDiario lê a coluna Sugerido (10ª); linhas antigas, sem ela, chegam co
     ["2026-10-08", "N", "Tygar Extrait"], ["2026-10-09", "M", "Météore", "T.Inf", "29", "", "4", "", "", "3"]]);
   assert.equal(d[0].sugerido, ""); assert.equal(d[1].sugerido, "3"); assert.equal(d[1].sprays, "4"); assert.equal(d[1].obs, "");
 });
+
+test("lerDiario lê Vivo (11ª coluna)", () => {
+  const d = lerDiario([["Data"], ["2026-10-09", "N", "Odéon", "", "", "", "", "", "", "", "vivo"], ["2026-10-09", "M", "Météore"]]);
+  assert.equal(d[0].vivo, "vivo"); assert.equal(d[1].vivo, "");
+});
