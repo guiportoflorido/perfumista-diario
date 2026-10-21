@@ -103,3 +103,12 @@ export function passaAmostra(v, donos) {
   return v === "tem" ? tem : v === "nao" ? !tem : v === "gui" ? Boolean(donos?.has("Gui")) : v === "bia" ? Boolean(donos?.has("Bia")) : true;
 }
 export const temFiltro = (f, chaves) => chaves.some(k => f[k] !== undefined && f[k] !== null && f[k] !== "");
+
+// ───────────────────────── Hoje: qual slot abre expandido ─────────────────────────
+/** "N" a partir da hora da aplicação da noite (Ajustes), senão "M". Se o slot da hora já tem registro no dia e o outro
+ *  não, abre o outro. agoraH e noiteH em horas decimais (ex.: 19.5 = 19h30). */
+export function slotExpandido({ agoraH, noiteH, usadoM = false, usadoN = false }) {
+  const atual = agoraH >= noiteH ? "N" : "M", outro = atual === "M" ? "N" : "M";
+  const usado = { M: usadoM, N: usadoN };
+  return usado[atual] && !usado[outro] ? outro : atual;
+}
