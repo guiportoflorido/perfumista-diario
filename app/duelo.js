@@ -67,6 +67,10 @@ export function duelosUnificados(planilha, fila) {
 const T_FAIXA = { MQ: [33, 37], Q: [27, 32], A: [22, 26], F: [17, 21], Fr: [12, 16], MF: [8, 11] };
 const TD_BANDA = { seco: [6, 11], neutro: [12, 19], carregado: [20, 24] };   // SP: Td abaixo de ~6 °C é raro
 const OC_DIA = ["T.Inf", "T.For", "Cozy D"], OC_NOITE = ["N.Inf", "N.For", "Cozy N"];
+// horas plausíveis para usar perfume: 8 AM a 11 PM (Madrugada fica só para duelos do modo Agora feitos de madrugada)
+const HORAS_CENARIO = { Manha: [8, 11], Tarde: [12, 17], Noite: [18, 23] };
+/** 14 → “2 PM”; 8 → “8 AM”; 12 → “12 PM”. */
+export const horaAmPm = h => `${h % 12 || 12} ${h < 12 ? "AM" : "PM"}`;
 const DIAS_SEM = ["Domingo", "Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado"];
 
 /** Vetos do cenário (true = combinação plausível). */
@@ -101,14 +105,14 @@ function sortearPeso(lista, peso, aleatorio) {
 }
 const inteiroEntre = (a, b, aleatorio) => a + Math.min(b - a, Math.floor(aleatorio() * (b - a + 1)));
 
-/** Sorteia um cenário: período → hora → faixa → T → Td (banda via bandaTd) → chuva → sub-ocasião (a mãe vem junto).
+/** Sorteia um cenário (entre 8 AM e 11 PM): período → hora → faixa → T → Td (banda via bandaTd) → chuva → sub-ocasião (a mãe vem junto).
  *  Só valores que não caem num veto; entre eles, peso ∝ 1/√(1 + duelos já feitos com aquele valor). */
 export function gerarCenario(duelos = [], aleatorio = Math.random) {
   const n = contarValores(duelos), w = k => v => 1 / Math.sqrt(1 + (n[k].get(v) || 0));
   const subsOk = c => Object.keys(MAE_DA_SUB).filter(s => cenarioValido({ ...c, sub: s, ocasiao: MAE_DA_SUB[s] }));
   const c = {};
-  c.periodo = sortearPeso(PERIODOS, w("periodo"), aleatorio);
-  const [h0, h1] = { Madrugada: [0, 5], Manha: [6, 11], Tarde: [12, 17], Noite: [18, 23] }[c.periodo];
+  c.periodo = sortearPeso(Object.keys(HORAS_CENARIO), w("periodo"), aleatorio);
+  const [h0, h1] = HORAS_CENARIO[c.periodo];
   c.hora = inteiroEntre(h0, h1, aleatorio);
   c.temp = sortearPeso(FAIXAS_CURTAS.filter(t => cenarioValido({ periodo: c.periodo, temp: t })), w("temp"), aleatorio);
   c.T = inteiroEntre(...T_FAIXA[c.temp], aleatorio);
@@ -122,11 +126,11 @@ export function gerarCenario(duelos = [], aleatorio = Math.random) {
   return c;
 }
 
-/** “Quinta, 14h · 29°C · abafado (Td 21) · pancada de chuva · almoço de trabalho” */
+/** “Quinta, 2 PM · 29°C · abafado (Td 21) · pancada de chuva · almoço de trabalho” */
 export function textoCenario(c) {
   const ar = { carregado: "abafado", neutro: "ar normal", seco: "ar seco" }[c.td];
   const chuva = { sem: "sem chuva", pancada: "pancada de chuva", continua: "chuva contínua" }[c.chuva];
-  return `${DIAS_SEM[c.dia ?? 3]}, ${c.hora}h · ${c.T}°C · ${ar} (Td ${c.Td}) · ${chuva} · ${c.sub}`;
+  return `${DIAS_SEM[c.dia ?? 3]}, ${horaAmPm(c.hora)} · ${c.T}°C · ${ar} (Td ${c.Td}) · ${chuva} · ${c.sub}`;
 }
 
 // ───────────── modelo: Bradley–Terry com efeitos por condição (MAP, em lote) ─────────────

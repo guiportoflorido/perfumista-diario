@@ -1,7 +1,7 @@
 // Duelo “Qual dos dois?”: pareamento por prioridade e balanceamento, Elo determinístico a partir do log, aba Duelos no backend.
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { pareamento, elo, lerDuelos, duelosUnificados, descompassos, powerRanking, gerarCenario, cenarioValido, brilhaCai, ajustar } from "../app/duelo.js";
+import { pareamento, elo, lerDuelos, duelosUnificados, descompassos, powerRanking, gerarCenario, cenarioValido, brilhaCai, ajustar, textoCenario, horaAmPm } from "../app/duelo.js";
 import { carregarBackend } from "../tools/planilha_falsa.mjs";
 
 const F = (nome, arquetipo, tier, extra = {}) => ({ nome, arquetipo, tier, camada: "grade", ...extra });
@@ -83,6 +83,8 @@ test("7 · 5.000 cenários sorteados, nenhum vetado; texto com números concreto
   for (let i = 0; i < 5000; i++) {
     const c = gerarCenario([], aleatorio);
     assert.ok(cenarioValido(c), JSON.stringify(c));
+    assert.ok(c.hora >= 8 && c.hora <= 23 && c.periodo !== "Madrugada", `hora ${c.hora}`);
+    assert.match(textoCenario(c), /, (1[0-2]|[1-9]) (AM|PM) · /);
     vistos.add(c.sub);
   }
   assert.ok(vistos.size >= 20, `só ${vistos.size} sub-ocasiões`);
@@ -142,4 +144,8 @@ test("8 · backend: aceita empate “=” e o cenário, rejeita valor fora da li
   assert.equal(b.post({ token: "dev", acao: "duelo_registrar", linhas: [{ ...l, id: "y", hora: "17:00:00", ocasiao: "Lazer" }] }).ok, false, "sub de outra ocasião");
   const lidos = lerDuelos(b.post({ token: "dev", acao: "duelos" }).duelos);
   assert.equal(lidos.length, 3); assert.equal(lidos[0].temp, "A"); assert.equal(lidos[1].vencedor, "=");
+});
+
+test("hora do cenário em AM/PM", () => {
+  assert.deepEqual([8, 11, 12, 14, 23].map(horaAmPm), ["8 AM", "11 AM", "12 PM", "2 PM", "11 PM"]);
 });
