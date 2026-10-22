@@ -649,3 +649,20 @@ select[disabled], input[readonly], textarea[readonly] { opacity: .75; }
 .wr-grade .d.vazio { background: rgba(255,255,255,.06); }
 .wr-grade .arq-ic { stroke-width: 2; }
 @media (prefers-reduced-motion: reduce) { .wr-story.entra { animation: none; } }
+
+/* duelo por cenário + power ranking */
+.duelo-modo { margin: 4px 0 10px; }
+.cenario-card { margin: 4px 0 2px; padding: 14px 16px; border-radius: var(--r); background: var(--sup2); box-shadow: var(--sombra); border-left: 3px solid var(--acento); }
+.cenario-card .cen-rot { font: 600 11.5px var(--f); color: var(--suave); text-transform: uppercase; letter-spacing: .06em; }
+.cenario-card p { margin: 4px 0 0; font: 600 16px/1.4 var(--f); }
+.duelo-acoes { flex-wrap: wrap; gap: 8px; }
+.rk-dim { display: grid; gap: 4px; margin-top: 8px; }
+.rk-dim .rot { font: 600 12px var(--f); color: var(--suave); }
+.rk-lista { list-style: none; margin: 0; padding: 0; display: grid; }
+.rk-lista li { display: flex; align-items: center; gap: 8px; padding: 7px 0; border-bottom: .5px solid var(--linha); font-variant-numeric: tabular-nums; }
+.rk-lista li:last-child { border-bottom: 0; }
+.rk-pos { width: 24px; text-align: right; font: 600 13px var(--f-num); color: var(--leve); }
+.rk-r { font: 700 15px var(--f-num); min-width: 46px; text-align: right; }
+.rk-n { min-width: 22px; text-align: right; }
+.rk-delta { font: 600 12.5px var(--f-num); }
+.rk-delta.sobe { color: #4caf7d; } .rk-delta.cai { color: #e0645c; }

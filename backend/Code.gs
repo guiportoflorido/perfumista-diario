@@ -16,7 +16,8 @@
  *        aba no primeiro registro) · editarAmostra · removerAmostra (por ID; avaliação — tier, arquétipo etc. — fica
  *        na aba Mercado, ligada pela Casa + Perfume) · subirFoto (guarda a foto na aba Fotos desta planilha — nada de
  *        Google Drive — e marca a coluna Foto da aba Mercado) · fotos (devolve as fotos pedidas) · removerFoto ·
- *        duelo_registrar (escolhas do Duelo “Qual dos dois?”; cria a aba Duelos na primeira gravação) · duelos (lê a aba).
+ *        duelo_registrar (escolhas do Duelo “Qual dos dois?”, modos Agora e Cenário, empate = "="; cria a aba Duelos na
+ *        primeira gravação e completa os cabeçalhos G–M de uma aba antiga) · duelos (lê a aba).
  * Regras da planilha: data como texto AAAA-MM-DD; campo vazio = ""; linhas existentes do Diário só mudam por
  *   editarRegistro/removerRegistro (pedido explícito do usuário no app, só registros recentes);
  * aba Frascos é só fórmula (nunca escrita aqui).
@@ -33,7 +34,21 @@ var COLS_DIARIO = ['Data', 'Slot', 'Perfume', 'Ocasião', 'Temp (°C)', 'Td (°C
 var CHAVES_DIARIO = ['data', 'slot', 'perfume', 'ocasiao', 'temp', 'td', 'sprays', 'notaDia', 'obs', 'sugerido', 'vivo'];
 var VIVO = ['', 'vivo', 'fraco', 'morto'];
 var ABA_AMOSTRAS = 'Amostras';
-var ABA_DUELOS = 'Duelos', COLS_DUELOS = ['Data', 'Hora', 'A', 'B', 'Vencedor', 'Contexto'];
+// Duelos: A–F desde o início; G–M (cenário) acrescentadas depois — a aba antiga ganha os cabeçalhos novos sozinha
+var ABA_DUELOS = 'Duelos', COLS_DUELOS = ['Data', 'Hora', 'A', 'B', 'Vencedor', 'Contexto', 'Modo', 'Temp', 'Td', 'Chuva', 'Período', 'Ocasião', 'Sub'];
+var DUELO_LISTAS = {
+  modo: ['', 'agora', 'cenario'], temp: ['', 'MQ', 'Q', 'A', 'F', 'Fr', 'MF'], td: ['', 'seco', 'neutro', 'carregado'],
+  chuva: ['', 'sem', 'pancada', 'continua'], periodo: ['', 'Manha', 'Tarde', 'Noite', 'Madrugada'], ocasiao: ['', 'Lazer', 'T.Inf', 'T.For', 'N.Inf', 'N.For', 'Cozy D', 'Cozy N']
+};
+var DUELO_SUBS = {
+  'Lazer': ['praia/piscina', 'parque/caminhada', 'shopping', 'churrasco com amigos', 'aeroporto e voo', 'almoço de domingo em família'],
+  'T.Inf': ['dia normal de escritório', 'almoço de trabalho', 'sala de reunião fechada'],
+  'T.For': ['reunião com diretoria', 'apresentação externa', 'evento corporativo'],
+  'N.Inf': ['bar/happy hour', 'jantar casual', 'cinema/teatro', 'show'],
+  'N.For': ['casamento', 'jantar sofisticado a dois', 'festa formal'],
+  'Cozy D': ['home office', 'domingo em casa'],
+  'Cozy N': ['sofá e série', 'pós-banho em casa']
+};
 var COLS_AMOSTRAS = ['ID', 'Casa', 'Perfume', 'Tipo', 'Volume (ml)', 'Origem', 'Status', 'Entrada', 'Saída', 'Motivo saída', 'Impressão', 'Obs', 'Atualizado em', 'Dono'];
 var DONOS_AMOSTRA = ['', 'Gui', 'Bia'], TIPOS_AMOSTRA = ['Amostra', 'Decant'], STATUS_AMOSTRA = ['Pendente', 'Em teste', 'Realizado', 'Esgotado'];
 var DIAS_EDITAVEIS = 30;   // editar/apagar no Diário: só registros com data a partir de hoje − 30 dias
@@ -635,7 +650,7 @@ function registrarDuelos_(linhas) {
       aba = ss.insertSheet(ABA_DUELOS);
       aba.getRange(1, 1, 1, COLS_DUELOS.length).setValues([COLS_DUELOS]).setFontWeight('bold');
       aba.setFrozenRows(1);
-    }
+    } else garantirCabecalhoDuelos_(aba);
     var ult = aba.getLastRow(), vistos = {};
     (ult > 1 ? aba.getRange(2, 1, ult - 1, 4).getDisplayValues() : []).forEach(function (r) { vistos[r.join('|')] = true; });
     var gravadas = [];
@@ -654,11 +669,30 @@ function registrarDuelos_(linhas) {
   }
 }
 
+/** Aba criada com 6 colunas (A–F): escreve os cabeçalhos que faltam (G1:M1). Idempotente. */
+function garantirCabecalhoDuelos_(aba) {
+  var cab = aba.getRange(1, 1, 1, COLS_DUELOS.length).getDisplayValues()[0];
+  for (var c = 0; c < COLS_DUELOS.length; c++) if (!cab[c]) aba.getRange(1, c + 1).setValue(COLS_DUELOS[c]);
+}
+
 function normalizarDuelo_(l) {
   var data = String(l.data || ''), hora = String(l.hora || ''), a = String(l.a || '').trim(), b = String(l.b || '').trim(), v = String(l.vencedor || '').trim();
   if (!/^\d{4}-\d{2}-\d{2}$/.test(data)) throw new Error('duelo: data inválida: ' + data);
   if (!/^\d{2}:\d{2}(:\d{2})?$/.test(hora)) throw new Error('duelo: hora inválida: ' + hora);
   if (!a || !b || a === b) throw new Error('duelo: precisa de dois frascos diferentes');
-  if (v !== a && v !== b) throw new Error('duelo: o vencedor tem de ser A ou B');
-  return [data, hora, a, b, v, String(l.contexto || '').slice(0, 120)];
+  if (v !== a && v !== b && v !== '=') throw new Error('duelo: o vencedor tem de ser A, B ou "=" (empate)');
+  var x = {};
+  for (var k in DUELO_LISTAS) {
+    x[k] = String(l[k] || '').trim();
+    if (DUELO_LISTAS[k].indexOf(x[k]) === -1) throw new Error('duelo: ' + k + ' inválido: ' + x[k]);
+  }
+  var sub = String(l.sub || '').trim();
+  if (sub) {
+    var mae = null;
+    for (var oc in DUELO_SUBS) if (DUELO_SUBS[oc].indexOf(sub) !== -1) mae = oc;
+    if (!mae) throw new Error('duelo: sub-ocasião inválida: ' + sub);
+    if (x.ocasiao && x.ocasiao !== mae) throw new Error('duelo: ' + sub + ' é de ' + mae + ', não de ' + x.ocasiao);
+    x.ocasiao = mae;
+  }
+  return [data, hora, a, b, v, String(l.contexto || '').slice(0, 120), x.modo || 'agora', x.temp, x.td, x.chuva, x.periodo, x.ocasiao, sub];
 }
