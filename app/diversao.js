@@ -5,6 +5,49 @@ import { arqIcone, corArq } from "./icones.js";
 
 const semMovimento = () => matchMedia("(prefers-reduced-motion: reduce)").matches;
 
+// ───────────────────────── nome do dia ─────────────────────────
+// Cada dia ganha um nome (“Terça de Âmbar sob Garoa”). Determinístico: a semente é a data, nunca Math.random.
+let MATERIAIS = {};
+/** Materiais por arquétipo, do data/arquetipos.json (campo `materiais`). */
+export function definirMateriais(arquetipos) { MATERIAIS = Object.fromEntries((arquetipos || []).map(a => [a.nome, a.materiais || []])); }
+
+/** Hash djb2 da string (semente estável para escolher variantes). */
+export function hashTxt(s) { let h = 5381; for (const c of String(s)) h = ((h * 33) ^ c.codePointAt(0)) >>> 0; return h; }
+const escolher = (lista, semente) => lista[semente % lista.length];
+
+const DIAS_NOME = ["Domingo", "Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado"];   // getDay(): 0 = domingo
+const ADJETIVOS = [["Esfumada", "Esfumado"], ["Dourada", "Dourado"], ["Serena", "Sereno"], ["Velada", "Velado"], ["Acesa", "Aceso"], ["Lenta", "Lento"]];
+// complementos de clima: o primeiro grupo que casar com o dia vence; dentro dele, a semente desempata
+const CLIMAS = [
+  [c => c.chuva === 2, ["sob Chuva Firme", "em Céu Fechado", "sob Temporal"]],
+  [c => c.chuva === 1, ["sob Garoa", "entre Pancadas"]],
+  [c => c.T != null && c.T >= 30, c => [`a ${Math.round(c.T)} °C`, "ao Sol Forte"]],
+  [c => c.faixaIdx != null && c.faixaIdx <= 1, ["ao Sol Forte", "em Calor Manso"]],
+  [c => c.faixaIdx != null && c.faixaIdx >= 4, ["com Frente Fria", "na Brisa Fria"]],
+  [c => c.td != null && c.td >= 20, ["em Ar Pesado", "no Mormaço"]],
+  [c => c.td != null && c.td < 12, ["em Ar Seco", "sem Nuvens"]],
+  [c => c.chuva === 0, ["sem Nuvens", "em Ar Leve", "em Tarde Mansa"]],
+  [c => c.faixaIdx != null || c.T != null, ["em Ar Leve", "em Tarde Mansa"]],
+];
+function complementoClima(c, semente) {
+  for (const [casa, lista] of CLIMAS) if (casa(c)) return escolher(typeof lista === "function" ? lista(c) : lista, semente);
+  return "";
+}
+
+/** Nome do dia: <dia da semana> <de | Adjetivo de> <Material> <clima>. top1: {arquetipo} (ou o nome do arquétipo); sem
+ *  top 1 fica só dia + clima; sem clima (chuva, faixa, T e Td nulos), só dia + material. */
+export function nomeDoDia({ data, faixaIdx = null, chuva = null, td = null, T = null, top1 = null }) {
+  const sem = hashTxt(data), wd = new Date(data + "T12:00:00").getDay(), dia = DIAS_NOME[wd];
+  const arq = typeof top1 === "string" ? top1 : top1?.arquetipo;
+  const mats = MATERIAIS[arq] || [];
+  const clima = complementoClima({ faixaIdx, chuva, td, T }, hashTxt(data + "|clima"));
+  if (!mats.length) return [dia, clima].filter(Boolean).join(" ");
+  const mat = escolher(mats, hashTxt(data + "|mat"));
+  const forma = sem % 3;
+  const meio = forma === 0 ? `de ${mat}` : forma === 1 ? mat : `${escolher(ADJETIVOS, hashTxt(data + "|adj"))[wd === 0 || wd === 6 ? 1 : 0]} de ${mat}`;
+  return [dia, meio, clima].filter(Boolean).join(" ");
+}
+
 // ───────────────────────── céu do slot ─────────────────────────
 /** Camada decorativa atrás do cartão de clima. tipo: "dia" | "noite"; chuva: 0 seco · 1 pancadas · 2 contínua. */
 export function ceuHTML(tipo, chuva = 0, faixaIdx = 2) {

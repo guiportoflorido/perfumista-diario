@@ -11,7 +11,7 @@ import { telaColecao, telaPlaybook, telaHistorico, idRegistro, periodo } from ".
 import { telaRoda } from "./roda.js";
 import { ordsDe, tocarOrd, mudarOrds, slotNome, slotBase, slotIcone, opcoesSlot, slotExpandido } from "./util.js";
 import { definirCores, arqTag, arqIcone, corArq } from "./icones.js";
-import { ceuHTML, abrirRoleta, animarSpray } from "./diversao.js";
+import { ceuHTML, abrirRoleta, animarSpray, nomeDoDia, definirMateriais } from "./diversao.js";
 import { chave as mercadoChave, telaMercado, fichaEditavel, camposAlterados, baseComTiers, deLinhas, linhasParaCriar, cachePlanilha, baixarMercado, criarNaPlanilha, editarNaPlanilha, adicionarNaPlanilha, removerNaPlanilha, fotoNoCache } from "./mercado.js";
 import { contagens } from "./estatisticas.js";
 import { telaAmostras, fichaAmostra, deLinhas as amostrasDeLinhas, juntar, semRegistro, camposAmostra, camposAvaliacaoMexidos, cacheAmostras, baixarAmostras,
@@ -19,7 +19,7 @@ import { telaAmostras, fichaAmostra, deLinhas as amostrasDeLinhas, juntar, semRe
 import { ler, gravar } from "./store.js";
 import { fotoFicha, iconeFicha, fotoMini, reduzirImagem, subirFoto, removerFotoPlanilha, iniciarFotos } from "./fotos.js";
 
-export const APP_VERSAO = "5.31";  // sobe a cada publicação: confere no topo da tela se o celular pegou a versão nova
+export const APP_VERSAO = "5.32";  // sobe a cada publicação: confere no topo da tela se o celular pegou a versão nova
 const S = { aba: "hoje", frascos: [], frascosAtivos: [], avisosTiers: null, medidos: [], fichas: {}, versao: {}, prev: null, prevOffline: false,
   prevErro: null, metar: null, metarMotivo: null, clima: null, resultado: null, erroMotor: null, entrada: "", carregandoClima: true,
   sync: { estado: "ocioso", msg: "" }, hr: ler("hr", { preset: "tudo" }), tokenNovo: null, playbook: null, janelas: new Map(),
@@ -81,7 +81,7 @@ const tierHTML = t => `<span class="tier ${esc(t)}" title="Tier ${esc(t)}">${esc
 async function carregarDados() {
   const [fr, fi, pb, aq] = await Promise.all(["frascos", "fichas", "playbook", "arquetipos"].map(n => fetch(`data/${n}.json`).then(r => r.json())));
   S.frascos = fr.frascos; S.versao = fr.versao; S.fichas = fi.fichas; S.playbook = pb; S.janelas = janelasPorFrasco(pb);
-  S.arquetipos = aq.arquetipos; S.gaps = aq.gaps; definirCores(aq.arquetipos);
+  S.arquetipos = aq.arquetipos; S.gaps = aq.gaps; definirCores(aq.arquetipos); definirMateriais(aq.arquetipos);
   $("#versao").textContent = `${fr.versao.playbook.replace("playbook_", "").replace(".md", "")} · app ${APP_VERSAO}`;
   aplicarPlanilha();
 }
@@ -229,8 +229,10 @@ function telaHoje() {
   const t0 = new Date(dia.data + "T12:00:00").toLocaleDateString("pt-BR", { weekday: "long", day: "numeric", month: "long" });
   const titulo = t0.charAt(0).toUpperCase() + t0.slice(1);
   if (S.carregandoClima && !c) return `<h2>${esc(titulo)}</h2><p class="nota">Buscando a previsão para ${esc(ajustes().local)}…</p>`;
+  const nome = nomeHoje(dia, c);
   return `
   <h2>${esc(titulo)}</h2>
+  ${nome ? `<p class="nome-dia">${esc(nome)}</p>` : ""}
   ${blocoSync()}
   ${blocoClima(c, dia)}
   ${blocoContexto(dia)}
@@ -238,13 +240,30 @@ function telaHoje() {
   ${S.resultado ? (() => {
     const slots = S.resultado.slots;
     if (slots.length < 2) return slots.map(s => blocoSlot(s, true)).join("");   // "Só um perfume hoje": um slot só, sempre aberto
-    const usou = cod => historico().some(r => r.data === dia.data && slotBase(r.slot) === cod);
-    const agora = new Date(), exp = slotExpandido({ agoraH: agora.getHours() + agora.getMinutes() / 60, noiteH: horaNum(ajustes().noite),
-      usadoM: usou("M"), usadoN: usou("N") });
+    const exp = slotDaHora(dia);
     return slots.map(s => blocoSlot(s, (s.nome === "Dia" ? "M" : "N") === exp)).join("");
   })() : ""}
   ${S.resultado && S.resultado.avisos.length ? `<div class="bloco"><h3>Premissas do modelo</h3><ul class="avisos">${S.resultado.avisos.map(a => `<li>${esc(a)}</li>`).join("")}</ul></div>` : ""}
   ${blocoAvancado(dia)}`;
+}
+
+/** Slot da hora ("M" | "N"): o expandido em Hoje. Com um slot só, "M". */
+function slotDaHora(dia = estadoDia()) {
+  if ((S.resultado?.slots.length ?? 2) < 2) return "M";
+  const usou = cod => historico().some(r => r.data === dia.data && slotBase(r.slot) === cod);
+  const agora = new Date();
+  return slotExpandido({ agoraH: agora.getHours() + agora.getMinutes() / 60, noiteH: horaNum(ajustes().noite), usadoM: usou("M"), usadoN: usou("N") });
+}
+/** Resultado do slot da hora (o item de S.resultado.slots). */
+const slotHoraRes = (dia = estadoDia()) => S.resultado?.slots[slotDaHora(dia) === "N" ? 1 : 0] || null;
+
+/** Nome do dia em Hoje: material do top 1 do slot da hora (se ainda não usado) e clima desse slot. */
+function nomeHoje(dia, c) {
+  if (!c) return "";
+  const cod = slotDaHora(dia), so = slotHoraRes(dia), f = cod === "N" ? c.faixaNoite : c.faixaDia;
+  const usado = historico().some(r => r.data === dia.data && slotBase(r.slot) === cod);
+  return nomeDoDia({ data: dia.data, faixaIdx: f?.idx ?? null, T: f?.T ?? null, chuva: c.chuva?.v ?? null, td: c.Td?.v ?? null,
+    top1: usado ? null : so?.top[0] ?? null });
 }
 
 function blocoClima(c, dia) {

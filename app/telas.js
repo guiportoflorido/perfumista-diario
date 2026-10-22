@@ -1,5 +1,6 @@
 // telas.js — Coleção, Playbook e Histórico (fase 4). Recebem o contexto pronto do main.js e devolvem HTML.
-import { FAIXAS } from "../engine/index.js";
+import { FAIXAS, faixaIdx } from "../engine/index.js";
+import { nomeDoDia } from "./diversao.js";
 import { esc, ROT_OC, OCAS_TODAS, pinta, faixaHTML, nf, tierHTML, slotNome, slotIcone, md, ordsDe, compararMulti, cmpValor, cabOrd, painelOrd, OPC_AMOSTRA, passaAmostra, temFiltro } from "./util.js";
 import { chave } from "./mercado.js";
 import { contagens, agrupar, esquecidos, usoVsJanelas, calibracao, deAnalise, notaPorFrascoFaixa } from "./estatisticas.js";
@@ -230,12 +231,25 @@ export function telaHistorico({ frascos, hist: histTodo, hoje, fila: filaToda, a
 }
 
 // ───────────────────────── calendário de cheiros ─────────────────────────
+/** Nome do dia recalculado do registro: temp/Td do registro e arquétipo do perfume (sem temp, só dia + material). */
+export function nomeDoRegistro(data, r, arqDe) {
+  if (!r) return "";
+  const num = v => (v === "" || v == null ? null : Number(String(v).replace(",", ".")));
+  const T = num(r.temp), td = num(r.td);
+  return nomeDoDia({ data, T: Number.isFinite(T) ? T : null, faixaIdx: Number.isFinite(T) ? faixaIdx(T) : null,
+    td: Number.isFinite(T) && Number.isFinite(td) ? td : null, top1: arqDe.get(r.perfume) || null });
+}
+
 /** Grade estilo GitHub: colunas = semanas, linhas = seg→dom; cada dia tem metade de cima (Dia) e de baixo (Noite)
  *  na cor do arquétipo usado. Mostra as últimas 16 semanas até o fim do período. */
 export function calendario(hist, frascos, ate, de) {
   const arqDe = new Map(frascos.map(f => [f.nome, f.arquetipo]));
   const porDia = new Map();
-  for (const r of hist) { if (!porDia.has(r.data)) porDia.set(r.data, {}); porDia.get(r.data)[r.slot] = r.perfume; }
+  const regs = new Map();   // registro que dá nome ao dia: o do Dia (M); sem ele, o da Noite
+  for (const r of hist) {
+    if (!porDia.has(r.data)) porDia.set(r.data, {}); porDia.get(r.data)[r.slot] = r.perfume;
+    if (r.slot === "M" || !regs.has(r.data)) regs.set(r.data, r);
+  }
   const fim = new Date(ate + "T12:00:00");
   const iso = x => `${x.getFullYear()}-${String(x.getMonth() + 1).padStart(2, "0")}-${String(x.getDate()).padStart(2, "0")}`;
   const semanas = 16, ini = new Date(fim); ini.setDate(ini.getDate() - ((fim.getDay() + 6) % 7) - (semanas - 1) * 7);
@@ -247,7 +261,8 @@ export function calendario(hist, frascos, ate, de) {
     for (let d = 0; d < 7; d++) {
       const dt = new Date(ini); dt.setDate(ini.getDate() + w * 7 + d);
       const k = iso(dt), u = porDia.get(k) || {}, futuro = dt > fim, fora = de && k < de;
-      const info = `<b>${dt.toLocaleDateString("pt-BR", { weekday: "short", day: "2-digit", month: "2-digit" })}</b> · ☀︎ ${esc(u.M || "—")} · ☾ ${esc(u.N || "—")}`;
+      const nome = nomeDoRegistro(k, regs.get(k), arqDe);
+      const info = `<b>${dt.toLocaleDateString("pt-BR", { weekday: "short", day: "2-digit", month: "2-digit" })}</b> · ☀︎ ${esc(u.M || "—")} · ☾ ${esc(u.N || "—")}${nome ? `<br><i>${esc(nome)}</i>` : ""}`;
       dias += futuro ? `<span class="dia vazio"></span>` : `<button class="dia ${fora ? "fora" : ""} ${u.M || u.N ? "usado" : ""}" data-dia="${k}" data-info="${esc(info)}" aria-label="${esc(k)}"><span style="${cel(u.M)}"></span><span style="${cel(u.N)}"></span></button>`;
     }
     const mesW = new Date(ini); mesW.setDate(ini.getDate() + w * 7);

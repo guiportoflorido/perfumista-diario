@@ -4,82 +4,162 @@
   {
    "nome": "Mediterrâneo",
    "rotulo": "O Mediterrâneo",
-   "cor": "#D9B24A"
+   "cor": "#D9B24A",
+   "materiais": [
+    "Neroli",
+    "Bergamota",
+    "Limão-siciliano"
+   ]
   },
   {
    "nome": "Marinho",
    "rotulo": "O Marinho",
-   "cor": "#5F9EA8"
+   "cor": "#5F9EA8",
+   "materiais": [
+    "Sal",
+    "Maresia",
+    "Alga"
+   ]
   },
   {
    "nome": "Minimalista",
    "rotulo": "O Minimalista",
-   "cor": "#AEB3B0"
+   "cor": "#AEB3B0",
+   "materiais": [
+    "Almíscar",
+    "Ambroxan",
+    "Algodão"
+   ]
   },
   {
    "nome": "Botânico",
    "rotulo": "O Botânico",
-   "cor": "#7C9A5E"
+   "cor": "#7C9A5E",
+   "materiais": [
+    "Gálbano",
+    "Folha Verde",
+    "Chá"
+   ]
   },
   {
    "nome": "Barbeiro",
    "rotulo": "O Barbeiro",
-   "cor": "#8F8FBF"
+   "cor": "#8F8FBF",
+   "materiais": [
+    "Fougère",
+    "Lavanda",
+    "Musgo"
+   ]
   },
   {
    "nome": "Geólogo",
    "rotulo": "O Geólogo",
-   "cor": "#7E8B93"
+   "cor": "#7E8B93",
+   "materiais": [
+    "Vetiver",
+    "Sílex",
+    "Pimenta"
+   ]
   },
   {
    "nome": "Chiprista",
    "rotulo": "O Chiprista",
-   "cor": "#A9985A"
+   "cor": "#A9985A",
+   "materiais": [
+    "Chypre",
+    "Patchouli",
+    "Musgo de Carvalho"
+   ]
   },
   {
    "nome": "Florista Branco",
    "rotulo": "O Florista Branco",
-   "cor": "#D8D2C4"
+   "cor": "#D8D2C4",
+   "materiais": [
+    "Jasmim",
+    "Tuberosa",
+    "Flor de Laranjeira"
+   ]
   },
   {
    "nome": "Rosal",
    "rotulo": "O Rosal",
-   "cor": "#B56A78"
+   "cor": "#B56A78",
+   "materiais": [
+    "Rosa",
+    "Peônia",
+    "Gerânio"
+   ]
   },
   {
    "nome": "Empoado",
    "rotulo": "O Empoado",
-   "cor": "#C1A9B8"
+   "cor": "#C1A9B8",
+   "materiais": [
+    "Íris",
+    "Violeta",
+    "Pó de Arroz"
+   ]
   },
   {
    "nome": "Marceneiro",
    "rotulo": "O Marceneiro",
-   "cor": "#A87B4F"
+   "cor": "#A87B4F",
+   "materiais": [
+    "Cedro",
+    "Sândalo",
+    "Serragem"
+   ]
   },
   {
    "nome": "Monge",
    "rotulo": "O Monge",
-   "cor": "#8C8478"
+   "cor": "#8C8478",
+   "materiais": [
+    "Incenso",
+    "Olíbano",
+    "Mirra"
+   ]
   },
   {
    "nome": "Curtidor",
    "rotulo": "O Curtidor",
-   "cor": "#8A5A3C"
+   "cor": "#8A5A3C",
+   "materiais": [
+    "Couro",
+    "Camurça",
+    "Bétula"
+   ]
   },
   {
    "nome": "Sultão",
    "rotulo": "O Sultão",
-   "cor": "#6E4A63"
+   "cor": "#6E4A63",
+   "materiais": [
+    "Oud",
+    "Âmbar",
+    "Açafrão"
+   ]
   },
   {
    "nome": "Lareira",
    "rotulo": "A Lareira",
-   "cor": "#C07A3A"
+   "cor": "#C07A3A",
+   "materiais": [
+    "Fumaça",
+    "Tabaco",
+    "Brasa"
+   ]
   },
   {
    "nome": "Confeiteiro",
    "rotulo": "O Confeiteiro",
-   "cor": "#C98A8A"
+   "cor": "#C98A8A",
+   "materiais": [
+    "Baunilha",
+    "Tonka",
+    "Caramelo"
+   ]
   }
  ],
  "gaps": [

@@ -572,3 +572,6 @@ select[disabled], input[readonly], textarea[readonly] { opacity: .75; }
 .selo-grade:focus-visible { outline: 2px solid var(--acento); }
 .versao, .selo-grade { white-space: nowrap; }
 @media (max-width: 420px) { h1 span:not(.marca) { display: none; } }
+
+/* nome do dia: subtítulo do Hoje */
+.nome-dia { margin: 2px 0 12px; font: italic 500 15.5px/1.35 var(--f-texto); color: var(--suave); letter-spacing: -.005em; }
