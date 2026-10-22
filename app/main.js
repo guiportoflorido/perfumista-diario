@@ -1,5 +1,5 @@
 // main.js — orquestra as telas: Hoje, Registrar e Ajustes (Coleção, Playbook e Histórico entram na fase 4).
-import { rodar, avaliar, vivoAte, porque, sprays, CFG, FAIXAS, OCASIOES, fmtH } from "../engine/index.js";
+import { rodar, avaliar, vivoAte, porque, sprays, CFG, FAIXAS, FAIXAS_CURTAS, OCASIOES, fmtH } from "../engine/index.js";
 import { ajustes, salvarAjustes, AJUSTES_PADRAO, estadoDia, salvarDia, hojeISO } from "./store.js";
 import { buscarPrevisao, buscarMetar, derivarClima, horaNum } from "./clima.js";
 import { montarEntrada, OCAS_DIA, OCAS_NOITE, AMBIENTES, EXTRAS } from "./entrada.js";
@@ -18,11 +18,12 @@ import { telaAmostras, fichaAmostra, deLinhas as amostrasDeLinhas, juntar, semRe
   adicionarAmostra, editarAmostra, removerAmostra, novoId } from "./amostras.js";
 import { ler, gravar } from "./store.js";
 import { storiesDoMes, abrirWrapped, MESES } from "./wrapped.js";
-import { lerDuelos, duelosUnificados, pareamento, elo, fmtElo, filaDuelos, adicionarDuelo, enviarDuelos, telaDuelo, blocoDuelos } from "./duelo.js";
+import { lerDuelos, duelosUnificados, pareamento, elo, fmtElo, filaDuelos, adicionarDuelo, enviarDuelos, telaDuelo, blocoDuelos, telaRanking,
+  gerarCenario, textoCenario, periodoDaHora, CHUVAS, MAE_DA_SUB, brilhaCai, rotuloValor } from "./duelo.js";
 import { fotoFicha, iconeFicha, fotoMini, reduzirImagem, subirFoto, removerFotoPlanilha, iniciarFotos } from "./fotos.js";
 
-export const APP_VERSAO = "5.37";  // sobe a cada publicação: confere no topo da tela se o celular pegou a versão nova
-const S = { motionOk: !movimentoPedePermissao() && "DeviceMotionEvent" in globalThis, aba: "hoje", frascos: [], frascosAtivos: [], avisosTiers: null, medidos: [], fichas: {}, versao: {}, prev: null, prevOffline: false,
+export const APP_VERSAO = "5.38";  // sobe a cada publicação: confere no topo da tela se o celular pegou a versão nova
+const S = { dueloModo: ler("dueloModo", "agora"), rkFiltro: ler("rkFiltro", {}), cenario: null, motionOk: !movimentoPedePermissao() && "DeviceMotionEvent" in globalThis, aba: "hoje", frascos: [], frascosAtivos: [], avisosTiers: null, medidos: [], fichas: {}, versao: {}, prev: null, prevOffline: false,
   prevErro: null, metar: null, metarMotivo: null, clima: null, resultado: null, erroMotor: null, entrada: "", carregandoClima: true,
   sync: { estado: "ocioso", msg: "" }, hr: ler("hr", { preset: "tudo" }), tokenNovo: null, playbook: null, janelas: new Map(),
   filtro: ler("filtro", {}), pbFaixa: null, arquetipos: [], gaps: [], sub: carregarSub(), exp: ler("exp", "tudo"), sim: null, verGaps: false,
@@ -33,7 +34,7 @@ const ajSpray = () => ler("sprays_ajuste", { ativo: false, geral: 0, por: {} });
 // ───────────────────────── 5 abas na barra; S.aba continua com os 8 valores de sempre ─────────────────────────
 // Grupos com sub-abas: Coleção (Roda · Lista · Playbook) · Mercado (Mercado · Amostras) · Mais (Histórico · Ajustes).
 // S.sub guarda a última sub-aba de cada grupo (reabre nela). Coleção absorve o antigo colModo (roda/lista).
-const SUBS = { colecao: [["roda", "Roda"], ["lista", "Lista"], ["playbook", "Playbook"], ["duelo", "Duelo"]],
+const SUBS = { colecao: [["roda", "Roda"], ["lista", "Lista"], ["playbook", "Playbook"], ["duelo", "Duelo"], ["ranking", "Ranking"]],
   mercado: [["mercado", "Mercado"], ["amostras", "Amostras"]], mais: [["historico", "Histórico"], ["ajustes", "Ajustes"]] };
 function carregarSub() {
   const s = ler("sub", null);
@@ -44,10 +45,10 @@ function carregarSub() {
   return novo;
 }
 function grupoDe(aba) {
-  return { colecao: "colecao", playbook: "colecao", duelo: "colecao", mercado: "mercado", amostras: "mercado", historico: "mais", ajustes: "mais" }[aba] || aba;
+  return { colecao: "colecao", playbook: "colecao", duelo: "colecao", ranking: "colecao", mercado: "mercado", amostras: "mercado", historico: "mais", ajustes: "mais" }[aba] || aba;
 }
 function abaDe(grupo, sub) {
-  if (grupo === "colecao") return sub === "playbook" || sub === "duelo" ? sub : "colecao";
+  if (grupo === "colecao") return ["playbook", "duelo", "ranking"].includes(sub) ? sub : "colecao";
   if (grupo === "mercado" || grupo === "mais") return SUBS[grupo].some(([v]) => v === sub) ? sub : SUBS[grupo][0][0];
   return grupo;
 }
@@ -56,7 +57,7 @@ function irPara(aba) {
   S.aba = aba;
   const g = grupoDe(aba);
   if (SUBS[g] && aba !== "colecao") { S.sub = { ...S.sub, [g]: aba }; gravar("sub", S.sub); }
-  else if (aba === "colecao" && (S.sub.colecao === "playbook" || S.sub.colecao === "duelo")) { S.sub = { ...S.sub, colecao: "roda" }; gravar("sub", S.sub); }
+  else if (aba === "colecao" && ["playbook", "duelo", "ranking"].includes(S.sub.colecao)) { S.sub = { ...S.sub, colecao: "roda" }; gravar("sub", S.sub); }
 }
 /** Controle segmentado logo abaixo do h2 das telas agrupadas. */
 function segmentosGrupo(grupo) {
@@ -207,7 +208,7 @@ function render() {
   };
   try {
     let html = ({ hoje: telaHoje, registrar: telaRegistrar, ajustes: telaAjustes,
-      colecao: () => telaColecaoTudo(ctx), duelo: telaDueloAba, mercado: telaMercadoAba, amostras: telaAmostrasAba, playbook: () => telaPlaybook(ctx), historico: () => telaHistorico(ctx) }[S.aba])();
+      colecao: () => telaColecaoTudo(ctx), duelo: telaDueloAba, ranking: () => telaRanking({ duelos: duelosTodos(), frascos: S.frascosAtivos, filtro: S.rkFiltro }), mercado: telaMercadoAba, amostras: telaAmostrasAba, playbook: () => telaPlaybook(ctx), historico: () => telaHistorico(ctx) }[S.aba])();
     // telas agrupadas: segmentos (sub-abas) logo abaixo do 1º h2; o h2 continua com o nome da sub-aba
     if (SUBS[grupo]) html = html.replace("</h2>", `</h2>${segmentosGrupo(grupo)}`);
     $("#tela").innerHTML = html;
@@ -832,27 +833,48 @@ function blocoWrapped() {
 }
 
 // ───────────────────────── duelo (Coleção › Duelo) ─────────────────────────
-/** Par atual (nomes) guardado na sessão: redesenhar a tela não troca o par; escolher ou pular, sim. */
+/** Par atual (nomes) guardado na sessão: redesenhar a tela não troca o par; escolher ou pular, sim. No modo Cenário,
+ *  o cenário também fica na sessão e o pareamento prefere pares de resultado incerto nele. */
+function cenarioAtual() {
+  if (S.dueloModo !== "cenario") return null;
+  if (!S.cenario) S.cenario = gerarCenario(duelosTodos());
+  return S.cenario;
+}
 function parDuelo() {
   const fs = S.frascosAtivos, ok = n => fs.some(f => f.nome === n);
-  if (!S.parDuelo || !S.parDuelo.every(ok)) S.parDuelo = pareamento(fs, duelosTodos())?.map(f => f.nome) || null;
+  if (!S.parDuelo || !S.parDuelo.every(ok)) S.parDuelo = pareamento(fs, duelosTodos(), Math.random, cenarioAtual())?.map(f => f.nome) || null;
   return S.parDuelo && S.parDuelo.map(n => fs.find(f => f.nome === n));
 }
 function telaDueloAba() {
-  const hoje = hojeISO();
-  return telaDuelo({ par: parDuelo(), nHoje: duelosTodos().filter(d => d.data === hoje).length,
+  const hoje = hojeISO(), cen = cenarioAtual();
+  return telaDuelo({ par: parDuelo(), nHoje: duelosTodos().filter(d => d.data === hoje).length, modo: S.dueloModo, cenario: cen,
     foto: f => iconeFicha(doMercado(f.casa, f.nome), arqIcone(f.arquetipo, 40)) });
 }
+/** Condições reais do momento (modo Agora): faixa e Td do slot da hora, chuva do dia, período pela hora, ocasião dominante. */
+function condicoesAgora(agora) {
+  const c = S.clima, cod = slotDaHora(), so = slotHoraRes();
+  const fx = (cod === "N" ? c?.faixaNoite : c?.faixaDia)?.idx, banda = c?.Td?.banda;
+  return { fx, temp: fx != null ? FAIXAS_CURTAS[fx] : "", td: banda && banda !== "nd" ? banda : "", chuva: c?.chuva ? CHUVAS[c.chuva.v] || "" : "",
+    periodo: periodoDaHora(agora.getHours()), ocasiao: so ? ocasiaoDominante(so) : "", slot: cod };
+}
+/** i = 0 | 1 (vencedor) ou "=" (tanto faz). */
 function escolherDuelo(i) {
   const par = parDuelo();
   if (!par || S.dueloAnimando) return;
-  const [a, b] = par, v = par[i], agora = new Date(), cod = slotDaHora(), c = S.clima;
-  const fx = (cod === "N" ? c?.faixaNoite : c?.faixaDia)?.idx;
-  adicionarDuelo({ data: hojeISO(), hora: agora.toTimeString().slice(0, 8), a: a.nome, b: b.nome, vencedor: v.nome,
-    contexto: [fx != null ? `faixa ${fx}` : "", cod === "N" ? "Noite" : "Dia", a.arquetipo === b.arquetipo ? "mesmo arquétipo" : "arquétipos diferentes"].filter(Boolean).join(" · ") });
+  const [a, b] = par, agora = new Date(), empate = i === "=";
+  const base = { data: hojeISO(), hora: agora.toTimeString().slice(0, 8), a: a.nome, b: b.nome, vencedor: empate ? "=" : par[i].nome };
+  const mesmo = a.arquetipo === b.arquetipo ? "mesmo arquétipo" : "arquétipos diferentes";
+  if (S.dueloModo === "cenario" && S.cenario) {
+    const c = S.cenario;
+    adicionarDuelo({ ...base, modo: "cenario", contexto: textoCenario(c), temp: c.temp, td: c.td, chuva: c.chuva, periodo: c.periodo, ocasiao: c.ocasiao, sub: c.sub });
+  } else {
+    const c = condicoesAgora(agora);
+    adicionarDuelo({ ...base, modo: "agora", temp: c.temp, td: c.td, chuva: c.chuva, periodo: c.periodo, ocasiao: c.ocasiao, sub: "",
+      contexto: [c.fx != null ? `faixa ${c.fx}` : "", c.slot === "N" ? "Noite" : "Dia", mesmo].filter(Boolean).join(" · ") });
+  }
   const cards = document.querySelectorAll(".duelo-card");
-  const proximo = () => { S.dueloAnimando = false; S.parDuelo = null; render(); };
-  if (matchMedia("(prefers-reduced-motion: reduce)").matches || !cards.length) { proximo(); return; }
+  const proximo = () => { S.dueloAnimando = false; S.parDuelo = null; S.cenario = null; render(); };
+  if (empate || matchMedia("(prefers-reduced-motion: reduce)").matches || !cards.length) { proximo(); return; }
   S.dueloAnimando = true;
   cards[i].classList.add("vence"); cards[1 - i].classList.add("perde");
   setTimeout(proximo, 480);
@@ -994,8 +1016,11 @@ function abrirFicha(nome) {
       ${(() => { const its = (S.resultado?.slots || []).map(so => [so, itemDoDia(so, nome)]).filter(([, t]) => t);
         return its.length ? `<dt>Hoje</dt><dd class="ficha-pq">${its.map(([so, t]) => { const pos = so.ranking.findIndex(x => x.nome === nome) + 1;
           return `${so.nome === "Dia" ? "☀︎ Dia" : "☾ Noite"}${pos ? ` · #${pos}` : ""} · score <b>${t.score.toFixed(0)}</b>${porqueHTML(t)}`; }).join("")}</dd>` : ""; })()}
-      ${(() => { const e = elo(duelosTodos(), S.frascosAtivos).get(nome);
-        return e?.n ? `<dt>Duelos</dt><dd>Elo ${fmtElo(e.rating)} · ${e.n} duelo${e.n > 1 ? "s" : ""} · ${e.vitorias} vitória${e.vitorias === 1 ? "" : "s"}${e.n < 5 ? ' <span class="nota">(Elo firma com 5+)</span>' : ""}</dd>` : ""; })()}
+      ${(() => { const ds = duelosTodos(), e = elo(ds, S.frascosAtivos).get(nome);
+        if (!e?.n) return "";
+        const bc = brilhaCai(ds, nome), it = x => `${esc(rotuloValor(x.k, x.v))} <b>${x.efeito > 0 ? "+" : "−"}${Math.round(Math.abs(x.efeito))}</b> <span class="nota">(${x.n})</span>`;
+        return `<dt>Duelos</dt><dd>Rating ${fmtElo(e.rating)} · ${e.n} duelo${e.n > 1 ? "s" : ""} · ${e.vitorias} vitória${e.vitorias === 1 ? "" : "s"}${e.n < 5 ? ' <span class="nota">(firma com 5+)</span>' : ""}
+          ${bc.brilha.length || bc.cai.length ? `<br>Onde brilha: ${bc.brilha.map(it).join(" · ") || "—"}<br>Onde cai: ${bc.cai.map(it).join(" · ") || "—"}` : ""}</dd>`; })()}
       <dt>Vizinhos</dt><dd>${esc(fi.vizinhos)}</dd>
       <dt>Leitura</dt><dd>${esc(fi.leitura)}</dd>
       <dt>Uso</dt><dd>${ult ? `último em ${esc(ult.data)} (${slotNome(ult.slot)}) · ${usos.length} registro${usos.length > 1 ? "s" : ""} no diário` : "sem registro no diário"}</dd>
@@ -1157,6 +1182,17 @@ document.addEventListener("click", async e => {
   if (b.dataset.acao === "wrapped") { abrirWrappedMes(b.dataset.mes); render(); return; }
   if (b.dataset.dueloVence) { escolherDuelo(Number(b.dataset.dueloVence)); return; }
   if (b.dataset.acao === "duelo-pular") { S.parDuelo = null; render(); return; }
+  if (b.dataset.acao === "duelo-empate") { escolherDuelo("="); return; }
+  if (b.dataset.acao === "duelo-cenario") { S.cenario = null; S.parDuelo = null; render(); return; }
+  if (b.dataset.dueloModo) { S.dueloModo = b.dataset.dueloModo; gravar("dueloModo", S.dueloModo); S.cenario = null; S.parDuelo = null; render(); return; }
+  if (b.dataset.rkDim) {
+    const k = b.dataset.rkDim, v = b.dataset.rkVal, f = { ...S.rkFiltro };
+    if (f[k] === v) delete f[k]; else f[k] = v;
+    if (k === "sub" && f.sub) f.ocasiao = MAE_DA_SUB[f.sub];                       // a situação traz a ocasião-mãe
+    if (k === "ocasiao" && f.sub && MAE_DA_SUB[f.sub] !== f.ocasiao) delete f.sub;
+    S.rkFiltro = f; gravar("rkFiltro", f); render(); return;
+  }
+  if (b.dataset.acao === "rk-limpar") { S.rkFiltro = {}; gravar("rkFiltro", {}); render(); return; }
   if (b.dataset.acao === "ativar-chacoalho") {
     S.motionOk = await pedirMovimento();
     render(); toast(S.motionOk ? "Chacoalhe para sortear." : "Sem permissão de movimento: use “Me surpreenda”.");

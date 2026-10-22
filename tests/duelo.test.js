@@ -1,7 +1,7 @@
 // Duelo “Qual dos dois?”: pareamento por prioridade e balanceamento, Elo determinístico a partir do log, aba Duelos no backend.
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { pareamento, elo, lerDuelos, duelosUnificados, descompassos } from "../app/duelo.js";
+import { pareamento, elo, lerDuelos, duelosUnificados, descompassos, powerRanking, gerarCenario, cenarioValido, brilhaCai, ajustar } from "../app/duelo.js";
 import { carregarBackend } from "../tools/planilha_falsa.mjs";
 
 const F = (nome, arquetipo, tier, extra = {}) => ({ nome, arquetipo, tier, camada: "grade", ...extra });
@@ -29,23 +29,75 @@ test("pareamento: com o par já visto, prefere pares menos vistos (mesmo arquét
   assert.ok(!["X1+X2", "X1+X3", "X2+X3"].includes(nomes(q)), nomes(q));
 });
 
-test("elo: log vazio → 1500 e n 0; determinístico; vitória sobe o vencedor e desce o perdedor", () => {
+test("1 · sem duelos: todos em 1500, n 0", () => {
   const m0 = elo([], fs);
   assert.deepEqual(m0.get("X1"), { rating: 1500, n: 0, vitorias: 0 });
-  const log = [D("X1", "X2", "X1"), D("X2", "Y1", "Y1")];
-  assert.deepEqual([...elo(log, fs)], [...elo(log, fs)]);
-  const m = elo([D("X1", "X2", "X1")], fs);
-  assert.equal(m.get("X1").rating, 1516); assert.equal(m.get("X2").rating, 1484);
-  assert.equal(m.get("X1").vitorias, 1); assert.equal(m.get("X2").n, 1);
+  for (const x of powerRanking([], fs)) { assert.equal(x.rating, 1500); assert.equal(x.delta_vs_geral, 0); }
 });
 
-test("elo: K = 32 nos 10 primeiros duelos do frasco, depois 16", () => {
-  // X1 e X2 se alternam vencendo: depois de 10 duelos cada, o 11º move metade
-  const log = Array.from({ length: 10 }, (_, i) => D("X1", "X2", i % 2 ? "X2" : "X1"));
-  const antes = elo(log, fs).get("X1").rating;
-  const depois = elo([...log, D("X1", "X2", "X1")], fs).get("X1").rating;
-  const e = 1 / (1 + 10 ** ((elo(log, fs).get("X2").rating - antes) / 400));
-  assert.ok(Math.abs((depois - antes) - 16 * (1 - e)) < 1e-9);
+test("2 · embaralhar o log não muda o resultado", () => {
+  const log = [D("X1", "X2", "X1"), { ...D("X2", "Y1", "Y1"), temp: "Q" }, { ...D("X1", "Y1", "="), periodo: "Noite" }, D("X3", "X1", "X3")];
+  const r1 = [...elo(log, fs)], r2 = [...elo([log[2], log[0], log[3], log[1]], fs)];
+  assert.deepEqual(r1, r2);
+  assert.deepEqual(powerRanking(log, fs, { temp: "Q" }), powerRanking([...log].reverse(), fs, { temp: "Q" }));
+});
+
+test("3 · filtro por um valor sem nenhum duelo = ranking Geral", () => {
+  const log = [{ ...D("X1", "X2", "X1"), temp: "Q" }, { ...D("X2", "Y1", "X2"), temp: "A" }, D("Y1", "Z1", "Y1")];
+  const geral = powerRanking(log, fs), filtro = powerRanking(log, fs, { temp: "MF" });
+  assert.deepEqual(filtro.map(x => [x.nome, x.rating]), geral.map(x => [x.nome, x.rating]));
+  assert.ok(filtro.every(x => x.n_recorte === 0 && x.delta_vs_geral === 0));
+});
+
+test("4 · A vence B 10× no MQ e perde 10× no F: acima no MQ, abaixo no F, perto do empate no Geral", () => {
+  const log = [...Array.from({ length: 10 }, () => ({ ...D("X1", "X2", "X1"), temp: "MQ" })), ...Array.from({ length: 10 }, () => ({ ...D("X1", "X2", "X2"), temp: "F" }))];
+  const r = filtro => Object.fromEntries(powerRanking(log, fs, filtro).map(x => [x.nome, x]));
+  assert.ok(r({ temp: "MQ" }).X1.rating > r({ temp: "MQ" }).X2.rating + 50);
+  assert.ok(r({ temp: "F" }).X1.rating < r({ temp: "F" }).X2.rating - 50);
+  assert.ok(Math.abs(r({}).X1.rating - r({}).X2.rating) < 1);
+  assert.equal(r({ temp: "MQ" }).X1.n_recorte, 10);
+  const bc = brilhaCai(log, "X1");
+  assert.equal(bc.brilha[0].v, "MQ"); assert.equal(bc.cai[0].v, "F");
+});
+
+test("5 · empate conta como 0,5 (fica entre vitória e derrota, e ninguém sai do lugar)", () => {
+  const e = elo([D("X1", "X2", "=")], fs);
+  assert.ok(Math.abs(e.get("X1").rating - 1500) < 1e-6 && Math.abs(e.get("X2").rating - 1500) < 1e-6);
+  assert.equal(e.get("X1").vitorias, 0); assert.equal(e.get("X1").n, 1);
+  const v = elo([D("X1", "X2", "X1")], fs), dv = elo([D("X1", "X2", "X2")], fs);
+  assert.ok(v.get("X1").rating > 1500 && dv.get("X1").rating < 1500);
+  assert.ok(Math.abs((v.get("X1").rating - 1500) + (dv.get("X1").rating - 1500)) < 1e-6);
+});
+
+test("6 · linha antiga “faixa 2 · Dia · …” → modo agora, temp A, período pela hora", () => {
+  const [d] = lerDuelos([["Data", "Hora", "A", "B", "Vencedor", "Contexto"], ["2026-10-20", "21:05:00", "X1", "X2", "X2", "faixa 2 · Dia · mesmo arquétipo"]]);
+  assert.deepEqual([d.modo, d.temp, d.periodo, d.td, d.chuva, d.ocasiao, d.sub], ["agora", "A", "Noite", "", "", "", ""]);
+  const [n] = lerDuelos([["Data"], ["2026-10-21", "14:00:00", "X1", "X2", "=", "", "cenario", "Q", "carregado", "pancada", "Tarde", "T.Inf", "almoço de trabalho"]]);
+  assert.deepEqual([n.vencedor, n.modo, n.temp, n.sub], ["=", "cenario", "Q", "almoço de trabalho"]);
+});
+
+test("7 · 5.000 cenários sorteados, nenhum vetado; texto com números concretos", () => {
+  let s = 7;
+  const aleatorio = () => ((s = (s * 1103515245 + 12345) % 2147483648) / 2147483648);
+  const vistos = new Set();
+  for (let i = 0; i < 5000; i++) {
+    const c = gerarCenario([], aleatorio);
+    assert.ok(cenarioValido(c), JSON.stringify(c));
+    vistos.add(c.sub);
+  }
+  assert.ok(vistos.size >= 20, `só ${vistos.size} sub-ocasiões`);
+  assert.equal(cenarioValido({ periodo: "Madrugada", temp: "Q" }), false);
+  assert.equal(cenarioValido({ periodo: "Tarde", temp: "A", chuva: "continua", sub: "praia/piscina", ocasiao: "Lazer" }), false);
+  assert.equal(cenarioValido({ periodo: "Noite", temp: "A", sub: "home office", ocasiao: "Cozy D" }), false);
+});
+
+test("pareamento no modo Cenário prefere par de resultado incerto", () => {
+  // X1 sempre ganha de X2 no MQ: com o cenário MQ, o par X1×X2 fica previsível e perde para X1×X3 / X2×X3 empatados em vistos
+  const log = Array.from({ length: 6 }, () => ({ ...D("X1", "X2", "X1"), temp: "MQ" }));
+  const sem = pareamento(fs, [], fixo(0)), com = pareamento(fs, log.slice(0, 0), fixo(0), { temp: "MQ" });
+  assert.equal(nomes(sem), nomes(com));   // sem duelos, p̂ = 0,5 em todo par: igual ao modo Agora
+  const ajuste = ajustar(log);
+  assert.ok(ajuste.score("X1", { temp: "MQ" }) > ajuste.score("X2", { temp: "MQ" }));
 });
 
 test("lerDuelos / unificar com a fila / descompassos", () => {
@@ -65,9 +117,29 @@ test("backend: duelo_registrar cria a aba Duelos, não duplica no reenvio e vali
   assert.deepEqual(b.post({ token: "dev", acao: "dados" }).dados.duelos, []);
   const l = { id: "a", data: "2026-10-20", hora: "21:05", a: "Odéon", b: "Liwa", vencedor: "Liwa", contexto: "faixa 3 · Noite · mesmo arquétipo" };
   assert.equal(b.post({ token: "dev", acao: "duelo_registrar", linhas: [l] }).ok, true);
-  assert.deepEqual(abas["Duelos"], [["Data", "Hora", "A", "B", "Vencedor", "Contexto"], ["2026-10-20", "21:05", "Odéon", "Liwa", "Liwa", "faixa 3 · Noite · mesmo arquétipo"]]);
+  assert.deepEqual(abas["Duelos"], [["Data", "Hora", "A", "B", "Vencedor", "Contexto", "Modo", "Temp", "Td", "Chuva", "Período", "Ocasião", "Sub"],
+    ["2026-10-20", "21:05", "Odéon", "Liwa", "Liwa", "faixa 3 · Noite · mesmo arquétipo", "agora", "", "", "", "", "", ""]]);
   assert.deepEqual(b.post({ token: "dev", acao: "duelo_registrar", linhas: [l] }).gravadas, [{ id: "a", duplicada: true }]);
   assert.equal(abas["Duelos"].length, 2);
   assert.equal(b.post({ token: "dev", acao: "duelo_registrar", linhas: [{ ...l, vencedor: "Outro" }] }).ok, false);
   assert.equal(b.post({ token: "dev", acao: "duelos" }).duelos.length, 2);
+});
+
+test("8 · backend: aceita empate “=” e o cenário, rejeita valor fora da lista, migra o cabeçalho de 6 colunas sem duplicar", () => {
+  const velha = [["Data", "Hora", "A", "B", "Vencedor", "Contexto"], ["2026-10-19", "10:00", "Odéon", "Liwa", "Odéon", "faixa 2 · Dia"]];
+  const abas = { "Tiers": [["Casa", "Perfume"]], "Diário": [["Data"]], "Duelos": velha.map(r => [...r]) };
+  const b = carregarBackend(abas);
+  const l = { id: "c", data: "2026-10-21", hora: "14:00:00", a: "Odéon", b: "Liwa", vencedor: "=", contexto: "Quinta, 14h · 29°C", modo: "cenario",
+    temp: "Q", td: "carregado", chuva: "pancada", periodo: "Tarde", ocasiao: "T.Inf", sub: "almoço de trabalho" };
+  assert.equal(b.post({ token: "dev", acao: "duelo_registrar", linhas: [l] }).ok, true);
+  assert.deepEqual(abas["Duelos"][0], ["Data", "Hora", "A", "B", "Vencedor", "Contexto", "Modo", "Temp", "Td", "Chuva", "Período", "Ocasião", "Sub"]);
+  assert.deepEqual(abas["Duelos"][2], ["2026-10-21", "14:00:00", "Odéon", "Liwa", "=", "Quinta, 14h · 29°C", "cenario", "Q", "carregado", "pancada", "Tarde", "T.Inf", "almoço de trabalho"]);
+  assert.equal(b.post({ token: "dev", acao: "duelo_registrar", linhas: [{ ...l, id: "d", hora: "15:00:00" }] }).ok, true);
+  assert.equal(abas["Duelos"][0].length, 13, "cabeçalho não duplica");
+  assert.equal(abas["Duelos"].filter(r => r[0] === "Data").length, 1);
+  for (const [k, v] of [["temp", "Morno"], ["chuva", "garoa"], ["periodo", "Manhã"], ["sub", "padaria"], ["modo", "teste"]])
+    assert.equal(b.post({ token: "dev", acao: "duelo_registrar", linhas: [{ ...l, id: "x" + k, hora: "16:00:00", [k]: v }] }).ok, false, k);
+  assert.equal(b.post({ token: "dev", acao: "duelo_registrar", linhas: [{ ...l, id: "y", hora: "17:00:00", ocasiao: "Lazer" }] }).ok, false, "sub de outra ocasião");
+  const lidos = lerDuelos(b.post({ token: "dev", acao: "duelos" }).duelos);
+  assert.equal(lidos.length, 3); assert.equal(lidos[0].temp, "A"); assert.equal(lidos[1].vencedor, "=");
 });
