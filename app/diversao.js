@@ -34,6 +34,12 @@ function complementoClima(c, semente) {
   return "";
 }
 
+/** Material que o nome do dia usa para essa data e esse arquétipo (o mesmo de nomeDoDia); null sem materiais. */
+export function materialDoDia(data, arquetipo) {
+  const mats = MATERIAIS[arquetipo] || [];
+  return mats.length ? escolher(mats, hashTxt(data + "|mat")) : null;
+}
+
 /** Nome do dia: <dia da semana> <de | Adjetivo de> <Material> <clima>. top1: {arquetipo} (ou o nome do arquétipo); sem
  *  top 1 fica só dia + clima; sem clima (chuva, faixa, T e Td nulos), só dia + material. */
 export function nomeDoDia({ data, faixaIdx = null, chuva = null, td = null, T = null, top1 = null }) {

@@ -153,7 +153,7 @@ export function blocoExportar(preset = "tudo") {
     <div id="expSaida"></div></div>`;
 }
 
-export function telaHistorico({ frascos, hist: histTodo, hoje, fila: filaToda, ajSpray, limiteEsq = 45, hr = {}, arqTag, limiteEdicao = "", exp = "tudo", raspadinha = "", duelos = "" }) {
+export function telaHistorico({ frascos, hist: histTodo, hoje, fila: filaToda, ajSpray, limiteEsq = 45, hr = {}, arqTag, limiteEdicao = "", exp = "tudo", raspadinha = "", duelos = "", wrapped = "" }) {
   const preset = hr.preset || "tudo";
   const { de, ate } = periodo(preset, hoje, hr.de, hr.ate);
   const dentro = r => (!de || r.data >= de) && r.data <= ate;
@@ -191,6 +191,7 @@ export function telaHistorico({ frascos, hist: histTodo, hoje, fila: filaToda, a
   </div>
   ${!doPeriodo && c.cobertura < 90 ? `<p class="nota">Diário com menos de 90 dias: não serve ainda para conclusões de desbaste sobre os B.</p>` : ""}
   ${recentes}
+  ${wrapped}
   ${calendario(histTodo.filter(deAnalise), frascos, ate, de)}
   ${passaporte(c.por, hist, frascos)}
   <div class="bloco"><h3>Mais usados</h3>${usados.length ? barras(usados.slice(0, 15).map(x => [`<button class="nome-inline" data-ficha="${esc(x.f.nome)}">${esc(x.f.nome)}</button>`, x.n]), usados[0].n) : `<p class="nota">Nenhum.</p>`}</div>

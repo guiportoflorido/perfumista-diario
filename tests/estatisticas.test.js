@@ -124,3 +124,50 @@ test("esquecido da semana: usável de maior score; só não-usáveis → o mais 
   assert.deepEqual(esquecidoDaSemana(esq, so2, "2026-W43"), { nome: "Liwa", dias: null, score: null, usavel: false, semana: "2026-W43" });
   assert.equal(esquecidoDaSemana([], so, "2026-W43"), null);
 });
+
+// ───────────── Wrapped do mês ─────────────
+test("resumoMes: mês vazio → tudo nulo", async () => {
+  const { resumoMes } = await import("../app/estatisticas.js");
+  const r = resumoMes([{ data: "2026-10-01", slot: "M", perfume: "Odéon" }], frascos, 2026, 11);
+  for (const k of ["total", "distintos", "frascoDoMes", "arquetipo", "maisQuente", "maisFrio", "resgates", "notaMedia", "sequencia", "subidao", "material"]) assert.equal(r[k], null, k);
+});
+
+test("resumoMes: frasco do mês, arquétipo dominante, extremos, resgates, nota e sequência sem repetir arquétipo", async () => {
+  const { resumoMes } = await import("../app/estatisticas.js");
+  const { definirMateriais } = await import("../app/diversao.js");
+  definirMateriais(JSON.parse(readFileSync(new URL("../data/arquetipos.json", import.meta.url))).arquetipos);
+  const R = (data, slot, perfume, extra = {}) => ({ data: `2026-${data}`, slot, perfume, ...extra });
+  const hist = [R("08-01", "M", "Odéon"), R("09-01", "M", "Liwa"), R("09-10", "M", "Decision"), R("09-20", "M", "Météore"), R("09-25", "M", "Tygar Extrait"), R("09-28", "M", "Bijou Zafran"),
+    // outubro: 20 registros de Dia/Noite (+ um de Esportes e um da camada custo, que não contam)
+    R("10-01", "M", "Météore", { temp: "25", notaDia: "4" }), R("10-01", "N", "Liwa"), R("10-02", "M", "Météore", { temp: "28", notaDia: "5" }), R("10-02", "N", "Odéon"),
+    R("10-03", "M", "Tygar Extrait", { temp: "31" }), R("10-03", "N", "Bijou Zafran"), R("10-04", "M", "Météore", { temp: "22", notaDia: "3" }), R("10-04", "N", "Liwa"),
+    R("10-05", "M", "Amyris Homme Extrait", { temp: "15" }), R("10-05", "N", "Decision"), R("10-06", "M", "Météore", { temp: "24" }), R("10-07", "M", "Odéon"),
+    R("10-07", "N", "Liwa"), R("10-08", "M", "Tygar Extrait"), R("10-09", "M", "Liwa"), R("10-10", "M", "Liwa"), R("10-12", "M", "Météore"),
+    R("10-13", "M", "Météore"), R("10-14", "M", "Decision"), R("10-15", "M", "Odéon"), R("10-15", "E", "Acqua Viva"), R("10-16", "M", "Acqua Viva")];
+  const r = resumoMes(hist, frascos, 2026, 10);
+  assert.equal(r.total, 20); assert.equal(r.distintos, 7); assert.equal(r.totalGrade, 70);
+  assert.deepEqual(r.frascoDoMes, { nome: "Météore", n: 6, nota: 4, arquetipo: "Geólogo" });
+  assert.deepEqual(r.arquetipo, { nome: "Geólogo", pct: 0.3 });
+  assert.deepEqual(r.maisQuente, { data: "2026-10-03", T: 31, perfume: "Tygar Extrait" });
+  assert.deepEqual(r.maisFrio, { data: "2026-10-05", T: 15, perfume: "Amyris Homme Extrait" });
+  assert.deepEqual(r.resgates, ["Odéon", "Amyris Homme Extrait"]);
+  assert.equal(r.notaMedia, 4);
+  assert.equal(r.sequencia, 8);
+  assert.equal(r.subidao, null);
+  assert.equal(r.dias.get("2026-10-05"), "Lareira"); assert.equal(r.dias.size, 14);
+  assert.ok(typeof r.material === "string");
+});
+
+test("storiesDoMes: 6 a 8 stories, pula campos nulos, termina na grade dos dias; mês vazio → nenhum", async () => {
+  const { storiesDoMes } = await import("../app/wrapped.js");
+  const base = { total: 20, distintos: 7, totalGrade: 70, frascoDoMes: { nome: "Météore", n: 6, nota: 4, arquetipo: "Geólogo" }, arquetipo: { nome: "Geólogo", pct: .3 },
+    maisQuente: { data: "2026-10-03", T: 31, perfume: "Tygar Extrait" }, maisFrio: { data: "2026-10-05", T: 15, perfume: "Amyris Homme Extrait" },
+    resgates: ["Odéon"], notaMedia: 4, sequencia: 8, subidao: { nome: "Liwa", de: 1500, para: 1540, ganho: 40 }, material: "Vetiver", dias: new Map([["2026-10-05", "Lareira"]]) };
+  const st = storiesDoMes(base, 2026, 10);
+  assert.equal(st.length, 8);
+  assert.equal(st.at(-1).numero, "Outubro foi Vetiver"); assert.equal(st.at(-1).dias.length, 31); assert.equal(st.at(-1).dias[4], "Lareira");
+  const pouco = storiesDoMes({ ...base, maisQuente: null, maisFrio: null, resgates: null, subidao: null }, 2026, 10);
+  assert.equal(pouco.length, 6);
+  for (const s of pouco) assert.ok(!/\bnull\b|undefined|NaN/.test(s.numero + s.frase), s.rotulo);
+  assert.deepEqual(storiesDoMes({ total: null }, 2026, 11), []);
+});

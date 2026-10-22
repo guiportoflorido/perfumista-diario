@@ -2,6 +2,7 @@
 // A camada custo fica fora de toda estatística (regra dele); Bedouin Rose (D) fica fora da grade.
 import { diasEntre, faixaIdx, OCASIOES } from "../engine/index.js";
 import { ROT_OC } from "./util.js";
+import { materialDoDia } from "./diversao.js";
 
 /** Análises só contam Dia (M) e Noite (N); Esportes (E) e 2ª aplicação (M2/N2) ficam só no registro (decisão dele, 18/out/2026). */
 export const deAnalise = r => r.slot === "M" || r.slot === "N";
@@ -181,4 +182,70 @@ export function ajustarSprays(f, sprModelo, aj) {
   if (!extra) return sprModelo;
   const teto = TETO_BEAST[f.nome] ?? (f.edt ? 5 : 4);
   return Math.max(1, Math.min(sprModelo + extra, Math.max(teto, sprModelo)));
+}
+
+// ───────────────────────── Wrapped do mês ─────────────────────────
+/** Resumo de um mês (mes 1–12) para o Wrapped. Só Dia e Noite, só frascos da grade. Campo sem dado = null (o story
+ *  correspondente é pulado). `duelos` (opcional, do Elo) dá o maior subidão do mês; `eloDe(duelos)` → Map nome → {rating}. */
+export function resumoMes(hist, frascos, ano, mes, { duelos = [], eloDe = null } = {}) {
+  const pref = `${ano}-${String(mes).padStart(2, "0")}`;
+  const grade = new Map(frascos.filter(daGrade).map(f => [f.nome, f]));
+  const doMes = hist.filter(r => deAnalise(r) && grade.has(r.perfume) && r.data.startsWith(pref));
+  const nulo = { total: null, distintos: null, totalGrade: grade.size, frascoDoMes: null, arquetipo: null, maisQuente: null, maisFrio: null,
+    resgates: null, notaMedia: null, sequencia: null, subidao: null, material: null, dias: new Map() };
+  if (!doMes.length) return nulo;
+  const num = v => { const n = v === "" || v == null ? NaN : Number(String(v).replace(",", ".")); return Number.isFinite(n) ? n : null; };
+  // frasco do mês: mais usos; empate → maior NotaDia média
+  const por = new Map();
+  for (const r of doMes) {
+    const c = por.get(r.perfume) || { n: 0, notas: [] };
+    c.n++; const nt = notaNum(r.notaDia); if (nt != null) c.notas.push(nt); por.set(r.perfume, c);
+  }
+  const media = a => (a.length ? a.reduce((x, y) => x + y, 0) / a.length : null);
+  const [nomeTop, cTop] = [...por].sort((a, b) => b[1].n - a[1].n || (media(b[1].notas) ?? -1) - (media(a[1].notas) ?? -1) || a[0].localeCompare(b[0], "pt"))[0];
+  // arquétipo dominante
+  const porArq = new Map();
+  for (const r of doMes) { const a = grade.get(r.perfume).arquetipo; porArq.set(a, (porArq.get(a) || 0) + 1); }
+  const [arq, nArq] = [...porArq].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0], "pt"))[0];
+  // extremos de temperatura (Temp do registro)
+  const comT = doMes.map(r => ({ r, T: num(r.temp) })).filter(x => x.T != null);
+  const ext = sinal => { if (!comT.length) return null; const x = [...comT].sort((a, b) => sinal * (b.T - a.T) || (a.r.data < b.r.data ? -1 : 1))[0]; return { data: x.r.data, T: x.T, perfume: x.r.perfume }; };
+  // resgates: 1º uso no mês de um frasco parado há 45+ dias (ou nunca usado, se o diário já cobria 45 dias antes)
+  const antes = hist.filter(r => deAnalise(r) && r.data < pref + "-01");
+  const inicioDiario = hist.filter(deAnalise).reduce((m, r) => (!m || r.data < m ? r.data : m), null);
+  const resgates = [];
+  for (const nome of por.keys()) {
+    const pri = doMes.find(r => r.perfume === nome).data;
+    const ult = antes.filter(r => r.perfume === nome).reduce((m, r) => (!m || r.data > m ? r.data : m), null);
+    if (ult ? diasEntre(pri, ult) >= 45 : diasEntre(pri, inicioDiario) >= 45) resgates.push(nome);
+  }
+  // NotaDia média do mês
+  const notas = doMes.map(r => notaNum(r.notaDia)).filter(n => n != null);
+  // dias: arquétipo do dia (Dia; sem Dia, a Noite) e sequência máxima de dias seguidos sem repetir o arquétipo do dia anterior
+  const arqsDia = new Map();
+  for (const r of doMes) { const a = grade.get(r.perfume).arquetipo; if (!arqsDia.has(r.data)) arqsDia.set(r.data, new Set()); arqsDia.get(r.data).add(a); }
+  const dias = new Map([...arqsDia.keys()].sort().map(d => [d, (doMes.find(r => r.data === d && r.slot === "M") || doMes.find(r => r.data === d)).perfume]).map(([d, p]) => [d, grade.get(p).arquetipo]));
+  let seq = 0, atual = 0, ant = null;
+  for (const d of [...arqsDia.keys()].sort()) {
+    const cont = ant && diasEntre(d, ant) === 1 && ![...arqsDia.get(d)].some(a => arqsDia.get(ant).has(a));
+    atual = cont ? atual + 1 : 1; seq = Math.max(seq, atual); ant = d;
+  }
+  // subidão de Elo no mês
+  let subidao = null;
+  const dMes = duelos.filter(d => d.data.startsWith(pref));
+  if (eloDe && dMes.length) {
+    const ini = eloDe(duelos.filter(d => d.data < pref + "-01")), fim = eloDe(duelos.filter(d => d.data <= pref + "-31"));
+    for (const nome of new Set(dMes.flatMap(d => [d.a, d.b]))) {
+      const de = ini.get(nome)?.rating ?? 1500, para = fim.get(nome)?.rating ?? 1500;
+      if (para - de > 0 && (!subidao || para - de > subidao.ganho)) subidao = { nome, de, para, ganho: para - de };
+    }
+  }
+  // material mais frequente dos nomes dos dias
+  const mats = new Map();
+  for (const [d, a] of dias) { const m = materialDoDia(d, a); if (m) mats.set(m, (mats.get(m) || 0) + 1); }
+  const material = [...mats].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0], "pt"))[0]?.[0] ?? null;
+  return { total: doMes.length, distintos: por.size, totalGrade: grade.size,
+    frascoDoMes: { nome: nomeTop, n: cTop.n, nota: media(cTop.notas), arquetipo: grade.get(nomeTop).arquetipo },
+    arquetipo: { nome: arq, pct: nArq / doMes.length }, maisQuente: ext(1), maisFrio: ext(-1),
+    resgates: resgates.length ? resgates : null, notaMedia: media(notas), sequencia: seq >= 2 ? seq : null, subidao, material, dias };
 }

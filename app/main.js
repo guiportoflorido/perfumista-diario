@@ -6,7 +6,7 @@ import { montarEntrada, OCAS_DIA, OCAS_NOITE, AMBIENTES, EXTRAS } from "./entrad
 import { configurado, chamar } from "./api.js";
 import { fila, adicionar, descartar, enviar, planilhaCache, baixarPlanilha, limiteEdicao, editarRegistro, removerRegistro, exportarDiario } from "./registro.js";
 import { lerTiers, lerDiario, aplicarTiers, aplicarMedicoes, MEDICOES_PADRAO, diarioUnificado, nomesRegistraveis } from "./planilha.js";
-import { janelasPorFrasco, ajustarSprays, deAnalise, notaPorFrascoFaixa, sobrevivencia, esquecidos, esquecidoDaSemana, semanaISO } from "./estatisticas.js";
+import { janelasPorFrasco, ajustarSprays, deAnalise, notaPorFrascoFaixa, sobrevivencia, esquecidos, esquecidoDaSemana, semanaISO, resumoMes } from "./estatisticas.js";
 import { telaColecao, telaPlaybook, telaHistorico, idRegistro, periodo } from "./telas.js";
 import { telaRoda } from "./roda.js";
 import { ordsDe, tocarOrd, mudarOrds, slotNome, slotBase, slotIcone, opcoesSlot, slotExpandido } from "./util.js";
@@ -17,10 +17,11 @@ import { contagens } from "./estatisticas.js";
 import { telaAmostras, fichaAmostra, deLinhas as amostrasDeLinhas, juntar, semRegistro, camposAmostra, camposAvaliacaoMexidos, cacheAmostras, baixarAmostras,
   adicionarAmostra, editarAmostra, removerAmostra, novoId } from "./amostras.js";
 import { ler, gravar } from "./store.js";
+import { storiesDoMes, abrirWrapped, MESES } from "./wrapped.js";
 import { lerDuelos, duelosUnificados, pareamento, elo, fmtElo, filaDuelos, adicionarDuelo, enviarDuelos, telaDuelo, blocoDuelos } from "./duelo.js";
 import { fotoFicha, iconeFicha, fotoMini, reduzirImagem, subirFoto, removerFotoPlanilha, iniciarFotos } from "./fotos.js";
 
-export const APP_VERSAO = "5.36";  // sobe a cada publicação: confere no topo da tela se o celular pegou a versão nova
+export const APP_VERSAO = "5.37";  // sobe a cada publicação: confere no topo da tela se o celular pegou a versão nova
 const S = { motionOk: !movimentoPedePermissao() && "DeviceMotionEvent" in globalThis, aba: "hoje", frascos: [], frascosAtivos: [], avisosTiers: null, medidos: [], fichas: {}, versao: {}, prev: null, prevOffline: false,
   prevErro: null, metar: null, metarMotivo: null, clima: null, resultado: null, erroMotor: null, entrada: "", carregandoClima: true,
   sync: { estado: "ocioso", msg: "" }, hr: ler("hr", { preset: "tudo" }), tokenNovo: null, playbook: null, janelas: new Map(),
@@ -195,6 +196,7 @@ function render() {
     frascos: S.frascosAtivos, hist: historico(), hoje: hojeISO(), janelas: S.janelas, filtro: S.filtro, playbook: S.playbook,
     faixaSel: S.pbFaixa ?? S.clima?.faixaDia?.idx ?? 2, fila: fila(), ajSpray: ajSpray(), limiteEdicao: limiteEdicao(hojeISO()), exp: S.exp, raspadinha: S.aba === "historico" ? blocoRaspadinha() : "",
     elo: S.aba === "colecao" ? elo(duelosTodos(), S.frascosAtivos) : null,
+    wrapped: S.aba === "historico" ? blocoWrapped() : "",
     duelos: S.aba === "historico" ? (() => { const ds = duelosTodos(); return blocoDuelos(elo(ds, S.frascosAtivos), S.frascosAtivos, ds.length); })() : "",
     amostras: S.aba === "colecao" ? amostrasEmMaos() : null };
   // mesma aba: guarda rolagem da página, das tabelas e painéis abertos para restaurar depois de redesenhar
@@ -259,6 +261,7 @@ function telaHoje() {
   return `
   <h2>${esc(titulo)}</h2>
   ${nome ? `<p class="nome-dia">${esc(nome)}</p>` : ""}
+  ${bannerWrapped()}
   ${blocoSync()}
   ${blocoClima(c, dia)}
   ${blocoContexto(dia)}
@@ -798,6 +801,36 @@ async function apagarRegistroEditando() {
 }
 
 // ───────────────────────── ajustes ─────────────────────────
+// ───────────────────────── Wrapped do mês ─────────────────────────
+const mesAnterior = (hoje = hojeISO()) => { const [a, m] = hoje.split("-").map(Number); return m === 1 ? `${a - 1}-12` : `${a}-${String(m - 1).padStart(2, "0")}`; };
+const nomeMes = am => { const [a, m] = am.split("-").map(Number); return `${MESES[m - 1]} ${a}`; };
+function storiesDe(am) {
+  const [a, m] = am.split("-").map(Number);
+  return storiesDoMes(resumoMes(historico(), S.frascosAtivos, a, m, { duelos: duelosTodos(), eloDe: ds => elo(ds, S.frascosAtivos) }), a, m);
+}
+function abrirWrappedMes(am) {
+  const st = storiesDe(am);
+  if (!st.length) { toast(`Sem registros de Dia/Noite em ${nomeMes(am)}.`); return; }
+  if (am === mesAnterior()) gravar("wrappedVisto", am);
+  abrirWrapped($("#folha"), st, nomeMes(am).replace(/^./, c => c.toUpperCase()));
+}
+/** Hoje: nos dias 1 a 3, convite para o Wrapped do mês anterior (até ele abrir). */
+function bannerWrapped() {
+  const hoje = hojeISO(), am = mesAnterior(hoje);
+  if (Number(hoje.slice(8)) > 3 || ler("wrappedVisto", "") === am) return "";
+  if (!historico().some(r => r.data.startsWith(am) && deAnalise(r))) return "";
+  return `<button class="banner-wrapped" data-acao="wrapped" data-mes="${am}">Seu Wrapped de ${MESES[Number(am.slice(5)) - 1]} está pronto ✨</button>`;
+}
+/** Histórico: escolher o mês e reabrir qualquer Wrapped. */
+function blocoWrapped() {
+  const meses = [...new Set(historico().filter(deAnalise).map(r => r.data.slice(0, 7)))].sort().reverse();
+  if (!meses.length) return "";
+  const sel = meses.includes(S.wrMes) ? S.wrMes : meses.includes(mesAnterior()) ? mesAnterior() : meses[0];
+  return `<div class="bloco"><h3>Wrapped</h3>
+    <div class="linha-flex"><select id="wr-mes" aria-label="Mês do Wrapped" style="width:auto">${meses.map(m => `<option value="${m}" ${m === sel ? "selected" : ""}>${nomeMes(m)}</option>`).join("")}</select>
+    <button class="btn peq" data-acao="wrapped" data-mes="${sel}">Ver Wrapped de ${MESES[Number(sel.slice(5)) - 1]}</button></div></div>`;
+}
+
 // ───────────────────────── duelo (Coleção › Duelo) ─────────────────────────
 /** Par atual (nomes) guardado na sessão: redesenhar a tela não troca o par; escolher ou pular, sim. */
 function parDuelo() {
@@ -1121,6 +1154,7 @@ document.addEventListener("click", async e => {
   if (b.dataset.chip) { const k = b.dataset.chip, v = b.dataset.v; mudarDia(d => { d[k] = v; }); return; }
   if (b.dataset.extra) { const v = b.dataset.extra; mudarDia(d => { d.extras = d.extras.includes(v) ? d.extras.filter(x => x !== v) : [...d.extras, v]; }); return; }
   if (b.dataset.roletaSlot) { abrirRoletaSlot(b.dataset.roletaSlot); return; }
+  if (b.dataset.acao === "wrapped") { abrirWrappedMes(b.dataset.mes); render(); return; }
   if (b.dataset.dueloVence) { escolherDuelo(Number(b.dataset.dueloVence)); return; }
   if (b.dataset.acao === "duelo-pular") { S.parDuelo = null; render(); return; }
   if (b.dataset.acao === "ativar-chacoalho") {
@@ -1207,6 +1241,7 @@ document.addEventListener("change", e => {
   if (el.id === "hr-de" || el.id === "hr-ate") { S.hr = { ...S.hr, [el.id === "hr-de" ? "de" : "ate"]: el.value }; gravar("hr", S.hr); render(); return; }
   if (/^mf-(posse|arq|wish|casa|tier|am)$/.test(el.id || "")) { S.mf = { ...S.mf, [el.id.slice(3)]: el.value }; S.mfLimite = 60; gravar("mf", S.mf); render(); return; }
   if (/^col-(arq|faixa|oc|casa|tier|eixo|am|camada)$/.test(el.id || "")) { S.filtro = { ...S.filtro, [el.id.slice(4)]: el.value }; gravar("filtro", S.filtro); render(); return; }
+  if (el.id === "wr-mes") { S.wrMes = el.value; render(); return; }
   if (el.id === "aj-chacoalhar") { gravar("chacoalhar", el.checked); cuidarChacoalho(); toast(el.checked ? "Chacoalhar ligado." : "Chacoalhar desligado."); return; }
   if (el.id === "testar") mudarDia(d => { d.testar = el.value.trim(); });
   if (el.id === "roupa") mudarDia(d => { d.roupa = el.value.trim(); });
