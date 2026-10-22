@@ -15,7 +15,8 @@
  *        (tira só da aba Mercado; Tiers e Diário não mudam) · amostras (lê a aba Amostras) · adicionarAmostra (cria a
  *        aba no primeiro registro) · editarAmostra · removerAmostra (por ID; avaliação — tier, arquétipo etc. — fica
  *        na aba Mercado, ligada pela Casa + Perfume) · subirFoto (guarda a foto na aba Fotos desta planilha — nada de
- *        Google Drive — e marca a coluna Foto da aba Mercado) · fotos (devolve as fotos pedidas) · removerFoto.
+ *        Google Drive — e marca a coluna Foto da aba Mercado) · fotos (devolve as fotos pedidas) · removerFoto ·
+ *        duelo_registrar (escolhas do Duelo “Qual dos dois?”; cria a aba Duelos na primeira gravação) · duelos (lê a aba).
  * Regras da planilha: data como texto AAAA-MM-DD; campo vazio = ""; linhas existentes do Diário só mudam por
  *   editarRegistro/removerRegistro (pedido explícito do usuário no app, só registros recentes);
  * aba Frascos é só fórmula (nunca escrita aqui).
@@ -32,6 +33,7 @@ var COLS_DIARIO = ['Data', 'Slot', 'Perfume', 'Ocasião', 'Temp (°C)', 'Td (°C
 var CHAVES_DIARIO = ['data', 'slot', 'perfume', 'ocasiao', 'temp', 'td', 'sprays', 'notaDia', 'obs', 'sugerido', 'vivo'];
 var VIVO = ['', 'vivo', 'fraco', 'morto'];
 var ABA_AMOSTRAS = 'Amostras';
+var ABA_DUELOS = 'Duelos', COLS_DUELOS = ['Data', 'Hora', 'A', 'B', 'Vencedor', 'Contexto'];
 var COLS_AMOSTRAS = ['ID', 'Casa', 'Perfume', 'Tipo', 'Volume (ml)', 'Origem', 'Status', 'Entrada', 'Saída', 'Motivo saída', 'Impressão', 'Obs', 'Atualizado em', 'Dono'];
 var DONOS_AMOSTRA = ['', 'Gui', 'Bia'], TIPOS_AMOSTRA = ['Amostra', 'Decant'], STATUS_AMOSTRA = ['Pendente', 'Em teste', 'Realizado', 'Esgotado'];
 var DIAS_EDITAVEIS = 30;   // editar/apagar no Diário: só registros com data a partir de hoje − 30 dias
@@ -64,6 +66,8 @@ function doPost(e) {
       case 'subirFoto': return saida_(subirFoto_(req.casa, req.perfume, req.imagem, req.tipo));
       case 'fotos': return saida_({ ok: true, fotos: lerFotos_(req.itens || []) });
       case 'removerFoto': return saida_(removerFoto_(req.casa, req.perfume));
+      case 'duelo_registrar': return saida_(registrarDuelos_(req.linhas || []));
+      case 'duelos': return saida_({ ok: true, duelos: lerDuelos_() });
       default: return saida_({ ok: false, erro: 'ação desconhecida' });
     }
   } catch (err) {
@@ -112,7 +116,7 @@ function valores_(nome) {
 function dados_() {
   var t = valores_(ABA_TIERS), d = valores_(ABA_DIARIO), f = [];
   try { f = valores_(ABA_FRASCOS); } catch (err) { f = []; }
-  return { tiers: t, diario: d, frascos: f, lido: new Date().toISOString() };
+  return { tiers: t, diario: d, frascos: f, duelos: lerDuelos_(), lido: new Date().toISOString() };
 }
 
 // ───────────────────────── gravação ─────────────────────────
@@ -611,4 +615,50 @@ function moverFoto_(casa, perfume, novaCasa, novoNome) {
   if (lf === -1) return;
   if (novaCasa === null) fotos.deleteRow(lf);
   else fotos.getRange(lf, 1, 1, 2).setNumberFormat('@').setValues([[novaCasa, novoNome]]);
+}
+
+// ───────────────────────── Duelos (“Qual dos dois?”) ─────────────────────────
+// Uma linha por escolha: Data | Hora | A | B | Vencedor | Contexto. O app calcula o Elo a partir do log inteiro.
+/** Aba Duelos inteira (com cabeçalho); sem a aba, [] — ela nasce na primeira gravação. */
+function lerDuelos_() {
+  var aba = SpreadsheetApp.getActive().getSheetByName(ABA_DUELOS);
+  return aba ? aba.getDataRange().getDisplayValues() : [];
+}
+
+/** Grava as escolhas da fila do app. Reenvio não duplica (chave Data|Hora|A|B). Tudo como texto. */
+function registrarDuelos_(linhas) {
+  var lock = LockService.getScriptLock();
+  lock.waitLock(20000);
+  try {
+    var ss = SpreadsheetApp.getActive(), aba = ss.getSheetByName(ABA_DUELOS);
+    if (!aba) {
+      aba = ss.insertSheet(ABA_DUELOS);
+      aba.getRange(1, 1, 1, COLS_DUELOS.length).setValues([COLS_DUELOS]).setFontWeight('bold');
+      aba.setFrozenRows(1);
+    }
+    var ult = aba.getLastRow(), vistos = {};
+    (ult > 1 ? aba.getRange(2, 1, ult - 1, 4).getDisplayValues() : []).forEach(function (r) { vistos[r.join('|')] = true; });
+    var gravadas = [];
+    for (var k = 0; k < linhas.length; k++) {
+      var l = linhas[k], linha = normalizarDuelo_(l), chave = linha.slice(0, 4).join('|');
+      if (vistos[chave]) { gravadas.push({ id: l.id, duplicada: true }); continue; }
+      var alvo = aba.getLastRow() + 1;
+      aba.getRange(alvo, 1, 1, COLS_DUELOS.length).setNumberFormat('@').setValues([linha]);
+      vistos[chave] = true;
+      gravadas.push({ id: l.id, linha: alvo });
+    }
+    SpreadsheetApp.flush();
+    return { ok: true, gravadas: gravadas };
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+function normalizarDuelo_(l) {
+  var data = String(l.data || ''), hora = String(l.hora || ''), a = String(l.a || '').trim(), b = String(l.b || '').trim(), v = String(l.vencedor || '').trim();
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(data)) throw new Error('duelo: data inválida: ' + data);
+  if (!/^\d{2}:\d{2}(:\d{2})?$/.test(hora)) throw new Error('duelo: hora inválida: ' + hora);
+  if (!a || !b || a === b) throw new Error('duelo: precisa de dois frascos diferentes');
+  if (v !== a && v !== b) throw new Error('duelo: o vencedor tem de ser A ou B');
+  return [data, hora, a, b, v, String(l.contexto || '').slice(0, 120)];
 }

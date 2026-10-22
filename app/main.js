@@ -1,26 +1,28 @@
 // main.js — orquestra as telas: Hoje, Registrar e Ajustes (Coleção, Playbook e Histórico entram na fase 4).
-import { rodar, avaliar, vivoAte, porque, CFG, FAIXAS, OCASIOES, fmtH } from "../engine/index.js";
+import { rodar, avaliar, vivoAte, porque, sprays, CFG, FAIXAS, OCASIOES, fmtH } from "../engine/index.js";
 import { ajustes, salvarAjustes, AJUSTES_PADRAO, estadoDia, salvarDia, hojeISO } from "./store.js";
 import { buscarPrevisao, buscarMetar, derivarClima, horaNum } from "./clima.js";
 import { montarEntrada, OCAS_DIA, OCAS_NOITE, AMBIENTES, EXTRAS } from "./entrada.js";
 import { configurado, chamar } from "./api.js";
 import { fila, adicionar, descartar, enviar, planilhaCache, baixarPlanilha, limiteEdicao, editarRegistro, removerRegistro, exportarDiario } from "./registro.js";
 import { lerTiers, lerDiario, aplicarTiers, aplicarMedicoes, MEDICOES_PADRAO, diarioUnificado, nomesRegistraveis } from "./planilha.js";
-import { janelasPorFrasco, ajustarSprays, deAnalise, notaPorFrascoFaixa, sobrevivencia } from "./estatisticas.js";
+import { janelasPorFrasco, ajustarSprays, deAnalise, notaPorFrascoFaixa, sobrevivencia, esquecidos, esquecidoDaSemana, semanaISO, resumoMes } from "./estatisticas.js";
 import { telaColecao, telaPlaybook, telaHistorico, idRegistro, periodo } from "./telas.js";
 import { telaRoda } from "./roda.js";
 import { ordsDe, tocarOrd, mudarOrds, slotNome, slotBase, slotIcone, opcoesSlot, slotExpandido } from "./util.js";
-import { definirCores, arqTag, arqIcone, corArq } from "./icones.js";
-import { ceuHTML, abrirRoleta, animarSpray } from "./diversao.js";
+import { definirCores, arqTag, arqIcone, corArq, humorDoSlot } from "./icones.js";
+import { ceuHTML, abrirRoleta, animarSpray, nomeDoDia, definirMateriais, raspadinhaHTML, ligarRaspadinha, ativarChacoalho, pedirMovimento, movimentoPedePermissao } from "./diversao.js";
 import { chave as mercadoChave, telaMercado, fichaEditavel, camposAlterados, baseComTiers, deLinhas, linhasParaCriar, cachePlanilha, baixarMercado, criarNaPlanilha, editarNaPlanilha, adicionarNaPlanilha, removerNaPlanilha, fotoNoCache } from "./mercado.js";
 import { contagens } from "./estatisticas.js";
 import { telaAmostras, fichaAmostra, deLinhas as amostrasDeLinhas, juntar, semRegistro, camposAmostra, camposAvaliacaoMexidos, cacheAmostras, baixarAmostras,
   adicionarAmostra, editarAmostra, removerAmostra, novoId } from "./amostras.js";
 import { ler, gravar } from "./store.js";
+import { storiesDoMes, abrirWrapped, MESES } from "./wrapped.js";
+import { lerDuelos, duelosUnificados, pareamento, elo, fmtElo, filaDuelos, adicionarDuelo, enviarDuelos, telaDuelo, blocoDuelos } from "./duelo.js";
 import { fotoFicha, iconeFicha, fotoMini, reduzirImagem, subirFoto, removerFotoPlanilha, iniciarFotos } from "./fotos.js";
 
-export const APP_VERSAO = "5.31";  // sobe a cada publicação: confere no topo da tela se o celular pegou a versão nova
-const S = { aba: "hoje", frascos: [], frascosAtivos: [], avisosTiers: null, medidos: [], fichas: {}, versao: {}, prev: null, prevOffline: false,
+export const APP_VERSAO = "5.37";  // sobe a cada publicação: confere no topo da tela se o celular pegou a versão nova
+const S = { motionOk: !movimentoPedePermissao() && "DeviceMotionEvent" in globalThis, aba: "hoje", frascos: [], frascosAtivos: [], avisosTiers: null, medidos: [], fichas: {}, versao: {}, prev: null, prevOffline: false,
   prevErro: null, metar: null, metarMotivo: null, clima: null, resultado: null, erroMotor: null, entrada: "", carregandoClima: true,
   sync: { estado: "ocioso", msg: "" }, hr: ler("hr", { preset: "tudo" }), tokenNovo: null, playbook: null, janelas: new Map(),
   filtro: ler("filtro", {}), pbFaixa: null, arquetipos: [], gaps: [], sub: carregarSub(), exp: ler("exp", "tudo"), sim: null, verGaps: false,
@@ -31,7 +33,7 @@ const ajSpray = () => ler("sprays_ajuste", { ativo: false, geral: 0, por: {} });
 // ───────────────────────── 5 abas na barra; S.aba continua com os 8 valores de sempre ─────────────────────────
 // Grupos com sub-abas: Coleção (Roda · Lista · Playbook) · Mercado (Mercado · Amostras) · Mais (Histórico · Ajustes).
 // S.sub guarda a última sub-aba de cada grupo (reabre nela). Coleção absorve o antigo colModo (roda/lista).
-const SUBS = { colecao: [["roda", "Roda"], ["lista", "Lista"], ["playbook", "Playbook"]],
+const SUBS = { colecao: [["roda", "Roda"], ["lista", "Lista"], ["playbook", "Playbook"], ["duelo", "Duelo"]],
   mercado: [["mercado", "Mercado"], ["amostras", "Amostras"]], mais: [["historico", "Histórico"], ["ajustes", "Ajustes"]] };
 function carregarSub() {
   const s = ler("sub", null);
@@ -42,10 +44,10 @@ function carregarSub() {
   return novo;
 }
 function grupoDe(aba) {
-  return { colecao: "colecao", playbook: "colecao", mercado: "mercado", amostras: "mercado", historico: "mais", ajustes: "mais" }[aba] || aba;
+  return { colecao: "colecao", playbook: "colecao", duelo: "colecao", mercado: "mercado", amostras: "mercado", historico: "mais", ajustes: "mais" }[aba] || aba;
 }
 function abaDe(grupo, sub) {
-  if (grupo === "colecao") return sub === "playbook" ? "playbook" : "colecao";
+  if (grupo === "colecao") return sub === "playbook" || sub === "duelo" ? sub : "colecao";
   if (grupo === "mercado" || grupo === "mais") return SUBS[grupo].some(([v]) => v === sub) ? sub : SUBS[grupo][0][0];
   return grupo;
 }
@@ -54,7 +56,7 @@ function irPara(aba) {
   S.aba = aba;
   const g = grupoDe(aba);
   if (SUBS[g] && aba !== "colecao") { S.sub = { ...S.sub, [g]: aba }; gravar("sub", S.sub); }
-  else if (aba === "colecao" && S.sub.colecao === "playbook") { S.sub = { ...S.sub, colecao: "roda" }; gravar("sub", S.sub); }
+  else if (aba === "colecao" && (S.sub.colecao === "playbook" || S.sub.colecao === "duelo")) { S.sub = { ...S.sub, colecao: "roda" }; gravar("sub", S.sub); }
 }
 /** Controle segmentado logo abaixo do h2 das telas agrupadas. */
 function segmentosGrupo(grupo) {
@@ -81,14 +83,14 @@ const tierHTML = t => `<span class="tier ${esc(t)}" title="Tier ${esc(t)}">${esc
 async function carregarDados() {
   const [fr, fi, pb, aq] = await Promise.all(["frascos", "fichas", "playbook", "arquetipos"].map(n => fetch(`data/${n}.json`).then(r => r.json())));
   S.frascos = fr.frascos; S.versao = fr.versao; S.fichas = fi.fichas; S.playbook = pb; S.janelas = janelasPorFrasco(pb);
-  S.arquetipos = aq.arquetipos; S.gaps = aq.gaps; definirCores(aq.arquetipos);
+  S.arquetipos = aq.arquetipos; S.gaps = aq.gaps; definirCores(aq.arquetipos); definirMateriais(aq.arquetipos);
   $("#versao").textContent = `${fr.versao.playbook.replace("playbook_", "").replace(".md", "")} · app ${APP_VERSAO}`;
   aplicarPlanilha();
 }
 
 function planilha() {
   const p = planilhaCache();
-  return { tiers: lerTiers(p?.tiers), diario: lerDiario(p?.diario), lido: p?.lido || null };
+  return { tiers: lerTiers(p?.tiers), diario: lerDiario(p?.diario), duelos: lerDuelos(p?.duelos), lido: p?.lido || null };
 }
 // tiers da planilha e depois as medições na pele: Hoje, Testar, ficha, Coleção e Playbook veem o mesmo frasco
 const opcoesMedicoes = () => ({ ...MEDICOES_PADRAO, ...(ajustes().medicoes || {}) });
@@ -98,17 +100,19 @@ function aplicarPlanilha() {
   S.frascosAtivos = m.frascos; S.medidos = m.medidos; S.avisosTiers = r.aplicado ? r.avisos : null;
 }
 const historico = () => diarioUnificado(planilha().diario, fila());
+const duelosTodos = () => duelosUnificados(planilha().duelos, filaDuelos());
 
 async function sincronizar({ silencioso = false } = {}) {
   if (!configurado()) { S.sync = { estado: "sem_config", msg: "" }; return; }
   S.sync = { estado: "sincronizando", msg: "Sincronizando com a planilha…" }; if (!silencioso) render();
-  const env = await enviar();
+  const env = await enviar(), envD = await enviarDuelos();
   let msg = "";
   try { await baixarPlanilha(); aplicarPlanilha(); S.sync = { estado: "ok", msg: "" }; }
   catch (e) { S.sync = { estado: "erro", msg: e.message }; }
   if (env.enviadas) msg = `${env.enviadas} registro${env.enviadas > 1 ? "s" : ""} gravado${env.enviadas > 1 ? "s" : ""} na planilha.`;
   if (env.conflitos) msg += ` ${env.conflitos} com slot já ocupado: veja em Registrar.`;
   if (env.erro && !env.rede) msg += ` Planilha recusou: ${env.erro}`;
+  if (envD.erro && !envD.rede) msg += ` Duelos recusados: ${envD.erro}`;
   if (msg) toast(msg.trim());
   recalcular();
 }
@@ -158,7 +162,26 @@ function doMercado(casa, nome) {
   return mercadoPorChave.get(mercadoChave(casa, nome)) || null;
 }
 
+function abrirRoletaSlot(slot) {
+  const so = S.resultado.slots.find(x => (x.nome === "Dia" ? "M" : "N") === slot);
+  abrirRoleta($("#folha"), so.nome, so.top, t => abrirRegistro({ perfume: t.nome, slot, sprays: ajustarSprays(t.r.f, t.sprays, ajSpray()), sugerido: t.sprays, ocasiao: ocasiaoDominante(so) }));
+}
+
+// chacoalhar o iPhone em Hoje abre a roleta do slot da hora; fora de Hoje o ouvinte sai (não dispara na Coleção)
+let desligarChacoalho = null;
+function cuidarChacoalho() {
+  const quer = S.aba === "hoje" && S.motionOk && ler("chacoalhar", true);
+  if (quer && !desligarChacoalho) desligarChacoalho = ativarChacoalho(() => {
+    if ($(".roleta") || $("#folha .folha") || S.aba !== "hoje") return;
+    const so = slotHoraRes(), cod = slotDaHora();
+    if (!so || so.top.length < 2 || historico().some(r => r.data === estadoDia().data && slotBase(r.slot) === cod)) return;
+    abrirRoletaSlot(cod);
+  });
+  else if (!quer && desligarChacoalho) { desligarChacoalho(); desligarChacoalho = null; }
+}
+
 function render() {
+  cuidarChacoalho();
   mercadoPorChave = null;
   const selo = $("#seloGrade");
   if (selo) selo.hidden = !(S.aba === "hoje" && S.avisosTiers?.divergentes?.length);
@@ -171,7 +194,10 @@ function render() {
   const arqDe = new Map(S.frascos.map(f => [f.nome, f.arquetipo]));
   const ctx = { fichas: S.fichas, arqTag, arqIcone, arqDe, hr: S.hr,
     frascos: S.frascosAtivos, hist: historico(), hoje: hojeISO(), janelas: S.janelas, filtro: S.filtro, playbook: S.playbook,
-    faixaSel: S.pbFaixa ?? S.clima?.faixaDia?.idx ?? 2, fila: fila(), ajSpray: ajSpray(), limiteEdicao: limiteEdicao(hojeISO()), exp: S.exp,
+    faixaSel: S.pbFaixa ?? S.clima?.faixaDia?.idx ?? 2, fila: fila(), ajSpray: ajSpray(), limiteEdicao: limiteEdicao(hojeISO()), exp: S.exp, raspadinha: S.aba === "historico" ? blocoRaspadinha() : "",
+    elo: S.aba === "colecao" ? elo(duelosTodos(), S.frascosAtivos) : null,
+    wrapped: S.aba === "historico" ? blocoWrapped() : "",
+    duelos: S.aba === "historico" ? (() => { const ds = duelosTodos(); return blocoDuelos(elo(ds, S.frascosAtivos), S.frascosAtivos, ds.length); })() : "",
     amostras: S.aba === "colecao" ? amostrasEmMaos() : null };
   // mesma aba: guarda rolagem da página, das tabelas e painéis abertos para restaurar depois de redesenhar
   const antes = trocouAba ? null : {
@@ -181,7 +207,7 @@ function render() {
   };
   try {
     let html = ({ hoje: telaHoje, registrar: telaRegistrar, ajustes: telaAjustes,
-      colecao: () => telaColecaoTudo(ctx), mercado: telaMercadoAba, amostras: telaAmostrasAba, playbook: () => telaPlaybook(ctx), historico: () => telaHistorico(ctx) }[S.aba])();
+      colecao: () => telaColecaoTudo(ctx), duelo: telaDueloAba, mercado: telaMercadoAba, amostras: telaAmostrasAba, playbook: () => telaPlaybook(ctx), historico: () => telaHistorico(ctx) }[S.aba])();
     // telas agrupadas: segmentos (sub-abas) logo abaixo do 1º h2; o h2 continua com o nome da sub-aba
     if (SUBS[grupo]) html = html.replace("</h2>", `</h2>${segmentosGrupo(grupo)}`);
     $("#tela").innerHTML = html;
@@ -194,6 +220,8 @@ function render() {
     document.querySelectorAll("#tela .tabelao").forEach((t, i) => { const p = antes.tabelas[i]; if (p) { t.scrollTop = p[0]; t.scrollLeft = p[1]; } });
     window.scrollTo(0, antes.y);
   }
+  const rasp = $("#tela [data-raspa]:not(.revelado)");
+  if (rasp) ligarRaspadinha(rasp, () => gravar("raspadinha", { ...ler("raspadinha", {}), revelado: true }));
   if (foco && document.getElementById(foco) && S.aba !== "hoje") {
     const el = document.getElementById(foco); el.focus();
     if (el.type === "search") { const n = el.value.length; try { el.setSelectionRange(n, n); } catch { /* sem seleção */ } }
@@ -229,8 +257,11 @@ function telaHoje() {
   const t0 = new Date(dia.data + "T12:00:00").toLocaleDateString("pt-BR", { weekday: "long", day: "numeric", month: "long" });
   const titulo = t0.charAt(0).toUpperCase() + t0.slice(1);
   if (S.carregandoClima && !c) return `<h2>${esc(titulo)}</h2><p class="nota">Buscando a previsão para ${esc(ajustes().local)}…</p>`;
+  const nome = nomeHoje(dia, c);
   return `
   <h2>${esc(titulo)}</h2>
+  ${nome ? `<p class="nome-dia">${esc(nome)}</p>` : ""}
+  ${bannerWrapped()}
   ${blocoSync()}
   ${blocoClima(c, dia)}
   ${blocoContexto(dia)}
@@ -238,13 +269,30 @@ function telaHoje() {
   ${S.resultado ? (() => {
     const slots = S.resultado.slots;
     if (slots.length < 2) return slots.map(s => blocoSlot(s, true)).join("");   // "Só um perfume hoje": um slot só, sempre aberto
-    const usou = cod => historico().some(r => r.data === dia.data && slotBase(r.slot) === cod);
-    const agora = new Date(), exp = slotExpandido({ agoraH: agora.getHours() + agora.getMinutes() / 60, noiteH: horaNum(ajustes().noite),
-      usadoM: usou("M"), usadoN: usou("N") });
+    const exp = slotDaHora(dia);
     return slots.map(s => blocoSlot(s, (s.nome === "Dia" ? "M" : "N") === exp)).join("");
   })() : ""}
   ${S.resultado && S.resultado.avisos.length ? `<div class="bloco"><h3>Premissas do modelo</h3><ul class="avisos">${S.resultado.avisos.map(a => `<li>${esc(a)}</li>`).join("")}</ul></div>` : ""}
   ${blocoAvancado(dia)}`;
+}
+
+/** Slot da hora ("M" | "N"): o expandido em Hoje. Com um slot só, "M". */
+function slotDaHora(dia = estadoDia()) {
+  if ((S.resultado?.slots.length ?? 2) < 2) return "M";
+  const usou = cod => historico().some(r => r.data === dia.data && slotBase(r.slot) === cod);
+  const agora = new Date();
+  return slotExpandido({ agoraH: agora.getHours() + agora.getMinutes() / 60, noiteH: horaNum(ajustes().noite), usadoM: usou("M"), usadoN: usou("N") });
+}
+/** Resultado do slot da hora (o item de S.resultado.slots). */
+const slotHoraRes = (dia = estadoDia()) => S.resultado?.slots[slotDaHora(dia) === "N" ? 1 : 0] || null;
+
+/** Nome do dia em Hoje: material do top 1 do slot da hora (se ainda não usado) e clima desse slot. */
+function nomeHoje(dia, c) {
+  if (!c) return "";
+  const cod = slotDaHora(dia), so = slotHoraRes(dia), f = cod === "N" ? c.faixaNoite : c.faixaDia;
+  const usado = historico().some(r => r.data === dia.data && slotBase(r.slot) === cod);
+  return nomeDoDia({ data: dia.data, faixaIdx: f?.idx ?? null, T: f?.T ?? null, chuva: c.chuva?.v ?? null, td: c.Td?.v ?? null,
+    top1: usado ? null : so?.top[0] ?? null });
 }
 
 function blocoClima(c, dia) {
@@ -353,8 +401,8 @@ function itemDoDia(so, nome) {
   const f = S.frascosAtivos.find(x => x.nome === nome), d = S.resultado.entrada, slot = { nome: so.nome, ini: so.ini, fim: so.fim };
   const r = f && avaliar(f, so.passos, d, slot);
   if (!r) return null;
-  const va = vivoAte(r, slot);
-  return { nome, score: r.score, vivo_ate: va, vivo_fim: va >= slot.fim, porque: porque(r, d, new Set(so.passos.map(p => p.ocas))), r };
+  const va = vivoAte(r, slot), [sp, nota] = sprays(r, d, d.extra.includes("vento"));
+  return { nome, score: r.score, sprays: sp, nota, vivo_ate: va, vivo_fim: va >= slot.fim, porque: porque(r, d, new Set(so.passos.map(p => p.ocas))), r };
 }
 
 /** Um slot da tela Hoje. `expandido` falso: o bloco inteiro vai dentro de um <details> recolhido, com o top 3 (ou o
@@ -367,7 +415,7 @@ function blocoSlot(s, expandido = true) {
     const ja = usado && usado.perfume === t.nome;
     const hero = i === 0 && !custo;
     return `<article class="card ${hero ? "top1" : ""}" style="--i:${i};--cor:${corArq(t.arquetipo)}">
-      ${hero ? `<span class="pos pos-hero">${arqIcone(t.arquetipo, 30)}<span class="n1">1</span></span>` : `<span class="pos">${i + 1}</span>`}
+      ${hero ? `<span class="pos pos-hero">${arqIcone(t.arquetipo, 30, slotCod === slotDaHora(dia) ? humorDoSlot(s, S.clima?.chuva?.v ?? 0) : null)}<span class="n1">1</span></span>` : `<span class="pos">${i + 1}</span>`}
       <div style="min-width:0" class="card-tx">${fotoMini(doMercado(t.casa, t.nome), hero ? "foto-hero" : "foto-mini")}<button class="nome" data-ficha="${esc(t.nome)}">${esc(t.nome)}</button>${tierHTML(t.tier)}<div class="casa">${esc(t.casa)} · ${arqTag(t.arquetipo, 13)}</div></div>
       <span class="score" title="Score">${t.score.toFixed(0)}</span>
       <div class="meta">${spraysHTML(t)}<span>vivo até <b>${vivoTxt(t)}</b>${seloMedido(t.r.f)}</span></div>
@@ -378,7 +426,7 @@ function blocoSlot(s, expandido = true) {
   const segs = (S.resultado.segs || []).filter(g => g.fim > s.ini && g.ini < s.fim).map(g => `${fmtH(Math.max(g.ini, s.ini))}–${fmtH(Math.min(g.fim, s.fim))} ${ROT_OC[g.ocas]} (${AMB[g.amb]}${g.fechado ? ", fechado" : ""})`);
   const estadoUso = u => (u.pendente ? (u.estado === "conflito" ? " · conflito na planilha" : " · na fila para a planilha") : " · na planilha");
   const bloco = `<section class="grupo" aria-label="Slot ${s.nome}">
-    <div class="slot-cab"><h2>${s.nome === "Dia" ? "☀︎ Slot Dia" : "☾ Slot Noite"}</h2><span class="t">${fmtH(s.ini)}→${fmtH(s.fim)}</span><span class="esp"></span>${s.top.length > 1 && !usado ? `<button class="btn sec peq roleta-btn" data-roleta-slot="${slotCod}">🎰 Me surpreenda</button>` : ""}</div>
+    <div class="slot-cab"><h2>${s.nome === "Dia" ? "☀︎ Slot Dia" : "☾ Slot Noite"}</h2><span class="t">${fmtH(s.ini)}→${fmtH(s.fim)}</span><span class="esp"></span>${s.top.length > 1 && !usado ? `${slotCod === slotDaHora(dia) && ler("chacoalhar", true) && !S.motionOk && movimentoPedePermissao() ? `<button class="chip chip-peq" data-acao="ativar-chacoalho">🎲 ativar chacoalhar</button>` : ""}<button class="btn sec peq roleta-btn" data-roleta-slot="${slotCod}">🎰 Me surpreenda</button>` : ""}</div>
     ${s.nome === "Dia" ? chips("ocDia", OCAS_DIA, dia.ocDia) + chips("ambDia", AMBIENTES, dia.ambDia) : chips("ocNoite", OCAS_NOITE, dia.ocNoite) + chips("ambNoite", AMBIENTES, dia.ambNoite)}
     <p class="nota">${esc(segs.join(" · "))}</p>
     ${usado ? `<p class="nota">Registrado hoje: <b>${esc(usado.perfume)}</b>${estadoUso(usado)}.${usado.pendente && usado.estado !== "enviado" ? ` <button class="btn sec peq" data-descartar="${esc(usado.id)}">Desfazer</button>` : ""}</p>` : ""}
@@ -753,6 +801,94 @@ async function apagarRegistroEditando() {
 }
 
 // ───────────────────────── ajustes ─────────────────────────
+// ───────────────────────── Wrapped do mês ─────────────────────────
+const mesAnterior = (hoje = hojeISO()) => { const [a, m] = hoje.split("-").map(Number); return m === 1 ? `${a - 1}-12` : `${a}-${String(m - 1).padStart(2, "0")}`; };
+const nomeMes = am => { const [a, m] = am.split("-").map(Number); return `${MESES[m - 1]} ${a}`; };
+function storiesDe(am) {
+  const [a, m] = am.split("-").map(Number);
+  return storiesDoMes(resumoMes(historico(), S.frascosAtivos, a, m, { duelos: duelosTodos(), eloDe: ds => elo(ds, S.frascosAtivos) }), a, m);
+}
+function abrirWrappedMes(am) {
+  const st = storiesDe(am);
+  if (!st.length) { toast(`Sem registros de Dia/Noite em ${nomeMes(am)}.`); return; }
+  if (am === mesAnterior()) gravar("wrappedVisto", am);
+  abrirWrapped($("#folha"), st, nomeMes(am).replace(/^./, c => c.toUpperCase()));
+}
+/** Hoje: nos dias 1 a 3, convite para o Wrapped do mês anterior (até ele abrir). */
+function bannerWrapped() {
+  const hoje = hojeISO(), am = mesAnterior(hoje);
+  if (Number(hoje.slice(8)) > 3 || ler("wrappedVisto", "") === am) return "";
+  if (!historico().some(r => r.data.startsWith(am) && deAnalise(r))) return "";
+  return `<button class="banner-wrapped" data-acao="wrapped" data-mes="${am}">Seu Wrapped de ${MESES[Number(am.slice(5)) - 1]} está pronto ✨</button>`;
+}
+/** Histórico: escolher o mês e reabrir qualquer Wrapped. */
+function blocoWrapped() {
+  const meses = [...new Set(historico().filter(deAnalise).map(r => r.data.slice(0, 7)))].sort().reverse();
+  if (!meses.length) return "";
+  const sel = meses.includes(S.wrMes) ? S.wrMes : meses.includes(mesAnterior()) ? mesAnterior() : meses[0];
+  return `<div class="bloco"><h3>Wrapped</h3>
+    <div class="linha-flex"><select id="wr-mes" aria-label="Mês do Wrapped" style="width:auto">${meses.map(m => `<option value="${m}" ${m === sel ? "selected" : ""}>${nomeMes(m)}</option>`).join("")}</select>
+    <button class="btn peq" data-acao="wrapped" data-mes="${sel}">Ver Wrapped de ${MESES[Number(sel.slice(5)) - 1]}</button></div></div>`;
+}
+
+// ───────────────────────── duelo (Coleção › Duelo) ─────────────────────────
+/** Par atual (nomes) guardado na sessão: redesenhar a tela não troca o par; escolher ou pular, sim. */
+function parDuelo() {
+  const fs = S.frascosAtivos, ok = n => fs.some(f => f.nome === n);
+  if (!S.parDuelo || !S.parDuelo.every(ok)) S.parDuelo = pareamento(fs, duelosTodos())?.map(f => f.nome) || null;
+  return S.parDuelo && S.parDuelo.map(n => fs.find(f => f.nome === n));
+}
+function telaDueloAba() {
+  const hoje = hojeISO();
+  return telaDuelo({ par: parDuelo(), nHoje: duelosTodos().filter(d => d.data === hoje).length,
+    foto: f => iconeFicha(doMercado(f.casa, f.nome), arqIcone(f.arquetipo, 40)) });
+}
+function escolherDuelo(i) {
+  const par = parDuelo();
+  if (!par || S.dueloAnimando) return;
+  const [a, b] = par, v = par[i], agora = new Date(), cod = slotDaHora(), c = S.clima;
+  const fx = (cod === "N" ? c?.faixaNoite : c?.faixaDia)?.idx;
+  adicionarDuelo({ data: hojeISO(), hora: agora.toTimeString().slice(0, 8), a: a.nome, b: b.nome, vencedor: v.nome,
+    contexto: [fx != null ? `faixa ${fx}` : "", cod === "N" ? "Noite" : "Dia", a.arquetipo === b.arquetipo ? "mesmo arquétipo" : "arquétipos diferentes"].filter(Boolean).join(" · ") });
+  const cards = document.querySelectorAll(".duelo-card");
+  const proximo = () => { S.dueloAnimando = false; S.parDuelo = null; render(); };
+  if (matchMedia("(prefers-reduced-motion: reduce)").matches || !cards.length) { proximo(); return; }
+  S.dueloAnimando = true;
+  cards[i].classList.add("vence"); cards[1 - i].classList.add("perde");
+  setTimeout(proximo, 480);
+}
+
+// ───────────────────────── raspadinha do esquecido (Histórico) ─────────────────────────
+/** Esquecido da semana: escolhido uma vez por semana ISO e guardado (não muda na semana). Precisa do resultado de hoje. */
+function raspadinhaAtual() {
+  const hoje = hojeISO(), semana = semanaISO(hoje), salvo = ler("raspadinha", null);
+  if (salvo?.semana === semana) return salvo;
+  const so = slotHoraRes();
+  if (!so) return null;
+  const e = esquecidoDaSemana(esquecidos(contagens(historico(), S.frascosAtivos, hoje).por), so, semana);
+  if (!e) return null;
+  const novo = { semana, nome: e.nome, revelado: false };
+  gravar("raspadinha", novo);
+  return novo;
+}
+function blocoRaspadinha() {
+  const rp = raspadinhaAtual();
+  const f = rp && S.frascosAtivos.find(x => x.nome === rp.nome);
+  if (!f) return "";
+  // usável hoje? (refeito a cada dia da semana: o clima muda)
+  const cod = slotDaHora(), so = slotHoraRes(), t = so && !so.fora[f.nome] ? itemDoDia(so, f.nome) : null;
+  const usado = historico().some(r => r.data === estadoDia().data && slotBase(r.slot) === cod);
+  const ult = historico().filter(r => r.perfume === f.nome && deAnalise(r)).at(-1);
+  const dias = ult ? Math.round((new Date(hojeISO()) - new Date(ult.data)) / 864e5) : null;
+  const conteudo = `<div class="raspa-fr">${fotoMini(doMercado(f.casa, f.nome), "foto-mini")}<span class="ic">${arqIcone(f.arquetipo, 30)}</span>
+      <div style="min-width:0"><button class="nome" data-ficha="${esc(f.nome)}">${esc(f.nome)}</button>${tierHTML(f.tier)}<div class="casa">${esc(f.casa)} · ${arqTag(f.arquetipo, 13)}</div>
+      <div class="nota">${dias == null ? "sem registro no diário" : `parado há ${dias} dias`}</div></div></div>
+    ${t ? `<div class="linha-flex"><span>${spraysHTML(t)} · score ${t.score.toFixed(0)}</span><span class="esp"></span>
+      <button class="btn peq ${usado ? "sec" : ""}" data-usei="${esc(f.nome)}" data-slot="${cod}" data-sprays="${t.sprays}" data-ajustado="${ajustarSprays(f, t.sprays, ajSpray())}" ${usado ? "disabled" : ""}>Usei este</button></div>`
+      : `<p class="nota">Não serve para hoje; guarde para a semana.</p>`}`;
+  return raspadinhaHTML({ conteudo, revelado: rp.revelado });
+}
+
 /** Copia o diário do período escolhido; sem permissão de área de transferência (iOS), mostra o texto selecionado. */
 async function copiarDiario() {
   const { de, ate } = periodo(S.exp, hojeISO());
@@ -772,6 +908,7 @@ function telaAjustes() {
   return `<h2>Ajustes</h2>
   <div class="bloco"><h3>Aparência</h3>
     <div class="segmentos">${[["escuro", "Escuro"], ["claro", "Claro"], ["auto", "Igual ao iPhone"]].map(([v, r]) => `<button data-tema="${v}" aria-selected="${ler("tema", "escuro") === v}">${r}</button>`).join("")}</div>
+    <label class="linha-flex" style="margin-top:10px"><input type="checkbox" id="aj-chacoalhar" ${ler("chacoalhar", true) ? "checked" : ""} style="width:auto"> Chacoalhar para sortear (em Hoje, abre a roleta do slot da hora)</label>
   </div>
   <form class="bloco" id="formAjustes">
     <h3>Local do clima</h3>
@@ -857,6 +994,8 @@ function abrirFicha(nome) {
       ${(() => { const its = (S.resultado?.slots || []).map(so => [so, itemDoDia(so, nome)]).filter(([, t]) => t);
         return its.length ? `<dt>Hoje</dt><dd class="ficha-pq">${its.map(([so, t]) => { const pos = so.ranking.findIndex(x => x.nome === nome) + 1;
           return `${so.nome === "Dia" ? "☀︎ Dia" : "☾ Noite"}${pos ? ` · #${pos}` : ""} · score <b>${t.score.toFixed(0)}</b>${porqueHTML(t)}`; }).join("")}</dd>` : ""; })()}
+      ${(() => { const e = elo(duelosTodos(), S.frascosAtivos).get(nome);
+        return e?.n ? `<dt>Duelos</dt><dd>Elo ${fmtElo(e.rating)} · ${e.n} duelo${e.n > 1 ? "s" : ""} · ${e.vitorias} vitória${e.vitorias === 1 ? "" : "s"}${e.n < 5 ? ' <span class="nota">(Elo firma com 5+)</span>' : ""}</dd>` : ""; })()}
       <dt>Vizinhos</dt><dd>${esc(fi.vizinhos)}</dd>
       <dt>Leitura</dt><dd>${esc(fi.leitura)}</dd>
       <dt>Uso</dt><dd>${ult ? `último em ${esc(ult.data)} (${slotNome(ult.slot)}) · ${usos.length} registro${usos.length > 1 ? "s" : ""} no diário` : "sem registro no diário"}</dd>
@@ -1014,9 +1153,13 @@ document.addEventListener("click", async e => {
   if (b.dataset.pbfaixa) { S.pbFaixa = Number(b.dataset.pbfaixa); render(); return; }
   if (b.dataset.chip) { const k = b.dataset.chip, v = b.dataset.v; mudarDia(d => { d[k] = v; }); return; }
   if (b.dataset.extra) { const v = b.dataset.extra; mudarDia(d => { d.extras = d.extras.includes(v) ? d.extras.filter(x => x !== v) : [...d.extras, v]; }); return; }
-  if (b.dataset.roletaSlot) {
-    const slot = b.dataset.roletaSlot, so = S.resultado.slots.find(x => (x.nome === "Dia" ? "M" : "N") === slot);
-    abrirRoleta($("#folha"), so.nome, so.top, t => abrirRegistro({ perfume: t.nome, slot, sprays: ajustarSprays(t.r.f, t.sprays, ajSpray()), sugerido: t.sprays, ocasiao: ocasiaoDominante(so) }));
+  if (b.dataset.roletaSlot) { abrirRoletaSlot(b.dataset.roletaSlot); return; }
+  if (b.dataset.acao === "wrapped") { abrirWrappedMes(b.dataset.mes); render(); return; }
+  if (b.dataset.dueloVence) { escolherDuelo(Number(b.dataset.dueloVence)); return; }
+  if (b.dataset.acao === "duelo-pular") { S.parDuelo = null; render(); return; }
+  if (b.dataset.acao === "ativar-chacoalho") {
+    S.motionOk = await pedirMovimento();
+    render(); toast(S.motionOk ? "Chacoalhe para sortear." : "Sem permissão de movimento: use “Me surpreenda”.");
     return;
   }
   if (b.dataset.usei) {
@@ -1098,6 +1241,8 @@ document.addEventListener("change", e => {
   if (el.id === "hr-de" || el.id === "hr-ate") { S.hr = { ...S.hr, [el.id === "hr-de" ? "de" : "ate"]: el.value }; gravar("hr", S.hr); render(); return; }
   if (/^mf-(posse|arq|wish|casa|tier|am)$/.test(el.id || "")) { S.mf = { ...S.mf, [el.id.slice(3)]: el.value }; S.mfLimite = 60; gravar("mf", S.mf); render(); return; }
   if (/^col-(arq|faixa|oc|casa|tier|eixo|am|camada)$/.test(el.id || "")) { S.filtro = { ...S.filtro, [el.id.slice(4)]: el.value }; gravar("filtro", S.filtro); render(); return; }
+  if (el.id === "wr-mes") { S.wrMes = el.value; render(); return; }
+  if (el.id === "aj-chacoalhar") { gravar("chacoalhar", el.checked); cuidarChacoalho(); toast(el.checked ? "Chacoalhar ligado." : "Chacoalhar desligado."); return; }
   if (el.id === "testar") mudarDia(d => { d.testar = el.value.trim(); });
   if (el.id === "roupa") mudarDia(d => { d.roupa = el.value.trim(); });
 });

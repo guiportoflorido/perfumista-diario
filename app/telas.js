@@ -1,5 +1,6 @@
 // telas.js — Coleção, Playbook e Histórico (fase 4). Recebem o contexto pronto do main.js e devolvem HTML.
-import { FAIXAS } from "../engine/index.js";
+import { FAIXAS, faixaIdx } from "../engine/index.js";
+import { nomeDoDia } from "./diversao.js";
 import { esc, ROT_OC, OCAS_TODAS, pinta, faixaHTML, nf, tierHTML, slotNome, slotIcone, md, ordsDe, compararMulti, cmpValor, cabOrd, painelOrd, OPC_AMOSTRA, passaAmostra, temFiltro } from "./util.js";
 import { chave } from "./mercado.js";
 import { contagens, agrupar, esquecidos, usoVsJanelas, calibracao, deAnalise, notaPorFrascoFaixa } from "./estatisticas.js";
@@ -17,17 +18,18 @@ const quando = d => (d === null ? "sem registro" : d === 0 ? "hoje" : d === 1 ? 
 
 // ───────────────────────── Coleção (tabela) ─────────────────────────
 const COLS_COL = [["nome", "Perfume"], ["casa", "Casa"], ["tier", "Tier"], ["arquetipo", "Arquétipo"], ["eixo", "Eixo"], ["td", "Td"],
-  ["peso", "Peso"], ["doc", "Doçura"], ["envelope", "Envelope"], ["janelas", "Janelas"], ["usos", "Usos"], ["ultimo", "Último uso"]];
+  ["peso", "Peso"], ["doc", "Doçura"], ["envelope", "Envelope"], ["janelas", "Janelas"], ["usos", "Usos"], ["elo", "Elo"], ["ultimo", "Último uso"]];
 const TD_ROT = { C: "C · carregado", S: "S · seco", N: "N · indiferente" };
 
+const eloDe = x => (x.e && x.e.n >= 5 ? x.e.rating : "");   // Elo só conta com 5+ duelos
 function ordenarColecao(linhas, ords) {
   const v = (k, x) => ({ tier: TIERS_ORD.indexOf(x.f.tier), nome: x.f.nome, casa: x.f.casa, arquetipo: x.f.arquetipo, eixo: x.f.eixo, td: x.f.td,
-    peso: x.f.peso, doc: x.f.doc, envelope: x.f.env_hot * 10 + x.f.env_cold, janelas: x.f.janelas ?? "", usos: x.k.n, ultimo: x.k.ultimo || "" }[k]);
+    peso: x.f.peso, doc: x.f.doc, envelope: x.f.env_hot * 10 + x.f.env_cold, janelas: x.f.janelas ?? "", usos: x.k.n, elo: eloDe(x), ultimo: x.k.ultimo || "" }[k]);
   const padrao = (a, b) => TIERS_ORD.indexOf(a.f.tier) - TIERS_ORD.indexOf(b.f.tier) || a.f.nome.localeCompare(b.f.nome, "pt");
   return [...linhas].sort(compararMulti(ords, (k, a, b) => cmpValor(v(k, a), v(k, b)), padrao));
 }
 
-export function telaColecao({ frascos, hist, hoje, janelas, filtro, fichas, arqTag, amostras = null }) {
+export function telaColecao({ frascos, hist, hoje, janelas, filtro, fichas, arqTag, amostras = null, elo = null }) {
   const c = contagens(hist, frascos, hoje, { todos: true });
   const nCam = k => frascos.filter(f => camadaDe(f) === k).length;
   const arqs = [...new Set(frascos.map(f => f.arquetipo))].sort((a, b) => a.localeCompare(b));
@@ -46,7 +48,7 @@ export function telaColecao({ frascos, hist, hoje, janelas, filtro, fichas, arqT
     }
     if (q && !`${f.nome} ${f.casa} ${f.arquetipo}`.toLowerCase().includes(q)) return false;
     return true;
-  }).map(f => ({ f, k: c.por.get(f.nome) }));
+  }).map(f => ({ f, k: c.por.get(f.nome), e: elo?.get(f.nome) }));
   const ords = ordsDe(filtro, "tier");
   const linhas = ordenarColecao(filtrados, ords);
   const th = ([k, r]) => `<th class="cc-${k}" scope="col">${cabOrd(k, r, ords, "col-ord")}</th>`;
@@ -66,7 +68,7 @@ export function telaColecao({ frascos, hist, hoje, janelas, filtro, fichas, arqT
   </div>
   ${linhas.length ? `${painelOrd(ords, COLS_COL, "col")}<div class="tabelao" role="region" aria-label="Tabela da coleção" tabindex="0"><table class="t-colecao">
     <thead><tr><th class="c-n" scope="col">#</th>${COLS_COL.map(th).join("")}</tr></thead>
-    <tbody>${linhas.map(({ f, k }, i) => `<tr data-ficha="${esc(f.nome)}" tabindex="0">
+    <tbody>${linhas.map(({ f, k, e }, i) => `<tr data-ficha="${esc(f.nome)}" tabindex="0">
       <td class="c-n">${i + 1}</td>
       <td class="c-nome">${esc(f.nome)}${f.janelas_estimadas ? ` <span class="selo aviso" title="janelas estimadas">est.</span>` : ""}${camadaDe(f) === "custo" ? ` <span class="selo" title="Camada custo: só academia e corrida, fora da grade">custo</span>` : camadaDe(f) === "fora" ? ` <span class="selo aviso" title="Fora da grade">fora</span>` : ""}</td>
       <td class="cc-casa">${esc(f.casa)}</td>
@@ -78,9 +80,10 @@ export function telaColecao({ frascos, hist, hoje, janelas, filtro, fichas, arqT
       <td class="cc-env">${esc(fichas[f.nome]?.envelope || "")}</td>
       <td class="cc-num">${f.janelas ?? "—"}</td>
       <td class="cc-num">${k.n}${k.n ? ` <span class="nota">☀︎${k.M} ☾${k.N}</span>` : ""}</td>
+      <td class="cc-num">${e && e.n >= 5 ? Math.round(e.rating) : "—"}</td>
       <td class="cc-ult">${quando(k.dias)}</td>
     </tr>`).join("")}</tbody></table></div>
-  <p class="nota">Toque no cabeçalho para ordenar (vira o 1º critério; os anteriores viram 2º e 3º) e na linha para abrir a ficha. Peso 1–5 · Doçura 0–3 · Td = como reage à umidade.</p>`
+  <p class="nota">Toque no cabeçalho para ordenar (vira o 1º critério; os anteriores viram 2º e 3º) e na linha para abrir a ficha. Peso 1–5 · Doçura 0–3 · Td = como reage à umidade · Elo = gosto nos duelos “Qual dos dois?” (— com menos de 5).</p>`
     : `<div class="bloco"><p class="vazio">Nenhum frasco nesse recorte.</p></div>`}`;
 }
 
@@ -150,7 +153,7 @@ export function blocoExportar(preset = "tudo") {
     <div id="expSaida"></div></div>`;
 }
 
-export function telaHistorico({ frascos, hist: histTodo, hoje, fila: filaToda, ajSpray, limiteEsq = 45, hr = {}, arqTag, limiteEdicao = "", exp = "tudo" }) {
+export function telaHistorico({ frascos, hist: histTodo, hoje, fila: filaToda, ajSpray, limiteEsq = 45, hr = {}, arqTag, limiteEdicao = "", exp = "tudo", raspadinha = "", duelos = "", wrapped = "" }) {
   const preset = hr.preset || "tudo";
   const { de, ate } = periodo(preset, hoje, hr.de, hr.ate);
   const dentro = r => (!de || r.data >= de) && r.data <= ate;
@@ -188,6 +191,7 @@ export function telaHistorico({ frascos, hist: histTodo, hoje, fila: filaToda, a
   </div>
   ${!doPeriodo && c.cobertura < 90 ? `<p class="nota">Diário com menos de 90 dias: não serve ainda para conclusões de desbaste sobre os B.</p>` : ""}
   ${recentes}
+  ${wrapped}
   ${calendario(histTodo.filter(deAnalise), frascos, ate, de)}
   ${passaporte(c.por, hist, frascos)}
   <div class="bloco"><h3>Mais usados</h3>${usados.length ? barras(usados.slice(0, 15).map(x => [`<button class="nome-inline" data-ficha="${esc(x.f.nome)}">${esc(x.f.nome)}</button>`, x.n]), usados[0].n) : `<p class="nota">Nenhum.</p>`}</div>
@@ -197,6 +201,7 @@ export function telaHistorico({ frascos, hist: histTodo, hoje, fila: filaToda, a
   </div>
   <div class="bloco"><h3>Por arquétipo</h3>${porArq.length ? barras(porArq.map(([k, v]) => [arqTag(k), v]), porArq[0][1]) : `<p class="nota">Nenhum.</p>`}</div>
   <div class="bloco"><h3>${doPeriodo ? `Sem uso no período · ${esq.length}` : `Esquecidos · sem uso há ${limiteEsq}+ dias ou sem registro · ${esq.length}`}</h3>
+    ${raspadinha}
     <p class="nota">“Sem registro” é ausência no diário, não prova de que você não usou.</p>
     ${(() => { const item = x => `<article class="card compacto"><span class="pos">${tierHTML(x.f.tier)}</span><div style="min-width:0"><button class="nome" data-ficha="${esc(x.f.nome)}">${esc(x.f.nome)}</button><div class="casa">${arqTag(x.f.arquetipo, 13)} · ${x.f.janelas} janelas</div></div><span class="nota">${quando(x.dias)}</span></article>`;
       return `<div class="lista">${esq.slice(0, 8).map(item).join("")}</div>${esq.length > 8 ? `<details><summary>Ver os outros ${esq.length - 8}</summary><div class="lista" style="margin-top:8px">${esq.slice(8).map(item).join("")}</div></details>` : ""}`; })()}
@@ -212,6 +217,7 @@ export function telaHistorico({ frascos, hist: histTodo, hoje, fila: filaToda, a
       return `<tr><td><button class="nome-inline" data-ficha="${esc(x.f.nome)}">${esc(x.f.nome)}</button> ${tierHTML(x.f.tier)}</td><td>${x.n}</td><td><b>${nf(x.media)}</b></td><td>${fx || `<span class="nota">—</span>`}</td></tr>`;
     }).join("")}</tbody></table></div>` : `<p class="nota">Ainda sem frascos com 2 ou mais notas no período. Dê a NotaDia ao registrar o uso.</p>`}
   </div>
+  ${duelos}
   <div class="bloco"><h3>Sprays · real × sugerido pelo modelo</h3>
     ${cal.n ? `<p>Desvio médio geral: <b>${cal.geral > 0 ? "+" : ""}${nf(cal.geral)}</b> spray${Math.abs(cal.geral) === 1 ? "" : "s"} em ${cal.n} registro${cal.n === 1 ? "" : "s"}.</p>
       <div class="tabela"><table><thead><tr><th>Frasco</th><th>Registros</th><th>Desvio médio</th></tr></thead><tbody>${cal.por.map(p => `<tr><td>${esc(p.nome)}</td><td>${p.n}</td><td>${p.media > 0 ? "+" : ""}${nf(p.media)}</td></tr>`).join("")}</tbody></table></div>`
@@ -230,12 +236,25 @@ export function telaHistorico({ frascos, hist: histTodo, hoje, fila: filaToda, a
 }
 
 // ───────────────────────── calendário de cheiros ─────────────────────────
+/** Nome do dia recalculado do registro: temp/Td do registro e arquétipo do perfume (sem temp, só dia + material). */
+export function nomeDoRegistro(data, r, arqDe) {
+  if (!r) return "";
+  const num = v => (v === "" || v == null ? null : Number(String(v).replace(",", ".")));
+  const T = num(r.temp), td = num(r.td);
+  return nomeDoDia({ data, T: Number.isFinite(T) ? T : null, faixaIdx: Number.isFinite(T) ? faixaIdx(T) : null,
+    td: Number.isFinite(T) && Number.isFinite(td) ? td : null, top1: arqDe.get(r.perfume) || null });
+}
+
 /** Grade estilo GitHub: colunas = semanas, linhas = seg→dom; cada dia tem metade de cima (Dia) e de baixo (Noite)
  *  na cor do arquétipo usado. Mostra as últimas 16 semanas até o fim do período. */
 export function calendario(hist, frascos, ate, de) {
   const arqDe = new Map(frascos.map(f => [f.nome, f.arquetipo]));
   const porDia = new Map();
-  for (const r of hist) { if (!porDia.has(r.data)) porDia.set(r.data, {}); porDia.get(r.data)[r.slot] = r.perfume; }
+  const regs = new Map();   // registro que dá nome ao dia: o do Dia (M); sem ele, o da Noite
+  for (const r of hist) {
+    if (!porDia.has(r.data)) porDia.set(r.data, {}); porDia.get(r.data)[r.slot] = r.perfume;
+    if (r.slot === "M" || !regs.has(r.data)) regs.set(r.data, r);
+  }
   const fim = new Date(ate + "T12:00:00");
   const iso = x => `${x.getFullYear()}-${String(x.getMonth() + 1).padStart(2, "0")}-${String(x.getDate()).padStart(2, "0")}`;
   const semanas = 16, ini = new Date(fim); ini.setDate(ini.getDate() - ((fim.getDay() + 6) % 7) - (semanas - 1) * 7);
@@ -247,7 +266,8 @@ export function calendario(hist, frascos, ate, de) {
     for (let d = 0; d < 7; d++) {
       const dt = new Date(ini); dt.setDate(ini.getDate() + w * 7 + d);
       const k = iso(dt), u = porDia.get(k) || {}, futuro = dt > fim, fora = de && k < de;
-      const info = `<b>${dt.toLocaleDateString("pt-BR", { weekday: "short", day: "2-digit", month: "2-digit" })}</b> · ☀︎ ${esc(u.M || "—")} · ☾ ${esc(u.N || "—")}`;
+      const nome = nomeDoRegistro(k, regs.get(k), arqDe);
+      const info = `<b>${dt.toLocaleDateString("pt-BR", { weekday: "short", day: "2-digit", month: "2-digit" })}</b> · ☀︎ ${esc(u.M || "—")} · ☾ ${esc(u.N || "—")}${nome ? `<br><i>${esc(nome)}</i>` : ""}`;
       dias += futuro ? `<span class="dia vazio"></span>` : `<button class="dia ${fora ? "fora" : ""} ${u.M || u.N ? "usado" : ""}" data-dia="${k}" data-info="${esc(info)}" aria-label="${esc(k)}"><span style="${cel(u.M)}"></span><span style="${cel(u.N)}"></span></button>`;
     }
     const mesW = new Date(ini); mesW.setDate(ini.getDate() + w * 7);

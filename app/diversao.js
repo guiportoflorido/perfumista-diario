@@ -5,6 +5,55 @@ import { arqIcone, corArq } from "./icones.js";
 
 const semMovimento = () => matchMedia("(prefers-reduced-motion: reduce)").matches;
 
+// ───────────────────────── nome do dia ─────────────────────────
+// Cada dia ganha um nome (“Terça de Âmbar sob Garoa”). Determinístico: a semente é a data, nunca Math.random.
+let MATERIAIS = {};
+/** Materiais por arquétipo, do data/arquetipos.json (campo `materiais`). */
+export function definirMateriais(arquetipos) { MATERIAIS = Object.fromEntries((arquetipos || []).map(a => [a.nome, a.materiais || []])); }
+
+/** Hash djb2 da string (semente estável para escolher variantes). */
+export function hashTxt(s) { let h = 5381; for (const c of String(s)) h = ((h * 33) ^ c.codePointAt(0)) >>> 0; return h; }
+const escolher = (lista, semente) => lista[semente % lista.length];
+
+const DIAS_NOME = ["Domingo", "Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado"];   // getDay(): 0 = domingo
+const ADJETIVOS = [["Esfumada", "Esfumado"], ["Dourada", "Dourado"], ["Serena", "Sereno"], ["Velada", "Velado"], ["Acesa", "Aceso"], ["Lenta", "Lento"]];
+// complementos de clima: o primeiro grupo que casar com o dia vence; dentro dele, a semente desempata
+const CLIMAS = [
+  [c => c.chuva === 2, ["sob Chuva Firme", "em Céu Fechado", "sob Temporal"]],
+  [c => c.chuva === 1, ["sob Garoa", "entre Pancadas"]],
+  [c => c.T != null && c.T >= 30, c => [`a ${Math.round(c.T)} °C`, "ao Sol Forte"]],
+  [c => c.faixaIdx != null && c.faixaIdx <= 1, ["ao Sol Forte", "em Calor Manso"]],
+  [c => c.faixaIdx != null && c.faixaIdx >= 4, ["com Frente Fria", "na Brisa Fria"]],
+  [c => c.td != null && c.td >= 20, ["em Ar Pesado", "no Mormaço"]],
+  [c => c.td != null && c.td < 12, ["em Ar Seco", "sem Nuvens"]],
+  [c => c.chuva === 0, ["sem Nuvens", "em Ar Leve", "em Tarde Mansa"]],
+  [c => c.faixaIdx != null || c.T != null, ["em Ar Leve", "em Tarde Mansa"]],
+];
+function complementoClima(c, semente) {
+  for (const [casa, lista] of CLIMAS) if (casa(c)) return escolher(typeof lista === "function" ? lista(c) : lista, semente);
+  return "";
+}
+
+/** Material que o nome do dia usa para essa data e esse arquétipo (o mesmo de nomeDoDia); null sem materiais. */
+export function materialDoDia(data, arquetipo) {
+  const mats = MATERIAIS[arquetipo] || [];
+  return mats.length ? escolher(mats, hashTxt(data + "|mat")) : null;
+}
+
+/** Nome do dia: <dia da semana> <de | Adjetivo de> <Material> <clima>. top1: {arquetipo} (ou o nome do arquétipo); sem
+ *  top 1 fica só dia + clima; sem clima (chuva, faixa, T e Td nulos), só dia + material. */
+export function nomeDoDia({ data, faixaIdx = null, chuva = null, td = null, T = null, top1 = null }) {
+  const sem = hashTxt(data), wd = new Date(data + "T12:00:00").getDay(), dia = DIAS_NOME[wd];
+  const arq = typeof top1 === "string" ? top1 : top1?.arquetipo;
+  const mats = MATERIAIS[arq] || [];
+  const clima = complementoClima({ faixaIdx, chuva, td, T }, hashTxt(data + "|clima"));
+  if (!mats.length) return [dia, clima].filter(Boolean).join(" ");
+  const mat = escolher(mats, hashTxt(data + "|mat"));
+  const forma = sem % 3;
+  const meio = forma === 0 ? `de ${mat}` : forma === 1 ? mat : `${escolher(ADJETIVOS, hashTxt(data + "|adj"))[wd === 0 || wd === 6 ? 1 : 0]} de ${mat}`;
+  return [dia, meio, clima].filter(Boolean).join(" ");
+}
+
 // ───────────────────────── céu do slot ─────────────────────────
 /** Camada decorativa atrás do cartão de clima. tipo: "dia" | "noite"; chuva: 0 seco · 1 pancadas · 2 contínua. */
 export function ceuHTML(tipo, chuva = 0, faixaIdx = 2) {
@@ -70,6 +119,100 @@ export function abrirRoleta(raiz, slotNome, top, onUsar) {
     try { navigator.vibrate?.(30); } catch { /* sem vibração */ }
   };
   if (voltas) fitaEl.addEventListener("transitionend", mostrar, { once: true }); else mostrar();
+}
+
+// ───────────────────────── chacoalhar para sortear ─────────────────────────
+/** iOS só entrega o movimento com permissão pedida dentro de um toque (e pede de novo a cada carga da página). */
+export const movimentoPedePermissao = () => typeof globalThis.DeviceMotionEvent?.requestPermission === "function";
+/** Pede a permissão de movimento (chamar no handler de um toque). true se pode ouvir o acelerômetro. */
+export async function pedirMovimento() {
+  if (!globalThis.DeviceMotionEvent) return false;
+  if (!movimentoPedePermissao()) return true;
+  try { return (await DeviceMotionEvent.requestPermission()) === "granted"; } catch { return false; }
+}
+
+/** Ouve o acelerômetro: 2 picos acima de `limiar` m/s² (aceleração com gravidade) em até `janela` ms = chacoalhada;
+ *  depois espera `pausa` ms antes de aceitar outra. Devolve a função que desliga o ouvinte. */
+export function ativarChacoalho(onChacoalho, { limiar = 18, janela = 400, pausa = 2000 } = {}) {
+  let picos = [], ultimo = -Infinity;
+  const h = e => {
+    const a = e.accelerationIncludingGravity;
+    if (!a) return;
+    const t = performance.now();
+    if (Math.hypot(a.x || 0, a.y || 0, a.z || 0) < limiar || t - ultimo < pausa) return;
+    picos = picos.filter(x => t - x <= janela); picos.push(t);
+    if (picos.length >= 2) { ultimo = t; picos = []; onChacoalho(); }
+  };
+  addEventListener("devicemotion", h);
+  return () => removeEventListener("devicemotion", h);
+}
+
+// ───────────────────────── raspadinha do esquecido ─────────────────────────
+/** Card coberto do esquecido da semana. `conteudo` é o HTML já pronto do frasco; revelado → aberto, sem cobertura.
+ *  Com “reduzir movimento”, um botão Revelar no lugar da tela de raspar. */
+export function raspadinhaHTML({ conteudo, revelado }) {
+  const capa = revelado ? "" : semMovimento()
+    ? `<div class="raspa-capa"><button class="btn" data-raspa-revelar>Revelar</button></div>`
+    : `<canvas class="raspa-tela" aria-label="Raspe para revelar"></canvas>`;
+  return `<div class="raspa ${revelado ? "revelado" : ""}" data-raspa>
+    <p class="raspa-tit">🎟️ Esquecido da semana${revelado ? "" : " — raspe para revelar"}</p>
+    <div class="raspa-corpo"><div class="raspa-conteudo" ${revelado ? "" : 'aria-hidden="true"'}>${conteudo}</div>${capa}</div></div>`;
+}
+
+/** Liga a raspagem: pincel de ~28 px apaga a cobertura (destination-out); a cada 10 traços amostra o alfa numa grade
+ *  16×16 e, com ≥ 60 % raspado, a cobertura some com fade e chama onRevelar(). */
+export function ligarRaspadinha(el, onRevelar) {
+  if (!el || el.dataset.ligada) return;
+  el.dataset.ligada = "1";
+  let feito = false;
+  const revelar = () => {
+    if (feito) return; feito = true;
+    el.querySelector(".raspa-conteudo")?.removeAttribute("aria-hidden");
+    const capa = el.querySelector(".raspa-tela, .raspa-capa");
+    el.querySelector(".raspa-tit").textContent = "🎟️ Esquecido da semana";
+    el.classList.add("revelado");
+    if (capa) { capa.classList.add("some"); setTimeout(() => capa.remove(), semMovimento() ? 0 : 450); }
+    try { navigator.vibrate?.(25); } catch { /* sem vibração */ }
+    onRevelar();
+  };
+  const btn = el.querySelector("[data-raspa-revelar]");
+  if (btn) { btn.onclick = revelar; return; }
+  const cv = el.querySelector(".raspa-tela");
+  if (!cv) return;
+  const corpo = el.querySelector(".raspa-corpo"), W = corpo.clientWidth, H = corpo.clientHeight;
+  const dpr = Math.min(devicePixelRatio || 1, 2), ctx = cv.getContext("2d");
+  cv.width = W * dpr; cv.height = H * dpr; ctx.scale(dpr, dpr);
+  // prata com textura: gradiente + ruído desenhado uma vez
+  const g = ctx.createLinearGradient(0, 0, W, H);
+  g.addColorStop(0, "#c9ccd1"); g.addColorStop(.5, "#eef0f2"); g.addColorStop(1, "#aeb3ba");
+  ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+  for (let i = 0; i < W * H / 18; i++) {
+    ctx.fillStyle = `rgba(${Math.random() < .5 ? "255,255,255" : "90,95,105"},${(Math.random() * .18).toFixed(2)})`;
+    ctx.fillRect(Math.random() * W, Math.random() * H, 1.4, 1.4);
+  }
+  ctx.fillStyle = "rgba(60,64,72,.55)"; ctx.font = "600 15px system-ui, sans-serif"; ctx.textAlign = "center";
+  ctx.fillText("raspe aqui ✦", W / 2, H / 2 + 5);
+  ctx.globalCompositeOperation = "destination-out"; ctx.lineCap = "round"; ctx.lineJoin = "round"; ctx.lineWidth = 28;
+  let ant = null, tracos = 0;
+  const ponto = e => { const r = cv.getBoundingClientRect(); return { x: e.clientX - r.left, y: e.clientY - r.top }; };
+  const raspado = () => {
+    const img = ctx.getImageData(0, 0, cv.width, cv.height).data;
+    let vazio = 0;
+    for (let i = 0; i < 16; i++) for (let j = 0; j < 16; j++) {
+      const x = Math.floor((i + .5) * cv.width / 16), y = Math.floor((j + .5) * cv.height / 16);
+      if (img[(y * cv.width + x) * 4 + 3] < 40) vazio++;
+    }
+    return vazio / 256;
+  };
+  cv.addEventListener("pointerdown", e => { cv.setPointerCapture(e.pointerId); ant = ponto(e); ctx.beginPath(); ctx.arc(ant.x, ant.y, 14, 0, Math.PI * 2); ctx.fill(); });
+  cv.addEventListener("pointermove", e => {
+    if (!ant || feito) return;
+    const p = ponto(e);
+    ctx.beginPath(); ctx.moveTo(ant.x, ant.y); ctx.lineTo(p.x, p.y); ctx.stroke(); ant = p;
+    if (++tracos % 10 === 0 && raspado() >= .6) revelar();
+  });
+  const solta = () => { ant = null; if (!feito && raspado() >= .6) revelar(); };
+  cv.addEventListener("pointerup", solta); cv.addEventListener("pointercancel", solta);
 }
 
 // ───────────────────────── spray ao registrar ─────────────────────────
