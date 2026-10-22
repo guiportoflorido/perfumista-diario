@@ -576,3 +576,18 @@ select[disabled], input[readonly], textarea[readonly] { opacity: .75; }
 /* nome do dia: subtítulo do Hoje */
 .nome-dia { margin: 2px 0 12px; font: italic 500 15.5px/1.35 var(--f-texto); color: var(--suave); letter-spacing: -.005em; }
 .chip.chip-peq { padding: 5px 10px; font-size: 12px; margin-right: 6px; }
+
+/* frasco com humor: acessórios do ícone do nº 1 em Hoje (um ciclo curto, nunca em loop) */
+.humor .gota { fill: #7cc7ff; stroke: none; animation: humor-gota 1.1s ease-in 1 both; }
+.humor .g2 { animation-delay: .15s; }
+.humor .cachecol { fill: #d9534f; stroke: none; }
+.humor .ponta { transform-origin: 15px 19.5px; animation: humor-balanca 1.1s ease-in-out 1; }
+.humor .pano { fill: #8a94ff; stroke: none; }
+.humor .cabo, .humor .pingo { stroke: #8a94ff; stroke-width: 1.4; }
+.humor .pingo { stroke: #7cc7ff; animation: humor-pingo 1s ease-in 1 both; }
+.humor .guarda { animation: humor-abre .7s cubic-bezier(.3,1.5,.5,1) 1 both; transform-origin: 12px 3px; }
+@keyframes humor-gota { 0% { transform: translateY(-3px); opacity: 0; } 30% { opacity: 1; } 100% { transform: translateY(1.5px); opacity: 1; } }
+@keyframes humor-balanca { 0%, 100% { transform: rotate(0); } 30% { transform: rotate(14deg); } 65% { transform: rotate(-9deg); } }
+@keyframes humor-pingo { from { transform: translateY(-3px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+@keyframes humor-abre { from { transform: translateY(-3px) scale(.6); opacity: 0; } to { transform: none; opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .humor * { animation: none !important; } }

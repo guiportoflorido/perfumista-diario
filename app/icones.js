@@ -25,11 +25,34 @@ let CORES = {};
 export function definirCores(arquetipos) { CORES = Object.fromEntries((arquetipos || []).map(a => [a.nome, a.cor])); }
 export const corArq = nome => CORES[nome] || "currentColor";
 
-/** Ícone HTML (SVG inline) do arquétipo, na cor dele. */
-export function arqIcone(nome, tam = 16, classe = "") {
+// Acessórios do “frasco com humor” (ícone do nº 1 em Hoje): uma camada por estado, a mesma para todos os arquétipos,
+// desenhada no viewBox 24×24 do ícone (pode passar da borda: o SVG fica com overflow visível).
+const HUMOR = {
+  normal: "",
+  calor: '<path class="gota g1" d="M21.2 1.2c1.3 1.7 2 2.8 2 3.7a2 2 0 0 1-4 0c0-.9.7-2 2-3.7Z"/><path class="gota g2" d="M2.6 5.6c.9 1.2 1.4 2 1.4 2.6a1.4 1.4 0 0 1-2.8 0c0-.6.5-1.4 1.4-2.6Z"/>',
+  frio: '<path class="cachecol" d="M3.5 16.2c5.4 2.3 11.6 2.3 17 0v2.8c-5.4 2.3-11.6 2.3-17 0Z"/><path class="cachecol ponta" d="M14.6 19.6l.9 4.6h2.6l-1.1-5Z"/>',
+  chuva: '<g class="guarda"><path class="pano" d="M3.5 .2a8.5 5.6 0 0 1 17 0Z"/><path class="cabo" d="M12 .2v3.2" fill="none"/></g><path class="pingo" d="M2 3.5v1.6M22 4v1.6M19.5 -3.4v1.4" fill="none"/>',
+};
+export const ESTADOS_HUMOR = Object.keys(HUMOR);
+
+/** Humor do nº 1 a partir do slot da hora: chuva (≥ pancadas) vence; senão calor (rua ≥ 30 °C), frio (rua ≤ 17 °C), normal.
+ *  “Rua” = passos fora do AC, como as faixas de rua do engine. */
+export function humorDoSlot(so, chuva = 0) {
+  if (chuva >= 1) return "chuva";
+  const ts = (so?.passos || []).filter(p => p.amb !== "ac").map(p => p.T);
+  if (!ts.length) return "normal";
+  if (Math.max(...ts) >= 30) return "calor";
+  if (Math.min(...ts) <= 17) return "frio";
+  return "normal";
+}
+
+/** Ícone HTML (SVG inline) do arquétipo, na cor dele. `estado` (normal · calor · frio · chuva) põe a camada de humor por
+ *  cima, com uma animação curta de um ciclo; sem `estado`, o ícone simples de sempre. */
+export function arqIcone(nome, tam = 16, estado = null) {
   const p = ARQ_PATHS[nome];
   if (!p) return "";
-  return `<svg class="arq-ic ${classe}" viewBox="0 0 24 24" width="${tam}" height="${tam}" style="color:${corArq(nome)}" aria-hidden="true" focusable="false">${p}</svg>`;
+  const humor = estado && estado in HUMOR ? `<g class="humor" data-estado="${estado}">${HUMOR[estado]}</g>` : "";
+  return `<svg class="arq-ic${humor ? " com-humor" : ""}" viewBox="0 0 24 24" width="${tam}" height="${tam}" style="color:${corArq(nome)}" aria-hidden="true" focusable="false"${humor ? ' overflow="visible"' : ""}>${p}${humor}</svg>`;
 }
 
 /** Ícone + nome do arquétipo. */

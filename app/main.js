@@ -10,7 +10,7 @@ import { janelasPorFrasco, ajustarSprays, deAnalise, notaPorFrascoFaixa, sobrevi
 import { telaColecao, telaPlaybook, telaHistorico, idRegistro, periodo } from "./telas.js";
 import { telaRoda } from "./roda.js";
 import { ordsDe, tocarOrd, mudarOrds, slotNome, slotBase, slotIcone, opcoesSlot, slotExpandido } from "./util.js";
-import { definirCores, arqTag, arqIcone, corArq } from "./icones.js";
+import { definirCores, arqTag, arqIcone, corArq, humorDoSlot } from "./icones.js";
 import { ceuHTML, abrirRoleta, animarSpray, nomeDoDia, definirMateriais, ativarChacoalho, pedirMovimento, movimentoPedePermissao } from "./diversao.js";
 import { chave as mercadoChave, telaMercado, fichaEditavel, camposAlterados, baseComTiers, deLinhas, linhasParaCriar, cachePlanilha, baixarMercado, criarNaPlanilha, editarNaPlanilha, adicionarNaPlanilha, removerNaPlanilha, fotoNoCache } from "./mercado.js";
 import { contagens } from "./estatisticas.js";
@@ -19,7 +19,7 @@ import { telaAmostras, fichaAmostra, deLinhas as amostrasDeLinhas, juntar, semRe
 import { ler, gravar } from "./store.js";
 import { fotoFicha, iconeFicha, fotoMini, reduzirImagem, subirFoto, removerFotoPlanilha, iniciarFotos } from "./fotos.js";
 
-export const APP_VERSAO = "5.33";  // sobe a cada publicação: confere no topo da tela se o celular pegou a versão nova
+export const APP_VERSAO = "5.34";  // sobe a cada publicação: confere no topo da tela se o celular pegou a versão nova
 const S = { motionOk: !movimentoPedePermissao() && "DeviceMotionEvent" in globalThis, aba: "hoje", frascos: [], frascosAtivos: [], avisosTiers: null, medidos: [], fichas: {}, versao: {}, prev: null, prevOffline: false,
   prevErro: null, metar: null, metarMotivo: null, clima: null, resultado: null, erroMotor: null, entrada: "", carregandoClima: true,
   sync: { estado: "ocioso", msg: "" }, hr: ler("hr", { preset: "tudo" }), tokenNovo: null, playbook: null, janelas: new Map(),
@@ -405,7 +405,7 @@ function blocoSlot(s, expandido = true) {
     const ja = usado && usado.perfume === t.nome;
     const hero = i === 0 && !custo;
     return `<article class="card ${hero ? "top1" : ""}" style="--i:${i};--cor:${corArq(t.arquetipo)}">
-      ${hero ? `<span class="pos pos-hero">${arqIcone(t.arquetipo, 30)}<span class="n1">1</span></span>` : `<span class="pos">${i + 1}</span>`}
+      ${hero ? `<span class="pos pos-hero">${arqIcone(t.arquetipo, 30, slotCod === slotDaHora(dia) ? humorDoSlot(s, S.clima?.chuva?.v ?? 0) : null)}<span class="n1">1</span></span>` : `<span class="pos">${i + 1}</span>`}
       <div style="min-width:0" class="card-tx">${fotoMini(doMercado(t.casa, t.nome), hero ? "foto-hero" : "foto-mini")}<button class="nome" data-ficha="${esc(t.nome)}">${esc(t.nome)}</button>${tierHTML(t.tier)}<div class="casa">${esc(t.casa)} · ${arqTag(t.arquetipo, 13)}</div></div>
       <span class="score" title="Score">${t.score.toFixed(0)}</span>
       <div class="meta">${spraysHTML(t)}<span>vivo até <b>${vivoTxt(t)}</b>${seloMedido(t.r.f)}</span></div>

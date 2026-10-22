@@ -30,3 +30,28 @@ test("fallback: sem top 1 → dia + clima; sem clima → dia + material", () => 
   assert.match(nomeDoDia({ data: "2026-10-22", top1: "Barbeiro" }), /^Quinta .*(Fougère|Lavanda|Musgo)$/);
   assert.equal(nomeDoDia({ data: "2026-10-22" }), "Quinta");
 });
+
+// ───────────── frasco com humor ─────────────
+import { arqIcone, humorDoSlot, ESTADOS_HUMOR } from "../app/icones.js";
+
+test("arqIcone com estado: SVG válido com <g data-estado> do estado; sem estado, o ícone de sempre", () => {
+  assert.deepEqual(ESTADOS_HUMOR, ["normal", "calor", "frio", "chuva"]);
+  for (const e of ESTADOS_HUMOR) {
+    const s = arqIcone("Sultão", 30, e);
+    assert.match(s, /^<svg [^>]*viewBox="0 0 24 24"[^>]*>.*<\/svg>$/s);
+    assert.ok(s.includes(`<g class="humor" data-estado="${e}">`), e);
+    assert.equal((s.match(/<g[\s>]/g) || []).length, (s.match(/<\/g>/g) || []).length, `${e}: <g> balanceados`);
+  }
+  assert.ok(!arqIcone("Sultão", 30).includes("data-estado"));
+  assert.equal(arqIcone("Inexistente", 30, "calor"), "");
+});
+
+test("humor do slot: chuva vence; rua ≥ 30 → calor; ≤ 17 → frio; AC não conta", () => {
+  const so = ts => ({ passos: ts.map(([T, amb]) => ({ T, amb })) });
+  assert.equal(humorDoSlot(so([[31, "rua"]]), 1), "chuva");
+  assert.equal(humorDoSlot(so([[24, "rua"], [30.2, "rua"]]), 0), "calor");
+  assert.equal(humorDoSlot(so([[16.5, "casa"], [20, "rua"]]), 0), "frio");
+  assert.equal(humorDoSlot(so([[23, "ac"], [22, "rua"]]), 0), "normal");
+  assert.equal(humorDoSlot(so([[35, "ac"], [22, "rua"]]), 0), "normal");
+  assert.equal(humorDoSlot(null, 0), "normal");
+});
