@@ -1,17 +1,17 @@
 // main.js — orquestra as telas: Hoje, Registrar e Ajustes (Coleção, Playbook e Histórico entram na fase 4).
-import { rodar, avaliar, vivoAte, porque, CFG, FAIXAS, OCASIOES, fmtH } from "../engine/index.js";
+import { rodar, avaliar, vivoAte, porque, sprays, CFG, FAIXAS, OCASIOES, fmtH } from "../engine/index.js";
 import { ajustes, salvarAjustes, AJUSTES_PADRAO, estadoDia, salvarDia, hojeISO } from "./store.js";
 import { buscarPrevisao, buscarMetar, derivarClima, horaNum } from "./clima.js";
 import { montarEntrada, OCAS_DIA, OCAS_NOITE, AMBIENTES, EXTRAS } from "./entrada.js";
 import { configurado, chamar } from "./api.js";
 import { fila, adicionar, descartar, enviar, planilhaCache, baixarPlanilha, limiteEdicao, editarRegistro, removerRegistro, exportarDiario } from "./registro.js";
 import { lerTiers, lerDiario, aplicarTiers, aplicarMedicoes, MEDICOES_PADRAO, diarioUnificado, nomesRegistraveis } from "./planilha.js";
-import { janelasPorFrasco, ajustarSprays, deAnalise, notaPorFrascoFaixa, sobrevivencia } from "./estatisticas.js";
+import { janelasPorFrasco, ajustarSprays, deAnalise, notaPorFrascoFaixa, sobrevivencia, esquecidos, esquecidoDaSemana, semanaISO } from "./estatisticas.js";
 import { telaColecao, telaPlaybook, telaHistorico, idRegistro, periodo } from "./telas.js";
 import { telaRoda } from "./roda.js";
 import { ordsDe, tocarOrd, mudarOrds, slotNome, slotBase, slotIcone, opcoesSlot, slotExpandido } from "./util.js";
 import { definirCores, arqTag, arqIcone, corArq, humorDoSlot } from "./icones.js";
-import { ceuHTML, abrirRoleta, animarSpray, nomeDoDia, definirMateriais, ativarChacoalho, pedirMovimento, movimentoPedePermissao } from "./diversao.js";
+import { ceuHTML, abrirRoleta, animarSpray, nomeDoDia, definirMateriais, raspadinhaHTML, ligarRaspadinha, ativarChacoalho, pedirMovimento, movimentoPedePermissao } from "./diversao.js";
 import { chave as mercadoChave, telaMercado, fichaEditavel, camposAlterados, baseComTiers, deLinhas, linhasParaCriar, cachePlanilha, baixarMercado, criarNaPlanilha, editarNaPlanilha, adicionarNaPlanilha, removerNaPlanilha, fotoNoCache } from "./mercado.js";
 import { contagens } from "./estatisticas.js";
 import { telaAmostras, fichaAmostra, deLinhas as amostrasDeLinhas, juntar, semRegistro, camposAmostra, camposAvaliacaoMexidos, cacheAmostras, baixarAmostras,
@@ -19,7 +19,7 @@ import { telaAmostras, fichaAmostra, deLinhas as amostrasDeLinhas, juntar, semRe
 import { ler, gravar } from "./store.js";
 import { fotoFicha, iconeFicha, fotoMini, reduzirImagem, subirFoto, removerFotoPlanilha, iniciarFotos } from "./fotos.js";
 
-export const APP_VERSAO = "5.34";  // sobe a cada publicação: confere no topo da tela se o celular pegou a versão nova
+export const APP_VERSAO = "5.35";  // sobe a cada publicação: confere no topo da tela se o celular pegou a versão nova
 const S = { motionOk: !movimentoPedePermissao() && "DeviceMotionEvent" in globalThis, aba: "hoje", frascos: [], frascosAtivos: [], avisosTiers: null, medidos: [], fichas: {}, versao: {}, prev: null, prevOffline: false,
   prevErro: null, metar: null, metarMotivo: null, clima: null, resultado: null, erroMotor: null, entrada: "", carregandoClima: true,
   sync: { estado: "ocioso", msg: "" }, hr: ler("hr", { preset: "tudo" }), tokenNovo: null, playbook: null, janelas: new Map(),
@@ -190,7 +190,7 @@ function render() {
   const arqDe = new Map(S.frascos.map(f => [f.nome, f.arquetipo]));
   const ctx = { fichas: S.fichas, arqTag, arqIcone, arqDe, hr: S.hr,
     frascos: S.frascosAtivos, hist: historico(), hoje: hojeISO(), janelas: S.janelas, filtro: S.filtro, playbook: S.playbook,
-    faixaSel: S.pbFaixa ?? S.clima?.faixaDia?.idx ?? 2, fila: fila(), ajSpray: ajSpray(), limiteEdicao: limiteEdicao(hojeISO()), exp: S.exp,
+    faixaSel: S.pbFaixa ?? S.clima?.faixaDia?.idx ?? 2, fila: fila(), ajSpray: ajSpray(), limiteEdicao: limiteEdicao(hojeISO()), exp: S.exp, raspadinha: S.aba === "historico" ? blocoRaspadinha() : "",
     amostras: S.aba === "colecao" ? amostrasEmMaos() : null };
   // mesma aba: guarda rolagem da página, das tabelas e painéis abertos para restaurar depois de redesenhar
   const antes = trocouAba ? null : {
@@ -213,6 +213,8 @@ function render() {
     document.querySelectorAll("#tela .tabelao").forEach((t, i) => { const p = antes.tabelas[i]; if (p) { t.scrollTop = p[0]; t.scrollLeft = p[1]; } });
     window.scrollTo(0, antes.y);
   }
+  const rasp = $("#tela [data-raspa]:not(.revelado)");
+  if (rasp) ligarRaspadinha(rasp, () => gravar("raspadinha", { ...ler("raspadinha", {}), revelado: true }));
   if (foco && document.getElementById(foco) && S.aba !== "hoje") {
     const el = document.getElementById(foco); el.focus();
     if (el.type === "search") { const n = el.value.length; try { el.setSelectionRange(n, n); } catch { /* sem seleção */ } }
@@ -391,8 +393,8 @@ function itemDoDia(so, nome) {
   const f = S.frascosAtivos.find(x => x.nome === nome), d = S.resultado.entrada, slot = { nome: so.nome, ini: so.ini, fim: so.fim };
   const r = f && avaliar(f, so.passos, d, slot);
   if (!r) return null;
-  const va = vivoAte(r, slot);
-  return { nome, score: r.score, vivo_ate: va, vivo_fim: va >= slot.fim, porque: porque(r, d, new Set(so.passos.map(p => p.ocas))), r };
+  const va = vivoAte(r, slot), [sp, nota] = sprays(r, d, d.extra.includes("vento"));
+  return { nome, score: r.score, sprays: sp, nota, vivo_ate: va, vivo_fim: va >= slot.fim, porque: porque(r, d, new Set(so.passos.map(p => p.ocas))), r };
 }
 
 /** Um slot da tela Hoje. `expandido` falso: o bloco inteiro vai dentro de um <details> recolhido, com o top 3 (ou o
@@ -791,6 +793,37 @@ async function apagarRegistroEditando() {
 }
 
 // ───────────────────────── ajustes ─────────────────────────
+// ───────────────────────── raspadinha do esquecido (Histórico) ─────────────────────────
+/** Esquecido da semana: escolhido uma vez por semana ISO e guardado (não muda na semana). Precisa do resultado de hoje. */
+function raspadinhaAtual() {
+  const hoje = hojeISO(), semana = semanaISO(hoje), salvo = ler("raspadinha", null);
+  if (salvo?.semana === semana) return salvo;
+  const so = slotHoraRes();
+  if (!so) return null;
+  const e = esquecidoDaSemana(esquecidos(contagens(historico(), S.frascosAtivos, hoje).por), so, semana);
+  if (!e) return null;
+  const novo = { semana, nome: e.nome, revelado: false };
+  gravar("raspadinha", novo);
+  return novo;
+}
+function blocoRaspadinha() {
+  const rp = raspadinhaAtual();
+  const f = rp && S.frascosAtivos.find(x => x.nome === rp.nome);
+  if (!f) return "";
+  // usável hoje? (refeito a cada dia da semana: o clima muda)
+  const cod = slotDaHora(), so = slotHoraRes(), t = so && !so.fora[f.nome] ? itemDoDia(so, f.nome) : null;
+  const usado = historico().some(r => r.data === estadoDia().data && slotBase(r.slot) === cod);
+  const ult = historico().filter(r => r.perfume === f.nome && deAnalise(r)).at(-1);
+  const dias = ult ? Math.round((new Date(hojeISO()) - new Date(ult.data)) / 864e5) : null;
+  const conteudo = `<div class="raspa-fr">${fotoMini(doMercado(f.casa, f.nome), "foto-mini")}<span class="ic">${arqIcone(f.arquetipo, 30)}</span>
+      <div style="min-width:0"><button class="nome" data-ficha="${esc(f.nome)}">${esc(f.nome)}</button>${tierHTML(f.tier)}<div class="casa">${esc(f.casa)} · ${arqTag(f.arquetipo, 13)}</div>
+      <div class="nota">${dias == null ? "sem registro no diário" : `parado há ${dias} dias`}</div></div></div>
+    ${t ? `<div class="linha-flex"><span>${spraysHTML(t)} · score ${t.score.toFixed(0)}</span><span class="esp"></span>
+      <button class="btn peq ${usado ? "sec" : ""}" data-usei="${esc(f.nome)}" data-slot="${cod}" data-sprays="${t.sprays}" data-ajustado="${ajustarSprays(f, t.sprays, ajSpray())}" ${usado ? "disabled" : ""}>Usei este</button></div>`
+      : `<p class="nota">Não serve para hoje; guarde para a semana.</p>`}`;
+  return raspadinhaHTML({ conteudo, revelado: rp.revelado });
+}
+
 /** Copia o diário do período escolhido; sem permissão de área de transferência (iOS), mostra o texto selecionado. */
 async function copiarDiario() {
   const { de, ate } = periodo(S.exp, hojeISO());

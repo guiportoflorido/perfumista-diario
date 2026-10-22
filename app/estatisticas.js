@@ -54,6 +54,28 @@ export function esquecidos(por, limite = 45) {
     .sort((a, b) => "SABC".indexOf(a.f.tier) - "SABC".indexOf(b.f.tier) || (b.dias ?? 1e9) - (a.dias ?? 1e9) || a.f.nome.localeCompare(b.f.nome));
 }
 
+/** Semana ISO da data (AAAA-MM-DD) → "AAAA-Www" (segunda a domingo; a semana 1 tem a 1ª quinta do ano). */
+export function semanaISO(iso) {
+  const d = new Date(iso + "T12:00:00Z");
+  d.setUTCDate(d.getUTCDate() - ((d.getUTCDay() + 6) % 7) + 3);   // quinta da mesma semana decide o ano
+  const ano = d.getUTCFullYear(), jan4 = new Date(Date.UTC(ano, 0, 4, 12));
+  const sem = 1 + Math.round((d - jan4) / 864e5 / 7 + ((jan4.getUTCDay() + 6) % 7 - 3) / 7);
+  return `${ano}-W${String(sem).padStart(2, "0")}`;
+}
+
+/** Esquecido da semana (raspadinha do Histórico). `esq` = esquecidos(…); `so` = slot da hora de hoje (rodar()).
+ *  Entre os esquecidos que passam nos filtros de hoje (fora de so.fora e no ranking), o de maior score; se nenhum
+ *  serve, o esquecido há mais tempo (sem registro conta como o mais antigo), marcado usavel: false. Sem esquecidos → null. */
+export function esquecidoDaSemana(esq, so, semana) {
+  if (!esq?.length) return null;
+  const score = new Map((so?.ranking || []).map(x => [x.nome, x.score]));
+  const usaveis = esq.filter(c => !so?.fora?.[c.f.nome] && score.has(c.f.nome))
+    .sort((a, b) => score.get(b.f.nome) - score.get(a.f.nome) || a.f.nome.localeCompare(b.f.nome, "pt"));
+  if (usaveis.length) { const c = usaveis[0]; return { nome: c.f.nome, dias: c.dias, score: score.get(c.f.nome), usavel: true, semana }; }
+  const c = [...esq].sort((a, b) => (b.dias ?? Infinity) - (a.dias ?? Infinity) || a.f.nome.localeCompare(b.f.nome, "pt"))[0];
+  return { nome: c.f.nome, dias: c.dias, score: null, usavel: false, semana };
+}
+
 /** Uso × janelas: participação de cada frasco nos usos vs. participação nas janelas do playbook (654 desde 14/out/2026). */
 export function usoVsJanelas(por) {
   const totJ = [...por.values()].reduce((s, c) => s + (c.f.janelas || 0), 0);

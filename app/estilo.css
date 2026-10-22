@@ -591,3 +591,18 @@ select[disabled], input[readonly], textarea[readonly] { opacity: .75; }
 @keyframes humor-pingo { from { transform: translateY(-3px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 @keyframes humor-abre { from { transform: translateY(-3px) scale(.6); opacity: 0; } to { transform: none; opacity: 1; } }
 @media (prefers-reduced-motion: reduce) { .humor * { animation: none !important; } }
+
+/* raspadinha do esquecido (Histórico) */
+.raspa { margin: 6px 0 12px; border-radius: var(--r); background: var(--sup2); box-shadow: var(--sombra); padding: 10px 12px 12px; }
+.raspa-tit { margin: 0 0 8px; font: 600 13.5px var(--f); color: var(--suave); }
+.raspa-corpo { position: relative; min-height: 96px; border-radius: 12px; overflow: hidden; }
+.raspa-conteudo { padding: 8px 4px; display: grid; gap: 8px; }
+.raspa-fr { display: flex; gap: 10px; align-items: center; }
+.raspa-fr .nome { all: unset; cursor: pointer; font: 650 16px/1.3 var(--f); }
+.raspa-fr .casa { color: var(--suave); font-size: 13px; }
+.raspa-tela, .raspa-capa { position: absolute; inset: 0; width: 100%; height: 100%; border-radius: 12px; touch-action: none; transition: opacity .4s; cursor: crosshair; }
+.raspa-capa { display: grid; place-items: center; background: linear-gradient(135deg, #c9ccd1, #eef0f2 50%, #aeb3ba); cursor: default; }
+.raspa-tela.some, .raspa-capa.some { opacity: 0; pointer-events: none; }
+.raspa.revelado .raspa-conteudo { animation: raspa-entra .4s ease-out 1; }
+@keyframes raspa-entra { from { transform: scale(.97); } to { transform: none; } }
+@media (prefers-reduced-motion: reduce) { .raspa-tela, .raspa-capa { transition: none; } .raspa.revelado .raspa-conteudo { animation: none; } }

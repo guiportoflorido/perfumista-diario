@@ -141,6 +141,74 @@ export function ativarChacoalho(onChacoalho, { limiar = 18, janela = 400, pausa 
   return () => removeEventListener("devicemotion", h);
 }
 
+// ───────────────────────── raspadinha do esquecido ─────────────────────────
+/** Card coberto do esquecido da semana. `conteudo` é o HTML já pronto do frasco; revelado → aberto, sem cobertura.
+ *  Com “reduzir movimento”, um botão Revelar no lugar da tela de raspar. */
+export function raspadinhaHTML({ conteudo, revelado }) {
+  const capa = revelado ? "" : semMovimento()
+    ? `<div class="raspa-capa"><button class="btn" data-raspa-revelar>Revelar</button></div>`
+    : `<canvas class="raspa-tela" aria-label="Raspe para revelar"></canvas>`;
+  return `<div class="raspa ${revelado ? "revelado" : ""}" data-raspa>
+    <p class="raspa-tit">🎟️ Esquecido da semana${revelado ? "" : " — raspe para revelar"}</p>
+    <div class="raspa-corpo"><div class="raspa-conteudo" ${revelado ? "" : 'aria-hidden="true"'}>${conteudo}</div>${capa}</div></div>`;
+}
+
+/** Liga a raspagem: pincel de ~28 px apaga a cobertura (destination-out); a cada 10 traços amostra o alfa numa grade
+ *  16×16 e, com ≥ 60 % raspado, a cobertura some com fade e chama onRevelar(). */
+export function ligarRaspadinha(el, onRevelar) {
+  if (!el || el.dataset.ligada) return;
+  el.dataset.ligada = "1";
+  let feito = false;
+  const revelar = () => {
+    if (feito) return; feito = true;
+    el.querySelector(".raspa-conteudo")?.removeAttribute("aria-hidden");
+    const capa = el.querySelector(".raspa-tela, .raspa-capa");
+    el.querySelector(".raspa-tit").textContent = "🎟️ Esquecido da semana";
+    el.classList.add("revelado");
+    if (capa) { capa.classList.add("some"); setTimeout(() => capa.remove(), semMovimento() ? 0 : 450); }
+    try { navigator.vibrate?.(25); } catch { /* sem vibração */ }
+    onRevelar();
+  };
+  const btn = el.querySelector("[data-raspa-revelar]");
+  if (btn) { btn.onclick = revelar; return; }
+  const cv = el.querySelector(".raspa-tela");
+  if (!cv) return;
+  const corpo = el.querySelector(".raspa-corpo"), W = corpo.clientWidth, H = corpo.clientHeight;
+  const dpr = Math.min(devicePixelRatio || 1, 2), ctx = cv.getContext("2d");
+  cv.width = W * dpr; cv.height = H * dpr; ctx.scale(dpr, dpr);
+  // prata com textura: gradiente + ruído desenhado uma vez
+  const g = ctx.createLinearGradient(0, 0, W, H);
+  g.addColorStop(0, "#c9ccd1"); g.addColorStop(.5, "#eef0f2"); g.addColorStop(1, "#aeb3ba");
+  ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+  for (let i = 0; i < W * H / 18; i++) {
+    ctx.fillStyle = `rgba(${Math.random() < .5 ? "255,255,255" : "90,95,105"},${(Math.random() * .18).toFixed(2)})`;
+    ctx.fillRect(Math.random() * W, Math.random() * H, 1.4, 1.4);
+  }
+  ctx.fillStyle = "rgba(60,64,72,.55)"; ctx.font = "600 15px system-ui, sans-serif"; ctx.textAlign = "center";
+  ctx.fillText("raspe aqui ✦", W / 2, H / 2 + 5);
+  ctx.globalCompositeOperation = "destination-out"; ctx.lineCap = "round"; ctx.lineJoin = "round"; ctx.lineWidth = 28;
+  let ant = null, tracos = 0;
+  const ponto = e => { const r = cv.getBoundingClientRect(); return { x: e.clientX - r.left, y: e.clientY - r.top }; };
+  const raspado = () => {
+    const img = ctx.getImageData(0, 0, cv.width, cv.height).data;
+    let vazio = 0;
+    for (let i = 0; i < 16; i++) for (let j = 0; j < 16; j++) {
+      const x = Math.floor((i + .5) * cv.width / 16), y = Math.floor((j + .5) * cv.height / 16);
+      if (img[(y * cv.width + x) * 4 + 3] < 40) vazio++;
+    }
+    return vazio / 256;
+  };
+  cv.addEventListener("pointerdown", e => { cv.setPointerCapture(e.pointerId); ant = ponto(e); ctx.beginPath(); ctx.arc(ant.x, ant.y, 14, 0, Math.PI * 2); ctx.fill(); });
+  cv.addEventListener("pointermove", e => {
+    if (!ant || feito) return;
+    const p = ponto(e);
+    ctx.beginPath(); ctx.moveTo(ant.x, ant.y); ctx.lineTo(p.x, p.y); ctx.stroke(); ant = p;
+    if (++tracos % 10 === 0 && raspado() >= .6) revelar();
+  });
+  const solta = () => { ant = null; if (!feito && raspado() >= .6) revelar(); };
+  cv.addEventListener("pointerup", solta); cv.addEventListener("pointercancel", solta);
+}
+
 // ───────────────────────── spray ao registrar ─────────────────────────
 /** Overlay com um frasco que borrifa `sprays` vezes. Resolve quando termina (ou quando ele toca para pular). */
 export function animarSpray({ sprays, nome, arquetipo }) {
