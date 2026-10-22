@@ -115,6 +115,32 @@ export function abrirRoleta(raiz, slotNome, top, onUsar) {
   if (voltas) fitaEl.addEventListener("transitionend", mostrar, { once: true }); else mostrar();
 }
 
+// ───────────────────────── chacoalhar para sortear ─────────────────────────
+/** iOS só entrega o movimento com permissão pedida dentro de um toque (e pede de novo a cada carga da página). */
+export const movimentoPedePermissao = () => typeof globalThis.DeviceMotionEvent?.requestPermission === "function";
+/** Pede a permissão de movimento (chamar no handler de um toque). true se pode ouvir o acelerômetro. */
+export async function pedirMovimento() {
+  if (!globalThis.DeviceMotionEvent) return false;
+  if (!movimentoPedePermissao()) return true;
+  try { return (await DeviceMotionEvent.requestPermission()) === "granted"; } catch { return false; }
+}
+
+/** Ouve o acelerômetro: 2 picos acima de `limiar` m/s² (aceleração com gravidade) em até `janela` ms = chacoalhada;
+ *  depois espera `pausa` ms antes de aceitar outra. Devolve a função que desliga o ouvinte. */
+export function ativarChacoalho(onChacoalho, { limiar = 18, janela = 400, pausa = 2000 } = {}) {
+  let picos = [], ultimo = -Infinity;
+  const h = e => {
+    const a = e.accelerationIncludingGravity;
+    if (!a) return;
+    const t = performance.now();
+    if (Math.hypot(a.x || 0, a.y || 0, a.z || 0) < limiar || t - ultimo < pausa) return;
+    picos = picos.filter(x => t - x <= janela); picos.push(t);
+    if (picos.length >= 2) { ultimo = t; picos = []; onChacoalho(); }
+  };
+  addEventListener("devicemotion", h);
+  return () => removeEventListener("devicemotion", h);
+}
+
 // ───────────────────────── spray ao registrar ─────────────────────────
 /** Overlay com um frasco que borrifa `sprays` vezes. Resolve quando termina (ou quando ele toca para pular). */
 export function animarSpray({ sprays, nome, arquetipo }) {

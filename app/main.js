@@ -11,7 +11,7 @@ import { telaColecao, telaPlaybook, telaHistorico, idRegistro, periodo } from ".
 import { telaRoda } from "./roda.js";
 import { ordsDe, tocarOrd, mudarOrds, slotNome, slotBase, slotIcone, opcoesSlot, slotExpandido } from "./util.js";
 import { definirCores, arqTag, arqIcone, corArq } from "./icones.js";
-import { ceuHTML, abrirRoleta, animarSpray, nomeDoDia, definirMateriais } from "./diversao.js";
+import { ceuHTML, abrirRoleta, animarSpray, nomeDoDia, definirMateriais, ativarChacoalho, pedirMovimento, movimentoPedePermissao } from "./diversao.js";
 import { chave as mercadoChave, telaMercado, fichaEditavel, camposAlterados, baseComTiers, deLinhas, linhasParaCriar, cachePlanilha, baixarMercado, criarNaPlanilha, editarNaPlanilha, adicionarNaPlanilha, removerNaPlanilha, fotoNoCache } from "./mercado.js";
 import { contagens } from "./estatisticas.js";
 import { telaAmostras, fichaAmostra, deLinhas as amostrasDeLinhas, juntar, semRegistro, camposAmostra, camposAvaliacaoMexidos, cacheAmostras, baixarAmostras,
@@ -19,8 +19,8 @@ import { telaAmostras, fichaAmostra, deLinhas as amostrasDeLinhas, juntar, semRe
 import { ler, gravar } from "./store.js";
 import { fotoFicha, iconeFicha, fotoMini, reduzirImagem, subirFoto, removerFotoPlanilha, iniciarFotos } from "./fotos.js";
 
-export const APP_VERSAO = "5.32";  // sobe a cada publicação: confere no topo da tela se o celular pegou a versão nova
-const S = { aba: "hoje", frascos: [], frascosAtivos: [], avisosTiers: null, medidos: [], fichas: {}, versao: {}, prev: null, prevOffline: false,
+export const APP_VERSAO = "5.33";  // sobe a cada publicação: confere no topo da tela se o celular pegou a versão nova
+const S = { motionOk: !movimentoPedePermissao() && "DeviceMotionEvent" in globalThis, aba: "hoje", frascos: [], frascosAtivos: [], avisosTiers: null, medidos: [], fichas: {}, versao: {}, prev: null, prevOffline: false,
   prevErro: null, metar: null, metarMotivo: null, clima: null, resultado: null, erroMotor: null, entrada: "", carregandoClima: true,
   sync: { estado: "ocioso", msg: "" }, hr: ler("hr", { preset: "tudo" }), tokenNovo: null, playbook: null, janelas: new Map(),
   filtro: ler("filtro", {}), pbFaixa: null, arquetipos: [], gaps: [], sub: carregarSub(), exp: ler("exp", "tudo"), sim: null, verGaps: false,
@@ -158,7 +158,26 @@ function doMercado(casa, nome) {
   return mercadoPorChave.get(mercadoChave(casa, nome)) || null;
 }
 
+function abrirRoletaSlot(slot) {
+  const so = S.resultado.slots.find(x => (x.nome === "Dia" ? "M" : "N") === slot);
+  abrirRoleta($("#folha"), so.nome, so.top, t => abrirRegistro({ perfume: t.nome, slot, sprays: ajustarSprays(t.r.f, t.sprays, ajSpray()), sugerido: t.sprays, ocasiao: ocasiaoDominante(so) }));
+}
+
+// chacoalhar o iPhone em Hoje abre a roleta do slot da hora; fora de Hoje o ouvinte sai (não dispara na Coleção)
+let desligarChacoalho = null;
+function cuidarChacoalho() {
+  const quer = S.aba === "hoje" && S.motionOk && ler("chacoalhar", true);
+  if (quer && !desligarChacoalho) desligarChacoalho = ativarChacoalho(() => {
+    if ($(".roleta") || $("#folha .folha") || S.aba !== "hoje") return;
+    const so = slotHoraRes(), cod = slotDaHora();
+    if (!so || so.top.length < 2 || historico().some(r => r.data === estadoDia().data && slotBase(r.slot) === cod)) return;
+    abrirRoletaSlot(cod);
+  });
+  else if (!quer && desligarChacoalho) { desligarChacoalho(); desligarChacoalho = null; }
+}
+
 function render() {
+  cuidarChacoalho();
   mercadoPorChave = null;
   const selo = $("#seloGrade");
   if (selo) selo.hidden = !(S.aba === "hoje" && S.avisosTiers?.divergentes?.length);
@@ -397,7 +416,7 @@ function blocoSlot(s, expandido = true) {
   const segs = (S.resultado.segs || []).filter(g => g.fim > s.ini && g.ini < s.fim).map(g => `${fmtH(Math.max(g.ini, s.ini))}–${fmtH(Math.min(g.fim, s.fim))} ${ROT_OC[g.ocas]} (${AMB[g.amb]}${g.fechado ? ", fechado" : ""})`);
   const estadoUso = u => (u.pendente ? (u.estado === "conflito" ? " · conflito na planilha" : " · na fila para a planilha") : " · na planilha");
   const bloco = `<section class="grupo" aria-label="Slot ${s.nome}">
-    <div class="slot-cab"><h2>${s.nome === "Dia" ? "☀︎ Slot Dia" : "☾ Slot Noite"}</h2><span class="t">${fmtH(s.ini)}→${fmtH(s.fim)}</span><span class="esp"></span>${s.top.length > 1 && !usado ? `<button class="btn sec peq roleta-btn" data-roleta-slot="${slotCod}">🎰 Me surpreenda</button>` : ""}</div>
+    <div class="slot-cab"><h2>${s.nome === "Dia" ? "☀︎ Slot Dia" : "☾ Slot Noite"}</h2><span class="t">${fmtH(s.ini)}→${fmtH(s.fim)}</span><span class="esp"></span>${s.top.length > 1 && !usado ? `${slotCod === slotDaHora(dia) && ler("chacoalhar", true) && !S.motionOk && movimentoPedePermissao() ? `<button class="chip chip-peq" data-acao="ativar-chacoalho">🎲 ativar chacoalhar</button>` : ""}<button class="btn sec peq roleta-btn" data-roleta-slot="${slotCod}">🎰 Me surpreenda</button>` : ""}</div>
     ${s.nome === "Dia" ? chips("ocDia", OCAS_DIA, dia.ocDia) + chips("ambDia", AMBIENTES, dia.ambDia) : chips("ocNoite", OCAS_NOITE, dia.ocNoite) + chips("ambNoite", AMBIENTES, dia.ambNoite)}
     <p class="nota">${esc(segs.join(" · "))}</p>
     ${usado ? `<p class="nota">Registrado hoje: <b>${esc(usado.perfume)}</b>${estadoUso(usado)}.${usado.pendente && usado.estado !== "enviado" ? ` <button class="btn sec peq" data-descartar="${esc(usado.id)}">Desfazer</button>` : ""}</p>` : ""}
@@ -791,6 +810,7 @@ function telaAjustes() {
   return `<h2>Ajustes</h2>
   <div class="bloco"><h3>Aparência</h3>
     <div class="segmentos">${[["escuro", "Escuro"], ["claro", "Claro"], ["auto", "Igual ao iPhone"]].map(([v, r]) => `<button data-tema="${v}" aria-selected="${ler("tema", "escuro") === v}">${r}</button>`).join("")}</div>
+    <label class="linha-flex" style="margin-top:10px"><input type="checkbox" id="aj-chacoalhar" ${ler("chacoalhar", true) ? "checked" : ""} style="width:auto"> Chacoalhar para sortear (em Hoje, abre a roleta do slot da hora)</label>
   </div>
   <form class="bloco" id="formAjustes">
     <h3>Local do clima</h3>
@@ -1033,9 +1053,10 @@ document.addEventListener("click", async e => {
   if (b.dataset.pbfaixa) { S.pbFaixa = Number(b.dataset.pbfaixa); render(); return; }
   if (b.dataset.chip) { const k = b.dataset.chip, v = b.dataset.v; mudarDia(d => { d[k] = v; }); return; }
   if (b.dataset.extra) { const v = b.dataset.extra; mudarDia(d => { d.extras = d.extras.includes(v) ? d.extras.filter(x => x !== v) : [...d.extras, v]; }); return; }
-  if (b.dataset.roletaSlot) {
-    const slot = b.dataset.roletaSlot, so = S.resultado.slots.find(x => (x.nome === "Dia" ? "M" : "N") === slot);
-    abrirRoleta($("#folha"), so.nome, so.top, t => abrirRegistro({ perfume: t.nome, slot, sprays: ajustarSprays(t.r.f, t.sprays, ajSpray()), sugerido: t.sprays, ocasiao: ocasiaoDominante(so) }));
+  if (b.dataset.roletaSlot) { abrirRoletaSlot(b.dataset.roletaSlot); return; }
+  if (b.dataset.acao === "ativar-chacoalho") {
+    S.motionOk = await pedirMovimento();
+    render(); toast(S.motionOk ? "Chacoalhe para sortear." : "Sem permissão de movimento: use “Me surpreenda”.");
     return;
   }
   if (b.dataset.usei) {
@@ -1117,6 +1138,7 @@ document.addEventListener("change", e => {
   if (el.id === "hr-de" || el.id === "hr-ate") { S.hr = { ...S.hr, [el.id === "hr-de" ? "de" : "ate"]: el.value }; gravar("hr", S.hr); render(); return; }
   if (/^mf-(posse|arq|wish|casa|tier|am)$/.test(el.id || "")) { S.mf = { ...S.mf, [el.id.slice(3)]: el.value }; S.mfLimite = 60; gravar("mf", S.mf); render(); return; }
   if (/^col-(arq|faixa|oc|casa|tier|eixo|am|camada)$/.test(el.id || "")) { S.filtro = { ...S.filtro, [el.id.slice(4)]: el.value }; gravar("filtro", S.filtro); render(); return; }
+  if (el.id === "aj-chacoalhar") { gravar("chacoalhar", el.checked); cuidarChacoalho(); toast(el.checked ? "Chacoalhar ligado." : "Chacoalhar desligado."); return; }
   if (el.id === "testar") mudarDia(d => { d.testar = el.value.trim(); });
   if (el.id === "roupa") mudarDia(d => { d.roupa = el.value.trim(); });
 });

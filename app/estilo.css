@@ -575,3 +575,4 @@ select[disabled], input[readonly], textarea[readonly] { opacity: .75; }
 
 /* nome do dia: subtítulo do Hoje */
 .nome-dia { margin: 2px 0 12px; font: italic 500 15.5px/1.35 var(--f-texto); color: var(--suave); letter-spacing: -.005em; }
+.chip.chip-peq { padding: 5px 10px; font-size: 12px; margin-right: 6px; }
