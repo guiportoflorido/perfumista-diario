@@ -606,3 +606,21 @@ select[disabled], input[readonly], textarea[readonly] { opacity: .75; }
 .raspa.revelado .raspa-conteudo { animation: raspa-entra .4s ease-out 1; }
 @keyframes raspa-entra { from { transform: scale(.97); } to { transform: none; } }
 @media (prefers-reduced-motion: reduce) { .raspa-tela, .raspa-capa { transition: none; } .raspa.revelado .raspa-conteudo { animation: none; } }
+
+/* duelo “Qual dos dois?” */
+.duelo { display: grid; gap: 10px; margin: 8px 0 12px; }
+@media (orientation: landscape) and (min-width: 640px) { .duelo { grid-template-columns: 1fr auto 1fr; align-items: center; } }
+.duelo-card { all: unset; box-sizing: border-box; cursor: pointer; display: flex; gap: 14px; align-items: center; padding: 18px 16px; min-height: 108px;
+  border-radius: var(--r); background: var(--sup); box-shadow: var(--sombra); transition: transform .45s cubic-bezier(.3,.8,.3,1), opacity .45s; }
+.duelo-card:focus-visible { outline: 2px solid var(--acento); }
+.duelo-card:active { transform: scale(.98); }
+.duelo-card .dc-tx { display: grid; gap: 2px; min-width: 0; }
+.duelo-card .dc-tx b { font: 650 18px/1.25 var(--f); }
+.duelo-card .casa { color: var(--suave); font-size: 13px; }
+.duelo-card .tier { justify-self: start; }
+.duelo-ou { text-align: center; font: italic 500 14px var(--f-texto); color: var(--leve); }
+.duelo-card.vence { animation: duelo-pulsa .45s ease-out 1; box-shadow: 0 0 0 2px var(--acento), var(--sombra); }
+.duelo-card.perde { transform: translateX(110%); opacity: 0; }
+@keyframes duelo-pulsa { 0% { transform: scale(1); } 45% { transform: scale(1.04); } 100% { transform: scale(1); } }
+.elo-lista { margin: 0; padding-left: 20px; display: grid; gap: 4px; font-size: 14px; }
+@media (prefers-reduced-motion: reduce) { .duelo-card { transition: none; } .duelo-card.vence { animation: none; } }

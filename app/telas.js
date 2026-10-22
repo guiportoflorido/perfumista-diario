@@ -18,17 +18,18 @@ const quando = d => (d === null ? "sem registro" : d === 0 ? "hoje" : d === 1 ? 
 
 // ───────────────────────── Coleção (tabela) ─────────────────────────
 const COLS_COL = [["nome", "Perfume"], ["casa", "Casa"], ["tier", "Tier"], ["arquetipo", "Arquétipo"], ["eixo", "Eixo"], ["td", "Td"],
-  ["peso", "Peso"], ["doc", "Doçura"], ["envelope", "Envelope"], ["janelas", "Janelas"], ["usos", "Usos"], ["ultimo", "Último uso"]];
+  ["peso", "Peso"], ["doc", "Doçura"], ["envelope", "Envelope"], ["janelas", "Janelas"], ["usos", "Usos"], ["elo", "Elo"], ["ultimo", "Último uso"]];
 const TD_ROT = { C: "C · carregado", S: "S · seco", N: "N · indiferente" };
 
+const eloDe = x => (x.e && x.e.n >= 5 ? x.e.rating : "");   // Elo só conta com 5+ duelos
 function ordenarColecao(linhas, ords) {
   const v = (k, x) => ({ tier: TIERS_ORD.indexOf(x.f.tier), nome: x.f.nome, casa: x.f.casa, arquetipo: x.f.arquetipo, eixo: x.f.eixo, td: x.f.td,
-    peso: x.f.peso, doc: x.f.doc, envelope: x.f.env_hot * 10 + x.f.env_cold, janelas: x.f.janelas ?? "", usos: x.k.n, ultimo: x.k.ultimo || "" }[k]);
+    peso: x.f.peso, doc: x.f.doc, envelope: x.f.env_hot * 10 + x.f.env_cold, janelas: x.f.janelas ?? "", usos: x.k.n, elo: eloDe(x), ultimo: x.k.ultimo || "" }[k]);
   const padrao = (a, b) => TIERS_ORD.indexOf(a.f.tier) - TIERS_ORD.indexOf(b.f.tier) || a.f.nome.localeCompare(b.f.nome, "pt");
   return [...linhas].sort(compararMulti(ords, (k, a, b) => cmpValor(v(k, a), v(k, b)), padrao));
 }
 
-export function telaColecao({ frascos, hist, hoje, janelas, filtro, fichas, arqTag, amostras = null }) {
+export function telaColecao({ frascos, hist, hoje, janelas, filtro, fichas, arqTag, amostras = null, elo = null }) {
   const c = contagens(hist, frascos, hoje, { todos: true });
   const nCam = k => frascos.filter(f => camadaDe(f) === k).length;
   const arqs = [...new Set(frascos.map(f => f.arquetipo))].sort((a, b) => a.localeCompare(b));
@@ -47,7 +48,7 @@ export function telaColecao({ frascos, hist, hoje, janelas, filtro, fichas, arqT
     }
     if (q && !`${f.nome} ${f.casa} ${f.arquetipo}`.toLowerCase().includes(q)) return false;
     return true;
-  }).map(f => ({ f, k: c.por.get(f.nome) }));
+  }).map(f => ({ f, k: c.por.get(f.nome), e: elo?.get(f.nome) }));
   const ords = ordsDe(filtro, "tier");
   const linhas = ordenarColecao(filtrados, ords);
   const th = ([k, r]) => `<th class="cc-${k}" scope="col">${cabOrd(k, r, ords, "col-ord")}</th>`;
@@ -67,7 +68,7 @@ export function telaColecao({ frascos, hist, hoje, janelas, filtro, fichas, arqT
   </div>
   ${linhas.length ? `${painelOrd(ords, COLS_COL, "col")}<div class="tabelao" role="region" aria-label="Tabela da coleção" tabindex="0"><table class="t-colecao">
     <thead><tr><th class="c-n" scope="col">#</th>${COLS_COL.map(th).join("")}</tr></thead>
-    <tbody>${linhas.map(({ f, k }, i) => `<tr data-ficha="${esc(f.nome)}" tabindex="0">
+    <tbody>${linhas.map(({ f, k, e }, i) => `<tr data-ficha="${esc(f.nome)}" tabindex="0">
       <td class="c-n">${i + 1}</td>
       <td class="c-nome">${esc(f.nome)}${f.janelas_estimadas ? ` <span class="selo aviso" title="janelas estimadas">est.</span>` : ""}${camadaDe(f) === "custo" ? ` <span class="selo" title="Camada custo: só academia e corrida, fora da grade">custo</span>` : camadaDe(f) === "fora" ? ` <span class="selo aviso" title="Fora da grade">fora</span>` : ""}</td>
       <td class="cc-casa">${esc(f.casa)}</td>
@@ -79,9 +80,10 @@ export function telaColecao({ frascos, hist, hoje, janelas, filtro, fichas, arqT
       <td class="cc-env">${esc(fichas[f.nome]?.envelope || "")}</td>
       <td class="cc-num">${f.janelas ?? "—"}</td>
       <td class="cc-num">${k.n}${k.n ? ` <span class="nota">☀︎${k.M} ☾${k.N}</span>` : ""}</td>
+      <td class="cc-num">${e && e.n >= 5 ? Math.round(e.rating) : "—"}</td>
       <td class="cc-ult">${quando(k.dias)}</td>
     </tr>`).join("")}</tbody></table></div>
-  <p class="nota">Toque no cabeçalho para ordenar (vira o 1º critério; os anteriores viram 2º e 3º) e na linha para abrir a ficha. Peso 1–5 · Doçura 0–3 · Td = como reage à umidade.</p>`
+  <p class="nota">Toque no cabeçalho para ordenar (vira o 1º critério; os anteriores viram 2º e 3º) e na linha para abrir a ficha. Peso 1–5 · Doçura 0–3 · Td = como reage à umidade · Elo = gosto nos duelos “Qual dos dois?” (— com menos de 5).</p>`
     : `<div class="bloco"><p class="vazio">Nenhum frasco nesse recorte.</p></div>`}`;
 }
 
@@ -151,7 +153,7 @@ export function blocoExportar(preset = "tudo") {
     <div id="expSaida"></div></div>`;
 }
 
-export function telaHistorico({ frascos, hist: histTodo, hoje, fila: filaToda, ajSpray, limiteEsq = 45, hr = {}, arqTag, limiteEdicao = "", exp = "tudo", raspadinha = "" }) {
+export function telaHistorico({ frascos, hist: histTodo, hoje, fila: filaToda, ajSpray, limiteEsq = 45, hr = {}, arqTag, limiteEdicao = "", exp = "tudo", raspadinha = "", duelos = "" }) {
   const preset = hr.preset || "tudo";
   const { de, ate } = periodo(preset, hoje, hr.de, hr.ate);
   const dentro = r => (!de || r.data >= de) && r.data <= ate;
@@ -214,6 +216,7 @@ export function telaHistorico({ frascos, hist: histTodo, hoje, fila: filaToda, a
       return `<tr><td><button class="nome-inline" data-ficha="${esc(x.f.nome)}">${esc(x.f.nome)}</button> ${tierHTML(x.f.tier)}</td><td>${x.n}</td><td><b>${nf(x.media)}</b></td><td>${fx || `<span class="nota">—</span>`}</td></tr>`;
     }).join("")}</tbody></table></div>` : `<p class="nota">Ainda sem frascos com 2 ou mais notas no período. Dê a NotaDia ao registrar o uso.</p>`}
   </div>
+  ${duelos}
   <div class="bloco"><h3>Sprays · real × sugerido pelo modelo</h3>
     ${cal.n ? `<p>Desvio médio geral: <b>${cal.geral > 0 ? "+" : ""}${nf(cal.geral)}</b> spray${Math.abs(cal.geral) === 1 ? "" : "s"} em ${cal.n} registro${cal.n === 1 ? "" : "s"}.</p>
       <div class="tabela"><table><thead><tr><th>Frasco</th><th>Registros</th><th>Desvio médio</th></tr></thead><tbody>${cal.por.map(p => `<tr><td>${esc(p.nome)}</td><td>${p.n}</td><td>${p.media > 0 ? "+" : ""}${nf(p.media)}</td></tr>`).join("")}</tbody></table></div>`

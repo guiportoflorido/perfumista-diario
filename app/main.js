@@ -17,9 +17,10 @@ import { contagens } from "./estatisticas.js";
 import { telaAmostras, fichaAmostra, deLinhas as amostrasDeLinhas, juntar, semRegistro, camposAmostra, camposAvaliacaoMexidos, cacheAmostras, baixarAmostras,
   adicionarAmostra, editarAmostra, removerAmostra, novoId } from "./amostras.js";
 import { ler, gravar } from "./store.js";
+import { lerDuelos, duelosUnificados, pareamento, elo, fmtElo, filaDuelos, adicionarDuelo, enviarDuelos, telaDuelo, blocoDuelos } from "./duelo.js";
 import { fotoFicha, iconeFicha, fotoMini, reduzirImagem, subirFoto, removerFotoPlanilha, iniciarFotos } from "./fotos.js";
 
-export const APP_VERSAO = "5.35";  // sobe a cada publicação: confere no topo da tela se o celular pegou a versão nova
+export const APP_VERSAO = "5.36";  // sobe a cada publicação: confere no topo da tela se o celular pegou a versão nova
 const S = { motionOk: !movimentoPedePermissao() && "DeviceMotionEvent" in globalThis, aba: "hoje", frascos: [], frascosAtivos: [], avisosTiers: null, medidos: [], fichas: {}, versao: {}, prev: null, prevOffline: false,
   prevErro: null, metar: null, metarMotivo: null, clima: null, resultado: null, erroMotor: null, entrada: "", carregandoClima: true,
   sync: { estado: "ocioso", msg: "" }, hr: ler("hr", { preset: "tudo" }), tokenNovo: null, playbook: null, janelas: new Map(),
@@ -31,7 +32,7 @@ const ajSpray = () => ler("sprays_ajuste", { ativo: false, geral: 0, por: {} });
 // ───────────────────────── 5 abas na barra; S.aba continua com os 8 valores de sempre ─────────────────────────
 // Grupos com sub-abas: Coleção (Roda · Lista · Playbook) · Mercado (Mercado · Amostras) · Mais (Histórico · Ajustes).
 // S.sub guarda a última sub-aba de cada grupo (reabre nela). Coleção absorve o antigo colModo (roda/lista).
-const SUBS = { colecao: [["roda", "Roda"], ["lista", "Lista"], ["playbook", "Playbook"]],
+const SUBS = { colecao: [["roda", "Roda"], ["lista", "Lista"], ["playbook", "Playbook"], ["duelo", "Duelo"]],
   mercado: [["mercado", "Mercado"], ["amostras", "Amostras"]], mais: [["historico", "Histórico"], ["ajustes", "Ajustes"]] };
 function carregarSub() {
   const s = ler("sub", null);
@@ -42,10 +43,10 @@ function carregarSub() {
   return novo;
 }
 function grupoDe(aba) {
-  return { colecao: "colecao", playbook: "colecao", mercado: "mercado", amostras: "mercado", historico: "mais", ajustes: "mais" }[aba] || aba;
+  return { colecao: "colecao", playbook: "colecao", duelo: "colecao", mercado: "mercado", amostras: "mercado", historico: "mais", ajustes: "mais" }[aba] || aba;
 }
 function abaDe(grupo, sub) {
-  if (grupo === "colecao") return sub === "playbook" ? "playbook" : "colecao";
+  if (grupo === "colecao") return sub === "playbook" || sub === "duelo" ? sub : "colecao";
   if (grupo === "mercado" || grupo === "mais") return SUBS[grupo].some(([v]) => v === sub) ? sub : SUBS[grupo][0][0];
   return grupo;
 }
@@ -54,7 +55,7 @@ function irPara(aba) {
   S.aba = aba;
   const g = grupoDe(aba);
   if (SUBS[g] && aba !== "colecao") { S.sub = { ...S.sub, [g]: aba }; gravar("sub", S.sub); }
-  else if (aba === "colecao" && S.sub.colecao === "playbook") { S.sub = { ...S.sub, colecao: "roda" }; gravar("sub", S.sub); }
+  else if (aba === "colecao" && (S.sub.colecao === "playbook" || S.sub.colecao === "duelo")) { S.sub = { ...S.sub, colecao: "roda" }; gravar("sub", S.sub); }
 }
 /** Controle segmentado logo abaixo do h2 das telas agrupadas. */
 function segmentosGrupo(grupo) {
@@ -88,7 +89,7 @@ async function carregarDados() {
 
 function planilha() {
   const p = planilhaCache();
-  return { tiers: lerTiers(p?.tiers), diario: lerDiario(p?.diario), lido: p?.lido || null };
+  return { tiers: lerTiers(p?.tiers), diario: lerDiario(p?.diario), duelos: lerDuelos(p?.duelos), lido: p?.lido || null };
 }
 // tiers da planilha e depois as medições na pele: Hoje, Testar, ficha, Coleção e Playbook veem o mesmo frasco
 const opcoesMedicoes = () => ({ ...MEDICOES_PADRAO, ...(ajustes().medicoes || {}) });
@@ -98,17 +99,19 @@ function aplicarPlanilha() {
   S.frascosAtivos = m.frascos; S.medidos = m.medidos; S.avisosTiers = r.aplicado ? r.avisos : null;
 }
 const historico = () => diarioUnificado(planilha().diario, fila());
+const duelosTodos = () => duelosUnificados(planilha().duelos, filaDuelos());
 
 async function sincronizar({ silencioso = false } = {}) {
   if (!configurado()) { S.sync = { estado: "sem_config", msg: "" }; return; }
   S.sync = { estado: "sincronizando", msg: "Sincronizando com a planilha…" }; if (!silencioso) render();
-  const env = await enviar();
+  const env = await enviar(), envD = await enviarDuelos();
   let msg = "";
   try { await baixarPlanilha(); aplicarPlanilha(); S.sync = { estado: "ok", msg: "" }; }
   catch (e) { S.sync = { estado: "erro", msg: e.message }; }
   if (env.enviadas) msg = `${env.enviadas} registro${env.enviadas > 1 ? "s" : ""} gravado${env.enviadas > 1 ? "s" : ""} na planilha.`;
   if (env.conflitos) msg += ` ${env.conflitos} com slot já ocupado: veja em Registrar.`;
   if (env.erro && !env.rede) msg += ` Planilha recusou: ${env.erro}`;
+  if (envD.erro && !envD.rede) msg += ` Duelos recusados: ${envD.erro}`;
   if (msg) toast(msg.trim());
   recalcular();
 }
@@ -191,6 +194,8 @@ function render() {
   const ctx = { fichas: S.fichas, arqTag, arqIcone, arqDe, hr: S.hr,
     frascos: S.frascosAtivos, hist: historico(), hoje: hojeISO(), janelas: S.janelas, filtro: S.filtro, playbook: S.playbook,
     faixaSel: S.pbFaixa ?? S.clima?.faixaDia?.idx ?? 2, fila: fila(), ajSpray: ajSpray(), limiteEdicao: limiteEdicao(hojeISO()), exp: S.exp, raspadinha: S.aba === "historico" ? blocoRaspadinha() : "",
+    elo: S.aba === "colecao" ? elo(duelosTodos(), S.frascosAtivos) : null,
+    duelos: S.aba === "historico" ? (() => { const ds = duelosTodos(); return blocoDuelos(elo(ds, S.frascosAtivos), S.frascosAtivos, ds.length); })() : "",
     amostras: S.aba === "colecao" ? amostrasEmMaos() : null };
   // mesma aba: guarda rolagem da página, das tabelas e painéis abertos para restaurar depois de redesenhar
   const antes = trocouAba ? null : {
@@ -200,7 +205,7 @@ function render() {
   };
   try {
     let html = ({ hoje: telaHoje, registrar: telaRegistrar, ajustes: telaAjustes,
-      colecao: () => telaColecaoTudo(ctx), mercado: telaMercadoAba, amostras: telaAmostrasAba, playbook: () => telaPlaybook(ctx), historico: () => telaHistorico(ctx) }[S.aba])();
+      colecao: () => telaColecaoTudo(ctx), duelo: telaDueloAba, mercado: telaMercadoAba, amostras: telaAmostrasAba, playbook: () => telaPlaybook(ctx), historico: () => telaHistorico(ctx) }[S.aba])();
     // telas agrupadas: segmentos (sub-abas) logo abaixo do 1º h2; o h2 continua com o nome da sub-aba
     if (SUBS[grupo]) html = html.replace("</h2>", `</h2>${segmentosGrupo(grupo)}`);
     $("#tela").innerHTML = html;
@@ -793,6 +798,33 @@ async function apagarRegistroEditando() {
 }
 
 // ───────────────────────── ajustes ─────────────────────────
+// ───────────────────────── duelo (Coleção › Duelo) ─────────────────────────
+/** Par atual (nomes) guardado na sessão: redesenhar a tela não troca o par; escolher ou pular, sim. */
+function parDuelo() {
+  const fs = S.frascosAtivos, ok = n => fs.some(f => f.nome === n);
+  if (!S.parDuelo || !S.parDuelo.every(ok)) S.parDuelo = pareamento(fs, duelosTodos())?.map(f => f.nome) || null;
+  return S.parDuelo && S.parDuelo.map(n => fs.find(f => f.nome === n));
+}
+function telaDueloAba() {
+  const hoje = hojeISO();
+  return telaDuelo({ par: parDuelo(), nHoje: duelosTodos().filter(d => d.data === hoje).length,
+    foto: f => iconeFicha(doMercado(f.casa, f.nome), arqIcone(f.arquetipo, 40)) });
+}
+function escolherDuelo(i) {
+  const par = parDuelo();
+  if (!par || S.dueloAnimando) return;
+  const [a, b] = par, v = par[i], agora = new Date(), cod = slotDaHora(), c = S.clima;
+  const fx = (cod === "N" ? c?.faixaNoite : c?.faixaDia)?.idx;
+  adicionarDuelo({ data: hojeISO(), hora: agora.toTimeString().slice(0, 8), a: a.nome, b: b.nome, vencedor: v.nome,
+    contexto: [fx != null ? `faixa ${fx}` : "", cod === "N" ? "Noite" : "Dia", a.arquetipo === b.arquetipo ? "mesmo arquétipo" : "arquétipos diferentes"].filter(Boolean).join(" · ") });
+  const cards = document.querySelectorAll(".duelo-card");
+  const proximo = () => { S.dueloAnimando = false; S.parDuelo = null; render(); };
+  if (matchMedia("(prefers-reduced-motion: reduce)").matches || !cards.length) { proximo(); return; }
+  S.dueloAnimando = true;
+  cards[i].classList.add("vence"); cards[1 - i].classList.add("perde");
+  setTimeout(proximo, 480);
+}
+
 // ───────────────────────── raspadinha do esquecido (Histórico) ─────────────────────────
 /** Esquecido da semana: escolhido uma vez por semana ISO e guardado (não muda na semana). Precisa do resultado de hoje. */
 function raspadinhaAtual() {
@@ -929,6 +961,8 @@ function abrirFicha(nome) {
       ${(() => { const its = (S.resultado?.slots || []).map(so => [so, itemDoDia(so, nome)]).filter(([, t]) => t);
         return its.length ? `<dt>Hoje</dt><dd class="ficha-pq">${its.map(([so, t]) => { const pos = so.ranking.findIndex(x => x.nome === nome) + 1;
           return `${so.nome === "Dia" ? "☀︎ Dia" : "☾ Noite"}${pos ? ` · #${pos}` : ""} · score <b>${t.score.toFixed(0)}</b>${porqueHTML(t)}`; }).join("")}</dd>` : ""; })()}
+      ${(() => { const e = elo(duelosTodos(), S.frascosAtivos).get(nome);
+        return e?.n ? `<dt>Duelos</dt><dd>Elo ${fmtElo(e.rating)} · ${e.n} duelo${e.n > 1 ? "s" : ""} · ${e.vitorias} vitória${e.vitorias === 1 ? "" : "s"}${e.n < 5 ? ' <span class="nota">(Elo firma com 5+)</span>' : ""}</dd>` : ""; })()}
       <dt>Vizinhos</dt><dd>${esc(fi.vizinhos)}</dd>
       <dt>Leitura</dt><dd>${esc(fi.leitura)}</dd>
       <dt>Uso</dt><dd>${ult ? `último em ${esc(ult.data)} (${slotNome(ult.slot)}) · ${usos.length} registro${usos.length > 1 ? "s" : ""} no diário` : "sem registro no diário"}</dd>
@@ -1087,6 +1121,8 @@ document.addEventListener("click", async e => {
   if (b.dataset.chip) { const k = b.dataset.chip, v = b.dataset.v; mudarDia(d => { d[k] = v; }); return; }
   if (b.dataset.extra) { const v = b.dataset.extra; mudarDia(d => { d.extras = d.extras.includes(v) ? d.extras.filter(x => x !== v) : [...d.extras, v]; }); return; }
   if (b.dataset.roletaSlot) { abrirRoletaSlot(b.dataset.roletaSlot); return; }
+  if (b.dataset.dueloVence) { escolherDuelo(Number(b.dataset.dueloVence)); return; }
+  if (b.dataset.acao === "duelo-pular") { S.parDuelo = null; render(); return; }
   if (b.dataset.acao === "ativar-chacoalho") {
     S.motionOk = await pedirMovimento();
     render(); toast(S.motionOk ? "Chacoalhe para sortear." : "Sem permissão de movimento: use “Me surpreenda”.");
