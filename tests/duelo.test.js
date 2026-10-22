@@ -1,7 +1,7 @@
 // Duelo “Qual dos dois?”: pareamento por prioridade e balanceamento, Elo determinístico a partir do log, aba Duelos no backend.
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { pareamento, elo, lerDuelos, duelosUnificados, descompassos, powerRanking, gerarCenario, cenarioValido, brilhaCai, ajustar, textoCenario, horaAmPm } from "../app/duelo.js";
+import { pareamento, elo, lerDuelos, duelosUnificados, descompassos, powerRanking, gerarCenario, cenarioValido, brilhaCai, ajustar, textoCenario, horaAmPm, previsao, ehZebra, movimentoSemana, titulos, climaCenario } from "../app/duelo.js";
 import { carregarBackend } from "../tools/planilha_falsa.mjs";
 
 const F = (nome, arquetipo, tier, extra = {}) => ({ nome, arquetipo, tier, camada: "grade", ...extra });
@@ -148,4 +148,35 @@ test("8 · backend: aceita empate “=” e o cenário, rejeita valor fora da li
 
 test("hora do cenário em AM/PM", () => {
   assert.deepEqual([8, 11, 12, 14, 23].map(horaAmPm), ["8 AM", "11 AM", "12 PM", "2 PM", "11 PM"]);
+});
+
+// ───────────── diversão ─────────────
+const Dd = (data, a, b, vencedor, extra = {}) => ({ data, hora: `${String(seq++).padStart(6, "0")}`, a, b, vencedor, ...extra });
+
+test("zebra: só quando o escolhido tinha ≤ 30 % e os dois já têm 3+ duelos", () => {
+  const log = Array.from({ length: 6 }, () => Dd("2026-10-10", "X1", "X2", "X1"));
+  const pr = previsao(log, "X1", "X2");
+  assert.ok(pr.p > 0.7 && pr.nA === 6);
+  assert.equal(ehZebra(pr, false), true);    // escolheu X2
+  assert.equal(ehZebra(pr, true), false);
+  assert.equal(ehZebra(previsao(log.slice(0, 2), "X1", "X2"), false), false, "poucos duelos: não é zebra");
+});
+
+test("movimento na semana: quem ganhou nos últimos 7 dias sobe; quem estreou é novo", () => {
+  const velho = [Dd("2026-10-01", "X1", "X2", "X1"), Dd("2026-10-01", "X1", "X3", "X1"), Dd("2026-10-02", "X2", "X3", "X2")];
+  const novo = [...velho, ...Array.from({ length: 4 }, () => Dd("2026-10-20", "X3", "X1", "X3")), Dd("2026-10-20", "Y1", "Z1", "Y1")];
+  const mv = movimentoSemana(novo, fs, "2026-10-22");
+  assert.ok(mv.get("X3").sobe > 0 && mv.get("X1").sobe < 0);
+  assert.equal(mv.get("Y1").antes, null);
+  assert.equal(movimentoSemana([], fs, "2026-10-22").size, 0);
+});
+
+test("títulos: quem mais sobe num valor (n ≥ 3) leva o título; cara do cenário", () => {
+  const log = Array.from({ length: 5 }, () => Dd("2026-10-10", "X1", "X2", "X1", { temp: "MQ" }));
+  const t = titulos(log, fs);
+  assert.equal(t.find(x => x.k === "temp" && x.v === "MQ")?.nome, "X1");
+  assert.equal(t.find(x => x.v === "MQ").titulo, "☀️ Rei do sol");
+  assert.deepEqual(titulos([], fs), []);
+  assert.deepEqual(climaCenario({ chuva: "continua", temp: "F", periodo: "Tarde" }), { emoji: "🌧️", tom: "fresco" });
+  assert.deepEqual(climaCenario({ chuva: "sem", temp: "Q", periodo: "Noite" }), { emoji: "🌙", tom: "quente noite" });
 });

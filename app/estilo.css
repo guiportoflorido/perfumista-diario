@@ -666,3 +666,48 @@ select[disabled], input[readonly], textarea[readonly] { opacity: .75; }
 .rk-n { min-width: 22px; text-align: right; }
 .rk-delta { font: 600 12.5px var(--f-num); }
 .rk-delta.sobe { color: #4caf7d; } .rk-delta.cai { color: #e0645c; }
+
+/* duelo e ranking mais divertidos */
+.duelo-placar { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin: 6px 0; }
+.meta-dia { display: inline-flex; align-items: center; gap: 6px; font: 600 12.5px var(--f-num); color: var(--suave); }
+.meta-dia .trilho { width: 70px; height: 6px; border-radius: 3px; background: var(--afund); overflow: hidden; }
+.meta-dia .trilho span { display: block; height: 100%; background: var(--acento); transition: width .4s; }
+.meta-dia.ok .trilho span { background: #D9B24A; }
+.seguidos { font: 700 12.5px var(--f-num); padding: 3px 9px; border-radius: 99px; background: rgba(224,100,92,.15); color: #e0645c; }
+.seguidos.quente { animation: pulsa-fogo 1s ease-in-out 1; }
+@keyframes pulsa-fogo { 50% { transform: scale(1.12); } }
+.duelo-reacao { margin: 4px 0; font: 650 15px var(--f); animation: reacao-entra .4s cubic-bezier(.3,1.6,.5,1) 1 both; }
+@keyframes reacao-entra { from { opacity: 0; transform: translateY(-6px) scale(.96); } to { opacity: 1; transform: none; } }
+.duelo-ou .vs { display: inline-grid; place-items: center; width: 40px; height: 40px; border-radius: 50%; font: 900 italic 15px var(--f); font-style: italic;
+  color: #fff; background: linear-gradient(135deg, #e0645c, #D9B24A); box-shadow: 0 4px 14px rgba(224,100,92,.35); animation: vs-entra .5s cubic-bezier(.3,1.7,.5,1) 1 both; }
+@keyframes vs-entra { from { transform: scale(.3) rotate(-30deg); opacity: 0; } to { transform: none; opacity: 1; } }
+.duelo .duelo-card { animation: card-entra .35s ease-out 1 both; }
+.duelo .duelo-card:last-child { animation-delay: .06s; }
+@keyframes card-entra { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+.cenario-card { display: flex; gap: 12px; align-items: center; }
+.cen-emoji { font-size: 34px; line-height: 1; }
+.cenario-card.tom-quente { background: linear-gradient(120deg, rgba(224,140,60,.22), var(--sup2) 70%); }
+.cenario-card.tom-ameno { background: linear-gradient(120deg, rgba(217,178,74,.16), var(--sup2) 70%); }
+.cenario-card.tom-fresco { background: linear-gradient(120deg, rgba(95,158,168,.2), var(--sup2) 70%); }
+.cenario-card.tom-frio { background: linear-gradient(120deg, rgba(120,150,220,.24), var(--sup2) 70%); }
+.cenario-card.tom-noite { background: linear-gradient(120deg, rgba(90,80,160,.28), var(--sup2) 70%); }
+.confete { position: fixed; inset: 0; pointer-events: none; z-index: 70; }
+.confete span { position: fixed; width: 8px; height: 12px; border-radius: 2px; animation: confete-cai 1.4s cubic-bezier(.2,.6,.4,1) 1 both; }
+@keyframes confete-cai { from { transform: translate(0, 0) rotate(0); opacity: 1; } to { transform: translate(var(--dx), var(--dy)) rotate(var(--rot)); opacity: 0; } }
+.podio { display: grid; grid-template-columns: 1fr 1.1fr 1fr; gap: 8px; align-items: end; margin: 8px 0 12px; }
+.podio-lugar { all: unset; cursor: pointer; display: grid; justify-items: center; gap: 4px; text-align: center; padding: 10px 6px 0; border-radius: var(--r) var(--r) 0 0;
+  background: var(--sup); box-shadow: var(--sombra); animation: card-entra .4s ease-out 1 both; }
+.podio-lugar b { font: 650 13.5px/1.2 var(--f); overflow-wrap: anywhere; }
+.podio-lugar .medalha { font-size: 26px; line-height: 1; }
+.podio-lugar .degrau { width: 100%; margin-top: 4px; padding: 6px 0; font: 800 18px var(--f-num); color: var(--leve); background: var(--afund); border-radius: 8px 8px 0 0; }
+.podio-lugar.p1 { padding-top: 16px; } .podio-lugar.p1 .degrau { padding: 14px 0; color: #D9B24A; }
+.podio-lugar.p2 .degrau { padding: 9px 0; } .podio-lugar.p2 { animation-delay: .08s; } .podio-lugar.p3 { animation-delay: .16s; }
+.titulos { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; }
+.titulo { all: unset; cursor: pointer; display: grid; gap: 2px; padding: 10px 12px; border-radius: 12px; background: var(--sup2); }
+.titulo > span:first-child { font: 650 13px var(--f); }
+.titulo b { font: 600 14px var(--f); }
+.rk-mov { font: 700 11.5px var(--f-num); } .rk-mov.sobe { color: #4caf7d; } .rk-mov.cai { color: #e0645c; } .rk-mov.novo { color: var(--acento); }
+@media (prefers-reduced-motion: reduce) {
+  .seguidos.quente, .duelo-reacao, .duelo-ou .vs, .duelo .duelo-card, .podio-lugar { animation: none; }
+  .meta-dia .trilho span { transition: none; }
+}

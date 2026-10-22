@@ -215,6 +215,22 @@ export function ligarRaspadinha(el, onRevelar) {
   cv.addEventListener("pointerup", solta); cv.addEventListener("pointercancel", solta);
 }
 
+// ───────────────────────── confete ─────────────────────────
+/** Chuva curta de confete sobre `alvo` (1 ciclo, ~1,4 s, depois some). Reduzir movimento: nada. */
+export function confete(alvo) {
+  if (semMovimento() || !alvo) return;
+  const r = alvo.getBoundingClientRect(), cx = r.left + r.width / 2, cy = r.top + Math.min(r.height, 300) / 3;
+  const cores = ["#D9B24A", "#B56A78", "#5F9EA8", "#7C9A5E", "#C07A3A", "#8F8FBF"];
+  const box = document.createElement("div"); box.className = "confete"; box.setAttribute("aria-hidden", "true");
+  for (let i = 0; i < 36; i++) {
+    const s = document.createElement("span"), ang = Math.random() * Math.PI * 2, d = 80 + Math.random() * 160;
+    s.style.cssText = `left:${cx}px;top:${cy}px;background:${cores[i % cores.length]};--dx:${Math.cos(ang) * d}px;--dy:${Math.sin(ang) * d * .6 + 160}px;--rot:${Math.random() * 720 - 360}deg;animation-delay:${Math.random() * .12}s`;
+    box.append(s);
+  }
+  document.body.append(box);
+  setTimeout(() => box.remove(), 1700);
+}
+
 // ───────────────────────── spray ao registrar ─────────────────────────
 /** Overlay com um frasco que borrifa `sprays` vezes. Resolve quando termina (ou quando ele toca para pular). */
 export function animarSpray({ sprays, nome, arquetipo }) {

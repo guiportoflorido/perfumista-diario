@@ -11,7 +11,7 @@ import { telaColecao, telaPlaybook, telaHistorico, idRegistro, periodo } from ".
 import { telaRoda } from "./roda.js";
 import { ordsDe, tocarOrd, mudarOrds, slotNome, slotBase, slotIcone, opcoesSlot, slotExpandido } from "./util.js";
 import { definirCores, arqTag, arqIcone, corArq, humorDoSlot } from "./icones.js";
-import { ceuHTML, abrirRoleta, animarSpray, nomeDoDia, definirMateriais, raspadinhaHTML, ligarRaspadinha, ativarChacoalho, pedirMovimento, movimentoPedePermissao } from "./diversao.js";
+import { confete, ceuHTML, abrirRoleta, animarSpray, nomeDoDia, definirMateriais, raspadinhaHTML, ligarRaspadinha, ativarChacoalho, pedirMovimento, movimentoPedePermissao } from "./diversao.js";
 import { chave as mercadoChave, telaMercado, fichaEditavel, camposAlterados, baseComTiers, deLinhas, linhasParaCriar, cachePlanilha, baixarMercado, criarNaPlanilha, editarNaPlanilha, adicionarNaPlanilha, removerNaPlanilha, fotoNoCache } from "./mercado.js";
 import { contagens } from "./estatisticas.js";
 import { telaAmostras, fichaAmostra, deLinhas as amostrasDeLinhas, juntar, semRegistro, camposAmostra, camposAvaliacaoMexidos, cacheAmostras, baixarAmostras,
@@ -19,10 +19,10 @@ import { telaAmostras, fichaAmostra, deLinhas as amostrasDeLinhas, juntar, semRe
 import { ler, gravar } from "./store.js";
 import { storiesDoMes, abrirWrapped, MESES } from "./wrapped.js";
 import { lerDuelos, duelosUnificados, pareamento, elo, fmtElo, filaDuelos, adicionarDuelo, enviarDuelos, telaDuelo, blocoDuelos, telaRanking,
-  gerarCenario, textoCenario, periodoDaHora, CHUVAS, MAE_DA_SUB, brilhaCai, rotuloValor } from "./duelo.js";
+  gerarCenario, textoCenario, periodoDaHora, CHUVAS, MAE_DA_SUB, brilhaCai, rotuloValor, previsao, ehZebra, META_DIA } from "./duelo.js";
 import { fotoFicha, iconeFicha, fotoMini, reduzirImagem, subirFoto, removerFotoPlanilha, iniciarFotos } from "./fotos.js";
 
-export const APP_VERSAO = "5.39";  // sobe a cada publicação: confere no topo da tela se o celular pegou a versão nova
+export const APP_VERSAO = "5.40";  // sobe a cada publicação: confere no topo da tela se o celular pegou a versão nova
 const S = { dueloModo: ler("dueloModo", "agora"), rkFiltro: ler("rkFiltro", {}), cenario: null, motionOk: !movimentoPedePermissao() && "DeviceMotionEvent" in globalThis, aba: "hoje", frascos: [], frascosAtivos: [], avisosTiers: null, medidos: [], fichas: {}, versao: {}, prev: null, prevOffline: false,
   prevErro: null, metar: null, metarMotivo: null, clima: null, resultado: null, erroMotor: null, entrada: "", carregandoClima: true,
   sync: { estado: "ocioso", msg: "" }, hr: ler("hr", { preset: "tudo" }), tokenNovo: null, playbook: null, janelas: new Map(),
@@ -208,7 +208,7 @@ function render() {
   };
   try {
     let html = ({ hoje: telaHoje, registrar: telaRegistrar, ajustes: telaAjustes,
-      colecao: () => telaColecaoTudo(ctx), duelo: telaDueloAba, ranking: () => telaRanking({ duelos: duelosTodos(), frascos: S.frascosAtivos, filtro: S.rkFiltro }), mercado: telaMercadoAba, amostras: telaAmostrasAba, playbook: () => telaPlaybook(ctx), historico: () => telaHistorico(ctx) }[S.aba])();
+      colecao: () => telaColecaoTudo(ctx), duelo: telaDueloAba, ranking: () => telaRanking({ duelos: duelosTodos(), frascos: S.frascosAtivos, filtro: S.rkFiltro, hoje: hojeISO(), arqIcone }), mercado: telaMercadoAba, amostras: telaAmostrasAba, playbook: () => telaPlaybook(ctx), historico: () => telaHistorico(ctx) }[S.aba])();
     // telas agrupadas: segmentos (sub-abas) logo abaixo do 1º h2; o h2 continua com o nome da sub-aba
     if (SUBS[grupo]) html = html.replace("</h2>", `</h2>${segmentosGrupo(grupo)}`);
     $("#tela").innerHTML = html;
@@ -848,6 +848,7 @@ function parDuelo() {
 function telaDueloAba() {
   const hoje = hojeISO(), cen = cenarioAtual();
   return telaDuelo({ par: parDuelo(), nHoje: duelosTodos().filter(d => d.data === hoje).length, modo: S.dueloModo, cenario: cen,
+    seguidos: S.dueloSeguidos || 0, reacao: S.dueloReacao || "",
     foto: f => iconeFicha(doMercado(f.casa, f.nome), arqIcone(f.arquetipo, 40)) });
 }
 /** Condições reais do momento (modo Agora): faixa e Td do slot da hora, chuva do dia, período pela hora, ocasião dominante. */
@@ -862,6 +863,13 @@ function escolherDuelo(i) {
   const par = parDuelo();
   if (!par || S.dueloAnimando) return;
   const [a, b] = par, agora = new Date(), empate = i === "=";
+  // reação depois da escolha (nunca antes): zebra contra o modelo, sequência e meta do dia
+  const antes = duelosTodos(), cond = S.dueloModo === "cenario" && S.cenario ? S.cenario : (() => { const c = condicoesAgora(agora); return { temp: c.temp, td: c.td, chuva: c.chuva, periodo: c.periodo, ocasiao: c.ocasiao }; })();
+  const pr = previsao(antes, a.nome, b.nome, cond), nHoje = antes.filter(d => d.data === hojeISO()).length + 1;
+  S.dueloSeguidos = (S.dueloSeguidos || 0) + 1;
+  S.dueloReacao = nHoje === META_DIA ? `🏆 Meta do dia! ${META_DIA} duelos.` : !empate && ehZebra(pr, i === 0) ? "🦓 Zebra! O modelo apostava no outro." :
+    [5, 10, 20, 30, 50].includes(S.dueloSeguidos) ? `🔥 ${S.dueloSeguidos} seguidos!` : "";
+  if (nHoje === META_DIA) setTimeout(() => confete($("#tela .duelo") || document.body), 60);
   const base = { data: hojeISO(), hora: agora.toTimeString().slice(0, 8), a: a.nome, b: b.nome, vencedor: empate ? "=" : par[i].nome };
   const mesmo = a.arquetipo === b.arquetipo ? "mesmo arquétipo" : "arquétipos diferentes";
   if (S.dueloModo === "cenario" && S.cenario) {
@@ -1181,7 +1189,7 @@ document.addEventListener("click", async e => {
   if (b.dataset.roletaSlot) { abrirRoletaSlot(b.dataset.roletaSlot); return; }
   if (b.dataset.acao === "wrapped") { abrirWrappedMes(b.dataset.mes); render(); return; }
   if (b.dataset.dueloVence) { escolherDuelo(Number(b.dataset.dueloVence)); return; }
-  if (b.dataset.acao === "duelo-pular") { S.parDuelo = null; render(); return; }
+  if (b.dataset.acao === "duelo-pular") { S.parDuelo = null; S.dueloSeguidos = 0; S.dueloReacao = ""; render(); return; }
   if (b.dataset.acao === "duelo-empate") { escolherDuelo("="); return; }
   if (b.dataset.acao === "duelo-cenario") { S.cenario = null; S.parDuelo = null; render(); return; }
   if (b.dataset.dueloModo) { S.dueloModo = b.dataset.dueloModo; gravar("dueloModo", S.dueloModo); S.cenario = null; S.parDuelo = null; render(); return; }
