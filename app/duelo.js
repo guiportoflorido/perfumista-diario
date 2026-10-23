@@ -139,13 +139,13 @@ export function textoCenario(c) {
 // 1/curvatura de cada parâmetro, para não divergir com frascos muito duelados), até max|grad| < 1e-5 ou 2000 iterações.
 const PREC = { t: 1 / 1.5 ** 2, b: 1 / 0.5 ** 2, g: 1 / 0.35 ** 2 };
 const sig = x => 1 / (1 + Math.exp(-x));
-let memo = { chave: null, modelo: null };
+const memo = new Map();   // poucos logs diferentes por tela (hoje e “há 7 dias”, início e fim do mês): guarda os 4 últimos
 
 /** Ajusta o modelo ao log inteiro. Devolve {theta, beta, gamma, n, vitorias, cont} (Maps por frasco) e score(nome, s). */
 export function ajustar(duelos) {
   const ord = [...duelos].sort((x, y) => (chaveDuelo(x) + x.vencedor < chaveDuelo(y) + y.vencedor ? -1 : 1));   // ordem fixa: mesma soma
   const chave = `${ord.length}|${ord.length ? chaveDuelo(ord[ord.length - 1]) + ord[ord.length - 1].vencedor : ""}`;
-  if (memo.chave === chave) return memo.modelo;
+  if (memo.has(chave)) return memo.get(chave);
   // índice dos parâmetros
   const idx = new Map(), tipo = [];
   const id = (k, t) => { if (!idx.has(k)) { idx.set(k, tipo.length); tipo.push(t); } return idx.get(k); };
@@ -196,7 +196,8 @@ export function ajustar(duelos) {
       return x;
     },
   };
-  memo = { chave, modelo };
+  memo.set(chave, modelo);
+  if (memo.size > 4) memo.delete(memo.keys().next().value);
   return modelo;
 }
 export const rating = x => ELO_INICIAL + ESCALA * x;
@@ -272,6 +273,59 @@ export function pareamento(frascos, duelos = [], aleatorio = Math.random, cenari
   return aleatorio() < 0.5 ? par : [par[1], par[0]];
 }
 
+// ───────────── diversão: previsão, movimento na semana, títulos ─────────────
+/** Chance prevista de A vencer B na situação s (cenário ou condições de agora), antes de gravar a escolha. */
+export function previsao(duelos, a, b, s = {}) {
+  const m = ajustar(duelos);
+  return { p: sig(m.score(a, s) - m.score(b, s)), nA: m.n.get(a) || 0, nB: m.n.get(b) || 0 };
+}
+/** Zebra: o escolhido tinha ≤ 30 % de chance pelo modelo, e os dois já tinham 3+ duelos (senão é chute do modelo). */
+export const ehZebra = (pr, venceuA) => pr.nA >= 3 && pr.nB >= 3 && (venceuA ? pr.p : 1 - pr.p) <= 0.3;
+
+/** Posições no Geral hoje × há 7 dias (só frascos com duelo). Map nome → {pos, antes, sobe} (sobe > 0 = subiu). */
+export function movimentoSemana(duelos, frascos, hoje) {
+  const d7 = new Date(hoje + "T12:00:00Z"); d7.setUTCDate(d7.getUTCDate() - 7);
+  const corte = d7.toISOString().slice(0, 10);
+  const antigos = duelos.filter(d => d.data <= corte);
+  const pos = ds => new Map(powerRanking(ds, frascos).filter(x => ajustar(ds).n.get(x.nome)).map((x, i) => [x.nome, i + 1]));
+  const agora = pos(duelos), antes = antigos.length ? pos(antigos) : new Map();
+  return new Map([...agora].map(([nome, p]) => [nome, { pos: p, antes: antes.get(nome) ?? null, sobe: antes.has(nome) ? antes.get(nome) - p : null }]));
+}
+
+// títulos por condição: quem mais sobe naquele valor (β ou γ, n ≥ 3, efeito ≥ 15 pontos)
+const TITULOS = {
+  temp: { MQ: "☀️ Rei do sol", Q: "🏖️ Dono do verão", A: "🌤️ Senhor do meio-termo", F: "🍃 Craque do fresco", Fr: "🧣 Lorde do frio", MF: "🐻‍❄️ Urso polar" },
+  td: { seco: "🏜️ Mestre do ar seco", neutro: "⚖️ Equilibrista", carregado: "🌫️ Domador do abafado" },
+  chuva: { sem: "😎 Céu limpo", pancada: "⛈️ Caçador de pancada", continua: "☂️ Guarda-chuva oficial" },
+  periodo: { Manha: "🌅 Madrugador", Tarde: "🕒 Rei da tarde", Noite: "🌙 Lobo da noite", Madrugada: "🦉 Coruja" },
+};
+export function tituloDe(k, v) {
+  if (TITULOS[k]?.[v]) return TITULOS[k][v];
+  return k === "ocasiao" ? `🎯 Craque em ${ROT_OC[v] || v}` : `🎯 Craque em ${v}`;
+}
+/** Títulos do Ranking: para cada valor de dimensão, o frasco da grade que mais sobe nele. [{k, v, titulo, nome, efeito, n}] */
+export function titulos(duelos, frascos, min = 3) {
+  const m = ajustar(duelos), out = [];
+  for (const k of [...DIMS, "sub"]) for (const v of VALORES[k]) {
+    let melhor = null;
+    for (const f of frascos.filter(daGrade)) {
+      const n = m.cont.get(f.nome)?.[k]?.get(v) || 0;
+      if (n < min) continue;
+      const efeito = ESCALA * (k === "sub" ? m.gamma(f.nome, v) : m.beta(f.nome, k, v));
+      if (efeito >= 15 && (!melhor || efeito > melhor.efeito)) melhor = { k, v, titulo: tituloDe(k, v), nome: f.nome, efeito, n };
+    }
+    if (melhor) out.push(melhor);
+  }
+  return out.sort((a, b) => b.efeito - a.efeito);
+}
+
+/** Cara do cenário: emoji e tom de fundo pela temperatura/chuva/período. */
+export function climaCenario(c) {
+  const emoji = c.chuva === "continua" ? "🌧️" : c.chuva === "pancada" ? "⛈️" : c.periodo === "Noite" ? "🌙" : ["MQ", "Q"].includes(c.temp) ? "☀️" : ["Fr", "MF"].includes(c.temp) ? "🥶" : "⛅";
+  const tom = { MQ: "quente", Q: "quente", A: "ameno", F: "fresco", Fr: "frio", MF: "frio" }[c.temp] || "ameno";
+  return { emoji, tom: c.periodo === "Noite" ? `${tom} noite` : tom };
+}
+
 /** “1 612”: Elo arredondado com espaço de milhar. */
 export const fmtElo = r => String(Math.round(r)).replace(/\B(?=(\d{3})+$)/g, " ");
 
@@ -309,19 +363,26 @@ export async function enviarDuelos() {
 
 /** Tela do Duelo (Coleção › Duelo). par = [fA, fB]; foto(f) = HTML da foto/ícone; nHoje = duelos de hoje;
  *  modo "agora" | "cenario"; cenario = situação sorteada (card acima dos frascos). Nenhum rating aparece aqui. */
-export function telaDuelo({ par, foto, nHoje, modo = "agora", cenario = null }) {
+export const META_DIA = 10;
+export function telaDuelo({ par, foto, nHoje, modo = "agora", cenario = null, seguidos = 0, reacao = "" }) {
   const alterna = `<div class="segmentos duelo-modo" role="tablist" aria-label="Modo do duelo">${[["agora", "Agora"], ["cenario", "Cenário"]].map(([v, r]) =>
     `<button role="tab" data-duelo-modo="${v}" aria-selected="${modo === v}">${r}</button>`).join("")}</div>`;
   if (!par) return `<h2>Duelo</h2>${alterna}<div class="bloco"><p class="vazio">Precisa de pelo menos dois frascos da grade.</p></div>`;
   const card = (f, i) => `<button class="duelo-card" data-duelo-vence="${i}" aria-label="Prefiro ${esc(f.nome)}">
       ${foto(f)}<span class="dc-tx"><b>${esc(f.nome)}</b>${tierHTML(f.tier)}<span class="casa">${esc(f.casa)}</span><span class="casa">${arqTag(f.arquetipo, 14)}</span></span></button>`;
-  const cen = modo === "cenario" && cenario;
+  const cen = modo === "cenario" && cenario, cc = cen && climaCenario(cenario);
+  const meta = Math.min(nHoje, META_DIA), bateu = nHoje >= META_DIA;
   return `<h2>Duelo</h2>
   ${alterna}
   <p class="nota">${cen ? "Imagine a situação abaixo: qual dos dois você usaria nela?" : "Qual dos dois você usaria agora, com o clima de hoje?"} Cada escolha vai para a aba Duelos da planilha e alimenta o Power Ranking (Coleção › Ranking; nunca aparece aqui).</p>
-  ${cen ? `<div class="cenario-card"><span class="cen-rot">Cenário</span><p>${esc(textoCenario(cenario))}</p></div>` : ""}
-  <div class="duelo">${card(par[0], 0)}<span class="duelo-ou">ou</span>${card(par[1], 1)}</div>
-  <div class="linha-flex duelo-acoes"><button class="btn sec peq" data-acao="duelo-empate">Tanto faz</button><button class="btn sec peq" data-acao="duelo-pular">Pular par</button>${cen ? `<button class="btn sec peq" data-acao="duelo-cenario">Outro cenário</button>` : ""}<span class="esp"></span><span class="nota">${nHoje} duelo${nHoje === 1 ? "" : "s"} hoje</span></div>`;
+  <div class="duelo-placar">
+    <span class="meta-dia ${bateu ? "ok" : ""}" title="Meta do dia"><span class="trilho"><span style="width:${(meta / META_DIA) * 100}%"></span></span>${bateu ? "🏆" : "🎯"} ${nHoje}/${META_DIA} hoje</span>
+    ${seguidos >= 2 ? `<span class="seguidos ${seguidos >= 10 ? "quente" : ""}">🔥 ${seguidos} seguidos</span>` : ""}
+  </div>
+  ${reacao ? `<p class="duelo-reacao" role="status">${esc(reacao)}</p>` : ""}
+  ${cen ? `<div class="cenario-card tom-${cc.tom.replace(" ", " tom-")}"><span class="cen-emoji" aria-hidden="true">${cc.emoji}</span><div><span class="cen-rot">Cenário</span><p>${esc(textoCenario(cenario))}</p></div></div>` : ""}
+  <div class="duelo">${card(par[0], 0)}<span class="duelo-ou"><span class="vs">VS</span></span>${card(par[1], 1)}</div>
+  <div class="linha-flex duelo-acoes"><button class="btn sec peq" data-acao="duelo-empate">🤷 Tanto faz</button><button class="btn sec peq" data-acao="duelo-pular">Pular par</button>${cen ? `<button class="btn sec peq" data-acao="duelo-cenario">🎲 Outro cenário</button>` : ""}</div>`;
 }
 
 const ROT_DIM = { temp: "Temperatura", td: "Umidade", chuva: "Chuva", periodo: "Período", ocasiao: "Ocasião", sub: "Situação" };
@@ -330,7 +391,7 @@ const ROT_VAL = { seco: "seco", neutro: "normal", carregado: "abafado", sem: "se
 const rotChip = (k, v) => (k === "ocasiao" ? ROT_OC[v] || v : ROT_VAL[v] || v);
 
 /** Coleção › Ranking: chips por dimensão (um valor por dimensão; sem chip = Geral), lista da grade e especialistas. */
-export function telaRanking({ duelos, frascos, filtro = {} }) {
+export function telaRanking({ duelos, frascos, filtro = {}, hoje = "", arqIcone = () => "" }) {
   const ativo = Object.keys(filtro).filter(k => filtro[k]);
   const subs = filtro.ocasiao ? SUBS[filtro.ocasiao] : Object.keys(MAE_DA_SUB);
   const chips = k => `<div class="rk-dim"><span class="rot">${ROT_DIM[k]}</span><div class="chips rolagem">${(k === "sub" ? subs : VALORES[k]).map(v =>
@@ -342,14 +403,23 @@ export function telaRanking({ duelos, frascos, filtro = {} }) {
   const esp = ativo.length ? lista.filter(x => x.n_recorte >= 3) : [];
   const sobe = [...esp].filter(x => x.delta_vs_geral > 0.5).sort((a, b) => b.delta_vs_geral - a.delta_vs_geral).slice(0, 3);
   const cai = [...esp].filter(x => x.delta_vs_geral < -0.5).sort((a, b) => a.delta_vs_geral - b.delta_vs_geral).slice(0, 3);
+  const mov = !ativo.length && hoje ? movimentoSemana(duelos, frascos, hoje) : new Map();
+  const seta = x => { const mv = mov.get(x.nome); return mv?.sobe ? `<span class="rk-mov ${mv.sobe > 0 ? "sobe" : "cai"}" title="na semana">${mv.sobe > 0 ? "▲" : "▼"}${Math.abs(mv.sobe)}</span>` : mv && mv.antes == null ? `<span class="rk-mov novo" title="novo na semana">novo</span>` : ""; };
+  const comDuelo = lista.filter(x => x.n_recorte > 0 || !ativo.length && x.rating !== 1500);
+  const podio = duelos.length && comDuelo.length >= 3 ? `<div class="podio">${[1, 0, 2].map(i => { const x = comDuelo[i];
+    return `<button class="podio-lugar p${i + 1}" data-ficha="${esc(x.nome)}"><span class="medalha">${["🥇", "🥈", "🥉"][i]}</span>${arqIcone(x.f.arquetipo, 30)}<b>${esc(x.nome)}</b><span class="nota">${fmtElo(x.rating)}</span><span class="degrau">${i + 1}</span></button>`; }).join("")}</div>` : "";
+  const tts = !ativo.length ? titulos(duelos, frascos) : [];
   const itemEsp = (x, verbo) => `<li><button class="nome-inline" data-ficha="${esc(x.nome)}">${esc(x.nome)}</button> ${tierHTML(x.f.tier)} · ${verbo} ${esc(recorte)} <b>${x.delta_vs_geral > 0 ? "+" : "−"}${Math.round(Math.abs(x.delta_vs_geral))}</b></li>`;
   return `<h2>Ranking</h2>
-  <div class="bloco rk-filtros"><p class="nota">${ativo.length ? `Recorte: <b>${esc(recorte)}</b> · <button class="btn sec peq" data-acao="rk-limpar">Geral</button>` : "Geral (sem recorte). Toque num valor para ver o ranking naquela condição; toque de novo para limpar."}</p>
-    ${["temp", "td", "chuva", "periodo", "ocasiao", "sub"].map(chips).join("")}</div>
+  ${podio}
+  <details class="bloco rk-filtros" ${ativo.length ? "open" : ""}><summary>${ativo.length ? `Recorte: ${esc(recorte)}` : "Filtrar por condição"}</summary>
+    <p class="nota">${ativo.length ? `<button class="btn sec peq" data-acao="rk-limpar">Voltar ao Geral</button>` : "Toque num valor para ver o ranking naquela condição; toque de novo para limpar."}</p>
+    ${["temp", "td", "chuva", "periodo", "ocasiao", "sub"].map(chips).join("")}</details>
+  ${tts.length ? `<div class="bloco"><h3>Títulos</h3><div class="titulos">${tts.slice(0, 8).map(t => `<button class="titulo" data-ficha="${esc(t.nome)}"><span>${esc(t.titulo)}</span><b>${esc(t.nome)}</b><span class="nota">+${Math.round(t.efeito)} · ${t.n} duelos</span></button>`).join("")}</div></div>` : ""}
   ${sobe.length || cai.length ? `<div class="bloco"><h3>Especialistas</h3><ul class="elo-lista">${sobe.map(x => itemEsp(x, "Sobe")).join("")}${cai.map(x => itemEsp(x, "Cai")).join("")}</ul></div>` : ""}
   <div class="bloco"><ol class="rk-lista">${lista.map((x, i) => `<li><span class="rk-pos">${i + 1}</span>
       <button class="nome-inline" data-ficha="${esc(x.nome)}">${esc(x.nome)}</button>${tierHTML(x.f.tier)}<span class="esp"></span>
-      ${ativo.length ? desde(x) : ""}<b class="rk-r">${fmtElo(x.rating)}</b><span class="nota rk-n">${x.n_recorte}</span></li>`).join("")}</ol>
+      ${ativo.length ? desde(x) : seta(x)}<b class="rk-r">${fmtElo(x.rating)}</b><span class="nota rk-n">${x.n_recorte}</span></li>`).join("")}</ol>
     <p class="nota">${duelos.length} duelo${duelos.length === 1 ? "" : "s"}, ${duelos.length ? Math.round(100 * reais / duelos.length) : 0}% reais (modo Agora). Rating 1 500 = neutro; n = duelos do frasco ${ativo.length ? "no recorte (o menor entre os valores escolhidos)" : "no total"}; ↑↓ vs Geral só com n ≥ 3.</p></div>`;
 }
 
