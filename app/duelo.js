@@ -246,11 +246,24 @@ export function rotuloValor(k, v) {
   return `em ${v}`;
 }
 
-/** Próximo par [A, B]. Candidatos: frascos da grade (já sem os que não são “Frasco Gui”, via aplicarTiers).
- *  Custo do par = 3 × duelos entre os dois + 2 × (prioridade − 1) + 0,25 × duelos de cada um; prioridade 1 = mesmo
- *  arquétipo e mesmo tier, 2 = mesmo arquétipo e tiers vizinhos, 3 = qualquer par. No modo Cenário, + 1,5 × |p̂ − 0,5|
- *  (p̂ = chance prevista de A vencer B naquele cenário): prefere pares de resultado incerto. Empate: sorteio. */
-export function pareamento(frascos, duelos = [], aleatorio = Math.random, cenario = null) {
+/** Frascos que fazem sentido no cenário: o envelope cobre a temperatura (folga de 2 °C) e há aptidão para a ocasião
+ *  (Cozy vale qualquer um — é em casa). Menos de 2 → afrouxa (só envelope; depois todos). */
+export function plausiveisNoCenario(frascos, c) {
+  if (!c) return frascos;
+  const cobre = f => c.T == null || (f.env_lo - 2 <= c.T && c.T <= f.env_hi + 2);
+  const apto = f => !c.ocasiao || c.ocasiao.startsWith("Cozy") || (f.apt?.[c.ocasiao] ?? 0) >= 1;
+  const tudo = frascos.filter(f => cobre(f) && apto(f));
+  if (tudo.length >= 2) return tudo;
+  const so = frascos.filter(cobre);
+  return so.length >= 2 ? so : frascos;
+}
+
+/** Próximo par [A, B]. Candidatos: frascos da grade (já sem os que não são “Frasco Gui”, via aplicarTiers) — quem
+ *  chama já filtra pela situação (plausiveisNoCenario / filtros do motor no modo Agora).
+ *  Custo do par = 3 × duelos entre os dois + 0,25 × duelos de cada um + distância de tier (0 · 0,75 · 2); no modo
+ *  Cenário, + 1,5 × |p̂ − 0,5| (prefere resultado incerto). Arquétipo não pesa: pares variam entre arquétipos.
+ *  Pares em `evitar` (pulados nesta sessão) custam +100. Sorteio entre os pares a até 0,6 do melhor custo. */
+export function pareamento(frascos, duelos = [], aleatorio = Math.random, cenario = null, evitar = null) {
   const fs = frascos.filter(daGrade).filter(f => TIERS.includes(f.tier));
   if (fs.length < 2) return null;
   const nDe = new Map(), nPar = new Map();
@@ -259,19 +272,21 @@ export function pareamento(frascos, duelos = [], aleatorio = Math.random, cenari
     const k = chavePar(d.a, d.b); nPar.set(k, (nPar.get(k) || 0) + 1);
   }
   const m = cenario ? ajustar(duelos) : null, sc = m && new Map(fs.map(f => [f.nome, m.score(f.nome, cenario)]));
-  let melhor = Infinity, empates = [];
+  const pares = [];
   for (let i = 0; i < fs.length; i++) for (let j = i + 1; j < fs.length; j++) {
-    const a = fs[i], b = fs[j];
-    const mesmoArq = a.arquetipo === b.arquetipo, dt = Math.abs(TIERS.indexOf(a.tier) - TIERS.indexOf(b.tier));
-    const prio = mesmoArq && dt === 0 ? 1 : mesmoArq && dt === 1 ? 2 : 3;
-    let custo = 3 * (nPar.get(chavePar(a.nome, b.nome)) || 0) + 2 * (prio - 1) + 0.25 * ((nDe.get(a.nome) || 0) + (nDe.get(b.nome) || 0));
+    const a = fs[i], b = fs[j], k = chavePar(a.nome, b.nome);
+    const dt = Math.abs(TIERS.indexOf(a.tier) - TIERS.indexOf(b.tier));
+    let custo = 3 * (nPar.get(k) || 0) + 0.25 * ((nDe.get(a.nome) || 0) + (nDe.get(b.nome) || 0)) + [0, 0.75, 2, 2][dt];
     if (sc) custo += 1.5 * Math.abs(sig(sc.get(a.nome) - sc.get(b.nome)) - 0.5);
-    if (custo < melhor - 1e-9) { melhor = custo; empates = [[a, b]]; }
-    else if (Math.abs(custo - melhor) < 1e-9) empates.push([a, b]);
+    if (evitar?.has(k)) custo += 100;
+    pares.push([custo, a, b]);
   }
-  const par = empates[Math.min(empates.length - 1, Math.floor(aleatorio() * empates.length))];
-  return aleatorio() < 0.5 ? par : [par[1], par[0]];
+  const melhor = Math.min(...pares.map(p => p[0]));
+  const perto = pares.filter(p => p[0] <= melhor + 0.6 + 1e-9);
+  const [, a, b] = perto[Math.min(perto.length - 1, Math.floor(aleatorio() * perto.length))];
+  return aleatorio() < 0.5 ? [a, b] : [b, a];
 }
+export { chavePar };
 
 // ───────────── diversão: previsão, movimento na semana, títulos ─────────────
 /** Chance prevista de A vencer B na situação s (cenário ou condições de agora), antes de gravar a escolha. */
