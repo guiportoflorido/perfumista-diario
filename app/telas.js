@@ -70,7 +70,7 @@ export function telaColecao({ frascos, hist, hoje, janelas, filtro, fichas, arqT
     <thead><tr><th class="c-n" scope="col">#</th>${COLS_COL.map(th).join("")}</tr></thead>
     <tbody>${linhas.map(({ f, k, e }, i) => `<tr data-ficha="${esc(f.nome)}" tabindex="0">
       <td class="c-n">${i + 1}</td>
-      <td class="c-nome">${esc(f.nome)}${f.janelas_estimadas ? ` <span class="selo aviso" title="janelas estimadas">est.</span>` : ""}${camadaDe(f) === "custo" ? ` <span class="selo" title="Camada custo: só academia e corrida, fora da grade">custo</span>` : camadaDe(f) === "fora" ? ` <span class="selo aviso" title="Fora da grade">fora</span>` : ""}</td>
+      <td class="c-nome">${esc(f.nome)}${camadaDe(f) === "fora" ? ` <span class="selo aviso" title="Fora da grade">fora</span>` : ""}</td>
       <td class="cc-casa">${esc(f.casa)}</td>
       <td class="c-tier">${tierHTML(f.tier)}</td>
       <td class="cc-arquetipo">${arqTag(f.arquetipo)}</td>
