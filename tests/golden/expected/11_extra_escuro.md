@@ -20,7 +20,7 @@
 | 7 | **Ani X** | Nishane | A | 3 | fim | 83 | térmico 0.97 · Lazer 2 · intenção ↑ |
 | 8 | **Drunk Lovers** | Born to Stand Out | A | 3 | ~16h45 | 82 | térmico 0.97 · Lazer 2 · intenção ↑ |
 | 9 | **New York** | Widian | A | 3 | ~16h45 | 82 | térmico 0.97 · Lazer 2 · intenção ↑ |
-| 10 | **Aventus** | Creed | A | 3 | ~16h15 | 80 | térmico 0.92 · Lazer 3 · intenção ↓ |
+| 10 | **Scarlet Sands** | Ex Nihilo | S | 3 | ~16h45 | 80 | térmico 0.99 · Lazer 2 · intenção ↓ |
 🔁 = ainda vivo na hora do banho: entra como resíduo sob o perfume da noite (informe em 'Manhã:' para o slot Noite considerar)
 S/A fora neste slot: Amyris Homme Extrait (S: 10.5h vivas fora de casa sem aptidão (Lazer)) · Bijou Zafran (S: 9h vivas fora de casa sem aptidão (Lazer)) · Blonde Amber (S: 5.5h na rua acima do envelope (Fresco é o teto)) · Brompton (S: 12.5h vivas fora de casa sem aptidão (Lazer)) · Decision (S: 9h vivas fora de casa sem aptidão (Lazer)) · Favonius (S: 12.5h vivas fora de casa sem aptidão (Lazer)) · Grand Soir (S: 5.5h na rua acima do envelope (Fresco é o teto)) · Les Sables Roses (S: 10.5h vivas fora de casa sem aptidão (Lazer))
 
@@ -35,10 +35,10 @@ S/A fora neste slot: Amyris Homme Extrait (S: 10.5h vivas fora de casa sem aptid
 | 5 | **Blonde Amber** | Clive Christian | S | 3 (em casa −1) | fim | 103 | térmico 0.87 · Cozy N 3 · intenção ↑ |
 | 6 | **Grand Soir** | MFK | S | 2 (em casa −1) | fim | 102 | térmico 0.83 · Cozy N 3 · intenção ↑ |
 | 7 | **Oud Satin Mood** | MFK | S | 1 (em casa −1) | fim | 102 | térmico 0.83 · Cozy N 3 · intenção ↑ |
-| 8 | **Brompton** | Ex Nihilo | S | 1 (em casa −1) | fim | 90 | térmico 0.92 · Cozy N 2 · intenção ↑ |
-| 9 | **Les Sables Roses** | Louis Vuitton | S | 2 (em casa −1) | fim | 90 | térmico 0.92 · Cozy N 2 · intenção ↑ |
-| 10 | **Caden** | Omanluxury | A | 2 (em casa −1) | fim | 89 | térmico 0.83 · Cozy N 3 · intenção ↑ |
+| 8 | **Omnia Omnibus Ubique** | Memo Paris | S | 2 (em casa −1) | fim | 93 | térmico 0.97 · Cozy N 3 · intenção ↓ |
+| 9 | **Brompton** | Ex Nihilo | S | 1 (em casa −1) | fim | 90 | térmico 0.92 · Cozy N 2 · intenção ↑ |
+| 10 | **Les Sables Roses** | Louis Vuitton | S | 2 (em casa −1) | fim | 90 | térmico 0.92 · Cozy N 2 · intenção ↑ |
 S/A fora neste slot: 1872 for Men (S: 2.5h abaixo do envelope (Ameno é o piso)) · Crab Apple Blossom (S: 2.5h abaixo do envelope (Ameno é o piso)) · Météore (S: 2.5h abaixo do envelope (Ameno é o piso)) · Tygar Extrait (S: 2.5h abaixo do envelope (Ameno é o piso)) · Anelo (A: 2.5h abaixo do envelope (Ameno é o piso)) · Blue Talisman (A: 2.5h abaixo do envelope (Ameno é o piso)) · L'Immensité (A: 2.5h abaixo do envelope (Ameno é o piso)) · Torino 21 (A: 2.5h abaixo do envelope (Ameno é o piso))
 
-_Modelo v1.6 (dois slots · base frascos_v7, grade 69) · pesos declarados no CFG · longevidade/projeção/curva são estimativas (16 com lastro na ficha, 63 por regra) · calibrar com o diário._
+_Modelo v1.7 (dois slots · base frascos_v8, grade 71) · pesos declarados no CFG · longevidade/projeção/curva são estimativas (17 com lastro na ficha, 64 por regra) · calibrar com o diário._
 📓 Depois me diga o que usou de manhã e à noite pra eu registrar as duas linhas.

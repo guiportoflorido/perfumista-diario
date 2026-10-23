@@ -185,6 +185,7 @@
     "Black Saffron Absolu": null,
     "Bleu de Chanel": null,
     "Blonde Amber": null,
+    "Blue Sapphire Supercharged": null,
     "Blue Talisman": 80.93923281282284,
     "Bois du Portugal": null,
     "Bois Impérial": null,
@@ -247,7 +248,8 @@
     "Sky": 80.93923281282284,
     "Belgravia": null,
     "Inception": 74.13485438136514,
-    "Dubai Musk": 73.23229275111979
+    "Dubai Musk": 73.23229275111979,
+    "Empire": 81.42323281282283
    },
    "fora": {
     "7 Loewe": "2h na rua acima do envelope (Quente é o teto)",
@@ -257,11 +259,12 @@
     "Ani X": "8h na rua acima do envelope (Quente é o teto)",
     "Apotecário": "11.5h na rua acima do envelope (Fresco é o teto)",
     "Aventus Absolu": "4.5h na rua acima do envelope (Quente é o teto)",
-    "Bedouin Rose": "11.5h na rua acima do envelope (Fresco é o teto)",
+    "Bedouin Rose": "11.5h na rua acima do envelope (Frio é o teto)",
     "Bijou Zafran": "8h na rua acima do envelope (Ameno é o teto)",
     "Black Saffron Absolu": "9h na rua acima do envelope (Ameno é o teto)",
     "Bleu de Chanel": "6.5h vivas fora de casa sem aptidão (Lazer)",
     "Blonde Amber": "11.5h na rua acima do envelope (Fresco é o teto)",
+    "Blue Sapphire Supercharged": "10.5h na rua acima do envelope (Ameno é o teto)",
     "Bois du Portugal": "3.5h na rua acima do envelope (Quente é o teto)",
     "Bois Impérial": "4.5h na rua acima do envelope (Quente é o teto)",
     "Brompton": "11.5h na rua acima do envelope (Ameno é o teto)",
@@ -332,6 +335,11 @@
      "motivo": "11.5h na rua acima do envelope (Fresco é o teto)"
     },
     {
+     "nome": "Blue Sapphire Supercharged",
+     "tier": "S",
+     "motivo": "10.5h na rua acima do envelope (Ameno é o teto)"
+    },
+    {
      "nome": "Bois Impérial",
      "tier": "S",
      "motivo": "4.5h na rua acima do envelope (Quente é o teto)"
@@ -340,11 +348,6 @@
      "nome": "Brompton",
      "tier": "S",
      "motivo": "11.5h na rua acima do envelope (Ameno é o teto)"
-    },
-    {
-     "nome": "Decision",
-     "tier": "S",
-     "motivo": "8h na rua acima do envelope (Ameno é o teto)"
     }
    ]
   },
@@ -405,16 +408,6 @@
      "porque": "térmico 0.91"
     },
     {
-     "nome": "Scarlet Sands",
-     "tier": "S",
-     "score": 49.65395037897779,
-     "sprays": 2,
-     "nota": "em casa −1",
-     "vivo_ate": 29.0,
-     "vivo_fim": true,
-     "porque": "térmico 0.90"
-    },
-    {
      "nome": "Aventus",
      "tier": "A",
      "score": 48.01597989962459,
@@ -453,6 +446,16 @@
      "vivo_ate": 28.0,
      "vivo_fim": true,
      "porque": "térmico 1.00"
+    },
+    {
+     "nome": "Désobéissant",
+     "tier": "S",
+     "score": 47.26650423876998,
+     "sprays": 6,
+     "nota": "6–7 fixo",
+     "vivo_ate": 26.5,
+     "vivo_fim": true,
+     "porque": "térmico 0.99 · Td ↓"
     }
    ],
    "scores": {
@@ -472,6 +475,7 @@
     "Black Saffron Absolu": null,
     "Bleu de Chanel": null,
     "Blonde Amber": null,
+    "Blue Sapphire Supercharged": null,
     "Blue Talisman": 40.54699293886643,
     "Bois du Portugal": 32.649935416315216,
     "Bois Impérial": 45.88416037616727,
@@ -514,7 +518,7 @@
     "Reflection Man": 47.04381461503977,
     "Royal Oud": 41.403793094796264,
     "Santal 33": null,
-    "Scarlet Sands": 49.65395037897779,
+    "Scarlet Sands": 46.903157579821666,
     "Search": 47.41459887763916,
     "Serenity": null,
     "Terre d'Hermès": 41.694939899624586,
@@ -534,17 +538,19 @@
     "Sky": 40.54699293886643,
     "Belgravia": 41.7382376373663,
     "Inception": 47.96361352230067,
-    "Dubai Musk": 48.048716861235
+    "Dubai Musk": 48.048716861235,
+    "Empire": 41.03099293886643
    },
    "fora": {
     "African Leather": "2h na rua acima do envelope (Ameno é o teto)",
     "Amyris Homme Extrait": "2h na rua acima do envelope (Ameno é o teto)",
     "Apotecário": "3.5h na rua acima do envelope (Fresco é o teto)",
-    "Bedouin Rose": "3.5h na rua acima do envelope (Fresco é o teto)",
+    "Bedouin Rose": "3.5h na rua acima do envelope (Frio é o teto)",
     "Bijou Zafran": "2h na rua acima do envelope (Ameno é o teto)",
     "Black Saffron Absolu": "2h na rua acima do envelope (Ameno é o teto)",
     "Bleu de Chanel": "tier C fora da célula-lar (Cozy N não é aptidão 3)",
     "Blonde Amber": "3.5h na rua acima do envelope (Fresco é o teto)",
+    "Blue Sapphire Supercharged": "2h na rua acima do envelope (Ameno é o teto)",
     "Brompton": "2h na rua acima do envelope (Ameno é o teto)",
     "Caden": "3.5h na rua acima do envelope (Fresco é o teto)",
     "Carved Oud": "2h na rua acima do envelope (Ameno é o teto)",
@@ -596,6 +602,11 @@
      "motivo": "3.5h na rua acima do envelope (Fresco é o teto)"
     },
     {
+     "nome": "Blue Sapphire Supercharged",
+     "tier": "S",
+     "motivo": "2h na rua acima do envelope (Ameno é o teto)"
+    },
+    {
      "nome": "Brompton",
      "tier": "S",
      "motivo": "2h na rua acima do envelope (Ameno é o teto)"
@@ -609,11 +620,6 @@
      "nome": "Favonius",
      "tier": "S",
      "motivo": "2h na rua acima do envelope (Ameno é o teto)"
-    },
-    {
-     "nome": "Grand Soir",
-     "tier": "S",
-     "motivo": "3.5h na rua acima do envelope (Fresco é o teto)"
     }
    ]
   }

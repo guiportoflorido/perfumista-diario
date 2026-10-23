@@ -21,7 +21,7 @@
 | 9 | **Aventus** | Creed | A | 3 | ~16h15 | 86 | térmico 0.96 · T.Inf 3 |
 | 10 | **Search** | Amouage | A | 4 | ~15h45 | 86 | térmico 0.96 · T.Inf 3 |
 🔁 = ainda vivo na hora do banho: entra como resíduo sob o perfume da noite (informe em 'Manhã:' para o slot Noite considerar)
-S/A fora neste slot: Blonde Amber (S: 11.5h vivas fora de casa sem aptidão (T.Inf)) · Brompton (S: 12.5h vivas fora de casa sem aptidão (T.Inf)) · Favonius (S: 12.5h vivas fora de casa sem aptidão (T.Inf)) · Grand Soir (S: 2.5h na rua acima do envelope (Fresco é o teto)) · Les Sables Roses (S: 10.5h vivas fora de casa sem aptidão (T.Inf)) · Liwa (S: 11.5h vivas fora de casa sem aptidão (T.Inf)) · Odéon (S: 9.5h vivas fora de casa sem aptidão (T.Inf)) · Ombre Nomade (S: 2.5h na rua acima do envelope (Fresco é o teto))
+S/A fora neste slot: Blonde Amber (S: 11.5h vivas fora de casa sem aptidão (T.Inf)) · Blue Sapphire Supercharged (S: 11.5h vivas fora de casa sem aptidão (T.Inf)) · Brompton (S: 12.5h vivas fora de casa sem aptidão (T.Inf)) · Favonius (S: 12.5h vivas fora de casa sem aptidão (T.Inf)) · Grand Soir (S: 2.5h na rua acima do envelope (Fresco é o teto)) · Les Sables Roses (S: 10.5h vivas fora de casa sem aptidão (T.Inf)) · Liwa (S: 11.5h vivas fora de casa sem aptidão (T.Inf)) · Odéon (S: 9.5h vivas fora de casa sem aptidão (T.Inf))
 
 ## Slot Noite (19h30→23h) — Top 10 da grade
 🧴 Onde aplicar: pós-banho: pele limpa e ainda morna absorve mais — pescoço/peito, sem esfregar; esperar a pele secar antes de vestir
@@ -31,13 +31,13 @@ S/A fora neste slot: Blonde Amber (S: 11.5h vivas fora de casa sem aptidão (T.I
 | 2 | **Hacivat** | Nishane | S | 3 | fim | 100 | térmico 1.00 · N.Inf 3 |
 | 3 | **Lucius** | Fragrance du Bois | S | 3 | fim | 100 | térmico 1.00 · N.Inf 3 |
 | 4 | **Tygar Extrait** | Bvlgari (Le Gemme) | S | 2 | fim | 96 | térmico 0.93 · N.Inf 3 |
-| 5 | **Scarlet Sands** | Ex Nihilo | S | 3 | fim | 95 | térmico 0.92 · N.Inf 3 |
-| 6 | **Aventus Absolu** | Creed | S | 3 | fim | 93 | térmico 0.87 · N.Inf 3 |
+| 5 | **Aventus Absolu** | Creed | S | 3 | fim | 93 | térmico 0.87 · N.Inf 3 |
+| 6 | **Scarlet Sands** | Ex Nihilo | S | 3 | fim | 93 | térmico 0.87 · N.Inf 3 |
 | 7 | **Town & Country** | Clive Christian | A | 3 | fim | 88 | térmico 0.95 · Td ↑ · N.Inf 3 |
 | 8 | **Aventus** | Creed | A | 3 | fim | 88 | térmico 1.00 · N.Inf 3 |
 | 9 | **Désobéissant** | Givenchy | S | 6 (6–7 fixo) | fim | 85 | térmico 0.99 · Td ↑ · N.Inf 2 |
 | 10 | **Ani X** | Nishane | A | 3 | fim | 84 | térmico 0.92 · N.Inf 3 |
 S/A fora neste slot: Blonde Amber (S: 3.5h na rua acima do envelope (Fresco é o teto)) · Grand Soir (S: 3.5h na rua acima do envelope (Fresco é o teto)) · Météore (S: 3.5h vivas fora de casa sem aptidão (N.Inf)) · Ombre Nomade (S: 3.5h na rua acima do envelope (Fresco é o teto)) · Oud Satin Mood (S: 3.5h na rua acima do envelope (Fresco é o teto)) · Outlands (S: 3.5h na rua acima do envelope (Fresco é o teto)) · Radical Rose (S: 3.5h na rua acima do envelope (Fresco é o teto)) · Reflection Man (S: 3.5h vivas fora de casa sem aptidão (N.Inf))
 
-_Modelo v1.6 (dois slots · base frascos_v7, grade 69) · pesos declarados no CFG · longevidade/projeção/curva são estimativas (16 com lastro na ficha, 63 por regra) · calibrar com o diário._
+_Modelo v1.7 (dois slots · base frascos_v8, grade 71) · pesos declarados no CFG · longevidade/projeção/curva são estimativas (17 com lastro na ficha, 64 por regra) · calibrar com o diário._
 📓 Depois me diga o que usou de manhã e à noite pra eu registrar as duas linhas.

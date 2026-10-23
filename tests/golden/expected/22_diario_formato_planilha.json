@@ -191,6 +191,7 @@
     "Black Saffron Absolu": 58.97470891403353,
     "Bleu de Chanel": 44.393391473411604,
     "Blonde Amber": null,
+    "Blue Sapphire Supercharged": null,
     "Blue Talisman": 78.02588899320443,
     "Bois du Portugal": null,
     "Bois Impérial": 95.07970485794378,
@@ -253,12 +254,14 @@
     "Sky": 64.42912902238,
     "Belgravia": 68.89230849571317,
     "Inception": 94.27085859763467,
-    "Dubai Musk": 82.33996544492067
+    "Dubai Musk": 82.33996544492067,
+    "Empire": 52.10988899320442
    },
    "fora": {
     "Al Qurashi Blend": "9h vivas fora de casa sem aptidão (T.Inf)",
-    "Bedouin Rose": "11h vivas fora de casa sem aptidão (T.Inf)",
+    "Bedouin Rose": "11.5h vivas fora de casa sem aptidão (T.Inf, N.Inf)",
     "Blonde Amber": "11h vivas fora de casa sem aptidão (T.Inf)",
+    "Blue Sapphire Supercharged": "11h vivas fora de casa sem aptidão (T.Inf)",
     "Bois du Portugal": "8h vivas fora de casa sem aptidão (T.Inf, N.Inf)",
     "Brompton": "11h vivas fora de casa sem aptidão (T.Inf)",
     "Caden": "11h vivas fora de casa sem aptidão (T.Inf)",
@@ -293,6 +296,11 @@
      "motivo": "11h vivas fora de casa sem aptidão (T.Inf)"
     },
     {
+     "nome": "Blue Sapphire Supercharged",
+     "tier": "S",
+     "motivo": "11h vivas fora de casa sem aptidão (T.Inf)"
+    },
+    {
      "nome": "Brompton",
      "tier": "S",
      "motivo": "11h vivas fora de casa sem aptidão (T.Inf)"
@@ -321,11 +329,6 @@
      "nome": "Odéon",
      "tier": "S",
      "motivo": "9.5h vivas fora de casa sem aptidão (T.Inf)"
-    },
-    {
-     "nome": "Ombre Nomade",
-     "tier": "S",
-     "motivo": "11h vivas fora de casa sem aptidão (T.Inf)"
     }
    ]
   },
@@ -346,6 +349,16 @@
      "porque": "térmico 0.88 · Cozy N 3"
     },
     {
+     "nome": "Omnia Omnibus Ubique",
+     "tier": "S",
+     "score": 92.70583039986202,
+     "sprays": 2,
+     "nota": "em casa −1",
+     "vivo_ate": 29.0,
+     "vivo_fim": true,
+     "porque": "térmico 0.88 · Cozy N 3"
+    },
+    {
      "nome": "African Leather",
      "tier": "S",
      "score": 90.74835204748814,
@@ -354,16 +367,6 @@
      "vivo_ate": 31.0,
      "vivo_fim": true,
      "porque": "térmico 0.84 · Cozy N 3"
-    },
-    {
-     "nome": "Omnia Omnibus Ubique",
-     "tier": "S",
-     "score": 77.70583039986201,
-     "sprays": 2,
-     "nota": "em casa −1",
-     "vivo_ate": 29.0,
-     "vivo_fim": true,
-     "porque": "térmico 0.88 · Cozy N 2"
     },
     {
      "nome": "Odéon",
@@ -396,6 +399,16 @@
      "porque": "térmico 0.84 · Cozy N 2"
     },
     {
+     "nome": "Favonius",
+     "tier": "S",
+     "score": 75.44035204748813,
+     "sprays": 2,
+     "nota": "em casa −1",
+     "vivo_ate": 32.0,
+     "vivo_fim": true,
+     "porque": "térmico 0.84 · Cozy N 2"
+    },
+    {
      "nome": "Liwa",
      "tier": "S",
      "score": 74.81335204748814,
@@ -424,16 +437,6 @@
      "vivo_ate": 29.0,
      "vivo_fim": true,
      "porque": "térmico 1.00 · Cozy N 2"
-    },
-    {
-     "nome": "Bijou Zafran",
-     "tier": "S",
-     "score": 73.38989114725359,
-     "sprays": 2,
-     "nota": "em casa −1",
-     "vivo_ate": 28.5,
-     "vivo_fim": true,
-     "porque": "térmico 0.87 · chuva ↓ · Cozy N 3 · usado há 2d"
     }
    ],
    "scores": {
@@ -453,6 +456,7 @@
     "Black Saffron Absolu": 70.37966794628781,
     "Bleu de Chanel": null,
     "Blonde Amber": null,
+    "Blue Sapphire Supercharged": 60.495352047488126,
     "Blue Talisman": 43.40677254855942,
     "Bois du Portugal": 34.92992677545621,
     "Bois Impérial": 54.284962342938634,
@@ -464,7 +468,7 @@
     "Decision": 46.682363934067,
     "Drunk Lovers": 70.8513507557136,
     "Désobéissant": 41.05800814050838,
-    "Favonius": 45.44035204748813,
+    "Favonius": 75.44035204748813,
     "Gentle Fluidity Silver": 52.99429426871073,
     "Grand Soir": null,
     "Green Irish Tweed": 37.563939291732765,
@@ -485,7 +489,7 @@
     "New York": 74.18691669488865,
     "Odéon": 76.48071886883054,
     "Ombre Nomade": null,
-    "Omnia Omnibus Ubique": 77.70583039986201,
+    "Omnia Omnibus Ubique": 92.70583039986202,
     "Oud Kyphi": null,
     "Oud Satin Mood": null,
     "Oudós Lux Solis": 48.400000000000006,
@@ -495,7 +499,7 @@
     "Reflection Man": 51.1822656586984,
     "Royal Oud": 44.2700679462878,
     "Santal 33": 41.08048026197896,
-    "Scarlet Sands": 55.00000000000001,
+    "Scarlet Sands": 53.854243708389845,
     "Search": 46.872549912926814,
     "Serenity": null,
     "Terre d'Hermès": 47.06348057636007,
@@ -515,11 +519,12 @@
     "Sky": 43.40677254855942,
     "Belgravia": 47.19419796674976,
     "Inception": 54.0642279276819,
-    "Dubai Musk": 45.882553779654586
+    "Dubai Musk": 45.882553779654586,
+    "Empire": 43.89077254855942
    },
    "fora": {
     "Apotecário": "3.5h na rua acima do envelope (Fresco é o teto)",
-    "Bedouin Rose": "3.5h na rua acima do envelope (Fresco é o teto)",
+    "Bedouin Rose": "3.5h na rua acima do envelope (Frio é o teto)",
     "Bleu de Chanel": "tier C fora da célula-lar (Cozy N não é aptidão 3)",
     "Blonde Amber": "3.5h na rua acima do envelope (Fresco é o teto)",
     "Caden": "3.5h na rua acima do envelope (Fresco é o teto)",

@@ -181,6 +181,7 @@
     "Black Saffron Absolu": 60.02553061712843,
     "Bleu de Chanel": 42.88297567371378,
     "Blonde Amber": null,
+    "Blue Sapphire Supercharged": null,
     "Blue Talisman": 75.36755718573625,
     "Bois du Portugal": null,
     "Bois Impérial": 93.53250777471631,
@@ -243,12 +244,14 @@
     "Sky": 63.175109479322664,
     "Belgravia": 67.4002651144735,
     "Inception": 91.38461062401797,
-    "Dubai Musk": 80.51324669700956
+    "Dubai Musk": 80.51324669700956,
+    "Empire": 51.46666177290909
    },
    "fora": {
     "Al Qurashi Blend": "9h vivas fora de casa sem aptidão (T.Inf)",
     "Bedouin Rose": "11h vivas fora de casa sem aptidão (T.Inf)",
     "Blonde Amber": "11h vivas fora de casa sem aptidão (T.Inf)",
+    "Blue Sapphire Supercharged": "11h vivas fora de casa sem aptidão (T.Inf)",
     "Bois du Portugal": "8h vivas fora de casa sem aptidão (T.Inf)",
     "Brompton": "11h vivas fora de casa sem aptidão (T.Inf)",
     "Caden": "2.5h na rua acima do envelope (Fresco é o teto)",
@@ -283,6 +286,11 @@
      "motivo": "11h vivas fora de casa sem aptidão (T.Inf)"
     },
     {
+     "nome": "Blue Sapphire Supercharged",
+     "tier": "S",
+     "motivo": "11h vivas fora de casa sem aptidão (T.Inf)"
+    },
+    {
      "nome": "Brompton",
      "tier": "S",
      "motivo": "11h vivas fora de casa sem aptidão (T.Inf)"
@@ -311,11 +319,6 @@
      "nome": "Odéon",
      "tier": "S",
      "motivo": "9.5h vivas fora de casa sem aptidão (T.Inf)"
-    },
-    {
-     "nome": "Ombre Nomade",
-     "tier": "S",
-     "motivo": "2.5h na rua acima do envelope (Fresco é o teto)"
     }
    ]
   }

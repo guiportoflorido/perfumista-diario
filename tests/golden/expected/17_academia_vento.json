@@ -97,6 +97,16 @@
      "porque": "térmico 0.97 · chuva ↓ · Lazer 3"
     },
     {
+     "nome": "Scarlet Sands",
+     "tier": "S",
+     "score": 84.2609618705434,
+     "sprays": 4,
+     "nota": "vento +1",
+     "vivo_ate": 16.75,
+     "vivo_fim": false,
+     "porque": "térmico 0.98 · Lazer 2"
+    },
+    {
      "nome": "Aventus Absolu",
      "tier": "S",
      "score": 84.1533629237348,
@@ -137,16 +147,6 @@
      "porque": "térmico 0.84 · Td ↑ · Lazer 2"
     },
     {
-     "nome": "Scarlet Sands",
-     "tier": "S",
-     "score": 81.86654756381276,
-     "sprays": 4,
-     "nota": "vento +1",
-     "vivo_ate": 16.75,
-     "vivo_fim": false,
-     "porque": "térmico 0.94 · Lazer 2"
-    },
-    {
      "nome": "Gris Charnel",
      "tier": "S",
      "score": 79.1066946172767,
@@ -184,6 +184,7 @@
     "Black Saffron Absolu": null,
     "Bleu de Chanel": null,
     "Blonde Amber": null,
+    "Blue Sapphire Supercharged": 70.0,
     "Blue Talisman": null,
     "Bois du Portugal": null,
     "Bois Impérial": 58.894282311127014,
@@ -226,7 +227,7 @@
     "Reflection Man": 68.33600123319096,
     "Royal Oud": null,
     "Santal 33": 85.19452321047697,
-    "Scarlet Sands": 81.86654756381276,
+    "Scarlet Sands": 84.2609618705434,
     "Search": 68.66855432617922,
     "Serenity": null,
     "Terre d'Hermès": null,
@@ -246,14 +247,15 @@
     "Sky": null,
     "Belgravia": 75.2237723149714,
     "Inception": 72.06919898097291,
-    "Dubai Musk": 66.93522758511465
+    "Dubai Musk": 66.93522758511465,
+    "Empire": null
    },
    "fora": {
     "1872 for Men": "5h abaixo do envelope (Ameno é o piso)",
     "Amyris Homme Extrait": "10.5h vivas fora de casa sem aptidão (Lazer)",
     "Anelo": "5h abaixo do envelope (Ameno é o piso)",
     "Apotecário": "11.5h vivas fora de casa sem aptidão (Lazer)",
-    "Bedouin Rose": "11.5h vivas fora de casa sem aptidão (Lazer)",
+    "Bedouin Rose": "9.5h na rua acima do envelope (Frio é o teto)",
     "Bijou Zafran": "9h vivas fora de casa sem aptidão (Lazer)",
     "Black Saffron Absolu": "10h vivas fora de casa sem aptidão (Lazer)",
     "Bleu de Chanel": "5h abaixo do envelope (Ameno é o piso)",
@@ -296,7 +298,8 @@
     "Aquatica": "5.5h abaixo do envelope (Quente é o piso)",
     "Incense 01": "12.5h vivas fora de casa sem aptidão (Lazer)",
     "Island Dreams": "5h abaixo do envelope (Ameno é o piso)",
-    "Sky": "5h abaixo do envelope (Ameno é o piso)"
+    "Sky": "5h abaixo do envelope (Ameno é o piso)",
+    "Empire": "5h abaixo do envelope (Ameno é o piso)"
    },
    "fora_sa": [
     {
@@ -400,6 +403,16 @@
      "porque": "térmico 0.98 · Td ↑ · chuva ↓ · Cozy N 3"
     },
     {
+     "nome": "Omnia Omnibus Ubique",
+     "tier": "S",
+     "score": 100.0,
+     "sprays": 2,
+     "nota": "em casa −1",
+     "vivo_ate": 29.0,
+     "vivo_fim": true,
+     "porque": "térmico 0.98 · Td ↑ · Cozy N 3"
+    },
+    {
      "nome": "Odéon",
      "tier": "S",
      "score": 99.57453166186616,
@@ -468,16 +481,6 @@
      "vivo_ate": 33.0,
      "vivo_fim": true,
      "porque": "térmico 0.94 · Td ↑ · Cozy N 2"
-    },
-    {
-     "nome": "Les Sables Roses",
-     "tier": "S",
-     "score": 85.0,
-     "sprays": 2,
-     "nota": "em casa −1",
-     "vivo_ate": 30.0,
-     "vivo_fim": true,
-     "porque": "térmico 0.94 · Td ↑ · Cozy N 2"
     }
    ],
    "scores": {
@@ -497,6 +500,7 @@
     "Black Saffron Absolu": 74.01331297616922,
     "Bleu de Chanel": null,
     "Blonde Amber": 99.18226381588693,
+    "Blue Sapphire Supercharged": 70.0,
     "Blue Talisman": null,
     "Bois du Portugal": 37.82032623104369,
     "Bois Impérial": 44.23802539010992,
@@ -508,7 +512,7 @@
     "Decision": 55.00000000000001,
     "Drunk Lovers": 74.3481478624422,
     "Désobéissant": 38.98050184742659,
-    "Favonius": 55.00000000000001,
+    "Favonius": 85.0,
     "Gentle Fluidity Silver": 53.441768708805824,
     "Grand Soir": 98.06050183411436,
     "Green Irish Tweed": 28.940333737299852,
@@ -529,7 +533,7 @@
     "New York": 71.05381595617176,
     "Odéon": 99.57453166186616,
     "Ombre Nomade": 82.51050183411436,
-    "Omnia Omnibus Ubique": 85.0,
+    "Omnia Omnibus Ubique": 100.0,
     "Oud Kyphi": null,
     "Oud Satin Mood": 97.91750183411436,
     "Oudós Lux Solis": 48.400000000000006,
@@ -539,7 +543,7 @@
     "Reflection Man": 38.765552578738266,
     "Royal Oud": 47.9037129761692,
     "Santal 33": 46.293779413424616,
-    "Scarlet Sands": 51.56797267746792,
+    "Scarlet Sands": 54.12339729455107,
     "Search": 41.83686578647935,
     "Serenity": 69.81258467112086,
     "Terre d'Hermès": 36.220572459336836,
@@ -559,12 +563,13 @@
     "Sky": null,
     "Belgravia": 36.35309384117696,
     "Inception": 41.74274143106459,
-    "Dubai Musk": 40.76384626928967
+    "Dubai Musk": 40.76384626928967,
+    "Empire": null
    },
    "fora": {
     "1872 for Men": "3.5h abaixo do envelope (Ameno é o piso)",
     "Anelo": "3.5h abaixo do envelope (Ameno é o piso)",
-    "Bedouin Rose": "tier C fora da célula-lar (Cozy N não é aptidão 3)",
+    "Bedouin Rose": "3.5h na rua acima do envelope (Frio é o teto)",
     "Bleu de Chanel": "3.5h abaixo do envelope (Ameno é o piso)",
     "Blue Talisman": "3.5h abaixo do envelope (Ameno é o piso)",
     "Crab Apple Blossom": "3.5h abaixo do envelope (Ameno é o piso)",
@@ -579,7 +584,8 @@
     "Vibrato": "3.5h abaixo do envelope (Ameno é o piso)",
     "Aquatica": "3.5h abaixo do envelope (Quente é o piso)",
     "Island Dreams": "3.5h abaixo do envelope (Ameno é o piso)",
-    "Sky": "3.5h abaixo do envelope (Ameno é o piso)"
+    "Sky": "3.5h abaixo do envelope (Ameno é o piso)",
+    "Empire": "3.5h abaixo do envelope (Ameno é o piso)"
    },
    "fora_sa": [
     {

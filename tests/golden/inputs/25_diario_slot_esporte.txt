@@ -1,0 +1,7 @@
+Data: 2026-10-23
+T: 16-27 pico 15 noite 20
+Td: 14
+Diario: 2026-10-22 Empire (esporte); 2026-10-22 Imagination (manhã); 2026-10-21 Acqua Viva (e)
+2026-10-22 | Blue Sapphire Supercharged (noite) | N.Inf | 21
+2026-10-21 | Météore (m) | T.Inf | 24
+2026-10-20 | Empire (Esporte)

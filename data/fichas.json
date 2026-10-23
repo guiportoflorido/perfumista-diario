@@ -1,5 +1,5 @@
 {
- "fonte": "fichas_tecnicas_v9.md",
+ "fonte": "fichas_tecnicas_v10.md",
  "fichas": {
   "1872 for Men": {
    "n": 1,
@@ -222,12 +222,12 @@
    "doc": "2",
    "peso": "4",
    "td": "S",
-   "envelope": "🔵F–⚫MF",
-   "aptidao": "N.Inf 2 · N.For 2 · Cozy N 2",
+   "envelope": "🟣Fr–⚫MF",
+   "aptidao": "Cozy N 3",
    "sprays_base": "3",
-   "janelas": "3",
+   "janelas": "2",
    "vizinhos": "Brompton (rosa-açafrão-imortelle-incenso), Radical Rose, Odéon, OSM",
-   "leitura": "Descrição literal do Brompton. **Tier C desde 14/out/2026** (era D, fora da grade): 3 janelas, só em *Também* — Frio × Noite Formal, Frio × Cozy Noite e Muito Frio × Noite Informal (células escolhidas por ele; o ideal térmico de 12 °C cai na fronteira Frio/Muito Frio). Frasco de 10 ml experimental."
+   "leitura": "Rosa oriental resinosa (tâmara-canela-açafrão sobre rosa Taif-imortelle, base âmbar-olíbano-oud). **v10 (23/out/2026): tier C dado por ele (aba Tiers, 14/out) e entrada na grade por decisão dele** — 'os C ficam'. Como C, só nas células-lar: Cozy Noite no Frio e no Muito Frio (2 janelas). Frasco de 10 ml experimental — fora de custo por uso e de desbaste por volume. Vizinho direto do Brompton."
   },
   "Bijou Zafran": {
    "n": 13,
@@ -305,8 +305,27 @@
    "vizinhos": "Grand Soir, Caden, Incense 01 (boozy)",
    "leitura": "Lareira líquida de dia."
   },
-  "Blue Talisman": {
+  "Blue Sapphire Supercharged": {
    "n": 17,
+   "nome": "Blue Sapphire Supercharged",
+   "casa": "Boadicea",
+   "conc": "Parfum (marca: 'pure parfum'; varejistas listam EDP)",
+   "arquetipo": "Rosal",
+   "tier": "S",
+   "perfil": "laranja-limão (aldeídos) / rosa-cardamomo-jasmim (framboesa e ylang citados pela marca) / oud-âmbar-patchouli, toque de couro (2022 — pirâmide: Selfridges e Neiman Marcus; descrição oficial Boadicea; verificada em 23/out/2026)",
+   "eixo": "S",
+   "doc": "1",
+   "peso": "4",
+   "td": "S",
+   "envelope": "🟡A–⚫MF",
+   "aptidao": "Lazer 1 · N.Inf 3 · N.For 3 · Cozy N 1",
+   "sprays_base": "3",
+   "janelas": "12",
+   "vizinhos": "Favonius, Radical Rose, Les Sables Roses, Brompton (rosa-oud); Blue Sapphire (avaliado, A — a versão original)",
+   "leitura": "Rosa-oud de saída cítrica-aldeídica e coração framboesa-cardamomo: o rosa-oud mais luminoso da grade, papel de **sair** (N.For e N.Inf 3), não de ficar em casa. **Tier S dado por ele (frasco desde 09/out/2026; usado em 19/out à noite, 14 °C).** Fragrantica: Oriental Floral; resenhas relatam 12h+ e versatilidade no ano todo. Envelope Ameno–MF, aptidões e sprays derivados pelo Claude em 23/out/2026 — **estimativa, não uso declarado**. **Registro franco:** com ele o Rosal vai a 7 frascos (6 S + Bedouin Rose C) e quatro rosa-oud S disputam as mesmas noites Ameno–MF — compra futura de rosa-oriental parte de redundância alta no gate 3."
+  },
+  "Blue Talisman": {
+   "n": 18,
    "nome": "Blue Talisman",
    "casa": "Ex Nihilo",
    "conc": "EDP",
@@ -325,7 +344,7 @@
    "leitura": "Pera-gengibre-Akigalawood: o mais 'amigável' dos cítricos de calor. Disputa a mesma tarde com L'Immensité."
   },
   "Bois du Portugal": {
-   "n": 18,
+   "n": 19,
    "nome": "Bois du Portugal",
    "casa": "Creed",
    "conc": "EDT",
@@ -344,7 +363,7 @@
    "leitura": "Fougère de terno — só formal, atrás de Purpose 50 e Bois Impérial nas mesmas células."
   },
   "Bois Impérial": {
-   "n": 19,
+   "n": 20,
    "nome": "Bois Impérial",
    "casa": "Essential Parfums",
    "conc": "EDP",
@@ -363,7 +382,7 @@
    "leitura": "Mineral-amadeirado: a base profissional da coleção. Ganha nitidez no suor."
   },
   "Brompton": {
-   "n": 20,
+   "n": 21,
    "nome": "Brompton",
    "casa": "Ex Nihilo",
    "conc": "Extrait",
@@ -382,7 +401,7 @@
    "leitura": "Opulência floral-resinosa em extrait — S. Começar em 2 sprays; o ameno noturno comporta."
   },
   "Caden": {
-   "n": 21,
+   "n": 22,
    "nome": "Caden",
    "casa": "Omanluxury",
    "conc": "EDP",
@@ -401,7 +420,7 @@
    "leitura": "Boozy-açafrão-café sobre baunilha candy — a fronteira do dessert gourmand recusado no DNA."
   },
   "Carved Oud": {
-   "n": 22,
+   "n": 23,
    "nome": "Carved Oud",
    "casa": "Thameen",
    "conc": "Extrait",
@@ -420,7 +439,7 @@
    "leitura": "Madeira educada de escritório — o oud vence-se pelo polimento cedro-íris. Presente; função formal."
   },
   "Castley": {
-   "n": 23,
+   "n": 24,
    "nome": "Castley",
    "casa": "Parfums de Marly",
    "conc": "EDP",
@@ -439,7 +458,7 @@
    "leitura": "Cítrico-apimentado competente."
   },
   "Crab Apple Blossom": {
-   "n": 24,
+   "n": 25,
    "nome": "Crab Apple Blossom",
    "casa": "Clive Christian",
    "conc": "EDP",
@@ -458,7 +477,7 @@
    "leitura": "Mojito-marinho de calor extremo."
   },
   "Decision": {
-   "n": 25,
+   "n": 26,
    "nome": "Decision",
    "casa": "Amouage",
    "conc": "EDP",
@@ -477,7 +496,7 @@
    "leitura": "Incenso seco e sério. Ganha noite e trabalho fresco."
   },
   "Drunk Lovers": {
-   "n": 26,
+   "n": 27,
    "nome": "Drunk Lovers",
    "casa": "Born to Stand Out",
    "conc": "EDP",
@@ -496,7 +515,7 @@
    "leitura": "O boozy de meia-estação — resolveu o Angels' Share. Preliminar; confirmar em sessão formal."
   },
   "Désobéissant": {
-   "n": 27,
+   "n": 28,
    "nome": "Désobéissant",
    "casa": "Givenchy",
    "conc": "EDP",
@@ -515,7 +534,7 @@
    "leitura": "Verde-chá-conífera seco, zero doçura. Projeção íntima (~6h) → 6–7 sprays sempre, reaplicar."
   },
   "Favonius": {
-   "n": 28,
+   "n": 29,
    "nome": "Favonius",
    "casa": "Nishane",
    "conc": "Extrait",
@@ -527,14 +546,14 @@
    "peso": "4",
    "td": "S",
    "envelope": "🟡A–⚫MF",
-   "aptidao": "T.For 2 · N.Inf 3 · N.For 3",
+   "aptidao": "N.Inf 3 · N.For 3 · Cozy N 2",
    "sprays_base": "3",
    "janelas": "12",
    "vizinhos": "Radical Rose, Les Sables Roses, Brompton (rosa oriental); Ombre Nomade (rosa-oud-incenso); Outlands, Purpose 50 (incenso)",
-   "leitura": "Rosa 'cristalina' com incenso do topo à base, lado herbal-verde (artemísia, clary sage, gerânio) e cypriol seco sobre oud-patchouli-cedro: a rosa-oud mais austera e menos doce da grade. **O frasco já era do Guilherme e constava como Amostra (tier A) no tabelão — erro de cadastro corrigido em 23/set/2026; tier S dado por ele.** É a única das três entradas de 23/set com janela de dia (Trab. Formal Ameno–MF), porque a doçura é baixa e o incenso lê sóbrio. **Envelope, aptidões, eixo, doçura, peso, Td e sprays derivados pelo Claude da pirâmide verificada (estimativa, método das fichas) — o Guilherme não declarou uso; validar no diário.** **Registro franco:** o Rosal vai a 5 frascos com 4 S e o rosa-oud a 9 na grade; o que o separa dos vizinhos é o eixo herbal-incenso (fronteira Monge), não o território."
+   "leitura": "Rosa 'cristalina' com incenso do topo à base, lado herbal-verde (artemísia, clary sage, gerânio) e cypriol seco sobre oud-patchouli-cedro: a rosa-oud mais austera e menos doce da grade. **O frasco já era do Guilherme e constava como Amostra (tier A) no tabelão — erro de cadastro corrigido em 23/set/2026; tier S dado por ele.** **v10 (23/out/2026): sai do Trab. Formal e fica só na noite (N.Inf · N.For · Cozy N, Ameno–MF)** — decisão do Claude a pedido dele: extrait de projeção e sillage altos (Fragrantica: 'Woody Chypre', resenhas de ambiente cheio; Parfumo: longevidade 8,5 · sillage 8,0) não é perfume de escritório; o diário dele confirma noite (09 e 15/out/2026). **Continua estimativa, não uso declarado.** **Registro franco:** o Rosal tem 7 frascos (6 S + Bedouin Rose C); o que separa o Favonius é o eixo herbal-incenso (fronteira Monge), não o território."
   },
   "Gentle Fluidity Silver": {
-   "n": 29,
+   "n": 30,
    "nome": "Gentle Fluidity Silver",
    "casa": "MFK",
    "conc": "EDP",
@@ -553,7 +572,7 @@
    "leitura": "O coringa absoluto — #1 do ranking de uso real. Musk-junípero que ganha corpo no frio e respira no ameno."
   },
   "Grand Soir": {
-   "n": 30,
+   "n": 31,
    "nome": "Grand Soir",
    "casa": "MFK",
    "conc": "EDP",
@@ -572,7 +591,7 @@
    "leitura": "Boozy-baunilha-âmbar sem oud: o respiro do óbvio."
   },
   "Green Irish Tweed": {
-   "n": 31,
+   "n": 32,
    "nome": "Green Irish Tweed",
    "casa": "Creed",
    "conc": "EDT",
@@ -591,7 +610,7 @@
    "leitura": "Clássico verde-ambergris."
   },
   "Gris Charnel": {
-   "n": 32,
+   "n": 33,
    "nome": "Gris Charnel",
    "casa": "BDK",
    "conc": "Extrait",
@@ -610,7 +629,7 @@
    "leitura": "Figo-tonka denso: conforto líquido e o coringa do frio. Sem rival no Cozy Dia."
   },
   "Hacivat": {
-   "n": 33,
+   "n": 34,
    "nome": "Hacivat",
    "casa": "Nishane",
    "conc": "Extrait",
@@ -629,7 +648,7 @@
    "leitura": "O chypre-frutado que resolve o calor — âncora de Lazer e Noite Informal em todo o calor."
   },
   "Himalaya": {
-   "n": 34,
+   "n": 35,
    "nome": "Himalaya",
    "casa": "Creed",
    "conc": "EDT",
@@ -648,7 +667,7 @@
    "leitura": "Cítrico-solar de pirâmide, frio-metálico na pele."
   },
   "Imagination": {
-   "n": 35,
+   "n": 36,
    "nome": "Imagination",
    "casa": "Louis Vuitton",
    "conc": "EDP",
@@ -667,7 +686,7 @@
    "leitura": "Chá-canela-incenso de teto alto. O luminoso-versátil que a prioridade #1 procurava — já estava em casa."
   },
   "Imperial": {
-   "n": 36,
+   "n": 37,
    "nome": "Imperial",
    "casa": "Boadicea",
    "conc": "EDP",
@@ -686,7 +705,7 @@
    "leitura": "Barbearia opulenta sobre base oud-couro. Função formal de frio."
   },
   "Intoxicated": {
-   "n": 37,
+   "n": 38,
    "nome": "Intoxicated",
    "casa": "By Kilian",
    "conc": "EDP",
@@ -705,7 +724,7 @@
    "leitura": "Único Confeiteiro da grade; vizinho de Caden no café-baunilha."
   },
   "K-Musk": {
-   "n": 38,
+   "n": 39,
    "nome": "K-Musk",
    "casa": "BYNOMADS",
    "conc": "n/d",
@@ -724,7 +743,7 @@
    "leitura": "Skin scent limpo-verde de calor. Frasco de 10 ml experimental."
   },
   "L'Immensité": {
-   "n": 39,
+   "n": 40,
    "nome": "L'Immensité",
    "casa": "Louis Vuitton",
    "conc": "EDP",
@@ -743,7 +762,7 @@
    "leitura": "Ambroxan-gengibre que não vira sopa a 30°C."
   },
   "Les Sables Roses": {
-   "n": 40,
+   "n": 41,
    "nome": "Les Sables Roses",
    "casa": "Louis Vuitton",
    "conc": "EDP",
@@ -758,11 +777,11 @@
    "aptidao": "N.Inf 3 · N.For 3 · Cozy N 2",
    "sprays_base": "3",
    "janelas": "12",
-   "vizinhos": "Radical Rose, Brompton, Odéon, Oud Satin Mood (rosa oriental); Ombre Nomade (rosa-oud da mesma casa); Bedouin Rose (C)",
+   "vizinhos": "Radical Rose, Brompton, Odéon, Oud Satin Mood (rosa oriental); Ombre Nomade (rosa-oud da mesma casa); Bedouin Rose (D)",
    "leitura": "Rosa centifolia realista com açafrão e pimenta preta sobre oud discreto e ambergris — a rosa-oud mais limpa e menos doce do território (sem baunilha, sem framboesa). **Tier S dado pelo usuário a partir da amostra (tabelão v2, 12/set) e confirmado para o frasco em 19/set/2026.** Envelope e ocasiões por declaração dele: \"noites em geral, exceto as quentes\" → Noite Informal, Noite Formal e Cozy Noite de Ameno a Muito Frio = 12 células = teto S. **Registro franco (na compra):** 7º frasco do território rosa oriental e 13º oud nomeado — categoria que ele recusou 5× por redundância (Roja Amber Aoud, Roja Aoud, Aquilaria, FM Promise e este mesmo Les Sables Roses) sob o princípio \"múltiplos rosa-oud são desejo, não guarda-roupa\". Não ataca nenhum dos 5 gaps: compra por prazer, chamada pelo nome. O que a diferencia dos vizinhos é textura, não território: Radical Rose é seca-mineral, Brompton é opulenta-floral, Odéon é geleia, OSM é caramelo; esta é a rosa polida de ambergris. Sprays 3 (EDP de longevidade forte, projeção que assenta); Frio/MF 4."
   },
   "Liwa": {
-   "n": 41,
+   "n": 42,
    "nome": "Liwa",
    "casa": "Widian",
    "conc": "EDP",
@@ -781,7 +800,7 @@
    "leitura": "Açafrão-âmbar-oud num território com 3 moradores diretos."
   },
   "Lucius": {
-   "n": 42,
+   "n": 43,
    "nome": "Lucius",
    "casa": "Fragrance du Bois",
    "conc": "Extrait",
@@ -800,7 +819,7 @@
    "leitura": "Cítrico sobre âmbar seco-tonka-vetiver: a seriedade que os frescos puros não entregam, sem somar calor."
   },
   "Monarch": {
-   "n": 43,
+   "n": 44,
    "nome": "Monarch",
    "casa": "Boadicea",
    "conc": "EDP",
@@ -819,7 +838,7 @@
    "leitura": "Opulência Sultão. Fica por decisão dele ('vou gostar um dia', 19/set/2026)."
   },
   "Montabaco Intensivo": {
-   "n": 44,
+   "n": 45,
    "nome": "Montabaco Intensivo",
    "casa": "Ormonde Jayne",
    "conc": "EDP (Intensivo 42%)",
@@ -838,7 +857,7 @@
    "leitura": "Tabaco seco-arejado-suede: sofisticação que nenhum colega nomeia. Fechou o gap #3."
   },
   "Météore": {
-   "n": 45,
+   "n": 46,
    "nome": "Météore",
    "casa": "Louis Vuitton",
    "conc": "EDP",
@@ -857,7 +876,7 @@
    "leitura": "Cítrico-neroli-cardamomo sobre vetiver seco: elegante e arejado — o formal do calor."
   },
   "New York": {
-   "n": 46,
+   "n": 47,
    "nome": "New York",
    "casa": "Widian",
    "conc": "EDP",
@@ -876,7 +895,7 @@
    "leitura": "O mais doce da leva de set — fronteira Confeiteiro registrada (caramelo)."
   },
   "Odéon": {
-   "n": 47,
+   "n": 48,
    "nome": "Odéon",
    "casa": "Memo Paris",
    "conc": "EDP",
@@ -895,7 +914,7 @@
    "leitura": "A rosa-geleia aconchegante — jammy-rose oriental da vertente secundária. Cozy por vocação."
   },
   "Ombre Nomade": {
-   "n": 48,
+   "n": 49,
    "nome": "Ombre Nomade",
    "casa": "Louis Vuitton",
    "conc": "EDP",
@@ -914,7 +933,7 @@
    "leitura": "Nuclear. Noite Formal e Cozy Noite no Fresco com 2 sprays."
   },
   "Omnia Omnibus Ubique": {
-   "n": 49,
+   "n": 50,
    "nome": "Omnia Omnibus Ubique",
    "casa": "Memo Paris",
    "conc": "EDP",
@@ -926,14 +945,14 @@
    "peso": "3",
    "td": "S",
    "envelope": "🟡A–⚫MF",
-   "aptidao": "N.Inf 3 · N.For 2 · Cozy N 2",
+   "aptidao": "N.Inf 2 · N.For 3 · Cozy N 3",
    "sprays_base": "3",
    "janelas": "12",
    "vizinhos": "Ultima Storia, Ya'e (íris); Bijou Zafran (açafrão-íris); Liwa, Oud Satin Mood (açafrão-oud)",
-   "leitura": "Manteiga de íris empoada ancorada num oud floral macio, com açafrão e jasmim; base baunilha-sândalo-musk cremoso. **Tier S dado pelo Guilherme (23/set/2026).** O veredito anterior (20–21/set) era 'testar antes, lado a lado com o Bijou Zafran' — o teste virou frasco. **Envelope, aptidões, eixo, doçura, peso, Td e sprays derivados pelo Claude da pirâmide verificada (estimativa, método das fichas) — o Guilherme não declarou uso; validar no diário.** Fronteira Sultão (açafrão-oud) registrada; se o oud mandar no drydown, reclassificar. Toca o gap #4 (sândalo cremoso) só como base, não fecha."
+   "leitura": "Manteiga de íris empoada ancorada num oud floral macio, com açafrão e jasmim; base baunilha-sândalo-musk cremoso. **Tier S dado pelo Guilherme (23/set/2026).** **v10 (23/out/2026): aptidões reordenadas — N.For 3 · Cozy N 3 · N.Inf 2** (eram N.Inf 3 · N.For 2 · Cozy N 2); mesmas 12 células de noite. Base: Fragrantica (Oriental Woody; acordes empoado-baunilha-amadeirado-oud-íris), Parfumo (cremoso-amadeirado; sillage 7,6 — moderado) e a escala dia/noite 3/4 do site da Memo. Decisão do Claude a pedido dele — **estimativa, não uso declarado**. Fronteira Sultão (açafrão-oud) registrada; toca o gap #4 (sândalo cremoso) só como base, não fecha."
   },
   "Oud Kyphi": {
-   "n": 50,
+   "n": 51,
    "nome": "Oud Kyphi",
    "casa": "BYNOMADS",
    "conc": "n/d",
@@ -952,7 +971,7 @@
    "leitura": "Resina+oud+benjoim — o cluster de maior prazer da coleção, mas o 7º Sultão. Tier C: 3 células-lar."
   },
   "Oud Satin Mood": {
-   "n": 51,
+   "n": 52,
    "nome": "Oud Satin Mood",
    "casa": "MFK",
    "conc": "Extrait",
@@ -971,7 +990,7 @@
    "leitura": "Rosa-oud-caramelo em extrait. 2 sprays; noite formal e cozy noite."
   },
   "Oudós Lux Solis": {
-   "n": 52,
+   "n": 53,
    "nome": "Oudós Lux Solis",
    "casa": "Nishane",
    "conc": "Extrait",
@@ -990,7 +1009,7 @@
    "leitura": "Oud solar frutado-mel: o Sultão que sai à noite de 28°C. Extrait: 2–3 sprays."
   },
   "Outlands": {
-   "n": 53,
+   "n": 54,
    "nome": "Outlands",
    "casa": "Amouage",
    "conc": "EDP",
@@ -1009,7 +1028,7 @@
    "leitura": "A catedral de olíbano-elemi-açafrão-oud."
   },
   "Purpose 50": {
-   "n": 54,
+   "n": 55,
    "nome": "Purpose 50",
    "casa": "Amouage",
    "conc": "Extrait 50%",
@@ -1028,7 +1047,7 @@
    "leitura": "Olíbano-mineral protagonista sobre sand vetiver-suede: o frasco mais alinhado ao DNA primário. Formalidade vertical; 2 no ameno, 3 no frio."
   },
   "Radical Rose": {
-   "n": 55,
+   "n": 56,
    "nome": "Radical Rose",
    "casa": "Matière Première",
    "conc": "Extrait",
@@ -1047,7 +1066,7 @@
    "leitura": "Rosa dark-mineral com chili-imortelle: a rosa que não é rosa de mulher. Foge do oud óbvio nas noites frias."
   },
   "Reflection Man": {
-   "n": 56,
+   "n": 57,
    "nome": "Reflection Man",
    "casa": "Amouage",
    "conc": "EDP",
@@ -1066,7 +1085,7 @@
    "leitura": "Flor branca masculina, execução limpa."
   },
   "Royal Oud": {
-   "n": 57,
+   "n": 58,
    "nome": "Royal Oud",
    "casa": "Creed",
    "conc": "EDP",
@@ -1085,7 +1104,7 @@
    "leitura": "Oud de terno: cedro-galbanum seco sobre oud discreto. Formal em qualquer temperatura abaixo de 32°C."
   },
   "Santal 33": {
-   "n": 58,
+   "n": 59,
    "nome": "Santal 33",
    "casa": "Le Labo",
    "conc": "EDP",
@@ -1104,7 +1123,7 @@
    "leitura": "Não é sândalo cremoso — é cedro-couro-violeta com assinatura. O gap #4 continua aberto apesar dele."
   },
   "Scarlet Sands": {
-   "n": 59,
+   "n": 60,
    "nome": "Scarlet Sands",
    "casa": "Ex Nihilo",
    "conc": "EDP",
@@ -1115,15 +1134,15 @@
    "doc": "2",
    "peso": "3",
    "td": "N",
-   "envelope": "🟠Q–🔵F",
+   "envelope": "🟠Q–🟣Fr",
    "aptidao": "Lazer 2 · N.Inf 3 · N.For 2",
    "sprays_base": "3",
-   "janelas": "9",
+   "janelas": "12",
    "vizinhos": "Reflection Man (floral branco); Ani X, New York (baunilha vestível); Lust in Paradise Extrait (amostra, mesma casa)",
-   "leitura": "Framboesa e mandarina sobre flor de laranjeira, jasmim e frésia; akigalawood, baunilha e âmbar na base — floral branco frutado-doce. **Tier S dado pelo Guilherme (23/set/2026). Registro franco: contradiz a rejeição declarada a floral feminino dominante e o veredito PASSAR de 20/set (dado sem pele).** O tier é dele e vale; o que fica registrado é que o DNA declarado não previu o gosto real neste território. **Envelope, aptidões, eixo, doçura, peso, Td e sprays derivados pelo Claude da pirâmide verificada (estimativa, método das fichas) — o Guilherme não declarou uso; validar no diário.** Risco de uso: doçura 2 no mormaço — por isso fica fora do Muito Quente."
+   "leitura": "Framboesa e mandarina sobre flor de laranjeira, jasmim e frésia; akigalawood, baunilha e âmbar na base — floral branco frutado-doce. **Tier S dado pelo Guilherme (23/set/2026).** **v10 (23/out/2026): envelope alarga até o Frio (Quente–Frio, 12 janelas)** — topo cítrico-frutado aguenta calor e a base âmbar-baunilha sustenta noite fria (Fragrantica: Oriental Floral; Parfumo: um resenhista o descreve para dias quentes que viram noites frescas). É o único dos frascos revistos em 23/out com janela de **Dia** (Lazer) — e o gargalo da coleção é o slot Dia. Decisão do Claude a pedido dele — **estimativa, não uso declarado**. Fica fora do Muito Quente: doçura 2 no mormaço. Resenhas divergem sobre performance (de 'powerhouse' a 'queria mais força') — calibrar sprays pelo diário."
   },
   "Search": {
-   "n": 60,
+   "n": 61,
    "nome": "Search",
    "casa": "Amouage",
    "conc": "EDP",
@@ -1142,7 +1161,7 @@
    "leitura": "Cítrico-incenso woody; relatos: cítrico some em 30–45 min, sobra incenso esfumaçado."
   },
   "Serenity": {
-   "n": 61,
+   "n": 62,
    "nome": "Serenity",
    "casa": "Omanluxury",
    "conc": "EDP",
@@ -1161,7 +1180,7 @@
    "leitura": "Couro-especiado com rosa-açafrão-cominho; o cominho não incomodou. Preliminar; confirmar em sessão formal."
   },
   "Terre d'Hermès": {
-   "n": 62,
+   "n": 63,
    "nome": "Terre d'Hermès",
    "casa": "Hermès",
    "conc": "Parfum",
@@ -1180,7 +1199,7 @@
    "leitura": "Sílex-pimenta sobre vetiver-cedro: sofisticação seca."
   },
   "Torino 21": {
-   "n": 63,
+   "n": 64,
    "nome": "Torino 21",
    "casa": "Xerjoff",
    "conc": "EDP",
@@ -1199,7 +1218,7 @@
    "leitura": "Erva-menta-verbena: o mais leve da grade. Verde-aromático com 3 vizinhos melhores; vive de calor extremo."
   },
   "Town & Country": {
-   "n": 64,
+   "n": 65,
    "nome": "Town & Country",
    "casa": "Clive Christian",
    "conc": "EDP",
@@ -1218,7 +1237,7 @@
    "leitura": "Aromático-mineral com chá branco-olíbano sobre ambergris: formal, seco e arejado."
   },
   "Tygar Extrait": {
-   "n": 65,
+   "n": 66,
    "nome": "Tygar Extrait",
    "casa": "Bvlgari (Le Gemme)",
    "conc": "Extrait",
@@ -1237,7 +1256,7 @@
    "leitura": "Versão noturna do DNA Tygar: grapefruit sobre ambergris aquecido por benjoim e bálsamo do Peru. **Tier S definitivo** (confirmado pelo usuário em 18/set/2026; testado na pele antes da compra e aprovado pela esposa na pele dele, fora da abertura). Compra por prazer com função definida — noite de verão; 1ª compra pós-reabertura (18/set/2026). Doçura, Td e envelope seguem por construção (são derivados da pirâmide, não do tier) — ajustam-se com o uso. Teto 3 sprays."
   },
   "Ultima Storia": {
-   "n": 66,
+   "n": 67,
    "nome": "Ultima Storia",
    "casa": "Thomas de Monaco",
    "conc": "Extrait",
@@ -1256,7 +1275,7 @@
    "leitura": "Cítrico-couro-empoado de extrait discreto. Formalidade com textura de talco e linho."
   },
   "Vibrato": {
-   "n": 67,
+   "n": 68,
    "nome": "Vibrato",
    "casa": "Sospiro",
    "conc": "EDP",
@@ -1275,7 +1294,7 @@
    "leitura": "Cítrico-gengibre-herbal-empoado — beast. **Leitura do usuário (18/set/2026): muito mais diurno, com uso até para trabalho — alocação validada por ele** (já conhece o frasco nessa função). **Sai das noites por decisão do usuário (05/out/2026)** — 9 janelas (teto A): Lazer, Trab. Informal e Trab. Formal em MQ/Q/A. À noite, a linhagem Tygar é do Tygar Extrait. Escritório fechado: 2 sprays; teto 3."
   },
   "Wild Vetiver": {
-   "n": 68,
+   "n": 69,
    "nome": "Wild Vetiver",
    "casa": "Creed",
    "conc": "EDT",
@@ -1294,7 +1313,7 @@
    "leitura": "Floral-fresco discreto (rosa-groselha-gerânio) sobre vetiver — não é vetiver-forward. Pink/Timur pepper dá nitidez."
   },
   "Wood Whisper": {
-   "n": 69,
+   "n": 70,
    "nome": "Wood Whisper",
    "casa": "OJAR",
    "conc": "EDP",
@@ -1313,7 +1332,7 @@
    "leitura": "Sândalo-cashmere cremoso sobre âmbar branco: o mais perto de 'cremoso' que a coleção chega — e ainda não é o gap #4."
   },
   "Ya'e": {
-   "n": 70,
+   "n": 71,
    "nome": "Ya'e",
    "casa": "Hind Al Oud",
    "conc": "EDP",
@@ -1332,7 +1351,7 @@
    "leitura": "Aldeído-íris-pistache metálico: moderno, empoado, unissex — o frasco mais 'perfumaria de autor' da grade."
   },
   "Supremacy CE": {
-   "n": 71,
+   "n": 72,
    "nome": "Supremacy CE",
    "casa": "Afnan",
    "conc": "EDP",
@@ -1351,7 +1370,7 @@
    "leitura": "Sonda barata do DNA Aventus."
   },
   "Musamam Black": {
-   "n": 72,
+   "n": 73,
    "nome": "Musamam Black",
    "casa": "Lattafa",
    "conc": "EDP",
@@ -1370,7 +1389,7 @@
    "leitura": "Âmbar boozy de prazer barato para o frio."
   },
   "Aquatica": {
-   "n": 73,
+   "n": 74,
    "nome": "Aquatica",
    "casa": "Rayhaan",
    "conc": "EDP",
@@ -1389,7 +1408,7 @@
    "leitura": "Exercício e rua de calor extremo."
   },
   "Incense 01": {
-   "n": 74,
+   "n": 75,
    "nome": "Incense 01",
    "casa": "Swiss Arabian",
    "conc": "Extrait",
@@ -1408,7 +1427,7 @@
    "leitura": "Versão açucarada do Gris Charnel; prazer barato de frio."
   },
   "Island Dreams": {
-   "n": 75,
+   "n": 76,
    "nome": "Island Dreams",
    "casa": "Khadlaj",
    "conc": "Extrait",
@@ -1427,7 +1446,7 @@
    "leitura": "Grapefruit-gengibre-ambroxan de calor."
   },
   "Sky": {
-   "n": 76,
+   "n": 77,
    "nome": "Sky",
    "casa": "Khadlaj",
    "conc": "EDP",
@@ -1446,7 +1465,7 @@
    "leitura": "Soapy-limpo de calor; identidade a confirmar."
   },
   "Belgravia": {
-   "n": 77,
+   "n": 78,
    "nome": "Belgravia",
    "casa": "Maison Asrar",
    "conc": "EDP",
@@ -1465,7 +1484,7 @@
    "leitura": "Perfil genuinamente novo à camada; eixo Bal d'Afrique."
   },
   "Inception": {
-   "n": 78,
+   "n": 79,
    "nome": "Inception",
    "casa": "Mykonos",
    "conc": "Extrait",
@@ -1484,7 +1503,7 @@
    "leitura": "Sonda barata do Imagination."
   },
   "Dubai Musk": {
-   "n": 79,
+   "n": 80,
    "nome": "Dubai Musk",
    "casa": "Al Ambra",
    "conc": "Extrait",
@@ -1501,6 +1520,25 @@
    "janelas": "—",
    "vizinhos": "GF Silver, K-Musk",
    "leitura": "Skin scent clean; ex-grade. Musk limpo para dia de calor."
+  },
+  "Empire": {
+   "n": 81,
+   "nome": "Empire",
+   "casa": "Mykonos",
+   "conc": "n/d",
+   "arquetipo": "Marinho",
+   "tier": "A",
+   "perfil": "lima-bergamota-mandarina-frutas tropicais / laranja siciliana-gengibre-jasmim-água de coco / patchouli-musk branco-tonka (2026, Mykonos x RRQ — pirâmide de varejista, arabicparfums.com; Parfumo o descreve como híbrido de Afternoon Swim e Virgin Island Water)",
+   "eixo": "F",
+   "doc": "1",
+   "peso": "2",
+   "td": "C",
+   "envelope": "🔴MQ–🟡A",
+   "aptidao": "Lazer 3 · T.Inf 1",
+   "sprays_base": "4",
+   "janelas": "—",
+   "vizinhos": "Aquatica, Island Dreams",
+   "leitura": "Cítrico-tropical de calor. Camada custo (tier A dado por ele, 11/out/2026): corrida, academia e praia pós-corrida — fora de qualquer análise."
   }
  }
 }

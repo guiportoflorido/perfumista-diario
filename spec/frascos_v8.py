@@ -1,21 +1,20 @@
 # -*- coding: utf-8 -*-
 """
-frascos_v7.py — base de dados dos 79 frascos para o modelo diário (v7, 05/out/2026)
+frascos_v8.py — base de dados dos 81 frascos para o modelo diário (v8, 23/out/2026 — gerado por gerador_v60.py)
 
-v7: só limpeza de cabeçalho e comentários. Nenhum dado muda vs v6. Tiers conferidos com a aba Tiers do Google Sheets
-"Diário de Uso — Perfumes" (fonte única de tier desde 04/out/2026). Janelas = playbook v59 (654 desde 14/out com Bedouin Rose C; Vibrato 9, só dia,
-desde 05/out/2026). A camada custo (9) fica aqui só para o modelo sugerir quando a entrada traz "Extra: corrida" ou
-"Extra: academia" — fora de qualquer análise da coleção (regra dele, 25/set/2026).
+v8: entram Blue Sapphire Supercharged (grade, S) e Empire (camada custo, A); Bedouin Rose D→C entra na grade
+(só células-lar); Favonius, Omnia Omnibus Ubique e Scarlet Sands com envelope/aptidão revistos pelo Claude a pedido
+dele (23/out/2026 — estimativa, não uso declarado). Tiers conferidos com a aba Tiers do Google Sheets "Diário de Uso —
+Perfumes" em 23/out/2026. Janelas = playbook v60 (668). A camada custo (10) fica aqui só para o modelo sugerir
+quando a entrada traz "Extra: corrida" ou "Extra: academia" — fora de qualquer análise da coleção (regra dele, 25/set/2026).
 
 Fontes, por campo:
   MAPA  (n, casa, arq, tier, td, peso, doc, env_hot, env_cold, custo, chuva, sem_piramide)
         = array DATA do mapa climático (v4, 25/set/2026), derivado das fichas técnicas.
         chuva = índice hipótese do Claude (nota a nota sobre a pirâmide), não dado medido.
   FICHA (conc, eixo, aptidão, sprays_base, janelas)
-        = transcritos das fichas_tecnicas_v9.md (grade 69 + Bedouin Rose + camada custo 9).
-        Validação embutida: 79 frascos · Td grade C21/S25/N24 · janelas = 654.
-        14/out/2026: Bedouin Rose D → C (aba Tiers, decisão dele) com 3 janelas — Frio × N.For e Cozy N,
-        Muito Frio × N.Inf (células escolhidas por ele; ideal térmico 12 °C cai na fronteira Frio/Muito Frio).
+        = transcritos das fichas_tecnicas_v10.md (grade 71 + camada custo 10).
+        Validação embutida: 81 frascos · Td grade C21/S26/N24 · janelas = 668.
   NOVO  (longevidade_h, projecao, curva)
         = ESTIMATIVA derivada por regra (concentração × peso × doçura) + overrides onde a
         Leitura da ficha traz dado (beast, projeção íntima, relatos de horas). Nada aqui é
@@ -42,11 +41,12 @@ MAPA = [
  {"n":"Aventus","casa":"Creed","arq":"Chiprista","t":"A","td":"N","p":3,"d":1,"a":0,"b":3,"c":0,"r":0.14,"u":0},
  {"n":"Aventus Absolu","casa":"Creed","arq":"Chiprista","t":"S","td":"N","p":3,"d":1,"a":1,"b":5,"c":0,"r":0.11,"u":0},
  {"n":"Beach Hut Man","casa":"Amouage","arq":"Botânico","t":"A","td":"C","p":2,"d":0,"a":0,"b":4,"c":0,"r":1.66,"u":0},
- {"n":"Bedouin Rose","casa":"BYNOMADS","arq":"Rosal","t":"C","td":"S","p":4,"d":2,"a":3,"b":5,"c":0,"r":0.88,"u":0},
+ {"n":"Bedouin Rose","casa":"BYNOMADS","arq":"Rosal","t":"C","td":"S","p":4,"d":2,"a":4,"b":5,"c":0,"r":0.88,"u":0},
  {"n":"Bijou Zafran","casa":"Ormonde Jayne","arq":"Curtidor","t":"S","td":"S","p":3,"d":1,"a":2,"b":5,"c":0,"r":1.21,"u":0},
  {"n":"Black Saffron Absolu","casa":"Byredo","arq":"Curtidor","t":"A","td":"N","p":3,"d":1,"a":2,"b":4,"c":0,"r":0.75,"u":0},
  {"n":"Bleu de Chanel","casa":"Chanel","arq":"Mediterrâneo","t":"C","td":"C","p":2,"d":0,"a":0,"b":2,"c":0,"r":-0.11,"u":0},
  {"n":"Blonde Amber","casa":"Clive Christian","arq":"Lareira","t":"S","td":"S","p":4,"d":2,"a":3,"b":5,"c":0,"r":1.08,"u":0},
+ {"n":"Blue Sapphire Supercharged","casa":"Boadicea","arq":"Rosal","t":"S","td":"S","p":4,"d":1,"a":2,"b":5,"c":0,"r":0.55,"u":0},
  {"n":"Blue Talisman","casa":"Ex Nihilo","arq":"Mediterrâneo","t":"A","td":"C","p":2,"d":1,"a":0,"b":2,"c":0,"r":0.0,"u":0},
  {"n":"Bois du Portugal","casa":"Creed","arq":"Barbeiro","t":"B","td":"N","p":3,"d":0,"a":1,"b":5,"c":0,"r":0.82,"u":0},
  {"n":"Bois Impérial","casa":"Essential Parfums","arq":"Geólogo","t":"S","td":"C","p":3,"d":0,"a":1,"b":3,"c":0,"r":0.45,"u":0},
@@ -89,7 +89,7 @@ MAPA = [
  {"n":"Reflection Man","casa":"Amouage","arq":"Florista Branco","t":"S","td":"C","p":2,"d":1,"a":0,"b":3,"c":0,"r":0.87,"u":0},
  {"n":"Royal Oud","casa":"Creed","arq":"Marceneiro","t":"A","td":"N","p":3,"d":0,"a":1,"b":5,"c":0,"r":0.45,"u":0},
  {"n":"Santal 33","casa":"Le Labo","arq":"Marceneiro","t":"A","td":"N","p":3,"d":1,"a":2,"b":5,"c":0,"r":1.26,"u":0},
- {"n":"Scarlet Sands","casa":"Ex Nihilo","arq":"Florista Branco","t":"S","td":"N","p":3,"d":2,"a":1,"b":3,"c":0,"r":-0.3,"u":0},
+ {"n":"Scarlet Sands","casa":"Ex Nihilo","arq":"Florista Branco","t":"S","td":"N","p":3,"d":2,"a":1,"b":4,"c":0,"r":-0.3,"u":0},
  {"n":"Search","casa":"Amouage","arq":"Monge","t":"A","td":"N","p":3,"d":0,"a":0,"b":3,"c":0,"r":0.79,"u":0},
  {"n":"Serenity","casa":"Omanluxury","arq":"Curtidor","t":"B","td":"S","p":4,"d":2,"a":3,"b":5,"c":0,"r":0.58,"u":0},
  {"n":"Terre d'Hermès","casa":"Hermès","arq":"Geólogo","t":"A","td":"C","p":3,"d":0,"a":0,"b":3,"c":0,"r":0.67,"u":0},
@@ -110,6 +110,7 @@ MAPA = [
  {"n":"Belgravia","casa":"Maison Asrar","arq":"Mediterrâneo","t":"A","td":"C","p":2,"d":1,"a":1,"b":3,"c":1,"r":0.6,"u":0},
  {"n":"Inception","casa":"Mykonos","arq":"Mediterrâneo","t":"S","td":"C","p":3,"d":0,"a":0,"b":3,"c":1,"r":0.14,"u":0},
  {"n":"Dubai Musk","casa":"Al Ambra","arq":"Minimalista","t":"A","td":"N","p":2,"d":1,"a":0,"b":3,"c":1,"r":0.0,"u":0},
+ {"n":"Empire","casa":"Mykonos","arq":"Marinho","t":"A","td":"C","p":2,"d":1,"a":0,"b":2,"c":1,"r":-0.5,"u":0},
 ]
 
 # FICHA: nome -> (concentração, eixo, aptidão "Ocasião n · ...", sprays_base, janelas)
@@ -126,11 +127,12 @@ FICHA = {
  "Aventus": ("EDP", "F", "Lazer 3 · T.Inf 3 · N.Inf 3 · N.For 1", 3, 9),
  "Aventus Absolu": ("EDP", "F", "Lazer 2 · T.Inf 1 · N.Inf 3 · N.For 3", 3, 12),
  "Beach Hut Man": ("EDP", "P", "Lazer 3 · T.Inf 3", 3, 9),
- "Bedouin Rose": ("n/d", "S", "N.Inf 2 · N.For 2 · Cozy N 2", 3, 3),
+ "Bedouin Rose": ("n/d", "S", "Cozy N 3", 3, 2),   # C na grade por decisão dele (23/out/2026): só células-lar
  "Bijou Zafran": ("EDP", "P", "T.Inf 1 · N.Inf 3 · N.For 1 · Cozy N 3", 3, 12),
  "Black Saffron Absolu": ("Absolu de Parfum", "P", "T.Inf 1 · N.Inf 3 · Cozy D 2 · Cozy N 2", 3, 9),
  "Bleu de Chanel": ("EDP", "F", "T.Inf 3 · T.For 2 · N.Inf 2", 4, 3),
  "Blonde Amber": ("EDP", "S", "N.Inf 2 · N.For 2 · Cozy D 3 · Cozy N 3", 4, 12),
+ "Blue Sapphire Supercharged": ("Parfum", "S", "Lazer 1 · N.Inf 3 · N.For 3 · Cozy N 1", 3, 12),   # v8: frasco desde 09/out/2026; envelope/aptidão do Claude — estimativa
  "Blue Talisman": ("EDP", "F", "Lazer 3 · T.Inf 3 · N.Inf 2", 4, 9),
  "Bois du Portugal": ("EDT", "F", "T.For 3 · N.For 3", 4, 6),
  "Bois Impérial": ("EDP", "P", "Lazer 1 · T.Inf 3 · T.For 3 · N.Inf 1", 3, 12),
@@ -142,7 +144,7 @@ FICHA = {
  "Decision": ("EDP", "P", "T.Inf 3 · T.For 3 · N.Inf 2 · N.For 2", 3, 12),
  "Drunk Lovers": ("EDP", "S", "Lazer 2 · N.Inf 3 · Cozy D 2 · Cozy N 2", 3, 9),
  "Désobéissant": ("EDP", "P", "Lazer 3 · T.Inf 3 · T.For 2 · N.Inf 2", 6, 12),
- "Favonius": ("Extrait", "P", "T.For 2 · N.Inf 3 · N.For 3", 3, 12),
+ "Favonius": ("Extrait", "P", "N.Inf 3 · N.For 3 · Cozy N 2", 3, 12),   # v8: envelope/aptidão revistos pelo Claude a pedido dele (23/out/2026) — estimativa
  "Gentle Fluidity Silver": ("EDP", "S", "Lazer 3 · T.Inf 3 · T.For 1 · N.Inf 2 · Cozy D 3", 4, 12),
  "Grand Soir": ("EDP", "S", "N.Inf 3 · N.For 2 · Cozy D 3 · Cozy N 3", 3, 12),
  "Green Irish Tweed": ("EDT", "P", "Lazer 3 · T.Inf 3", 4, 6),
@@ -163,7 +165,7 @@ FICHA = {
  "New York": ("EDP", "S", "Lazer 2 · N.Inf 3 · Cozy D 2 · Cozy N 2", 3, 9),
  "Odéon": ("EDP", "S", "N.Inf 2 · Cozy D 3 · Cozy N 3", 3, 9),
  "Ombre Nomade": ("EDP", "S", "T.For 1 · N.Inf 3 · N.For 3 · Cozy N 2", 2, 12),
- "Omnia Omnibus Ubique": ("EDP", "S", "N.Inf 3 · N.For 2 · Cozy N 2", 3, 12),
+ "Omnia Omnibus Ubique": ("EDP", "S", "N.Inf 2 · N.For 3 · Cozy N 3", 3, 12),   # v8: idem
  "Oud Kyphi": ("n/d", "S", "N.Inf 2 · N.For 2 · Cozy N 1", 3, 3),
  "Oud Satin Mood": ("Extrait", "S", "N.Inf 2 · N.For 3 · Cozy N 3", 2, 9),
  "Oudós Lux Solis": ("Extrait", "S", "Lazer 2 · N.Inf 3 · N.For 1", 3, 9),
@@ -173,7 +175,7 @@ FICHA = {
  "Reflection Man": ("EDP", "F", "Lazer 2 · T.Inf 3 · T.For 2 · N.For 2", 4, 12),
  "Royal Oud": ("EDP", "P", "T.Inf 1 · T.For 3 · N.For 3", 3, 9),
  "Santal 33": ("EDP", "P", "Lazer 3 · T.Inf 3 · Cozy D 2", 3, 9),
- "Scarlet Sands": ("EDP", "F", "Lazer 2 · N.Inf 3 · N.For 2", 3, 9),
+ "Scarlet Sands": ("EDP", "F", "Lazer 2 · N.Inf 3 · N.For 2", 3, 12),   # v8: idem — envelope até o Frio
  "Search": ("EDP", "P", "Lazer 2 · T.Inf 3 · T.For 3 · N.Inf 2", 4, 9),
  "Serenity": ("EDP", "S", "N.Inf 2 · N.For 3 · Cozy N 3", 3, 6),
  "Terre d'Hermès": ("Parfum", "P", "T.Inf 2 · T.For 3 · N.For 3", 3, 9),
@@ -195,6 +197,7 @@ FICHA = {
  "Belgravia": ("EDP", "F", "Lazer 3 · T.Inf 2 · N.Inf 1", 4, None),
  "Inception": ("Extrait", "P", "Lazer 2 · T.Inf 3 · N.Inf 3", 3, None),
  "Dubai Musk": ("Extrait", "F", "Lazer 2 · T.Inf 3 · Cozy D 2", 3, None),
+ "Empire": ("n/d", "F", "Lazer 3 · T.Inf 1", 4, None),
 }
 
 # NOVO — overrides de performance com lastro na Leitura da ficha (ou no relato dele).
@@ -217,6 +220,7 @@ OVERRIDE_PERF = {
  "Purpose 50": (12, 4, "F"),        # extrait 50%, "2 no ameno"
  "Oud Satin Mood": (12, 4, "F"),    # extrait; 2 sprays
  "Brompton": (12, 4, "F"),          # extrait; "começar em 2 sprays"
+ "Blue Sapphire Supercharged": (10, 4, "F"),  # Fragrantica: relatos de 12h+ — estimativa
 }
 
 OCASIOES = ["Lazer", "T.Inf", "T.For", "N.Inf", "N.For", "Cozy D", "Cozy N"]
@@ -282,18 +286,18 @@ def carregar():
             "edt": "edt" in conc.lower(),
         })
     # validações
-    assert len(frascos) == 79, len(frascos)
+    assert len(frascos) == 81, len(frascos)
     grade = [f for f in frascos if not f["custo"]]
-    assert len(grade) == 70
+    assert len(grade) == 71
     td_cnt = {k: sum(1 for f in grade if f["td"] == k) for k in "CSN"}
-    assert td_cnt == {"C": 21, "S": 25, "N": 24}, td_cnt
-    assert sum(f["janelas"] or 0 for f in grade) == 654, sum(f["janelas"] or 0 for f in grade)
+    assert td_cnt == {"C": 21, "S": 26, "N": 24}, td_cnt
+    assert sum(f["janelas"] or 0 for f in grade) == 668, sum(f["janelas"] or 0 for f in grade)
     tiers = {k: sum(1 for f in frascos if f["tier"] == k) for k in "SABCD"}
-    assert tiers == {"S": 33, "A": 30, "B": 13, "C": 3, "D": 0}, tiers
+    assert tiers == {"S": 34, "A": 31, "B": 13, "C": 3, "D": 0}, tiers
     return frascos
 
 
 if __name__ == "__main__":
     fr = carregar()
-    print("OK — 79 frascos · Td grade C21/S25/N24 · janelas 654 · tiers", {k: sum(1 for f in fr if f['tier']==k) for k in 'SABCD'})
+    print("OK — 81 frascos · Td grade C21/S26/N24 · janelas 668 · tiers", {k: sum(1 for f in fr if f['tier']==k) for k in 'SABCD'})
     print("perf por leitura:", sum(1 for f in fr if f["perf_origem"] == "leitura"), "· por regra:", sum(1 for f in fr if f["perf_origem"] == "regra"))

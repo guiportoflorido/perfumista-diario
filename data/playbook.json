@@ -1,5 +1,5 @@
 {
- "fonte": "playbook_v59.md",
+ "fonte": "playbook_v60.md",
  "faixas": [
   "Muito Quente",
   "Quente",
@@ -302,11 +302,11 @@
      "tambem": [
       "Hacivat",
       "Crab Apple Blossom",
-      "Scarlet Sands",
       "Aventus Absolu",
       "Reflection Man",
       "1872 for Men",
       "Météore",
+      "Scarlet Sands",
       "Bois Impérial",
       "Aventus",
       "Beach Hut Man",
@@ -326,7 +326,7 @@
       "7 Loewe",
       "K-Musk"
      ],
-     "texto": "**Seguro: Gentle Fluidity Silver** (4). Junípero-noz-moscada-coentro / baunilha-amberwood / musks — tier S. **A jogada: Désobéissant** — Verde-chá-conífera seco, zero doçura (tier S). **Também:** Hacivat, Crab Apple Blossom, Scarlet Sands, Aventus Absolu, Reflection Man, 1872 for Men, Météore, Bois Impérial, Aventus, Beach Hut Man, Wild Vetiver, L'Immensité, Santal 33, Vibrato, Anelo, Blue Talisman, Torino 21, Ani X, New York, Oudós Lux Solis, Drunk Lovers, Al Qurashi Blend, Green Irish Tweed, 7 Loewe, K-Musk."
+     "texto": "**Seguro: Gentle Fluidity Silver** (4). Junípero-noz-moscada-coentro / baunilha-amberwood / musks — tier S. **A jogada: Désobéissant** — Verde-chá-conífera seco, zero doçura (tier S). **Também:** Hacivat, Crab Apple Blossom, Aventus Absolu, Reflection Man, 1872 for Men, Météore, Scarlet Sands, Bois Impérial, Aventus, Beach Hut Man, Wild Vetiver, L'Immensité, Santal 33, Vibrato, Anelo, Blue Talisman, Torino 21, Ani X, New York, Oudós Lux Solis, Drunk Lovers, Al Qurashi Blend, Green Irish Tweed, 7 Loewe, K-Musk."
     },
     "T.Inf": {
      "seguro": "Imagination",
@@ -382,7 +382,6 @@
       "Lucius",
       "Decision",
       "Météore",
-      "Favonius",
       "1872 for Men",
       "Ultima Storia",
       "Search",
@@ -395,7 +394,7 @@
       "Bois du Portugal",
       "Ya'e"
      ],
-     "texto": "**Seguro: Imagination** (3). Citron-bergamota-laranja / neroli-gengibre-canela / chá preto-ambroxan-guaiac-olíbano — tier S. **A jogada: Purpose 50** — Olíbano-mineral protagonista sobre sand vetiver-suede: o frasco mais alinhado ao DNA primário (tier S). **Também:** Bois Impérial, Lucius, Decision, Météore, Favonius, 1872 for Men, Ultima Storia, Search, Terre d'Hermès, Royal Oud, Montabaco Intensivo, Carved Oud, Town & Country, Vibrato, Bois du Portugal, Ya'e."
+     "texto": "**Seguro: Imagination** (3). Citron-bergamota-laranja / neroli-gengibre-canela / chá preto-ambroxan-guaiac-olíbano — tier S. **A jogada: Purpose 50** — Olíbano-mineral protagonista sobre sand vetiver-suede: o frasco mais alinhado ao DNA primário (tier S). **Também:** Bois Impérial, Lucius, Decision, Météore, 1872 for Men, Ultima Storia, Search, Terre d'Hermès, Royal Oud, Montabaco Intensivo, Carved Oud, Town & Country, Vibrato, Bois du Portugal, Ya'e."
     },
     "N.Inf": {
      "seguro": "Hacivat",
@@ -406,19 +405,20 @@
      "jogada_txt": "Cítrico sobre âmbar seco-tonka-vetiver: a seriedade que os frescos puros não entregam, sem somar calor",
      "jogada_tier": "S",
      "tambem": [
-      "Scarlet Sands",
       "Imagination",
       "Aventus Absolu",
       "Bijou Zafran",
-      "Omnia Omnibus Ubique",
       "Tygar Extrait",
       "Brompton",
-      "Favonius",
       "Les Sables Roses",
+      "Favonius",
+      "Scarlet Sands",
+      "Blue Sapphire Supercharged",
       "Gentle Fluidity Silver",
       "Odéon",
       "Liwa",
       "Purpose 50",
+      "Omnia Omnibus Ubique",
       "Bois Impérial",
       "1872 for Men",
       "Crab Apple Blossom",
@@ -436,7 +436,7 @@
       "Torino 21",
       "Ya'e"
      ],
-     "texto": "**Seguro: Hacivat** (3). Abacaxi-grapefruit-bergamota / cedro-patchouli-jasmim / oakmoss-madeiras — tier S. **A jogada: Lucius** — Cítrico sobre âmbar seco-tonka-vetiver: a seriedade que os frescos puros não entregam, sem somar calor (tier S). **Também:** Scarlet Sands, Imagination, Aventus Absolu, Bijou Zafran, Omnia Omnibus Ubique, Tygar Extrait, Brompton, Favonius, Les Sables Roses, Gentle Fluidity Silver, Odéon, Liwa, Purpose 50, Bois Impérial, 1872 for Men, Crab Apple Blossom, Ani X, New York, Aventus, Oudós Lux Solis, Black Saffron Absolu, Drunk Lovers, Town & Country, Al Qurashi Blend, Ultima Storia, Anelo, Blue Talisman, Torino 21, Ya'e."
+     "texto": "**Seguro: Hacivat** (3). Abacaxi-grapefruit-bergamota / cedro-patchouli-jasmim / oakmoss-madeiras — tier S. **A jogada: Lucius** — Cítrico sobre âmbar seco-tonka-vetiver: a seriedade que os frescos puros não entregam, sem somar calor (tier S). **Também:** Imagination, Aventus Absolu, Bijou Zafran, Tygar Extrait, Brompton, Les Sables Roses, Favonius, Scarlet Sands, Blue Sapphire Supercharged, Gentle Fluidity Silver, Odéon, Liwa, Purpose 50, Omnia Omnibus Ubique, Bois Impérial, 1872 for Men, Crab Apple Blossom, Ani X, New York, Aventus, Oudós Lux Solis, Black Saffron Absolu, Drunk Lovers, Town & Country, Al Qurashi Blend, Ultima Storia, Anelo, Blue Talisman, Torino 21, Ya'e."
     },
     "N.For": {
      "seguro": "Purpose 50",
@@ -450,14 +450,15 @@
       "Lucius",
       "Aventus Absolu",
       "Tygar Extrait",
-      "Favonius",
       "Les Sables Roses",
-      "Scarlet Sands",
+      "Favonius",
+      "Omnia Omnibus Ubique",
+      "Blue Sapphire Supercharged",
       "Reflection Man",
       "Amyris Homme Extrait",
-      "Omnia Omnibus Ubique",
       "Liwa",
       "Météore",
+      "Scarlet Sands",
       "Ultima Storia",
       "Terre d'Hermès",
       "Royal Oud",
@@ -466,7 +467,7 @@
       "Oudós Lux Solis",
       "Bois du Portugal"
      ],
-     "texto": "**Seguro: Purpose 50** (2). Olíbano-pimento-pimenta rosa-bergamota / sândalo-sand vetiver-papiro-rosa / akigalawood-suede-baunilha-mystikal-açafrão — tier S. **A jogada: Brompton** — Opulência floral-resinosa em extrait — S (tier S). **Também:** Lucius, Aventus Absolu, Tygar Extrait, Favonius, Les Sables Roses, Scarlet Sands, Reflection Man, Amyris Homme Extrait, Omnia Omnibus Ubique, Liwa, Météore, Ultima Storia, Terre d'Hermès, Royal Oud, Town & Country, Al Qurashi Blend, Oudós Lux Solis, Bois du Portugal."
+     "texto": "**Seguro: Purpose 50** (2). Olíbano-pimento-pimenta rosa-bergamota / sândalo-sand vetiver-papiro-rosa / akigalawood-suede-baunilha-mystikal-açafrão — tier S. **A jogada: Brompton** — Opulência floral-resinosa em extrait — S (tier S). **Também:** Lucius, Aventus Absolu, Tygar Extrait, Les Sables Roses, Favonius, Omnia Omnibus Ubique, Blue Sapphire Supercharged, Reflection Man, Amyris Homme Extrait, Liwa, Météore, Scarlet Sands, Ultima Storia, Terre d'Hermès, Royal Oud, Town & Country, Al Qurashi Blend, Oudós Lux Solis, Bois du Portugal."
     },
     "Cozy D": {
      "seguro": "Gris Charnel",
@@ -502,11 +503,12 @@
       "African Leather",
       "Omnia Omnibus Ubique",
       "Les Sables Roses",
+      "Favonius",
       "New York",
       "Black Saffron Absolu",
       "Drunk Lovers"
      ],
-     "texto": "**Seguro: Liwa** (3). açafrão-jasmim / âmbar-incenso-sândalo / cedro-patchouli-oud-vetiver (DNA BR540/OFG) — tier S. **A jogada: Bijou Zafran** — O açafrão estranho e macio — aresta indecifrável (tier S). **Também:** Amyris Homme Extrait, Odéon, African Leather, Omnia Omnibus Ubique, Les Sables Roses, New York, Black Saffron Absolu, Drunk Lovers."
+     "texto": "**Seguro: Liwa** (3). açafrão-jasmim / âmbar-incenso-sândalo / cedro-patchouli-oud-vetiver (DNA BR540/OFG) — tier S. **A jogada: Bijou Zafran** — O açafrão estranho e macio — aresta indecifrável (tier S). **Também:** Amyris Homme Extrait, Odéon, African Leather, Omnia Omnibus Ubique, Les Sables Roses, Favonius, New York, Black Saffron Absolu, Drunk Lovers."
     }
    }
   },
@@ -527,6 +529,7 @@
       "Gris Charnel",
       "Scarlet Sands",
       "Bois Impérial",
+      "Blue Sapphire Supercharged",
       "Santal 33",
       "Beach Hut Man",
       "Wild Vetiver",
@@ -537,7 +540,7 @@
       "New York",
       "Al Qurashi Blend"
      ],
-     "texto": "**Seguro: Gentle Fluidity Silver** (4). Junípero-noz-moscada-coentro / baunilha-amberwood / musks — tier S. **A jogada: Hacivat** — o chypre-frutado que resolve o calor (tier S). **Também:** Désobéissant, Aventus Absolu, Gris Charnel, Scarlet Sands, Bois Impérial, Santal 33, Beach Hut Man, Wild Vetiver, Drunk Lovers, Montabaco Intensivo, Oudós Lux Solis, Ani X, New York, Al Qurashi Blend."
+     "texto": "**Seguro: Gentle Fluidity Silver** (4). Junípero-noz-moscada-coentro / baunilha-amberwood / musks — tier S. **A jogada: Hacivat** — o chypre-frutado que resolve o calor (tier S). **Também:** Désobéissant, Aventus Absolu, Gris Charnel, Scarlet Sands, Bois Impérial, Blue Sapphire Supercharged, Santal 33, Beach Hut Man, Wild Vetiver, Drunk Lovers, Montabaco Intensivo, Oudós Lux Solis, Ani X, New York, Al Qurashi Blend."
     },
     "T.Inf": {
      "seguro": "Gentle Fluidity Silver",
@@ -580,7 +583,6 @@
       "Bois Impérial",
       "Imagination",
       "Lucius",
-      "Favonius",
       "Radical Rose",
       "Ombre Nomade",
       "Royal Oud",
@@ -593,7 +595,7 @@
       "Bois du Portugal",
       "Ya'e"
      ],
-     "texto": "**Seguro: Purpose 50** (2). Olíbano-pimento-pimenta rosa-bergamota / sândalo-sand vetiver-papiro-rosa / akigalawood-suede-baunilha-mystikal-açafrão — tier S. **A jogada: Decision** — Incenso seco e sério (tier S). **Também:** Bois Impérial, Imagination, Lucius, Favonius, Radical Rose, Ombre Nomade, Royal Oud, Montabaco Intensivo, Carved Oud, Search, Terre d'Hermès, Ultima Storia, Imperial, Bois du Portugal, Ya'e."
+     "texto": "**Seguro: Purpose 50** (2). Olíbano-pimento-pimenta rosa-bergamota / sândalo-sand vetiver-papiro-rosa / akigalawood-suede-baunilha-mystikal-açafrão — tier S. **A jogada: Decision** — Incenso seco e sério (tier S). **Também:** Bois Impérial, Imagination, Lucius, Radical Rose, Ombre Nomade, Royal Oud, Montabaco Intensivo, Carved Oud, Search, Terre d'Hermès, Ultima Storia, Imperial, Bois du Portugal, Ya'e."
     },
     "N.Inf": {
      "seguro": "Hacivat",
@@ -606,16 +608,16 @@
      "tambem": [
       "Aventus Absolu",
       "Bijou Zafran",
-      "Omnia Omnibus Ubique",
-      "Favonius",
       "Les Sables Roses",
       "Imagination",
       "Lucius",
-      "Scarlet Sands",
       "Radical Rose",
       "Grand Soir",
       "Ombre Nomade",
       "Outlands",
+      "Favonius",
+      "Scarlet Sands",
+      "Blue Sapphire Supercharged",
       "Odéon",
       "Amyris Homme Extrait",
       "Decision",
@@ -624,6 +626,7 @@
       "Purpose 50",
       "Blonde Amber",
       "Oud Satin Mood",
+      "Omnia Omnibus Ubique",
       "Bois Impérial",
       "Black Saffron Absolu",
       "Drunk Lovers",
@@ -637,7 +640,7 @@
       "Intoxicated",
       "Monarch"
      ],
-     "texto": "**Seguro: Hacivat** (3). Abacaxi-grapefruit-bergamota / cedro-patchouli-jasmim / oakmoss-madeiras — tier S. **A jogada: Brompton** — Opulência floral-resinosa em extrait — S (tier S). **Também:** Aventus Absolu, Bijou Zafran, Omnia Omnibus Ubique, Favonius, Les Sables Roses, Imagination, Lucius, Scarlet Sands, Radical Rose, Grand Soir, Ombre Nomade, Outlands, Odéon, Amyris Homme Extrait, Decision, African Leather, Liwa, Purpose 50, Blonde Amber, Oud Satin Mood, Bois Impérial, Black Saffron Absolu, Drunk Lovers, Oudós Lux Solis, Ani X, New York, Caden, Carved Oud, Al Qurashi Blend, Imperial, Intoxicated, Monarch."
+     "texto": "**Seguro: Hacivat** (3). Abacaxi-grapefruit-bergamota / cedro-patchouli-jasmim / oakmoss-madeiras — tier S. **A jogada: Brompton** — Opulência floral-resinosa em extrait — S (tier S). **Também:** Aventus Absolu, Bijou Zafran, Les Sables Roses, Imagination, Lucius, Radical Rose, Grand Soir, Ombre Nomade, Outlands, Favonius, Scarlet Sands, Blue Sapphire Supercharged, Odéon, Amyris Homme Extrait, Decision, African Leather, Liwa, Purpose 50, Blonde Amber, Oud Satin Mood, Omnia Omnibus Ubique, Bois Impérial, Black Saffron Absolu, Drunk Lovers, Oudós Lux Solis, Ani X, New York, Caden, Carved Oud, Al Qurashi Blend, Imperial, Intoxicated, Monarch."
     },
     "N.For": {
      "seguro": "Purpose 50",
@@ -649,20 +652,21 @@
      "jogada_tier": "S",
      "tambem": [
       "Aventus Absolu",
-      "Favonius",
       "Les Sables Roses",
       "Lucius",
       "Radical Rose",
       "Ombre Nomade",
       "Oud Satin Mood",
       "Outlands",
+      "Favonius",
+      "Omnia Omnibus Ubique",
+      "Blue Sapphire Supercharged",
       "Amyris Homme Extrait",
       "Decision",
-      "Omnia Omnibus Ubique",
       "Liwa",
-      "Scarlet Sands",
       "Blonde Amber",
       "Grand Soir",
+      "Scarlet Sands",
       "Bijou Zafran",
       "Royal Oud",
       "Terre d'Hermès",
@@ -674,7 +678,7 @@
       "Serenity",
       "Monarch"
      ],
-     "texto": "**Seguro: Purpose 50** (2). Olíbano-pimento-pimenta rosa-bergamota / sândalo-sand vetiver-papiro-rosa / akigalawood-suede-baunilha-mystikal-açafrão — tier S. **A jogada: Brompton** — Opulência floral-resinosa em extrait — S (tier S). **Também:** Aventus Absolu, Favonius, Les Sables Roses, Lucius, Radical Rose, Ombre Nomade, Oud Satin Mood, Outlands, Amyris Homme Extrait, Decision, Omnia Omnibus Ubique, Liwa, Scarlet Sands, Blonde Amber, Grand Soir, Bijou Zafran, Royal Oud, Terre d'Hermès, Ultima Storia, Imperial, Carved Oud, Al Qurashi Blend, Bois du Portugal, Serenity, Monarch."
+     "texto": "**Seguro: Purpose 50** (2). Olíbano-pimento-pimenta rosa-bergamota / sândalo-sand vetiver-papiro-rosa / akigalawood-suede-baunilha-mystikal-açafrão — tier S. **A jogada: Brompton** — Opulência floral-resinosa em extrait — S (tier S). **Também:** Aventus Absolu, Les Sables Roses, Lucius, Radical Rose, Ombre Nomade, Oud Satin Mood, Outlands, Favonius, Omnia Omnibus Ubique, Blue Sapphire Supercharged, Amyris Homme Extrait, Decision, Liwa, Blonde Amber, Grand Soir, Scarlet Sands, Bijou Zafran, Royal Oud, Terre d'Hermès, Ultima Storia, Imperial, Carved Oud, Al Qurashi Blend, Bois du Portugal, Serenity, Monarch."
     },
     "Cozy D": {
      "seguro": "Gris Charnel",
@@ -720,6 +724,8 @@
       "Gris Charnel",
       "Les Sables Roses",
       "Liwa",
+      "Favonius",
+      "Blue Sapphire Supercharged",
       "Caden",
       "Black Saffron Absolu",
       "Drunk Lovers",
@@ -727,7 +733,7 @@
       "Intoxicated",
       "Serenity"
      ],
-     "texto": "**Seguro: African Leather** (3). Cardamomo-gerânio-pimenta rosa / patchouli-canela-rosa / couro-oud-âmbar — tier S. **A jogada: Ombre Nomade** — Nuclear (tier S). **Também:** Odéon, Amyris Homme Extrait, Bijou Zafran, Blonde Amber, Grand Soir, Oud Satin Mood, Omnia Omnibus Ubique, Gris Charnel, Les Sables Roses, Liwa, Caden, Black Saffron Absolu, Drunk Lovers, Wood Whisper, Intoxicated, Serenity."
+     "texto": "**Seguro: African Leather** (3). Cardamomo-gerânio-pimenta rosa / patchouli-canela-rosa / couro-oud-âmbar — tier S. **A jogada: Ombre Nomade** — Nuclear (tier S). **Também:** Odéon, Amyris Homme Extrait, Bijou Zafran, Blonde Amber, Grand Soir, Oud Satin Mood, Omnia Omnibus Ubique, Gris Charnel, Les Sables Roses, Liwa, Favonius, Blue Sapphire Supercharged, Caden, Black Saffron Absolu, Drunk Lovers, Wood Whisper, Intoxicated, Serenity."
     }
    }
   },
@@ -744,11 +750,13 @@
      "jogada_tier": "S",
      "tambem": [
       "Gentle Fluidity Silver",
+      "Scarlet Sands",
+      "Blue Sapphire Supercharged",
       "Santal 33",
       "Beach Hut Man",
       "Oudós Lux Solis"
      ],
-     "texto": "**Seguro: Gris Charnel** (4). Cardamomo-figo-chá preto / íris marroquina-cistus-vetiver bourbon / sândalo-baunilha-tonka-cedro-patchouli — tier S. **A jogada: Outlands** — A catedral de olíbano-elemi-açafrão-oud (tier S). **Também:** Gentle Fluidity Silver, Santal 33, Beach Hut Man, Oudós Lux Solis."
+     "texto": "**Seguro: Gris Charnel** (4). Cardamomo-figo-chá preto / íris marroquina-cistus-vetiver bourbon / sândalo-baunilha-tonka-cedro-patchouli — tier S. **A jogada: Outlands** — A catedral de olíbano-elemi-açafrão-oud (tier S). **Também:** Gentle Fluidity Silver, Scarlet Sands, Blue Sapphire Supercharged, Santal 33, Beach Hut Man, Oudós Lux Solis."
     },
     "T.Inf": {
      "seguro": "Gentle Fluidity Silver",
@@ -780,7 +788,6 @@
      "jogada_tier": "S",
      "tambem": [
       "Decision",
-      "Favonius",
       "Outlands",
       "Ombre Nomade",
       "Carved Oud",
@@ -789,7 +796,7 @@
       "Royal Oud",
       "Bois du Portugal"
      ],
-     "texto": "**Seguro: Purpose 50** (3). Olíbano-pimento-pimenta rosa-bergamota / sândalo-sand vetiver-papiro-rosa / akigalawood-suede-baunilha-mystikal-açafrão — tier S. **A jogada: Radical Rose** — Rosa dark-mineral com chili-imortelle: a rosa que não é rosa de mulher (tier S). **Também:** Decision, Favonius, Outlands, Ombre Nomade, Carved Oud, Montabaco Intensivo, Imperial, Royal Oud, Bois du Portugal."
+     "texto": "**Seguro: Purpose 50** (3). Olíbano-pimento-pimenta rosa-bergamota / sândalo-sand vetiver-papiro-rosa / akigalawood-suede-baunilha-mystikal-açafrão — tier S. **A jogada: Radical Rose** — Rosa dark-mineral com chili-imortelle: a rosa que não é rosa de mulher (tier S). **Também:** Decision, Outlands, Ombre Nomade, Carved Oud, Montabaco Intensivo, Imperial, Royal Oud, Bois du Portugal."
     },
     "N.Inf": {
      "seguro": "Outlands",
@@ -800,14 +807,15 @@
      "jogada_txt": "Opulência floral-resinosa em extrait — S",
      "jogada_tier": "S",
      "tambem": [
-      "Favonius",
       "Les Sables Roses",
       "Bijou Zafran",
-      "Omnia Omnibus Ubique",
       "Aventus Absolu",
       "Radical Rose",
       "Grand Soir",
       "Ombre Nomade",
+      "Favonius",
+      "Scarlet Sands",
+      "Blue Sapphire Supercharged",
       "African Leather",
       "Liwa",
       "Purpose 50",
@@ -816,6 +824,7 @@
       "Blonde Amber",
       "Odéon",
       "Oud Satin Mood",
+      "Omnia Omnibus Ubique",
       "Black Saffron Absolu",
       "Caden",
       "Drunk Lovers",
@@ -827,7 +836,7 @@
       "Monarch",
       "Oud Kyphi"
      ],
-     "texto": "**Seguro: Outlands** (3). Olíbano-cardamomo-elemi-limão-bergamota-pimenta Sichuan / patchouli-anis-coentro-cominho-açafrão-flor de laranjeira-absinto-gerânio-rosa / olíbano-baunilha-âmbar-benjoim-oud-opoponax-birch-ambergris-maltol-labdanum-musk — tier S. **A jogada: Brompton** — Opulência floral-resinosa em extrait — S (tier S). **Também:** Favonius, Les Sables Roses, Bijou Zafran, Omnia Omnibus Ubique, Aventus Absolu, Radical Rose, Grand Soir, Ombre Nomade, African Leather, Liwa, Purpose 50, Amyris Homme Extrait, Decision, Blonde Amber, Odéon, Oud Satin Mood, Black Saffron Absolu, Caden, Drunk Lovers, Oudós Lux Solis, Carved Oud, Imperial, Intoxicated, Apotecário, Monarch, Oud Kyphi."
+     "texto": "**Seguro: Outlands** (3). Olíbano-cardamomo-elemi-limão-bergamota-pimenta Sichuan / patchouli-anis-coentro-cominho-açafrão-flor de laranjeira-absinto-gerânio-rosa / olíbano-baunilha-âmbar-benjoim-oud-opoponax-birch-ambergris-maltol-labdanum-musk — tier S. **A jogada: Brompton** — Opulência floral-resinosa em extrait — S (tier S). **Também:** Les Sables Roses, Bijou Zafran, Aventus Absolu, Radical Rose, Grand Soir, Ombre Nomade, Favonius, Scarlet Sands, Blue Sapphire Supercharged, African Leather, Liwa, Purpose 50, Amyris Homme Extrait, Decision, Blonde Amber, Odéon, Oud Satin Mood, Omnia Omnibus Ubique, Black Saffron Absolu, Caden, Drunk Lovers, Oudós Lux Solis, Carved Oud, Imperial, Intoxicated, Apotecário, Monarch, Oud Kyphi."
     },
     "N.For": {
      "seguro": "Ombre Nomade",
@@ -839,28 +848,29 @@
      "jogada_tier": "S",
      "tambem": [
       "Brompton",
-      "Favonius",
       "Les Sables Roses",
       "Purpose 50",
       "Aventus Absolu",
       "Oud Satin Mood",
       "Outlands",
+      "Favonius",
+      "Omnia Omnibus Ubique",
+      "Blue Sapphire Supercharged",
       "Liwa",
       "Amyris Homme Extrait",
       "Decision",
-      "Omnia Omnibus Ubique",
       "Blonde Amber",
       "Grand Soir",
+      "Scarlet Sands",
       "Bijou Zafran",
       "Imperial",
       "Royal Oud",
       "Carved Oud",
       "Bois du Portugal",
       "Serenity",
-      "Monarch",
-      "Bedouin Rose"
+      "Monarch"
      ],
-     "texto": "**Seguro: Ombre Nomade** (3). Oud-rosa-incenso-framboesa-açafrão-amberwood-benjoim-birch-gerânio — tier S. **A jogada: Radical Rose** — Rosa dark-mineral com chili-imortelle: a rosa que não é rosa de mulher (tier S). **Também:** Brompton, Favonius, Les Sables Roses, Purpose 50, Aventus Absolu, Oud Satin Mood, Outlands, Liwa, Amyris Homme Extrait, Decision, Omnia Omnibus Ubique, Blonde Amber, Grand Soir, Bijou Zafran, Imperial, Royal Oud, Carved Oud, Bois du Portugal, Serenity, Monarch, Bedouin Rose."
+     "texto": "**Seguro: Ombre Nomade** (3). Oud-rosa-incenso-framboesa-açafrão-amberwood-benjoim-birch-gerânio — tier S. **A jogada: Radical Rose** — Rosa dark-mineral com chili-imortelle: a rosa que não é rosa de mulher (tier S). **Também:** Brompton, Les Sables Roses, Purpose 50, Aventus Absolu, Oud Satin Mood, Outlands, Favonius, Omnia Omnibus Ubique, Blue Sapphire Supercharged, Liwa, Amyris Homme Extrait, Decision, Blonde Amber, Grand Soir, Scarlet Sands, Bijou Zafran, Imperial, Royal Oud, Carved Oud, Bois du Portugal, Serenity, Monarch."
     },
     "Cozy D": {
      "seguro": "Gris Charnel",
@@ -898,13 +908,15 @@
       "Blonde Amber",
       "Odéon",
       "Oud Satin Mood",
+      "Omnia Omnibus Ubique",
       "Brompton",
       "Gris Charnel",
       "Les Sables Roses",
       "Liwa",
-      "Omnia Omnibus Ubique",
       "Ombre Nomade",
       "Outlands",
+      "Favonius",
+      "Blue Sapphire Supercharged",
       "Caden",
       "Intoxicated",
       "Black Saffron Absolu",
@@ -912,7 +924,7 @@
       "Apotecário",
       "Bedouin Rose"
      ],
-     "texto": "**Seguro: Grand Soir** (3). Labdanum espanhol-âmbar-benjoim de Sião-baunilha-tonka-lavanda — tier S. **A jogada: Bijou Zafran** — O açafrão estranho e macio — aresta indecifrável (tier S). **Também:** African Leather, Amyris Homme Extrait, Blonde Amber, Odéon, Oud Satin Mood, Brompton, Gris Charnel, Les Sables Roses, Liwa, Omnia Omnibus Ubique, Ombre Nomade, Outlands, Caden, Intoxicated, Black Saffron Absolu, Serenity, Apotecário, Bedouin Rose."
+     "texto": "**Seguro: Grand Soir** (3). Labdanum espanhol-âmbar-benjoim de Sião-baunilha-tonka-lavanda — tier S. **A jogada: Bijou Zafran** — O açafrão estranho e macio — aresta indecifrável (tier S). **Também:** African Leather, Amyris Homme Extrait, Blonde Amber, Odéon, Oud Satin Mood, Omnia Omnibus Ubique, Brompton, Gris Charnel, Les Sables Roses, Liwa, Ombre Nomade, Outlands, Favonius, Blue Sapphire Supercharged, Caden, Intoxicated, Black Saffron Absolu, Serenity, Apotecário, Bedouin Rose."
     }
    }
   },
@@ -960,13 +972,12 @@
      "tambem": [
       "Decision",
       "Outlands",
-      "Favonius",
       "Ombre Nomade",
       "Imperial",
       "Carved Oud",
       "Montabaco Intensivo"
      ],
-     "texto": "**Seguro: Purpose 50** (3). Olíbano-pimento-pimenta rosa-bergamota / sândalo-sand vetiver-papiro-rosa / akigalawood-suede-baunilha-mystikal-açafrão — tier S. **A jogada: Radical Rose** — Rosa dark-mineral com chili-imortelle: a rosa que não é rosa de mulher (tier S). **Também:** Decision, Outlands, Favonius, Ombre Nomade, Imperial, Carved Oud, Montabaco Intensivo."
+     "texto": "**Seguro: Purpose 50** (3). Olíbano-pimento-pimenta rosa-bergamota / sândalo-sand vetiver-papiro-rosa / akigalawood-suede-baunilha-mystikal-açafrão — tier S. **A jogada: Radical Rose** — Rosa dark-mineral com chili-imortelle: a rosa que não é rosa de mulher (tier S). **Também:** Decision, Outlands, Ombre Nomade, Imperial, Carved Oud, Montabaco Intensivo."
     },
     "N.Inf": {
      "seguro": "Outlands",
@@ -980,25 +991,25 @@
       "Grand Soir",
       "Ombre Nomade",
       "Radical Rose",
-      "Favonius",
       "Les Sables Roses",
       "Aventus Absolu",
       "Bijou Zafran",
-      "Omnia Omnibus Ubique",
+      "Favonius",
+      "Blue Sapphire Supercharged",
       "Oud Satin Mood",
       "Blonde Amber",
       "African Leather",
       "Liwa",
       "Purpose 50",
+      "Omnia Omnibus Ubique",
       "Caden",
       "Imperial",
       "Intoxicated",
       "Apotecário",
       "Monarch",
-      "Bedouin Rose",
       "Oud Kyphi"
      ],
-     "texto": "**Seguro: Outlands** (3). Olíbano-cardamomo-elemi-limão-bergamota-pimenta Sichuan / patchouli-anis-coentro-cominho-açafrão-flor de laranjeira-absinto-gerânio-rosa / olíbano-baunilha-âmbar-benjoim-oud-opoponax-birch-ambergris-maltol-labdanum-musk — tier S. **A jogada: Brompton** — Opulência floral-resinosa em extrait — S (tier S). **Também:** Grand Soir, Ombre Nomade, Radical Rose, Favonius, Les Sables Roses, Aventus Absolu, Bijou Zafran, Omnia Omnibus Ubique, Oud Satin Mood, Blonde Amber, African Leather, Liwa, Purpose 50, Caden, Imperial, Intoxicated, Apotecário, Monarch, Bedouin Rose, Oud Kyphi."
+     "texto": "**Seguro: Outlands** (3). Olíbano-cardamomo-elemi-limão-bergamota-pimenta Sichuan / patchouli-anis-coentro-cominho-açafrão-flor de laranjeira-absinto-gerânio-rosa / olíbano-baunilha-âmbar-benjoim-oud-opoponax-birch-ambergris-maltol-labdanum-musk — tier S. **A jogada: Brompton** — Opulência floral-resinosa em extrait — S (tier S). **Também:** Grand Soir, Ombre Nomade, Radical Rose, Les Sables Roses, Aventus Absolu, Bijou Zafran, Favonius, Blue Sapphire Supercharged, Oud Satin Mood, Blonde Amber, African Leather, Liwa, Purpose 50, Omnia Omnibus Ubique, Caden, Imperial, Intoxicated, Apotecário, Monarch, Oud Kyphi."
     },
     "N.For": {
      "seguro": "Ombre Nomade",
@@ -1013,20 +1024,21 @@
       "Outlands",
       "Radical Rose",
       "Brompton",
-      "Favonius",
       "Les Sables Roses",
       "Aventus Absolu",
+      "Favonius",
+      "Omnia Omnibus Ubique",
+      "Blue Sapphire Supercharged",
       "Grand Soir",
       "Blonde Amber",
       "Liwa",
-      "Omnia Omnibus Ubique",
       "Imperial",
       "Royal Oud",
       "Serenity",
       "Monarch",
       "Oud Kyphi"
      ],
-     "texto": "**Seguro: Ombre Nomade** (3). Oud-rosa-incenso-framboesa-açafrão-amberwood-benjoim-birch-gerânio — tier S. **A jogada: Purpose 50** — Olíbano-mineral protagonista sobre sand vetiver-suede: o frasco mais alinhado ao DNA primário (tier S). **Também:** Oud Satin Mood, Outlands, Radical Rose, Brompton, Favonius, Les Sables Roses, Aventus Absolu, Grand Soir, Blonde Amber, Liwa, Omnia Omnibus Ubique, Imperial, Royal Oud, Serenity, Monarch, Oud Kyphi."
+     "texto": "**Seguro: Ombre Nomade** (3). Oud-rosa-incenso-framboesa-açafrão-amberwood-benjoim-birch-gerânio — tier S. **A jogada: Purpose 50** — Olíbano-mineral protagonista sobre sand vetiver-suede: o frasco mais alinhado ao DNA primário (tier S). **Também:** Oud Satin Mood, Outlands, Radical Rose, Brompton, Les Sables Roses, Aventus Absolu, Favonius, Omnia Omnibus Ubique, Blue Sapphire Supercharged, Grand Soir, Blonde Amber, Liwa, Imperial, Royal Oud, Serenity, Monarch, Oud Kyphi."
     },
     "Cozy D": {
      "seguro": "Brompton",
@@ -1059,25 +1071,27 @@
       "African Leather",
       "Amyris Homme Extrait",
       "Bijou Zafran",
+      "Omnia Omnibus Ubique",
       "Outlands",
       "Brompton",
       "Les Sables Roses",
       "Liwa",
-      "Omnia Omnibus Ubique",
+      "Favonius",
       "Caden",
       "Intoxicated",
       "Serenity",
-      "Apotecário"
+      "Apotecário",
+      "Bedouin Rose"
      ],
-     "texto": "**Seguro: Ombre Nomade** (3). Oud-rosa-incenso-framboesa-açafrão-amberwood-benjoim-birch-gerânio — tier S. **A jogada: Grand Soir** — Boozy-baunilha-âmbar sem oud: o respiro do óbvio (tier S). **Também:** Oud Satin Mood, Blonde Amber, African Leather, Amyris Homme Extrait, Bijou Zafran, Outlands, Brompton, Les Sables Roses, Liwa, Omnia Omnibus Ubique, Caden, Intoxicated, Serenity, Apotecário."
+     "texto": "**Seguro: Ombre Nomade** (3). Oud-rosa-incenso-framboesa-açafrão-amberwood-benjoim-birch-gerânio — tier S. **A jogada: Grand Soir** — Boozy-baunilha-âmbar sem oud: o respiro do óbvio (tier S). **Também:** Oud Satin Mood, Blonde Amber, African Leather, Amyris Homme Extrait, Bijou Zafran, Omnia Omnibus Ubique, Outlands, Brompton, Les Sables Roses, Liwa, Favonius, Caden, Intoxicated, Serenity, Apotecário, Bedouin Rose."
     }
    }
   }
  },
  "secoes": {
-  "Custo por uso com dois slots": "Dias e noites por faixa: normais INMET 1991–2020 (Mirante de Santana); slot Noite medido a ~21h. Frascos alocados = frascos distintos que aparecem em alguma célula da faixa na grade v59 (Dia = Lazer, Trab. Informal, Trab. Formal, Cozy Dia; Noite = Noite Informal, Noite Formal, Cozy Noite).\n\n| Faixa | Dias/ano (slot Dia) | Noites/ano (slot Noite) | Frascos alocados Dia / Noite | Dias por frasco / Noites por frasco |\n|---|---|---|---|---|\n| 🔴 Muito Quente | 27 | 1 | 23 / 15 | 1,2 / 0,1 |\n| 🟠 Quente | 124 | 36 | 34 / 27 | 3,6 / 1,3 |\n| 🟡 Ameno | 154 | 154 | 49 / 38 | 3,1 / 4,1 |\n| 🔵 Fresco | 55 | 143 | 44 / 41 | 1,2 / 3,5 |\n| 🟣 Frio | 5 | 30 | 28 / 32 | 0,2 / 0,9 |\n| ⚫ Muito Frio | 0 | 1 | 19 / 24 | 0,0 / 0,0 |\n\n**Regras (vigentes desde 19/set/2026; substituem o antigo \"slot frio congelado\"):**\n\n1. **Noite Ameno/Fresco (~300 noites/ano) é a janela mais abundante da coleção.** Noturno denso não reprova por clima; reprova, se reprovar, por **redundância dentro do slot Noite** e por tier — hoje 38 frascos disputam a noite de Ameno e 41 a de Fresco.\n2. **Frio e Muito Frio seguem escassos nos dois slots** (~31 noites e ~5 dias/ano). Candidato cujo envelope não inclua o Fresco tem custo por uso alto.\n3. **O gargalo é o slot Dia** (~12h, AC/trabalho, Ameno–Quente). Compra por gap se defende de dia. Fresco de dia: 44 frascos para ~55 dias.\n4. **Noite de calor é rara** (~37 noites/ano Quente/Muito Quente a 21h).",
-  "Notas de uso": "- **Também** = ordem de prioridade dentro da célula (tier → aptidão → nome). Com 31 S na grade, o tier separa pouco dentro das células de noite; na dúvida entre S do *Também*, pesa o uso real registrado no diário.\n- **Dois slots:** célula do Dia de manhã (7h00–7h30) e célula da Noite antes do banho (19h–20h). O perfume da noite é o segundo do dia — não repetir o da manhã; evitar dois densos (peso ≥4) no mesmo dia; mesmo arquétipo nos dois slots é aceitável. Em casa à noite, −1 spray. O perfume do Dia **não precisa durar até a noite** (decisão dele, 25/set/2026).\n- **Sprays das células são valores finais.** Em extraits e beasts, primeira vez numa faixa nova: comece 1 abaixo. Désobéissant: 6–7. Ombre Nomade e Outlands no Fresco: 2.\n- Cozy Dia/Noite não existem em Muito Quente/Quente.\n- **Faixa do slot Dia:** máxima prevista para as horas restantes do dia. **Slot Noite:** temperatura prevista para ~20–22h (em SP, tipicamente uma faixa abaixo da máxima).\n- **Td:** coluna Td da ficha do frasco para o modificador ±2.\n- **O que reabre o playbook:** mudança de tier na aba *Tiers*, mudança de aptidão/envelope declarada por ele, ou frasco novo — sempre por script, nunca editando célula à mão. **Pendências que reabrem:** (1) onde ele de fato usa Favonius, Omnia Omnibus Ubique e Scarlet Sands (envelopes hoje estimados pelo Claude); (2) se ele quiser que os Seguros reflitam os novos S (hoje vale incumbência, por decisão dele)."
+  "Custo por uso com dois slots": "Dias e noites por faixa: normais INMET 1991–2020 (Mirante de Santana); slot Noite medido a ~21h. Frascos alocados = frascos distintos que aparecem em alguma célula da faixa na grade v60 (Dia = Lazer, Trab. Informal, Trab. Formal, Cozy Dia; Noite = Noite Informal, Noite Formal, Cozy Noite).\n\n| Faixa | Dias/ano (slot Dia) | Noites/ano (slot Noite) | Frascos alocados Dia / Noite | Dias por frasco / Noites por frasco |\n|---|---|---|---|---|\n| 🔴 Muito Quente | 27 | 1 | 23 / 15 | 1,2 / 0,1 |\n| 🟠 Quente | 124 | 36 | 34 / 27 | 3,6 / 1,3 |\n| 🟡 Ameno | 154 | 154 | 48 / 39 | 3,2 / 3,9 |\n| 🔵 Fresco | 55 | 143 | 44 / 42 | 1,2 / 3,4 |\n| 🟣 Frio | 5 | 30 | 29 / 35 | 0,2 / 0,9 |\n| ⚫ Muito Frio | 0 | 1 | 18 / 26 | 0,0 / 0,0 |\n\n**Regras (vigentes desde 19/set/2026; substituem o antigo \"slot frio congelado\"):**\n\n1. **Noite Ameno/Fresco (~300 noites/ano) é a janela mais abundante da coleção.** Noturno denso não reprova por clima; reprova, se reprovar, por **redundância dentro do slot Noite** e por tier — hoje 39 frascos disputam a noite de Ameno e 42 a de Fresco.\n2. **Frio e Muito Frio seguem escassos nos dois slots** (~31 noites e ~5 dias/ano). Candidato cujo envelope não inclua o Fresco tem custo por uso alto.\n3. **O gargalo é o slot Dia** (~12h, AC/trabalho, Ameno–Quente). Compra por gap se defende de dia. Fresco de dia: 44 frascos para ~55 dias.\n4. **Noite de calor é rara** (~37 noites/ano Quente/Muito Quente a 21h).",
+  "Notas de uso": "- **Também** = ordem de prioridade dentro da célula (tier → aptidão → nome). Com 31 S na grade, o tier separa pouco dentro das células de noite; na dúvida entre S do *Também*, pesa o uso real registrado no diário.\n- **Dois slots:** célula do Dia de manhã (7h00–7h30) e célula da Noite antes do banho (19h–20h). O perfume da noite é o segundo do dia — não repetir o da manhã; evitar dois densos (peso ≥4) no mesmo dia; mesmo arquétipo nos dois slots é aceitável. Em casa à noite, −1 spray. O perfume do Dia **não precisa durar até a noite** (decisão dele, 25/set/2026).\n- **Sprays das células são valores finais.** Em extraits e beasts, primeira vez numa faixa nova: comece 1 abaixo. Désobéissant: 6–7. Ombre Nomade e Outlands no Fresco: 2.\n- Cozy Dia/Noite não existem em Muito Quente/Quente.\n- **Faixa do slot Dia:** máxima prevista para as horas restantes do dia. **Slot Noite:** temperatura prevista para ~20–22h (em SP, tipicamente uma faixa abaixo da máxima).\n- **Td:** coluna Td da ficha do frasco para o modificador ±2.\n- **O que reabre o playbook:** mudança de tier na aba *Tiers*, mudança de aptidão/envelope declarada por ele, ou frasco novo — sempre por script, nunca editando célula à mão. **Pendências que reabrem:** (1) uso real de Favonius, Omnia Omnibus Ubique, Scarlet Sands e Blue Sapphire Supercharged no diário — envelopes decididos pelo Claude em 23/out/2026, a pedido dele, sem uso declarado; a coluna NotaDia (acerto do dia, 1–5) é o dado que confirma ou derruba cada célula; (2) se ele quiser que os Seguros reflitam os novos S (hoje vale incumbência, por decisão dele)."
  },
- "total_alocacoes": 654,
+ "total_alocacoes": 668,
  "celulas": 38
 }
