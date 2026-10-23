@@ -1,6 +1,8 @@
-# Fichas Técnicas — v10 (23/out/2026) · grade 71 (Bedouin Rose entra como C) + camada custo 10
+# Fichas Técnicas — v11 (23/out/2026) · grade 71 + camada custo 11
 
-> **v10 — regerado por `gerador_v60.py`.** Entram **Blue Sapphire Supercharged** (grade, S) e **Empire** (camada custo, A). **Bedouin Rose** D→C entra na grade (2 janelas, células-lar). Revistos por decisão do Claude a pedido dele (23/out/2026), com Fragrantica/Parfumo/site da marca: **Favonius** (sai do Trab. Formal, ganha Cozy Noite), **Omnia Omnibus Ubique** (aptidões reordenadas), **Scarlet Sands** (envelope até o Frio). Nenhum outro campo de nenhum outro frasco muda. Janelas = playbook v60 (668 alocações).
+> **v11 — regerado por `gerador_v61.py`.** Entra **Enigma of Taif** (Swiss Arabian) na camada custo (11º frasco; tier A dado por ele, 23/out/2026). Grade, janelas (playbook v60, 668 alocações) e todas as demais fichas idênticas à v10.
+>
+> **v10 — regerado por `gerador_v60.py`.** Entram Blue Sapphire Supercharged (grade, S) e Empire (camada custo, A); Bedouin Rose D→C entra na grade; Favonius, Omnia Omnibus Ubique e Scarlet Sands revistos pelo Claude a pedido dele.
 >
 > **Fonte de tier:** aba *Tiers* da planilha "Diário de Uso — Perfumes" (decisão dele, 04/out/2026). Tiers desta ficha conferem com ela em 23/out/2026.
 
@@ -95,9 +97,9 @@
 | 70 | **Wood Whisper** | OJAR | EDP | Marceneiro | A | ameixa-rosa / sândalo-violeta-cashmere / âmbar branco-baunilha-ambergris-musk | S | 2 | 3 | N | 🟡A–⚫MF | Lazer 1 · T.Inf 3 · Cozy D 3 · Cozy N 2 | 3 | 9 | Gris Charnel, Santal 33 | Sândalo-cashmere cremoso sobre âmbar branco: o mais perto de 'cremoso' que a coleção chega — e ainda não é o gap #4. |
 | 71 | **Ya'e** | Hind Al Oud | EDP | Empoado | B | aldeídos / orris butter-pistache / açafrão metálico-amber wood | F | 1 | 3 | N | 🟡A–🔵F | T.Inf 3 · T.For 2 · N.Inf 2 · Cozy D 2 | 3 | 6 | Ultima Storia | Aldeído-íris-pistache metálico: moderno, empoado, unissex — o frasco mais 'perfumaria de autor' da grade. |
 
-## Camada custo — 10 frascos (só academia e corrida · slot E no diário)
+## Camada custo — 11 frascos (só academia e corrida · slot E no diário)
 
-> **Fora de qualquer análise ou framework** (regra dele, 25/set/2026): usada só em academia e corrida. As fichas ficam aqui apenas porque o modelo diário as usa quando a entrada traz `Extra: corrida` ou `Extra: academia`. Quatro pirâmides não têm fonte limpa documentada — marcadas como tal, não inventadas.
+> **Fora de qualquer análise ou framework** (regra dele, 25/set/2026): usada só em academia e corrida. As fichas ficam aqui apenas porque o modelo diário as usa quando a entrada traz `Extra: corrida` ou `Extra: academia`. Quatro pirâmides não têm fonte limpa documentada — marcadas como tal, não inventadas. Enigma of Taif (23/out/2026): pirâmide verificada em varejistas; envelope, aptidão, sprays e performance são estimativa do Claude.
 
 | # | Frasco | Casa | Conc. | Arquétipo | Tier | Perfil (pirâmide verificada) | Eixo | Doç. | Peso | Td | Envelope | Aptidão por ocasião | Sprays-base | Janelas | Vizinhos / redundância | Leitura |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
@@ -111,6 +113,7 @@
 | 79 | **Inception** | Mykonos | Extrait | Mediterrâneo | S | limão-gengibre-bergamota-laranja / chá preto-neroli-canela / musk-cedro-guaiac-Lorenox | P | 0 | 3 | C | 🔴MQ–🔵F | Lazer 2 · T.Inf 3 · N.Inf 3 | 3 | — | Imagination (clone) | Sonda barata do Imagination. |
 | 80 | **Dubai Musk** | Al Ambra | Extrait | Minimalista | A | bergamota-magnólia-tangerina-sândalo branco-groselha / white musk / musk-sândalo branco | F | 1 | 2 | N | 🔴MQ–🔵F | Lazer 2 · T.Inf 3 · Cozy D 2 | 3 | — | GF Silver, K-Musk | Skin scent clean; ex-grade. Musk limpo para dia de calor. |
 | 81 | **Empire** | Mykonos | n/d | Marinho | A | lima-bergamota-mandarina-frutas tropicais / laranja siciliana-gengibre-jasmim-água de coco / patchouli-musk branco-tonka (2026, Mykonos x RRQ — pirâmide de varejista, arabicparfums.com; Parfumo o descreve como híbrido de Afternoon Swim e Virgin Island Water) | F | 1 | 2 | C | 🔴MQ–🟡A | Lazer 3 · T.Inf 1 | 4 | — | Aquatica, Island Dreams | Cítrico-tropical de calor. Camada custo (tier A dado por ele, 11/out/2026): corrida, academia e praia pós-corrida — fora de qualquer análise. |
+| 82 | **Enigma of Taif** | Swiss Arabian | Extrait | Rosal | A | cardamomo-pimenta preta-pimenta rosa-elemi-ameixa / rosa Taif-açafrão-violeta-osmanthus-olíbano / carvalho-melaço-vetiver-âmbar-labdanum (2025, Shinichiro Oba, coleção Cities — pirâmide: Ferwer, Notino, Aar Fragrances, Ulta; verificada em 23/out/2026. Uma listagem da Notino troca osmanthus por heliotrópio) | S | 2 | 4 | S | 🔵F–⚫MF | N.Inf 2 · N.For 3 · Cozy N 2 | 2 | — | Bedouin Rose (rosa Taif-açafrão-olíbano-âmbar), Brompton, Radical Rose | Rosa Taif jammy entre especiarias (cardamomo, pimentas) e ameixa, com base escura e adocicada de melaço-labdanum-âmbar: rosa oriental resinosa de frio. **Camada custo (tier A dado por ele, 23/out/2026): só corrida e academia — fora de qualquer análise.** Envelope, aptidão, sprays e performance são estimativa do Claude: varejistas relatam projeção forte e uso noturno/estações frias (Ulta; ScentVerdict: longevidade 6–10h, projeção forte, 'beast mode', perfil polarizante). Começar em 2 sprays. **Registro franco:** como perfume de corrida/academia é o mais denso da camada; o modelo só o sugere com Extra corrida/academia em faixa Fresco–MF. |
 
 ## Leituras transversais (derivadas das fichas da grade)
 
@@ -136,7 +139,7 @@
 | Cítrico-gengibre-ambroxan (eixo LV / linhagem Tygar) | 7 | L'Immensité, Castley, Blue Talisman, Météore, Imagination, Vibrato, Tygar Extrait | Imagination é o único indispensável. **Linhagem Tygar = 3 frascos** (Tygar Extrait, Vibrato, L'Immensité), agora com divisão de trabalho: Vibrato só dia/trabalho · Tygar Extrait noite · L'Immensité inalterado |
 | DNA Aventus / chypre frutado | 4 | Aventus, Aventus Absolu, Hacivat, Anelo | Hacivat resolve; Anelo vive de calor extremo |
 | Açafrão protagonista ou coadjuvante forte | 13 | Bijou Zafran, Black Saffron Absolu, Liwa, Serenity, Bedouin Rose, Caden, Brompton, Amyris Homme Extrait, Oud Kyphi, Purpose 50, Blonde Amber, Les Sables Roses, Omnia Omnibus Ubique | 13 frascos com açafrão nomeado — Liwa é o que mais precisa se justificar |
-| Rosa oriental | 9 | Radical Rose, Odéon, Brompton, Bedouin Rose, Oud Satin Mood, Serenity, Les Sables Roses, Favonius, Blue Sapphire Supercharged | categoria recusada 5× e comprada 3× depois; Favonius (23/set/2026) já era frasco e entra por correção de cadastro. **7 S em 9 (Radical Rose, Odéon, Brompton, Oud Satin Mood, Les Sables Roses, Favonius, Blue Sapphire Supercharged) — o território mais denso de S da grade.** Favonius é o único seco-herbal-incenso do grupo; Blue Sapphire Supercharged, o mais luminoso (cítrico-aldeído-framboesa). Próxima rosa-oriental parte de redundância alta no gate 3 |
+| Rosa oriental | 9 | Radical Rose, Odéon, Brompton, Bedouin Rose, Oud Satin Mood, Serenity, Les Sables Roses, Favonius, Blue Sapphire Supercharged | categoria recusada 5× e comprada 3× depois; Favonius (23/set/2026) já era frasco e entra por correção de cadastro. **7 S em 9 (Radical Rose, Odéon, Brompton, Oud Satin Mood, Les Sables Roses, Favonius, Blue Sapphire Supercharged) — o território mais denso de S da grade.** Favonius é o único seco-herbal-incenso do grupo; Blue Sapphire Supercharged, o mais luminoso (cítrico-aldeído-framboesa). Próxima rosa-oriental parte de redundância alta no gate 3. + Enigma of Taif (camada custo, fora da análise) |
 | Âmbar-baunilha | 6 | Grand Soir, Caden, Ani X, Amyris Homme Extrait, New York, Drunk Lovers | + Musamam Black (camada custo, fora da análise) |
 | Boozy | 4 | Grand Soir, Caden, Drunk Lovers, Blonde Amber | + Incense 01 (camada custo, fora da análise) |
 | Couro / tabaco / suede | 8 | Montabaco Intensivo, African Leather, Black Saffron Absolu, Bijou Zafran, Apotecário, Serenity, Ultima Storia, New York | Curtidor + fronteiras |
@@ -146,6 +149,7 @@
 
 ### 4. Pendências (23/out/2026)
 
+- **Enigma of Taif (camada custo):** envelope Fresco–MF, aptidão, 2 sprays e performance (10h · projeção 4 · fundo manda) são estimativa do Claude sem uso declarado; o slot E do diário confirma ou derruba.
 - **Quatro frascos com envelope e aptidão decididos pelo Claude, a pedido dele, sem uso declarado** (Favonius, Omnia Omnibus Ubique, Scarlet Sands, Blue Sapphire Supercharged — 23/out/2026). O que confirma ou derruba cada célula: o diário, com a coluna NotaDia (acerto do dia, 1–5).
 - **Tygar Extrait:** se render em noite fresca, o envelope alarga ao Fresco e a grade regera (S comporta 12; hoje tem 6).
 - **Arquétipos:** a divisão Mediterrâneo + Solar (Imagination, Lucius, Tygar Extrait), pedida em 05/out/2026, ainda não está propagada às fichas, ao mapa e ao observatório.

@@ -12,7 +12,7 @@ import glob, json, os, re, sys
 
 RAIZ = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(RAIZ, "spec"))
-import modelo_diario_v1_7 as M  # noqa: E402
+import modelo_diario_v1_8 as M  # noqa: E402
 
 CFG = M.CFG
 

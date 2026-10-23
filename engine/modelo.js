@@ -1,4 +1,4 @@
-// modelo.js — porta fiel de spec/modelo_diario_v1_7.py (Top 10 do dia em dois slots).
+// modelo.js — porta fiel de spec/modelo_diario_v1_8.py (Top 10 do dia em dois slots).
 // Cada função espelha a homônima do Python; nada de "melhorias". Datas são strings AAAA-MM-DD.
 import { CFG, FAIXAS, OCASIOES, OCAS_ALIAS, ESCUROS, DIAS } from "./config.js";
 

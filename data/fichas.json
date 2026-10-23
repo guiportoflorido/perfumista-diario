@@ -1,5 +1,5 @@
 {
- "fonte": "fichas_tecnicas_v10.md",
+ "fonte": "fichas_tecnicas_v11.md",
  "fichas": {
   "1872 for Men": {
    "n": 1,
@@ -1539,6 +1539,25 @@
    "janelas": "—",
    "vizinhos": "Aquatica, Island Dreams",
    "leitura": "Cítrico-tropical de calor. Camada custo (tier A dado por ele, 11/out/2026): corrida, academia e praia pós-corrida — fora de qualquer análise."
+  },
+  "Enigma of Taif": {
+   "n": 82,
+   "nome": "Enigma of Taif",
+   "casa": "Swiss Arabian",
+   "conc": "Extrait",
+   "arquetipo": "Rosal",
+   "tier": "A",
+   "perfil": "cardamomo-pimenta preta-pimenta rosa-elemi-ameixa / rosa Taif-açafrão-violeta-osmanthus-olíbano / carvalho-melaço-vetiver-âmbar-labdanum (2025, Shinichiro Oba, coleção Cities — pirâmide: Ferwer, Notino, Aar Fragrances, Ulta; verificada em 23/out/2026. Uma listagem da Notino troca osmanthus por heliotrópio)",
+   "eixo": "S",
+   "doc": "2",
+   "peso": "4",
+   "td": "S",
+   "envelope": "🔵F–⚫MF",
+   "aptidao": "N.Inf 2 · N.For 3 · Cozy N 2",
+   "sprays_base": "2",
+   "janelas": "—",
+   "vizinhos": "Bedouin Rose (rosa Taif-açafrão-olíbano-âmbar), Brompton, Radical Rose",
+   "leitura": "Rosa Taif jammy entre especiarias (cardamomo, pimentas) e ameixa, com base escura e adocicada de melaço-labdanum-âmbar: rosa oriental resinosa de frio. **Camada custo (tier A dado por ele, 23/out/2026): só corrida e academia — fora de qualquer análise.** Envelope, aptidão, sprays e performance são estimativa do Claude: varejistas relatam projeção forte e uso noturno/estações frias (Ulta; ScentVerdict: longevidade 6–10h, projeção forte, 'beast mode', perfil polarizante). Começar em 2 sprays. **Registro franco:** como perfume de corrida/academia é o mais denso da camada; o modelo só o sugere com Extra corrida/academia em faixa Fresco–MF."
   }
  }
 }

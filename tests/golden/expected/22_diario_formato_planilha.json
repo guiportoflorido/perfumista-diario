@@ -255,7 +255,8 @@
     "Belgravia": 68.89230849571317,
     "Inception": 94.27085859763467,
     "Dubai Musk": 82.33996544492067,
-    "Empire": 52.10988899320442
+    "Empire": 52.10988899320442,
+    "Enigma of Taif": null
    },
    "fora": {
     "Al Qurashi Blend": "9h vivas fora de casa sem aptidão (T.Inf)",
@@ -287,7 +288,8 @@
     "Supremacy CE": "9h vivas fora de casa sem aptidão (T.Inf)",
     "Musamam Black": "11h vivas fora de casa sem aptidão (T.Inf)",
     "Aquatica": "5.5h abaixo do envelope (Quente é o piso)",
-    "Incense 01": "12.5h vivas fora de casa sem aptidão (T.Inf, N.Inf)"
+    "Incense 01": "12.5h vivas fora de casa sem aptidão (T.Inf, N.Inf)",
+    "Enigma of Taif": "11h vivas fora de casa sem aptidão (T.Inf)"
    },
    "fora_sa": [
     {
@@ -520,7 +522,8 @@
     "Belgravia": 47.19419796674976,
     "Inception": 54.0642279276819,
     "Dubai Musk": 45.882553779654586,
-    "Empire": 43.89077254855942
+    "Empire": 43.89077254855942,
+    "Enigma of Taif": null
    },
    "fora": {
     "Apotecário": "3.5h na rua acima do envelope (Fresco é o teto)",
@@ -540,7 +543,8 @@
     "Serenity": "3.5h na rua acima do envelope (Fresco é o teto)",
     "Musamam Black": "3.5h na rua acima do envelope (Fresco é o teto)",
     "Aquatica": "3h abaixo do envelope (Quente é o piso)",
-    "Incense 01": "3.5h na rua acima do envelope (Fresco é o teto)"
+    "Incense 01": "3.5h na rua acima do envelope (Fresco é o teto)",
+    "Enigma of Taif": "3.5h na rua acima do envelope (Fresco é o teto)"
    },
    "fora_sa": [
     {

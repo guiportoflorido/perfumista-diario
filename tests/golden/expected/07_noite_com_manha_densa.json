@@ -252,7 +252,8 @@
     "Belgravia": 66.76539936616203,
     "Inception": 92.37513183737411,
     "Dubai Musk": 82.17414735043396,
-    "Empire": 45.31452441312598
+    "Empire": 45.31452441312598,
+    "Enigma of Taif": null
    },
    "fora": {
     "Al Qurashi Blend": "9h vivas fora de casa sem aptidão (T.Inf)",
@@ -284,7 +285,8 @@
     "Supremacy CE": "9h vivas fora de casa sem aptidão (T.Inf)",
     "Musamam Black": "11.5h vivas fora de casa sem aptidão (T.Inf)",
     "Aquatica": "5.5h abaixo do envelope (Quente é o piso)",
-    "Incense 01": "12.5h vivas fora de casa sem aptidão (T.Inf)"
+    "Incense 01": "12.5h vivas fora de casa sem aptidão (T.Inf)",
+    "Enigma of Taif": "11.5h vivas fora de casa sem aptidão (T.Inf)"
    },
    "fora_sa": [
     {
@@ -517,7 +519,8 @@
     "Belgravia": 49.33119345531027,
     "Inception": 86.44419497162899,
     "Dubai Musk": null,
-    "Empire": null
+    "Empire": null,
+    "Enigma of Taif": 67.32
    },
    "fora": {
     "1872 for Men": "3.5h abaixo do envelope (Ameno é o piso)",

@@ -39,5 +39,5 @@ S/A fora neste slot: 1872 for Men (S: 5.5h abaixo do envelope (Ameno é o piso))
 | 10 | **Brompton** | Ex Nihilo | S | 1 (em casa −1) | fim | 85 | térmico 0.99 · Td ↑ · Cozy N 2 |
 S/A fora neste slot: 1872 for Men (S: 3.5h abaixo do envelope (Ameno é o piso)) · Bois Impérial (S: 2h abaixo do envelope (Fresco é o piso)) · Crab Apple Blossom (S: 3.5h abaixo do envelope (Ameno é o piso)) · Désobéissant (S: 2h abaixo do envelope (Fresco é o piso)) · Hacivat (S: 2h abaixo do envelope (Fresco é o piso)) · Imagination (S: 2h abaixo do envelope (Fresco é o piso)) · Lucius (S: 2h abaixo do envelope (Fresco é o piso)) · Météore (S: 3.5h abaixo do envelope (Ameno é o piso))
 
-_Modelo v1.7 (dois slots · base frascos_v8, grade 71) · pesos declarados no CFG · longevidade/projeção/curva são estimativas (17 com lastro na ficha, 64 por regra) · calibrar com o diário._
+_Modelo v1.8 (dois slots · base frascos_v9, grade 71 + camada custo 11) · pesos declarados no CFG · longevidade/projeção/curva são estimativas (18 com lastro na ficha, 64 por regra) · calibrar com o diário._
 📓 Depois me diga o que usou de manhã e à noite pra eu registrar as duas linhas.

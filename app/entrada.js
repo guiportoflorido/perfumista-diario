@@ -1,4 +1,4 @@
-// entrada.js — monta o texto de entrada do modelo (mesmo formato do modelo_diario_v1_7.py) a partir da tela.
+// entrada.js — monta o texto de entrada do modelo (mesmo formato do modelo_diario_v1_8.py) a partir da tela.
 // Usar o texto como contrato garante que o app roda exatamente o que os testes de paridade cobrem.
 export const OCAS_DIA = [["auto", "Automático"], ["lazer", "Lazer"], ["ti", "Trab. Informal"], ["tf", "Trab. Formal"], ["cd", "Cozy Dia"]];
 export const OCAS_NOITE = [["auto", "Automático"], ["ni", "Noite Informal"], ["nf", "Noite Formal"], ["cn", "Cozy Noite"]];

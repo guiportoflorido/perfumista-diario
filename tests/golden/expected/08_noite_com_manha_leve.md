@@ -41,5 +41,5 @@ S/A fora neste slot: Blonde Amber (S: 11h vivas fora de casa sem aptidão (T.Inf
 | 10 | **Gris Charnel** | BDK | S | 3 (em casa −1) | fim | 76 | térmico 0.85 · chuva ↓ · Cozy N 2 |
 S/A fora neste slot: Blonde Amber (S: 3h na rua acima do envelope (Fresco é o teto)) · Grand Soir (S: 3h na rua acima do envelope (Fresco é o teto)) · Hacivat (S: já usado hoje de manhã (o slot Noite é o segundo perfume do dia)) · Ombre Nomade (S: 3h na rua acima do envelope (Fresco é o teto)) · Oud Satin Mood (S: 3h na rua acima do envelope (Fresco é o teto)) · Outlands (S: 3h na rua acima do envelope (Fresco é o teto)) · Radical Rose (S: 3h na rua acima do envelope (Fresco é o teto)) · Caden (A: 3h na rua acima do envelope (Fresco é o teto))
 
-_Modelo v1.7 (dois slots · base frascos_v8, grade 71) · pesos declarados no CFG · longevidade/projeção/curva são estimativas (17 com lastro na ficha, 64 por regra) · calibrar com o diário._
+_Modelo v1.8 (dois slots · base frascos_v9, grade 71 + camada custo 11) · pesos declarados no CFG · longevidade/projeção/curva são estimativas (18 com lastro na ficha, 64 por regra) · calibrar com o diário._
 📓 Depois me diga o que usou de manhã e à noite pra eu registrar as duas linhas.

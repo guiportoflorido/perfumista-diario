@@ -38,5 +38,5 @@ S/A fora neste slot: African Leather (S: 11.5h na rua acima do envelope (Ameno �
 | 10 | **L'Immensité** | Louis Vuitton | A | 4 | fim | 75 | térmico 0.97 · Td ↑ · N.Inf 2 |
 S/A fora neste slot: African Leather (S: 3.5h na rua acima do envelope (Ameno é o teto)) · Amyris Homme Extrait (S: 3.5h na rua acima do envelope (Ameno é o teto)) · Bijou Zafran (S: 3.5h na rua acima do envelope (Ameno é o teto)) · Blonde Amber (S: 3.5h na rua acima do envelope (Fresco é o teto)) · Blue Sapphire Supercharged (S: 3.5h na rua acima do envelope (Ameno é o teto)) · Brompton (S: 3.5h na rua acima do envelope (Ameno é o teto)) · Decision (S: 3.5h na rua acima do envelope (Ameno é o teto)) · Favonius (S: 3.5h na rua acima do envelope (Ameno é o teto))
 
-_Modelo v1.7 (dois slots · base frascos_v8, grade 71) · pesos declarados no CFG · longevidade/projeção/curva são estimativas (17 com lastro na ficha, 64 por regra) · calibrar com o diário._
+_Modelo v1.8 (dois slots · base frascos_v9, grade 71 + camada custo 11) · pesos declarados no CFG · longevidade/projeção/curva são estimativas (18 com lastro na ficha, 64 por regra) · calibrar com o diário._
 📓 Depois me diga o que usou de manhã e à noite pra eu registrar as duas linhas.

@@ -43,5 +43,5 @@ S/A fora neste slot: Blonde Amber (S: 11h vivas fora de casa sem aptidão (T.Inf
 ★ Testar Grand Soir: reprovado nos filtros deste slot — 3.5h na rua acima do envelope (Fresco é o teto)
 S/A fora neste slot: Blonde Amber (S: 3.5h na rua acima do envelope (Fresco é o teto)) · Grand Soir (S: 3.5h na rua acima do envelope (Fresco é o teto)) · Ombre Nomade (S: 3.5h na rua acima do envelope (Fresco é o teto)) · Oud Satin Mood (S: 3.5h na rua acima do envelope (Fresco é o teto)) · Outlands (S: 3.5h na rua acima do envelope (Fresco é o teto)) · Radical Rose (S: 3.5h na rua acima do envelope (Fresco é o teto)) · Caden (A: 3.5h na rua acima do envelope (Fresco é o teto)) · Imperial (A: 3.5h na rua acima do envelope (Fresco é o teto))
 
-_Modelo v1.7 (dois slots · base frascos_v8, grade 71) · pesos declarados no CFG · longevidade/projeção/curva são estimativas (17 com lastro na ficha, 64 por regra) · calibrar com o diário._
+_Modelo v1.8 (dois slots · base frascos_v9, grade 71 + camada custo 11) · pesos declarados no CFG · longevidade/projeção/curva são estimativas (18 com lastro na ficha, 64 por regra) · calibrar com o diário._
 📓 Depois me diga o que usou de manhã e à noite pra eu registrar as duas linhas.
