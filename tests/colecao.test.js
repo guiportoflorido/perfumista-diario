@@ -22,13 +22,19 @@ test("Coleção lista grade, camada custo e fora da grade; filtro Camada separa"
   assert.match(telaColecao(ctx({ camada: "custo" })), /<td class="cc-num">—<\/td>/);   // sem janelas no playbook
 });
 
-test("Roda: camada custo entra com contorno tracejado e pode ser ocultada; tier D fica fora", async () => {
+test("Roda: camada custo em círculos pontilhados no anel próprio do arquétipo; filtro Grade e custo · Só grade · Só custo; tier D fora", async () => {
   const { rodaSVG, telaRoda } = await import("../app/roda.js");
   const arquetipos = [{ nome: "Monge", cor: "#123456" }];
   const pontos = h => [...h.matchAll(/data-fr="([^"]+)"/g)].map(m => m[1]);
-  const com = rodaSVG({ frascos, arquetipos, gaps: [], verGaps: false, usosPor: new Map() });
-  assert.deepEqual(pontos(com).sort(), ["Custo A", "Grade S"]);
-  assert.match(com, /class="r-fr r-custo" data-fr="Custo A"/);
-  assert.deepEqual(pontos(rodaSVG({ frascos, arquetipos, gaps: [], verGaps: false, usosPor: new Map(), comCusto: false })), ["Grade S"]);
-  assert.match(telaRoda({ frascos, arquetipos, gaps: [], verGaps: false, usosPor: new Map(), comCusto: true }), /Ocultar camada custo \(1\)/);
+  const base = { frascos, arquetipos, gaps: [], verGaps: false, usosPor: new Map() };
+  const tudo = rodaSVG(base);
+  assert.deepEqual(pontos(tudo).sort(), ["Custo A", "Grade S"]);
+  assert.match(tudo, /class="r-fr r-custo" data-fr="Custo A"/);
+  assert.match(tudo, /data-fr="Custo A"[\s\S]*?fill="#123456" class="r-ponto" style="--d:\d+ms;stroke:#123456"/);   // pontilhado na cor do arquétipo, contorno na cor do arquétipo
+  assert.match(tudo, /r-orb-custo/);
+  assert.deepEqual(pontos(rodaSVG({ ...base, ver: "grade" })), ["Grade S"]);
+  const so = rodaSVG({ ...base, ver: "custo" });
+  assert.deepEqual(pontos(so), ["Custo A"]); assert.doesNotMatch(so, /r-orb-S/);
+  const t = telaRoda({ ...base, ver: "custo" });
+  assert.match(t, /data-roda-ver="custo" aria-selected="true">Só custo \(1\)/);
 });
