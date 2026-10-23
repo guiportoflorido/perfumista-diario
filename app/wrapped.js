@@ -11,11 +11,11 @@ const semMovimento = () => matchMedia("(prefers-reduced-motion: reduce)").matche
 const DURACAO = 5000;
 
 /** Stories do mês (6 a 8): cada um {rotulo, numero, frase, arq}; o último traz a grade dos dias. Campo nulo = story pulado. */
-export function storiesDoMes(r, ano, mes) {
+export function storiesDoMes(r, ano, mes, fotoDe = () => "") {
   if (!r?.total) return [];
   const m = MESES[mes - 1], st = [];
   st.push({ rotulo: `Seu ${m} em perfume`, numero: String(r.total), frase: `${r.total === 1 ? "uso" : "usos"} de Dia e Noite · ${r.distintos} de ${r.totalGrade} frascos da grade`, arq: r.arquetipo?.nome });
-  if (r.frascoDoMes) st.push({ rotulo: "Frasco do mês", numero: r.frascoDoMes.nome, frase: `${r.frascoDoMes.n} uso${r.frascoDoMes.n === 1 ? "" : "s"}${r.frascoDoMes.nota != null ? ` · NotaDia ${nf(r.frascoDoMes.nota)}` : ""}`, arq: r.frascoDoMes.arquetipo, grande: true });
+  if (r.frascoDoMes) st.push({ rotulo: "Frasco do mês", numero: r.frascoDoMes.nome, foto: fotoDe(r.frascoDoMes.nome, 120), frase: `${r.frascoDoMes.n} uso${r.frascoDoMes.n === 1 ? "" : "s"}${r.frascoDoMes.nota != null ? ` · NotaDia ${nf(r.frascoDoMes.nota)}` : ""}`, arq: r.frascoDoMes.arquetipo, grande: true });
   if (r.arquetipo) st.push({ rotulo: "Arquétipo dominante", numero: `${Math.round(r.arquetipo.pct * 100)}%`, frase: `dos usos foram ${r.arquetipo.nome}`, arq: r.arquetipo.nome, icone: true });
   if (r.maisQuente && r.maisFrio && r.maisQuente.data !== r.maisFrio.data)
     st.push({ rotulo: "Extremos", numero: `${nf(r.maisQuente.T, 0)}° · ${nf(r.maisFrio.T, 0)}°`, frase: `${dataBR(r.maisQuente.data)} com ${r.maisQuente.perfume} · ${dataBR(r.maisFrio.data)} com ${r.maisFrio.perfume}`, arq: r.arquetipo?.nome });
@@ -35,6 +35,7 @@ function storyHTML(s) {
   return `<div class="wr-story" style="--cor:${fundo(s.arq)}">
     <p class="wr-rot">${esc(s.rotulo)}</p>
     ${s.icone ? `<span class="wr-ic">${arqIcone(s.arq, 96)}</span>` : ""}
+    ${s.foto ? `<span class="wr-foto">${s.foto}</span>` : ""}
     <p class="wr-num ${s.grande || s.final ? "wr-txt" : ""}">${esc(s.numero)}</p>
     <p class="wr-frase">${esc(s.frase)}</p>
     ${s.dias ? `<div class="wr-grade">${Array.from({ length: 35 }, (_, i) => { const a = s.dias[i]; return i >= s.dias.length ? `<span></span>` : a ? `<span class="d">${arqIcone(a, 22)}</span>` : `<span class="d vazio"></span>`; }).join("")}</div>` : ""}

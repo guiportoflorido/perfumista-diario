@@ -77,8 +77,9 @@ export function sortear(top, aleatorio = Math.random) {
   return cands[cands.length - 1];
 }
 
-/** Abre a roleta num overlay. onUsar(t) é chamado se ele tocar em "Usei este". */
-export function abrirRoleta(raiz, slotNome, top, onUsar) {
+/** Abre a roleta num overlay. onUsar(t) é chamado se ele tocar em "Usei este". iconeDe(t, tam) = foto do perfume ou
+ *  ícone do arquétipo. */
+export function abrirRoleta(raiz, slotNome, top, onUsar, iconeDe = (t, tam) => arqIcone(t.arquetipo, tam)) {
   const cands = top.slice(0, 3);
   if (!cands.length) return;
   const escolhido = sortear(cands);
@@ -92,7 +93,7 @@ export function abrirRoleta(raiz, slotNome, top, onUsar) {
     <div class="roleta" role="dialog" aria-modal="true" aria-label="Roleta do slot ${esc(slotNome)}">
       <p class="roleta-tit">🎰 Roleta do slot ${esc(slotNome)}</p>
       <div class="rolo"><div class="rolo-janela"></div><div class="fita" style="transform:translateY(${H}px)">
-        ${fita.map(t => `<div class="item" style="height:${H}px">${arqIcone(t.arquetipo, 26)}<span>${esc(t.nome)}</span></div>`).join("")}
+        ${fita.map(t => `<div class="item" style="height:${H}px">${iconeDe(t, 26)}<span>${esc(t.nome)}</span></div>`).join("")}
       </div></div>
       <div class="roleta-res" hidden></div>
     </div></div>`;
@@ -106,7 +107,7 @@ export function abrirRoleta(raiz, slotNome, top, onUsar) {
     raiz.querySelector(".rolo")?.classList.add("parou");
     res.hidden = false;
     res.innerHTML = `<div class="roleta-card" style="--cor:${corArq(escolhido.arquetipo)}">
-        <span class="ic">${arqIcone(escolhido.arquetipo, 34)}</span>
+        <span class="ic">${iconeDe(escolhido, 34)}</span>
         <span><b>${esc(escolhido.nome)}</b>${tierHTML(escolhido.tier)}<br><span class="nota">${esc(escolhido.casa)} · ${escolhido.sprays} spray${escolhido.sprays > 1 ? "s" : ""} · #${top.indexOf(escolhido) + 1} do modelo</span></span>
       </div>
       <div class="linha-flex" style="justify-content:center">
@@ -115,7 +116,7 @@ export function abrirRoleta(raiz, slotNome, top, onUsar) {
         <button class="btn sec" data-fechar>Fechar</button>
       </div>`;
     res.querySelector('[data-roleta="usar"]').onclick = () => { raiz.innerHTML = ""; onUsar(escolhido); };
-    res.querySelector('[data-roleta="girar"]').onclick = () => abrirRoleta(raiz, slotNome, top, onUsar);
+    res.querySelector('[data-roleta="girar"]').onclick = () => abrirRoleta(raiz, slotNome, top, onUsar, iconeDe);
     try { navigator.vibrate?.(30); } catch { /* sem vibração */ }
   };
   if (voltas) fitaEl.addEventListener("transitionend", mostrar, { once: true }); else mostrar();

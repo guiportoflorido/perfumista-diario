@@ -43,6 +43,12 @@ export function fotoMini(p, cls = "foto-mini") {
   return src ? `<img class="${cls}" ${src} alt="" decoding="async" referrerpolicy="no-referrer" aria-hidden="true" title="${esc(p.nome || "")}">` : "";
 }
 
+/** Foto redonda do tamanho de um ícone (para ficar no lugar do ícone do arquétipo); "" se o perfume não tem foto. */
+export function fotoIcone(p, tam = 24, cls = "") {
+  const src = fonte(p);
+  return src ? `<img class="foto-ic ${cls}" ${src} alt="" width="${tam}" height="${tam}" style="width:${tam}px;height:${tam}px" decoding="async" referrerpolicy="no-referrer" aria-hidden="true">` : "";
+}
+
 /** Lê a imagem escolhida, reduz para JPEG e devolve o base64 (sem o prefixo data:), dentro do limite da planilha. */
 export async function reduzirImagem(arquivo) {
   if (!arquivo || !/^image\//.test(arquivo.type || "image/")) throw new Error("escolha uma imagem");
