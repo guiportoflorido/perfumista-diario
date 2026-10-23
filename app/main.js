@@ -22,7 +22,7 @@ import { lerDuelos, duelosUnificados, pareamento, elo, fmtElo, filaDuelos, adici
   gerarCenario, textoCenario, periodoDaHora, CHUVAS, MAE_DA_SUB, brilhaCai, rotuloValor, previsao, ehZebra, META_DIA } from "./duelo.js";
 import { fotoFicha, iconeFicha, fotoMini, fotoIcone, reduzirImagem, subirFoto, removerFotoPlanilha, iniciarFotos } from "./fotos.js";
 
-export const APP_VERSAO = "5.42";  // sobe a cada publicação: confere no topo da tela se o celular pegou a versão nova
+export const APP_VERSAO = "5.43";  // sobe a cada publicação: confere no topo da tela se o celular pegou a versão nova
 const S = { dueloModo: ler("dueloModo", "agora"), rkFiltro: ler("rkFiltro", {}), cenario: null, motionOk: !movimentoPedePermissao() && "DeviceMotionEvent" in globalThis, aba: "hoje", frascos: [], frascosAtivos: [], avisosTiers: null, medidos: [], fichas: {}, versao: {}, prev: null, prevOffline: false,
   prevErro: null, metar: null, metarMotivo: null, clima: null, resultado: null, erroMotor: null, entrada: "", carregandoClima: true,
   sync: { estado: "ocioso", msg: "" }, hr: ler("hr", { preset: "tudo" }), tokenNovo: null, playbook: null, janelas: new Map(),
@@ -1026,7 +1026,7 @@ function abrirFicha(nome) {
       <dt>Eixo · doçura · peso</dt><dd>${esc(fi.eixo)} · ${esc(fi.doc)} · ${esc(fi.peso)}</dd>
       <dt>Td</dt><dd>${{ C: "sobe no ar carregado", S: "sobe no ar seco", N: "indiferente" }[f.td]}</dd>
       <dt>Sprays-base</dt><dd>${esc(fi.sprays_base)}</dd>
-      <dt>Janelas</dt><dd>${esc(fi.janelas)}${f.janelas_estimadas ? `<span class="selo aviso">estimado</span>` : ""}${janelasHTML(nome)}</dd>
+      <dt>Janelas</dt><dd>${esc(fi.janelas)}${janelasHTML(nome)}</dd>
       ${(() => { const nt = notaPorFrascoFaixa(historico(), S.frascosAtivos.length ? S.frascosAtivos : S.frascos).get(nome);
         return nt ? `<dt>NotaDia</dt><dd>média ${nf(nt.media)} em ${nt.n} uso${nt.n > 1 ? "s" : ""}</dd>` : ""; })()}
       <dt>Performance</dt><dd>${f.perf_origem === "medido" ? `Longevidade: ${virg(f.longev)} h medida em ${f.longev_n} noites (estimativa era ${virg(f.longev_estimada_original)} h)<br>` : `~${f.longev} h · `}projeção ${f.proj}/5 · curva ${{ S: "saída manda", L: "linear", F: "fundo manda" }[f.curva]}${f.perf_origem === "medido" ? `<span class="selo">medido</span>` : f.perf_estimada ? `<span class="selo aviso">estimado por regra</span>` : `<span class="selo">da leitura da ficha</span>`}${(() => {

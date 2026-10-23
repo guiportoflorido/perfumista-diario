@@ -13,7 +13,8 @@ test("Coleção lista grade, camada custo e fora da grade; filtro Camada separa"
   assert.deepEqual([camadaDe(frascos[0]), camadaDe(frascos[1]), camadaDe(frascos[2])], ["grade", "custo", "fora"]);
   const h = telaColecao(ctx({}));
   assert.deepEqual(nomes(h), ["Grade S", "Custo A", "Bedouin"]);   // ordem padrão por tier S, A, D
-  assert.match(h, /title="Camada custo[^"]*">custo<\/span>/); assert.match(h, />fora<\/span>/);
+  assert.doesNotMatch(h, />custo<\/span>|>est\.<\/span>/);   // sem selos “custo” e “est.” na lista (pedido dele, 23/out)
+  assert.match(h, />fora<\/span>/);
   assert.match(h, /3 de 3 frascos \(grade 1 · custo 1 · fora da grade 1\)/);
   assert.deepEqual(nomes(telaColecao(ctx({ camada: "custo" }))), ["Custo A"]);
   assert.deepEqual(nomes(telaColecao(ctx({ camada: "grade" }))), ["Grade S"]);
