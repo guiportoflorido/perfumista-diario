@@ -39,5 +39,5 @@ S/A fora neste slot: Amyris Homme Extrait (S: 10.5h vivas fora de casa sem aptid
 | 10 | **Omnia Omnibus Ubique** | Memo Paris | S | 4 (frio +1) | fim | 99 | térmico 0.87 · Td ↑ · N.For 3 |
 S/A fora neste slot: 1872 for Men (S: 4h abaixo do envelope (Ameno é o piso)) · Bois Impérial (S: 4h abaixo do envelope (Fresco é o piso)) · Crab Apple Blossom (S: 4h abaixo do envelope (Ameno é o piso)) · Désobéissant (S: 4h abaixo do envelope (Fresco é o piso)) · Gentle Fluidity Silver (S: 4h abaixo do envelope (Frio é o piso)) · Gris Charnel (S: 4h vivas fora de casa sem aptidão (N.For)) · Hacivat (S: 4h abaixo do envelope (Fresco é o piso)) · Imagination (S: 4h abaixo do envelope (Fresco é o piso))
 
-_Modelo v1.7 (dois slots · base frascos_v8, grade 71) · pesos declarados no CFG · longevidade/projeção/curva são estimativas (17 com lastro na ficha, 64 por regra) · calibrar com o diário._
+_Modelo v1.8 (dois slots · base frascos_v9, grade 71 + camada custo 11) · pesos declarados no CFG · longevidade/projeção/curva são estimativas (18 com lastro na ficha, 64 por regra) · calibrar com o diário._
 📓 Depois me diga o que usou de manhã e à noite pra eu registrar as duas linhas.

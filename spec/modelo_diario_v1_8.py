@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 """
-modelo_diario_v1_7.py — Top 10 do dia em DOIS SLOTS (v1.7, 23/out/2026 — base frascos_v8)
+modelo_diario_v1_8.py — Top 10 do dia em DOIS SLOTS (v1.8, 23/out/2026 — base frascos_v9)
+
+v1.8 vs v1.7: só a base — frascos_v9 (camada custo 11: entra Enigma of Taif). Pesos, filtros e ranking idênticos.
 
 v1.7 vs v1.6: (1) base frascos_v8 (grade 71: entram Blue Sapphire Supercharged e Bedouin Rose C; Empire na camada
 custo); (2) linhas do diário com slot E (Esporte — camada custo, corrida/academia) são lidas: "(esporte)" ou "(e)"
@@ -13,8 +15,8 @@ Rotina (19/set/2026): 2x/dia, sempre — manhã 7h00–7h30 e noite após o banh
 precisa durar até a noite (25/set/2026): a "presença" estimada serve só aos filtros de clima/ocasião e ao resíduo.
 
 Uso:
-    python3 modelo_diario_v1_7.py entrada.txt      # ou: cat entrada.txt | python3 modelo_diario_v1_7.py -
-    python3 modelo_diario_v1_7.py --exemplo        # roda o dia de exemplo embutido
+    python3 modelo_diario_v1_8.py entrada.txt      # ou: cat entrada.txt | python3 modelo_diario_v1_8.py -
+    python3 modelo_diario_v1_8.py --exemplo        # roda o dia de exemplo embutido
 
 Entrada (texto, uma chave por linha; ordem livre; só T e Td são obrigatórias):
     Data: 2026-09-21                      (default: hoje)
@@ -48,7 +50,7 @@ coluna Td da ficha; nunca estimar Td externo; tier D fora; tier C só em célula
 do playbook continuam valendo quando ele consultar o playbook — aqui sprays vêm da ficha + regra de faixa.
 """
 import sys, re, math, datetime as dt
-from frascos_v8 import carregar, FAIXAS, FAIXA_LIM, OCASIOES
+from frascos_v9 import carregar, FAIXAS, FAIXA_LIM, OCASIOES
 
 CFG = {
     "passo_h": 0.5,            # resolução temporal
@@ -546,7 +548,7 @@ def rodar(txt):
             out.append("S/A fora neste slot: " + " · ".join(f"{r['f']['nome']} ({r['f']['tier']}: {r['fora']})" for r in sorted(fora, key=lambda r: ({'S': 0, 'A': 1}[r['f']['tier']], r['f']['nome']))[:8]))
 
     out.append("")
-    out.append(f"_Modelo v1.7 (dois slots · base frascos_v8, grade 71) · pesos declarados no CFG · longevidade/projeção/curva são estimativas ({sum(1 for f in frascos if f['perf_origem']=='leitura')} com lastro na ficha, {sum(1 for f in frascos if f['perf_origem']=='regra')} por regra) · calibrar com o diário._")
+    out.append(f"_Modelo v1.8 (dois slots · base frascos_v9, grade 71 + camada custo 11) · pesos declarados no CFG · longevidade/projeção/curva são estimativas ({sum(1 for f in frascos if f['perf_origem']=='leitura')} com lastro na ficha, {sum(1 for f in frascos if f['perf_origem']=='regra')} por regra) · calibrar com o diário._")
     out.append("📓 Depois me diga o que usou de manhã e à noite pra eu registrar as duas linhas.")
     return "\n".join(out)
 

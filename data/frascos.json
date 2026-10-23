@@ -1,9 +1,9 @@
 {
  "versao": {
-  "frascos": "frascos_v8.py",
-  "fichas": "fichas_tecnicas_v10.md",
+  "frascos": "frascos_v9.py",
+  "fichas": "fichas_tecnicas_v11.md",
   "playbook": "playbook_v60.md",
-  "modelo": "modelo_diario_v1_7.py",
+  "modelo": "modelo_diario_v1_8.py",
   "mercado": "avaliacao_perfumes_v52_2026-10-23.html"
  },
  "frascos": [
@@ -2713,6 +2713,39 @@
    "curva": "S",
    "perf_estimada": true,
    "perf_origem": "regra",
+   "janelas_estimadas": false
+  },
+  {
+   "nome": "Enigma of Taif",
+   "casa": "Swiss Arabian",
+   "camada": "custo",
+   "tier": "A",
+   "arquetipo": "Rosal",
+   "eixo": "S",
+   "doc": 2,
+   "peso": 4,
+   "td": "S",
+   "env_hot": 3,
+   "env_cold": 5,
+   "env_lo": 6,
+   "env_hi": 22,
+   "ideal": 12.0,
+   "conc": "Extrait",
+   "edt": false,
+   "apt": {
+    "N.Inf": 2,
+    "N.For": 3,
+    "Cozy N": 2
+   },
+   "sprays_base": 2,
+   "janelas": null,
+   "chuva": 0.5,
+   "sem_piramide": false,
+   "longev": 10,
+   "proj": 4,
+   "curva": "F",
+   "perf_estimada": false,
+   "perf_origem": "leitura",
    "janelas_estimadas": false
   }
  ]

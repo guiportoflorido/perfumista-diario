@@ -38,5 +38,5 @@ S/A fora neste slot: Amyris Homme Extrait (S: 10.5h vivas fora de casa sem aptid
 | 10 | **Blue Sapphire Supercharged** | Boadicea | S | 3 | fim | 93 | térmico 0.88 · N.Inf 3 |
 S/A fora neste slot: Blonde Amber (S: 2.5h na rua acima do envelope (Fresco é o teto)) · Grand Soir (S: 2.5h na rua acima do envelope (Fresco é o teto)) · Météore (S: 6h vivas fora de casa sem aptidão (N.Inf)) · Ombre Nomade (S: 2.5h na rua acima do envelope (Fresco é o teto)) · Oud Satin Mood (S: 2.5h na rua acima do envelope (Fresco é o teto)) · Outlands (S: 2.5h na rua acima do envelope (Fresco é o teto)) · Radical Rose (S: 2.5h na rua acima do envelope (Fresco é o teto)) · Reflection Man (S: 6h vivas fora de casa sem aptidão (N.Inf))
 
-_Modelo v1.7 (dois slots · base frascos_v8, grade 71) · pesos declarados no CFG · longevidade/projeção/curva são estimativas (17 com lastro na ficha, 64 por regra) · calibrar com o diário._
+_Modelo v1.8 (dois slots · base frascos_v9, grade 71 + camada custo 11) · pesos declarados no CFG · longevidade/projeção/curva são estimativas (18 com lastro na ficha, 64 por regra) · calibrar com o diário._
 📓 Depois me diga o que usou de manhã e à noite pra eu registrar as duas linhas.

@@ -249,7 +249,8 @@
     "Belgravia": 92.83206668278692,
     "Inception": 90.44402184835508,
     "Dubai Musk": 76.69487281876918,
-    "Empire": 81.43887652122976
+    "Empire": 81.43887652122976,
+    "Enigma of Taif": null
    },
    "fora": {
     "Amyris Homme Extrait": "10.5h vivas fora de casa sem aptidão (Lazer)",
@@ -288,7 +289,8 @@
     "Ya'e": "9h vivas fora de casa sem aptidão (Lazer)",
     "Musamam Black": "5.5h na rua acima do envelope (Fresco é o teto)",
     "Aquatica": "5.5h abaixo do envelope (Quente é o piso)",
-    "Incense 01": "5.5h na rua acima do envelope (Fresco é o teto)"
+    "Incense 01": "5.5h na rua acima do envelope (Fresco é o teto)",
+    "Enigma of Taif": "5.5h na rua acima do envelope (Fresco é o teto)"
    },
    "fora_sa": [
     {
@@ -521,7 +523,8 @@
     "Belgravia": 48.26680699474355,
     "Inception": 55.30883032496856,
     "Dubai Musk": 46.413005761835784,
-    "Empire": null
+    "Empire": null,
+    "Enigma of Taif": 64.60543036938196
    },
    "fora": {
     "1872 for Men": "2.5h abaixo do envelope (Ameno é o piso)",

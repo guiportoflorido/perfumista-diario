@@ -2,7 +2,7 @@
 """
 extrair.py — gera data/frascos.json, data/fichas.json e data/playbook.json a partir dos arquivos de spec/.
 
-Nada é digitado à mão: frascos vêm de frascos_v8.carregar(); fichas e playbook são lidos das tabelas/células
+Nada é digitado à mão: frascos vêm de frascos_v9.carregar(); fichas e playbook são lidos das tabelas/células
 dos .md. O script falha (assert) se alguma contagem não bater com o que o projeto declara.
 
 Uso:  python3 tools/extrair.py            (lê spec/, escreve data/)
@@ -14,7 +14,7 @@ SPEC = os.path.join(RAIZ, "spec")
 DATA = os.path.join(RAIZ, "data")
 sys.path.insert(0, SPEC)
 
-import frascos_v8 as FV  # noqa: E402
+import frascos_v9 as FV  # noqa: E402
 
 # Janelas declaradas por ele vs decididas pelo Claude a pedido dele (00_LEIA_PRIMEIRO §4, 23/out/2026)
 JANELAS_ESTIMADAS = {"Favonius", "Omnia Omnibus Ubique", "Scarlet Sands", "Blue Sapphire Supercharged"}
@@ -48,7 +48,8 @@ def extrair_frascos():
             "janelas_estimadas": f["nome"] in JANELAS_ESTIMADAS,
         })
     grade = [f for f in out if f["camada"] == "grade" and f["tier"] != "D"]
-    assert len(out) == 81 and len(grade) == 71, (len(out), len(grade))
+    assert len(out) == 82 and len(grade) == 71, (len(out), len(grade))
+    assert sum(1 for f in out if f["camada"] == "custo") == 11
     assert sum(f["janelas"] or 0 for f in out) == 668
     return out
 
@@ -73,7 +74,7 @@ def extrair_fichas(frascos):
         fichas[d["nome"]] = d
     nomes = {f["nome"] for f in frascos}
     assert set(fichas) == nomes, (set(fichas) ^ nomes)
-    # conferência cruzada com frascos_v8 (tier, arquétipo, Td, peso, doçura, sprays, janelas)
+    # conferência cruzada com frascos_v9 (tier, arquétipo, Td, peso, doçura, sprays, janelas)
     for f in frascos:
         x = fichas[f["nome"]]
         assert x["tier"] == f["tier"] and x["arquetipo"] == f["arquetipo"] and x["td"] == f["td"], f["nome"]
@@ -206,7 +207,7 @@ def main():
     frascos = extrair_frascos()
     fichas = extrair_fichas(frascos)
     playbook = extrair_playbook(frascos)
-    versao = {"frascos": "frascos_v8.py", "fichas": fichas["fonte"], "playbook": playbook["fonte"],
+    versao = {"frascos": "frascos_v9.py", "fichas": fichas["fonte"], "playbook": playbook["fonte"],
               "modelo": os.path.basename(achar("modelo_diario_v"))}
     arquetipos = extrair_arquetipos(frascos)
     mercado = extrair_mercado()

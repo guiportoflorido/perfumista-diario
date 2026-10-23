@@ -39,5 +39,5 @@ S/A fora neste slot: Blonde Amber (S: 11.5h vivas fora de casa sem aptidão (T.I
 | 10 | **Radical Rose** | Matière Première | S | 3 | fim | 90 | térmico 0.90 · Td ↑ · N.Inf 3 · sobre resíduo denso de Grand Soir ↓ |
 S/A fora neste slot: 1872 for Men (S: 3.5h abaixo do envelope (Ameno é o piso)) · Crab Apple Blossom (S: 3.5h abaixo do envelope (Ameno é o piso)) · Grand Soir (S: já usado hoje de manhã (o slot Noite é o segundo perfume do dia)) · Météore (S: 3.5h abaixo do envelope (Ameno é o piso)) · Reflection Man (S: 3.5h vivas fora de casa sem aptidão (N.Inf)) · Tygar Extrait (S: 3.5h abaixo do envelope (Ameno é o piso)) · Anelo (A: 3.5h abaixo do envelope (Ameno é o piso)) · Beach Hut Man (A: 3.5h vivas fora de casa sem aptidão (N.Inf))
 
-_Modelo v1.7 (dois slots · base frascos_v8, grade 71) · pesos declarados no CFG · longevidade/projeção/curva são estimativas (17 com lastro na ficha, 64 por regra) · calibrar com o diário._
+_Modelo v1.8 (dois slots · base frascos_v9, grade 71 + camada custo 11) · pesos declarados no CFG · longevidade/projeção/curva são estimativas (18 com lastro na ficha, 64 por regra) · calibrar com o diário._
 📓 Depois me diga o que usou de manhã e à noite pra eu registrar as duas linhas.

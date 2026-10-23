@@ -254,7 +254,8 @@
     "Belgravia": 74.03806162294042,
     "Inception": 100.1026540859968,
     "Dubai Musk": 87.87237967682991,
-    "Empire": 53.64305297372169
+    "Empire": 53.64305297372169,
+    "Enigma of Taif": null
    },
    "fora": {
     "Al Qurashi Blend": "9h vivas fora de casa sem aptidão (T.Inf)",
@@ -286,7 +287,8 @@
     "Supremacy CE": "9h vivas fora de casa sem aptidão (T.Inf)",
     "Musamam Black": "11.5h vivas fora de casa sem aptidão (T.Inf)",
     "Aquatica": "5.5h abaixo do envelope (Quente é o piso)",
-    "Incense 01": "12.5h vivas fora de casa sem aptidão (T.Inf)"
+    "Incense 01": "12.5h vivas fora de casa sem aptidão (T.Inf)",
+    "Enigma of Taif": "11.5h vivas fora de casa sem aptidão (T.Inf)"
    },
    "fora_sa": [
     {
@@ -519,7 +521,8 @@
     "Belgravia": 48.78930953137326,
     "Inception": 55.32863059531533,
     "Dubai Musk": 46.15208468916988,
-    "Empire": 43.321972451506284
+    "Empire": 43.321972451506284,
+    "Enigma of Taif": 65.68903914037745
    },
    "fora": {
     "Bedouin Rose": "3.5h na rua acima do envelope (Frio é o teto)",

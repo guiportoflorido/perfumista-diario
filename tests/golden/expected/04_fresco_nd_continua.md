@@ -40,5 +40,5 @@ S/A fora neste slot: Amyris Homme Extrait (S: 10.5h vivas fora de casa sem aptid
 | 10 | **Outlands** | Amouage | S | 2 (Fresco: 2, sem exceção) | fim | 94 | térmico 0.88 · N.For 3 |
 S/A fora neste slot: 1872 for Men (S: 3.5h abaixo do envelope (Ameno é o piso)) · Bois Impérial (S: 3.5h vivas fora de casa sem aptidão (N.For)) · Crab Apple Blossom (S: 3.5h abaixo do envelope (Ameno é o piso)) · Désobéissant (S: 3.5h vivas fora de casa sem aptidão (N.For)) · Gentle Fluidity Silver (S: 3.5h vivas fora de casa sem aptidão (N.For)) · Gris Charnel (S: 3.5h vivas fora de casa sem aptidão (N.For)) · Météore (S: 3.5h abaixo do envelope (Ameno é o piso)) · Odéon (S: 3.5h vivas fora de casa sem aptidão (N.For))
 
-_Modelo v1.7 (dois slots · base frascos_v8, grade 71) · pesos declarados no CFG · longevidade/projeção/curva são estimativas (17 com lastro na ficha, 64 por regra) · calibrar com o diário._
+_Modelo v1.8 (dois slots · base frascos_v9, grade 71 + camada custo 11) · pesos declarados no CFG · longevidade/projeção/curva são estimativas (18 com lastro na ficha, 64 por regra) · calibrar com o diário._
 📓 Depois me diga o que usou de manhã e à noite pra eu registrar as duas linhas.

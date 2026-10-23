@@ -253,7 +253,8 @@
     "Belgravia": 85.25468137935366,
     "Inception": 83.15514175573946,
     "Dubai Musk": 70.81965947143114,
-    "Empire": 80.57396727707196
+    "Empire": 80.57396727707196,
+    "Enigma of Taif": null
    },
    "fora": {
     "Amyris Homme Extrait": "10.5h vivas fora de casa sem aptidão (Lazer)",
@@ -292,7 +293,8 @@
     "Ya'e": "9h vivas fora de casa sem aptidão (Lazer)",
     "Musamam Black": "9h na rua acima do envelope (Fresco é o teto)",
     "Aquatica": "5.5h abaixo do envelope (Quente é o piso)",
-    "Incense 01": "10h na rua acima do envelope (Fresco é o teto)"
+    "Incense 01": "10h na rua acima do envelope (Fresco é o teto)",
+    "Enigma of Taif": "9h na rua acima do envelope (Fresco é o teto)"
    },
    "fora_sa": [
     {
@@ -525,7 +527,8 @@
     "Belgravia": 58.83129662247177,
     "Inception": 97.06916687589766,
     "Dubai Musk": null,
-    "Empire": null
+    "Empire": null,
+    "Enigma of Taif": null
    },
    "fora": {
     "Apotecário": "2.5h na rua acima do envelope (Fresco é o teto)",
@@ -562,7 +565,8 @@
     "Island Dreams": "6.5h vivas fora de casa sem aptidão (N.Inf)",
     "Sky": "6h vivas fora de casa sem aptidão (N.Inf)",
     "Dubai Musk": "6.5h vivas fora de casa sem aptidão (N.Inf)",
-    "Empire": "6h vivas fora de casa sem aptidão (N.Inf)"
+    "Empire": "6h vivas fora de casa sem aptidão (N.Inf)",
+    "Enigma of Taif": "2.5h na rua acima do envelope (Fresco é o teto)"
    },
    "fora_sa": [
     {

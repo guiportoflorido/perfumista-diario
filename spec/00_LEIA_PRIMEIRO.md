@@ -1,4 +1,4 @@
-# 00 — LEIA PRIMEIRO · fonte de verdade do projeto (23/out/2026 · cadeia v60)
+# 00 — LEIA PRIMEIRO · fonte de verdade do projeto (23/out/2026 · cadeia v61)
 
 > Vale para toda conversa deste projeto, inclusive quando a skill @perfumista for acionada. Este arquivo só traz **regras vigentes** — o histórico de cada decisão está nos próprios arquivos (seção *Histórico*) e não deve ser usado como regra.
 
@@ -17,22 +17,22 @@
 |---|---|
 | `00_LEIA_PRIMEIRO.md` | Este arquivo |
 | `playbook_v60.md` | Grade por faixa × ocasião: 71 frascos, 668 alocações, Seguro / jogada / Também / sprays; custo por uso em dois slots |
-| `fichas_tecnicas_v10.md` | Ficha de cada frasco: pirâmide, arquétipo, eixo, doçura, peso, Td, envelope, aptidão, sprays, janelas |
+| `fichas_tecnicas_v11.md` | Ficha de cada frasco: pirâmide, arquétipo, eixo, doçura, peso, Td, envelope, aptidão, sprays, janelas |
 | `tabelao_v2_9.md` / `.xlsx` | Espelho da aba Tiers (362 linhas, posse + tier); xlsx com aba *Histórico* |
-| `frascos_v8.py` + `modelo_diario_v1_7.py` | Modelo "Top 10 do dia" em dois slots (`python3 modelo_diario_v1_7.py --exemplo`) |
+| `frascos_v9.py` + `modelo_diario_v1_8.py` | Modelo "Top 10 do dia" em dois slots (`python3 modelo_diario_v1_8.py --exemplo`); 82 frascos (grade 71 + camada custo 11) |
 | `observatorio_colecao_v4_8.html` | Roda de arquétipos × tier, simulador por célula do playbook v60 |
 | `mapa_climatico_colecao_v6.html` | Temperatura × Td × chuva, 71 frascos |
 | `avaliacao_perfumes_v52_2026-10-23.html` | Base de avaliação (1.207 perfumes, pirâmides, veredictos históricos) |
-| `gerador_v60.py` | Script que gera toda a cadeia v60 a partir da v59 + snapshot da aba Tiers, com verificações |
+| `gerador_v61.py` | Script da cadeia v61 (a partir da v60 + tabelão v2.9): entra Enigma of Taif na camada custo; grade e playbook v60 intactos |
 
-**Não existem mais e não devem ser citados:** qualquer versão anterior dos arquivos acima (playbook v59, fichas v9, tabelão v2.7 e v2.8, frascos_v7, modelo v1.6, observatório v4.6/v4.7, mapa v5, avaliação v51, gerador_v59), arquétipos v1.x, gaps v3.x, custo_por_uso_2slots, ranking_faixa, `claude/diario_uso.md`. O arquétipo de cada frasco está nas fichas; os gaps estão na seção 6; o custo por uso está no playbook.
+**Não existem mais e não devem ser citados:** qualquer versão anterior dos arquivos acima (playbook v59, fichas v9, tabelão v2.7 e v2.8, frascos_v7, modelo v1.6, observatório v4.6/v4.7, mapa v5, avaliação v51, gerador_v59, fichas v10, frascos_v8, modelo v1.7, gerador_v60), arquétipos v1.x, gaps v3.x, custo_por_uso_2slots, ranking_faixa, `claude/diario_uso.md`. O arquétipo de cada frasco está nas fichas; os gaps estão na seção 6; o custo por uso está no playbook.
 
 ## 3. Coleção
 
 | Item | Valor |
 |---|---|
 | Grade | **71 frascos** — S 32 · A 26 · B 10 · C 3 (Oud Kyphi, Bleu de Chanel, Bedouin Rose) |
-| Camada custo | 11 frascos (Enigma of Taif, A, entrou em 23/out/2026; fora do motor até a próxima geração) — **usada só em academia e corrida; ignorada em qualquer análise ou framework** (regra dele, 25/set/2026). Aparece no modelo diário só com `Extra: corrida` ou `Extra: academia`. No diário, slot **E** |
+| Camada custo | 11 frascos (Enigma of Taif, A, entrou em 23/out/2026 — ficha v11 e frascos_v9; campos derivados são estimativa do Claude) — **usada só em academia e corrida; ignorada em qualquer análise ou framework** (regra dele, 25/set/2026). Aparece no modelo diário só com `Extra: corrida` ou `Extra: academia`. No diário, slot **E** |
 | Total próprio | 82 frascos (= Frasco Gui na aba Tiers) |
 | Frascos de 10 ml experimentais | Oud Kyphi, Bedouin Rose, K-Musk — não tratar como frasco cheio em custo por uso ou desbaste |
 
@@ -82,4 +82,3 @@ Vive na aba **Diário** do Google Sheets (primeiro registro: 19/set/2026). Colun
 | 2 | Divisão do arquétipo Mediterrâneo em Mediterrâneo + Solar (Imagination, Lucius, Tygar Extrait), pedida em 05/out/2026: não propagada a fichas, mapa e observatório | Guilherme decide se segue |
 | 3 | Sem tier, ainda a dar: Amouage Enclave, Vinegia 21, Demon Dancer, Raw Gold, Spirit of Kings Honor, Vetiveria (todas Amostra) | Guilherme |
 | 4 | Confirmar nomes: Spirit of Kings "Honoro" (na marca só existe Honor) e Raw Gold EDP ou Extrait | Guilherme |
-| 5 | Enigma of Taif (camada custo) entra em fichas e `frascos_v*` só na próxima rodada do gerador | Claude, na próxima regeração |

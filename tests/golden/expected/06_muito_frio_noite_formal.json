@@ -254,7 +254,8 @@
     "Belgravia": null,
     "Inception": null,
     "Dubai Musk": null,
-    "Empire": null
+    "Empire": null,
+    "Enigma of Taif": null
    },
    "fora": {
     "Al Qurashi Blend": "9h vivas fora de casa sem aptidão (T.For)",
@@ -307,7 +308,8 @@
     "Belgravia": "6.5h vivas fora de casa sem aptidão (T.For)",
     "Inception": "10h vivas fora de casa sem aptidão (T.For)",
     "Dubai Musk": "7.5h vivas fora de casa sem aptidão (T.For)",
-    "Empire": "6.5h vivas fora de casa sem aptidão (T.For)"
+    "Empire": "6.5h vivas fora de casa sem aptidão (T.For)",
+    "Enigma of Taif": "11.5h vivas fora de casa sem aptidão (T.For)"
    },
    "fora_sa": [
     {
@@ -540,7 +542,8 @@
     "Belgravia": null,
     "Inception": null,
     "Dubai Musk": null,
-    "Empire": null
+    "Empire": null,
+    "Enigma of Taif": 88.0
    },
    "fora": {
     "1872 for Men": "4h abaixo do envelope (Ameno é o piso)",

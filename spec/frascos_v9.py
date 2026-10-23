@@ -1,20 +1,21 @@
 # -*- coding: utf-8 -*-
 """
-frascos_v8.py — base de dados dos 81 frascos para o modelo diário (v8, 23/out/2026 — gerado por gerador_v60.py)
+frascos_v9.py — base de dados dos 82 frascos para o modelo diário (v9, 23/out/2026 — gerado por gerador_v61.py)
 
-v8: entram Blue Sapphire Supercharged (grade, S) e Empire (camada custo, A); Bedouin Rose D→C entra na grade
-(só células-lar); Favonius, Omnia Omnibus Ubique e Scarlet Sands com envelope/aptidão revistos pelo Claude a pedido
-dele (23/out/2026 — estimativa, não uso declarado). Tiers conferidos com a aba Tiers do Google Sheets "Diário de Uso —
-Perfumes" em 23/out/2026. Janelas = playbook v60 (668). A camada custo (10) fica aqui só para o modelo sugerir
-quando a entrada traz "Extra: corrida" ou "Extra: academia" — fora de qualquer análise da coleção (regra dele, 25/set/2026).
+v9: entra Swiss Arabian Enigma of Taif na camada custo (11º; Frasco Gui, tier A — fala dele, 23/out/2026). Grade (71),
+janelas (playbook v60, 668) e todos os demais frascos idênticos à v8. Tiers conferidos com o tabelão v2.9 (espelho da
+aba Tiers do Google Sheets "Diário de Uso — Perfumes"). A camada custo (11) fica aqui só para o modelo sugerir quando
+a entrada traz "Extra: corrida" ou "Extra: academia" — fora de qualquer análise da coleção (regra dele, 25/set/2026).
+
+v8: entram Blue Sapphire Supercharged (grade, S) e Empire (camada custo, A); Bedouin Rose D→C entra na grade.
 
 Fontes, por campo:
   MAPA  (n, casa, arq, tier, td, peso, doc, env_hot, env_cold, custo, chuva, sem_piramide)
         = array DATA do mapa climático (v4, 25/set/2026), derivado das fichas técnicas.
         chuva = índice hipótese do Claude (nota a nota sobre a pirâmide), não dado medido.
   FICHA (conc, eixo, aptidão, sprays_base, janelas)
-        = transcritos das fichas_tecnicas_v10.md (grade 71 + camada custo 10).
-        Validação embutida: 81 frascos · Td grade C21/S26/N24 · janelas = 668.
+        = transcritos das fichas_tecnicas_v11.md (grade 71 + camada custo 11).
+        Validação embutida: 82 frascos · camada custo 11 · Td grade C21/S26/N24 · janelas = 668.
   NOVO  (longevidade_h, projecao, curva)
         = ESTIMATIVA derivada por regra (concentração × peso × doçura) + overrides onde a
         Leitura da ficha traz dado (beast, projeção íntima, relatos de horas). Nada aqui é
@@ -111,6 +112,7 @@ MAPA = [
  {"n":"Inception","casa":"Mykonos","arq":"Mediterrâneo","t":"S","td":"C","p":3,"d":0,"a":0,"b":3,"c":1,"r":0.14,"u":0},
  {"n":"Dubai Musk","casa":"Al Ambra","arq":"Minimalista","t":"A","td":"N","p":2,"d":1,"a":0,"b":3,"c":1,"r":0.0,"u":0},
  {"n":"Empire","casa":"Mykonos","arq":"Marinho","t":"A","td":"C","p":2,"d":1,"a":0,"b":2,"c":1,"r":-0.5,"u":0},
+ {"n":"Enigma of Taif","casa":"Swiss Arabian","arq":"Rosal","t":"A","td":"S","p":4,"d":2,"a":3,"b":5,"c":1,"r":0.5,"u":0},   # v9: camada custo (23/out/2026) — campos derivados pelo Claude, estimativa
 ]
 
 # FICHA: nome -> (concentração, eixo, aptidão "Ocasião n · ...", sprays_base, janelas)
@@ -198,6 +200,7 @@ FICHA = {
  "Inception": ("Extrait", "P", "Lazer 2 · T.Inf 3 · N.Inf 3", 3, None),
  "Dubai Musk": ("Extrait", "F", "Lazer 2 · T.Inf 3 · Cozy D 2", 3, None),
  "Empire": ("n/d", "F", "Lazer 3 · T.Inf 1", 4, None),
+ "Enigma of Taif": ("Extrait", "S", "N.Inf 2 · N.For 3 · Cozy N 2", 2, None),   # v9: camada custo, tier A dado por ele
 }
 
 # NOVO — overrides de performance com lastro na Leitura da ficha (ou no relato dele).
@@ -221,6 +224,7 @@ OVERRIDE_PERF = {
  "Oud Satin Mood": (12, 4, "F"),    # extrait; 2 sprays
  "Brompton": (12, 4, "F"),          # extrait; "começar em 2 sprays"
  "Blue Sapphire Supercharged": (10, 4, "F"),  # Fragrantica: relatos de 12h+ — estimativa
+ "Enigma of Taif": (10, 4, "F"),   # ScentVerdict 6–10h, projeção forte; Ulta: projeção forte — estimativa
 }
 
 OCASIOES = ["Lazer", "T.Inf", "T.For", "N.Inf", "N.For", "Cozy D", "Cozy N"]
@@ -286,18 +290,20 @@ def carregar():
             "edt": "edt" in conc.lower(),
         })
     # validações
-    assert len(frascos) == 81, len(frascos)
+    assert len(frascos) == 82, len(frascos)
     grade = [f for f in frascos if not f["custo"]]
     assert len(grade) == 71
+    custo = [f for f in frascos if f["custo"]]
+    assert len(custo) == 11, len(custo)
     td_cnt = {k: sum(1 for f in grade if f["td"] == k) for k in "CSN"}
     assert td_cnt == {"C": 21, "S": 26, "N": 24}, td_cnt
     assert sum(f["janelas"] or 0 for f in grade) == 668, sum(f["janelas"] or 0 for f in grade)
     tiers = {k: sum(1 for f in frascos if f["tier"] == k) for k in "SABCD"}
-    assert tiers == {"S": 34, "A": 31, "B": 13, "C": 3, "D": 0}, tiers
+    assert tiers == {"S": 34, "A": 32, "B": 13, "C": 3, "D": 0}, tiers
     return frascos
 
 
 if __name__ == "__main__":
     fr = carregar()
-    print("OK — 81 frascos · Td grade C21/S26/N24 · janelas 668 · tiers", {k: sum(1 for f in fr if f['tier']==k) for k in 'SABCD'})
+    print("OK — 82 frascos (grade 71 + camada custo 11) · Td grade C21/S26/N24 · janelas 668 · tiers", {k: sum(1 for f in fr if f['tier']==k) for k in 'SABCD'})
     print("perf por leitura:", sum(1 for f in fr if f["perf_origem"] == "leitura"), "· por regra:", sum(1 for f in fr if f["perf_origem"] == "regra"))

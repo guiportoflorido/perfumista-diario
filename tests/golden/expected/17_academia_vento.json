@@ -248,7 +248,8 @@
     "Belgravia": 75.2237723149714,
     "Inception": 72.06919898097291,
     "Dubai Musk": 66.93522758511465,
-    "Empire": null
+    "Empire": null,
+    "Enigma of Taif": null
    },
    "fora": {
     "1872 for Men": "5h abaixo do envelope (Ameno é o piso)",
@@ -299,7 +300,8 @@
     "Incense 01": "12.5h vivas fora de casa sem aptidão (Lazer)",
     "Island Dreams": "5h abaixo do envelope (Ameno é o piso)",
     "Sky": "5h abaixo do envelope (Ameno é o piso)",
-    "Empire": "5h abaixo do envelope (Ameno é o piso)"
+    "Empire": "5h abaixo do envelope (Ameno é o piso)",
+    "Enigma of Taif": "11.5h vivas fora de casa sem aptidão (Lazer)"
    },
    "fora_sa": [
     {
@@ -564,7 +566,8 @@
     "Belgravia": 36.35309384117696,
     "Inception": 41.74274143106459,
     "Dubai Musk": 40.76384626928967,
-    "Empire": null
+    "Empire": null,
+    "Enigma of Taif": 74.64183215798049
    },
    "fora": {
     "1872 for Men": "3.5h abaixo do envelope (Ameno é o piso)",
@@ -641,6 +644,16 @@
      "porque": "térmico 0.89 · Td ↑ · Cozy N 3"
     },
     {
+     "nome": "Enigma of Taif",
+     "tier": "A",
+     "score": 74.64183215798049,
+     "sprays": 1,
+     "nota": "em casa −1",
+     "vivo_ate": 31.0,
+     "vivo_fim": true,
+     "porque": "térmico 0.89 · Td ↑ · Cozy N 2"
+    },
+    {
      "nome": "Incense 01",
      "tier": "B",
      "score": 69.48918467112085,
@@ -649,16 +662,6 @@
      "vivo_ate": 32.0,
      "vivo_fim": true,
      "porque": "térmico 0.89 · Td ↑ · Cozy N 3"
-    },
-    {
-     "nome": "Supremacy CE",
-     "tier": "S",
-     "score": 51.146025390109926,
-     "sprays": 2,
-     "nota": "em casa −1",
-     "vivo_ate": 28.5,
-     "vivo_fim": true,
-     "porque": "térmico 0.93"
     }
    ]
   }
