@@ -391,7 +391,7 @@ const ROT_VAL = { seco: "seco", neutro: "normal", carregado: "abafado", sem: "se
 const rotChip = (k, v) => (k === "ocasiao" ? ROT_OC[v] || v : ROT_VAL[v] || v);
 
 /** Coleção › Ranking: chips por dimensão (um valor por dimensão; sem chip = Geral), lista da grade e especialistas. */
-export function telaRanking({ duelos, frascos, filtro = {}, hoje = "", arqIcone = () => "" }) {
+export function telaRanking({ duelos, frascos, filtro = {}, hoje = "", icone = () => "" }) {
   const ativo = Object.keys(filtro).filter(k => filtro[k]);
   const subs = filtro.ocasiao ? SUBS[filtro.ocasiao] : Object.keys(MAE_DA_SUB);
   const chips = k => `<div class="rk-dim"><span class="rot">${ROT_DIM[k]}</span><div class="chips rolagem">${(k === "sub" ? subs : VALORES[k]).map(v =>
@@ -407,7 +407,7 @@ export function telaRanking({ duelos, frascos, filtro = {}, hoje = "", arqIcone 
   const seta = x => { const mv = mov.get(x.nome); return mv?.sobe ? `<span class="rk-mov ${mv.sobe > 0 ? "sobe" : "cai"}" title="na semana">${mv.sobe > 0 ? "▲" : "▼"}${Math.abs(mv.sobe)}</span>` : mv && mv.antes == null ? `<span class="rk-mov novo" title="novo na semana">novo</span>` : ""; };
   const comDuelo = lista.filter(x => x.n_recorte > 0 || !ativo.length && x.rating !== 1500);
   const podio = duelos.length && comDuelo.length >= 3 ? `<div class="podio">${[1, 0, 2].map(i => { const x = comDuelo[i];
-    return `<button class="podio-lugar p${i + 1}" data-ficha="${esc(x.nome)}"><span class="medalha">${["🥇", "🥈", "🥉"][i]}</span>${arqIcone(x.f.arquetipo, 30)}<b>${esc(x.nome)}</b><span class="nota">${fmtElo(x.rating)}</span><span class="degrau">${i + 1}</span></button>`; }).join("")}</div>` : "";
+    return `<button class="podio-lugar p${i + 1}" data-ficha="${esc(x.nome)}"><span class="medalha">${["🥇", "🥈", "🥉"][i]}</span>${icone(x.f, 44)}<b>${esc(x.nome)}</b><span class="nota">${fmtElo(x.rating)}</span><span class="degrau">${i + 1}</span></button>`; }).join("")}</div>` : "";
   const tts = !ativo.length ? titulos(duelos, frascos) : [];
   const itemEsp = (x, verbo) => `<li><button class="nome-inline" data-ficha="${esc(x.nome)}">${esc(x.nome)}</button> ${tierHTML(x.f.tier)} · ${verbo} ${esc(recorte)} <b>${x.delta_vs_geral > 0 ? "+" : "−"}${Math.round(Math.abs(x.delta_vs_geral))}</b></li>`;
   return `<h2>Ranking</h2>
@@ -415,10 +415,10 @@ export function telaRanking({ duelos, frascos, filtro = {}, hoje = "", arqIcone 
   <details class="bloco rk-filtros" ${ativo.length ? "open" : ""}><summary>${ativo.length ? `Recorte: ${esc(recorte)}` : "Filtrar por condição"}</summary>
     <p class="nota">${ativo.length ? `<button class="btn sec peq" data-acao="rk-limpar">Voltar ao Geral</button>` : "Toque num valor para ver o ranking naquela condição; toque de novo para limpar."}</p>
     ${["temp", "td", "chuva", "periodo", "ocasiao", "sub"].map(chips).join("")}</details>
-  ${tts.length ? `<div class="bloco"><h3>Títulos</h3><div class="titulos">${tts.slice(0, 8).map(t => `<button class="titulo" data-ficha="${esc(t.nome)}"><span>${esc(t.titulo)}</span><b>${esc(t.nome)}</b><span class="nota">+${Math.round(t.efeito)} · ${t.n} duelos</span></button>`).join("")}</div></div>` : ""}
+  ${tts.length ? `<div class="bloco"><h3>Títulos</h3><div class="titulos">${tts.slice(0, 8).map(t => `<button class="titulo" data-ficha="${esc(t.nome)}"><span>${esc(t.titulo)}</span><b>${icone(frascos.find(f => f.nome === t.nome), 22)}${esc(t.nome)}</b><span class="nota">+${Math.round(t.efeito)} · ${t.n} duelos</span></button>`).join("")}</div></div>` : ""}
   ${sobe.length || cai.length ? `<div class="bloco"><h3>Especialistas</h3><ul class="elo-lista">${sobe.map(x => itemEsp(x, "Sobe")).join("")}${cai.map(x => itemEsp(x, "Cai")).join("")}</ul></div>` : ""}
   <div class="bloco"><ol class="rk-lista">${lista.map((x, i) => `<li><span class="rk-pos">${i + 1}</span>
-      <button class="nome-inline" data-ficha="${esc(x.nome)}">${esc(x.nome)}</button>${tierHTML(x.f.tier)}<span class="esp"></span>
+      <button class="nome-inline" data-ficha="${esc(x.nome)}">${icone(x.f, 22)}${esc(x.nome)}</button>${tierHTML(x.f.tier)}<span class="esp"></span>
       ${ativo.length ? desde(x) : seta(x)}<b class="rk-r">${fmtElo(x.rating)}</b><span class="nota rk-n">${x.n_recorte}</span></li>`).join("")}</ol>
     <p class="nota">${duelos.length} duelo${duelos.length === 1 ? "" : "s"}, ${duelos.length ? Math.round(100 * reais / duelos.length) : 0}% reais (modo Agora). Rating 1 500 = neutro; n = duelos do frasco ${ativo.length ? "no recorte (o menor entre os valores escolhidos)" : "no total"}; ↑↓ vs Geral só com n ≥ 3.</p></div>`;
 }

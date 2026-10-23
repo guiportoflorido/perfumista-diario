@@ -1,10 +1,10 @@
 {
  "versao": {
-  "frascos": "frascos_v7.py",
-  "fichas": "fichas_tecnicas_v9.md",
-  "playbook": "playbook_v59.md",
-  "modelo": "modelo_diario_v1_6.py",
-  "mercado": "avaliacao_perfumes_v51_2026-10-05.html"
+  "frascos": "frascos_v8.py",
+  "fichas": "fichas_tecnicas_v10.md",
+  "playbook": "playbook_v60.md",
+  "modelo": "modelo_diario_v1_7.py",
+  "mercado": "avaliacao_perfumes_v52_2026-10-23.html"
  },
  "frascos": [
   {
@@ -390,20 +390,18 @@
    "doc": 2,
    "peso": 4,
    "td": "S",
-   "env_hot": 3,
+   "env_hot": 4,
    "env_cold": 5,
    "env_lo": 6,
-   "env_hi": 22,
-   "ideal": 12.0,
+   "env_hi": 17,
+   "ideal": 9.5,
    "conc": "n/d",
    "edt": false,
    "apt": {
-    "N.Inf": 2,
-    "N.For": 2,
-    "Cozy N": 2
+    "Cozy N": 3
    },
    "sprays_base": 3,
-   "janelas": 3,
+   "janelas": 2,
    "chuva": 0.88,
    "sem_piramide": false,
    "longev": 10,
@@ -547,6 +545,40 @@
    "perf_estimada": true,
    "perf_origem": "regra",
    "janelas_estimadas": false
+  },
+  {
+   "nome": "Blue Sapphire Supercharged",
+   "casa": "Boadicea",
+   "camada": "grade",
+   "tier": "S",
+   "arquetipo": "Rosal",
+   "eixo": "S",
+   "doc": 1,
+   "peso": 4,
+   "td": "S",
+   "env_hot": 2,
+   "env_cold": 5,
+   "env_lo": 6,
+   "env_hi": 27,
+   "ideal": 14.5,
+   "conc": "Parfum",
+   "edt": false,
+   "apt": {
+    "Lazer": 1,
+    "N.Inf": 3,
+    "N.For": 3,
+    "Cozy N": 1
+   },
+   "sprays_base": 3,
+   "janelas": 12,
+   "chuva": 0.55,
+   "sem_piramide": false,
+   "longev": 10,
+   "proj": 4,
+   "curva": "F",
+   "perf_estimada": false,
+   "perf_origem": "leitura",
+   "janelas_estimadas": true
   },
   {
    "nome": "Blue Talisman",
@@ -936,9 +968,9 @@
    "conc": "Extrait",
    "edt": false,
    "apt": {
-    "T.For": 2,
     "N.Inf": 3,
-    "N.For": 3
+    "N.For": 3,
+    "Cozy N": 2
    },
    "sprays_base": 3,
    "janelas": 12,
@@ -1644,9 +1676,9 @@
    "conc": "EDP",
    "edt": false,
    "apt": {
-    "N.Inf": 3,
-    "N.For": 2,
-    "Cozy N": 2
+    "N.Inf": 2,
+    "N.For": 3,
+    "Cozy N": 3
    },
    "sprays_base": 3,
    "janelas": 12,
@@ -1971,10 +2003,10 @@
    "peso": 3,
    "td": "N",
    "env_hot": 1,
-   "env_cold": 3,
-   "env_lo": 17,
+   "env_cold": 4,
+   "env_lo": 12,
    "env_hi": 32,
-   "ideal": 24.5,
+   "ideal": 22.0,
    "conc": "EDP",
    "edt": false,
    "apt": {
@@ -1983,7 +2015,7 @@
     "N.For": 2
    },
    "sprays_base": 3,
-   "janelas": 9,
+   "janelas": 12,
    "chuva": -0.3,
    "sem_piramide": false,
    "longev": 8,
@@ -2645,6 +2677,38 @@
    "chuva": 0.0,
    "sem_piramide": false,
    "longev": 7,
+   "proj": 2,
+   "curva": "S",
+   "perf_estimada": true,
+   "perf_origem": "regra",
+   "janelas_estimadas": false
+  },
+  {
+   "nome": "Empire",
+   "casa": "Mykonos",
+   "camada": "custo",
+   "tier": "A",
+   "arquetipo": "Marinho",
+   "eixo": "F",
+   "doc": 1,
+   "peso": 2,
+   "td": "C",
+   "env_hot": 0,
+   "env_cold": 2,
+   "env_lo": 22,
+   "env_hi": 38,
+   "ideal": 32.0,
+   "conc": "n/d",
+   "edt": false,
+   "apt": {
+    "Lazer": 3,
+    "T.Inf": 1
+   },
+   "sprays_base": 4,
+   "janelas": null,
+   "chuva": -0.5,
+   "sem_piramide": false,
+   "longev": 6,
    "proj": 2,
    "curva": "S",
    "perf_estimada": true,

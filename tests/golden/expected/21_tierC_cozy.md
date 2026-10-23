@@ -31,13 +31,13 @@ S/A fora neste slot: 1872 for Men (S: 5.5h abaixo do envelope (Ameno é o piso))
 | 2 | **Bijou Zafran** | Ormonde Jayne | S | 2 (em casa −1) | fim | 100 | térmico 1.00 · Td ↑ · chuva ↓ · Cozy N 3 |
 | 3 | **Blonde Amber** | Clive Christian | S | 3 (em casa −1) | fim | 100 | térmico 0.96 · Td ↑ · Cozy N 3 |
 | 4 | **Grand Soir** | MFK | S | 2 (em casa −1) | fim | 100 | térmico 0.91 · Td ↑ · Cozy N 3 |
-| 5 | **Oud Satin Mood** | MFK | S | 1 (em casa −1) | fim | 100 | térmico 0.91 · Td ↑ · Cozy N 3 |
-| 6 | **Amyris Homme Extrait** | MFK | S | 2 (em casa −1) | fim | 99 | térmico 0.99 · Cozy N 3 |
-| 7 | **Odéon** | Memo Paris | S | 2 (em casa −1) | fim | 98 | térmico 0.96 · Cozy N 3 |
-| 8 | **Caden** | Omanluxury | A | 2 (em casa −1) | fim | 88 | térmico 0.91 · Td ↑ · Cozy N 3 |
-| 9 | **Brompton** | Ex Nihilo | S | 1 (em casa −1) | fim | 85 | térmico 0.99 · Td ↑ · Cozy N 2 |
-| 10 | **Les Sables Roses** | Louis Vuitton | S | 2 (em casa −1) | fim | 85 | térmico 0.99 · Td ↑ · Cozy N 2 |
+| 5 | **Omnia Omnibus Ubique** | Memo Paris | S | 2 (em casa −1) | fim | 100 | térmico 0.99 · Td ↑ · Cozy N 3 |
+| 6 | **Oud Satin Mood** | MFK | S | 1 (em casa −1) | fim | 100 | térmico 0.91 · Td ↑ · Cozy N 3 |
+| 7 | **Amyris Homme Extrait** | MFK | S | 2 (em casa −1) | fim | 99 | térmico 0.99 · Cozy N 3 |
+| 8 | **Odéon** | Memo Paris | S | 2 (em casa −1) | fim | 98 | térmico 0.96 · Cozy N 3 |
+| 9 | **Caden** | Omanluxury | A | 2 (em casa −1) | fim | 88 | térmico 0.91 · Td ↑ · Cozy N 3 |
+| 10 | **Brompton** | Ex Nihilo | S | 1 (em casa −1) | fim | 85 | térmico 0.99 · Td ↑ · Cozy N 2 |
 S/A fora neste slot: 1872 for Men (S: 3.5h abaixo do envelope (Ameno é o piso)) · Bois Impérial (S: 2h abaixo do envelope (Fresco é o piso)) · Crab Apple Blossom (S: 3.5h abaixo do envelope (Ameno é o piso)) · Désobéissant (S: 2h abaixo do envelope (Fresco é o piso)) · Hacivat (S: 2h abaixo do envelope (Fresco é o piso)) · Imagination (S: 2h abaixo do envelope (Fresco é o piso)) · Lucius (S: 2h abaixo do envelope (Fresco é o piso)) · Météore (S: 3.5h abaixo do envelope (Ameno é o piso))
 
-_Modelo v1.6 (dois slots · base frascos_v7, grade 69) · pesos declarados no CFG · longevidade/projeção/curva são estimativas (16 com lastro na ficha, 63 por regra) · calibrar com o diário._
+_Modelo v1.7 (dois slots · base frascos_v8, grade 71) · pesos declarados no CFG · longevidade/projeção/curva são estimativas (17 com lastro na ficha, 64 por regra) · calibrar com o diário._
 📓 Depois me diga o que usou de manhã e à noite pra eu registrar as duas linhas.

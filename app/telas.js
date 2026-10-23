@@ -88,10 +88,10 @@ export function telaColecao({ frascos, hist, hoje, janelas, filtro, fichas, arqT
 }
 
 // ───────────────────────── Playbook ─────────────────────────
-export function telaPlaybook({ playbook, faixaSel, ajSpray, arqDe, arqIcone }) {
+export function telaPlaybook({ playbook, faixaSel, ajSpray, arqDe, arqIcone, iconeNome = null }) {
   if (!playbook) return `<h2>Playbook</h2><p class="nota">Carregando…</p>`;
   const fi = Number(faixaSel ?? 2), faixa = playbook.faixas[fi], g = playbook.grade[faixa];
-  const nomeBtn = n => `<button class="nome-inline" data-ficha="${esc(n)}">${arqIcone(arqDe.get(n), 14)}${esc(n)}</button>`;
+  const nomeBtn = n => `<button class="nome-inline" data-ficha="${esc(n)}">${iconeNome ? iconeNome(n, 16) : arqIcone(arqDe.get(n), 14)}${esc(n)}</button>`;
   return `<h2>Playbook</h2>
   <p class="nota">${esc(playbook.fonte)} · ${playbook.total_alocacoes} alocações · ${playbook.celulas} células (Cozy só de Ameno para baixo). Sprays da célula são os do playbook.</p>
   <div class="chips rolagem" role="tablist">${playbook.faixas.map((x, i) => `<button class="chip" data-pbfaixa="${i}" aria-pressed="${i === fi}">${pinta(i)} ${esc(x)}</button>`).join("")}</div>

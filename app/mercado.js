@@ -1,4 +1,4 @@
-// mercado.js — aba Mercado: base da avaliação v51 (1.205 perfumes, inclusive os da coleção) guardada na aba
+// mercado.js — aba Mercado: base da avaliação v52 (1.207 perfumes, inclusive os da coleção) guardada na aba
 // "Mercado" da planilha, com edição. Tier e posse da aba Tiers sempre vencem na exibição (fonte única de tier).
 import { esc, tierHTML, ordsDe, compararMulti, cmpValor, cabOrd, painelOrd, OPC_AMOSTRA, passaAmostra, temFiltro } from "./util.js";
 import { arqTag, arqIcone } from "./icones.js";
@@ -51,7 +51,7 @@ export async function criarNaPlanilha(linhas) {
 }
 const hojeISO = () => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`; };
 
-/** Mexe na cópia local da aba Mercado (sem baixar 1.205 linhas de novo). */
+/** Mexe na cópia local da aba Mercado (sem baixar 1.207 linhas de novo). */
 function mexerCache(fn) {
   const c = cachePlanilha();
   if (!c?.existe) return;

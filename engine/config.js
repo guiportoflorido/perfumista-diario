@@ -1,4 +1,4 @@
-// config.js — bloco CFG idêntico ao de spec/modelo_diario_v1_6.py. Não alterar sem pedido explícito:
+// config.js — bloco CFG idêntico ao de spec/modelo_diario_v1_7.py (igual ao da v1.6). Não alterar sem pedido explícito:
 // a paridade com o Python (tests/paridade.test.js) quebra se qualquer número aqui mudar.
 
 export const CFG = Object.freeze({

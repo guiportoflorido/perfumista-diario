@@ -24,7 +24,7 @@
 | 10 | **Search** | Amouage | A | 4 | ~15h45 | 85 | térmico 0.96 · T.Inf 3/N.Inf 2 |
 🔁 = ainda vivo na hora do banho: entra como resíduo sob o perfume da noite (informe em 'Manhã:' para o slot Noite considerar)
 ★ Testar Grand Soir: reprovado nos filtros deste slot — 11h vivas fora de casa sem aptidão (T.Inf)
-S/A fora neste slot: Blonde Amber (S: 11h vivas fora de casa sem aptidão (T.Inf)) · Brompton (S: 11h vivas fora de casa sem aptidão (T.Inf)) · Favonius (S: 11h vivas fora de casa sem aptidão (T.Inf)) · Grand Soir (S: 11h vivas fora de casa sem aptidão (T.Inf)) · Les Sables Roses (S: 10.5h vivas fora de casa sem aptidão (T.Inf)) · Liwa (S: 11h vivas fora de casa sem aptidão (T.Inf)) · Odéon (S: 9.5h vivas fora de casa sem aptidão (T.Inf)) · Ombre Nomade (S: 11h vivas fora de casa sem aptidão (T.Inf))
+S/A fora neste slot: Blonde Amber (S: 11h vivas fora de casa sem aptidão (T.Inf)) · Blue Sapphire Supercharged (S: 11h vivas fora de casa sem aptidão (T.Inf)) · Brompton (S: 11h vivas fora de casa sem aptidão (T.Inf)) · Favonius (S: 11h vivas fora de casa sem aptidão (T.Inf)) · Grand Soir (S: 11h vivas fora de casa sem aptidão (T.Inf)) · Les Sables Roses (S: 10.5h vivas fora de casa sem aptidão (T.Inf)) · Liwa (S: 11h vivas fora de casa sem aptidão (T.Inf)) · Odéon (S: 9.5h vivas fora de casa sem aptidão (T.Inf))
 
 ## Slot Noite (19h30→23h) — Top 10 da grade
 🧴 Onde aplicar: pós-banho: pele limpa e ainda morna absorve mais — pescoço/peito, sem esfregar; esperar a pele secar antes de vestir · noite em casa: o perfume é para você e para quem está perto — projeção pesa menos que o drydown
@@ -34,14 +34,14 @@ S/A fora neste slot: Blonde Amber (S: 11h vivas fora de casa sem aptidão (T.Inf
 | 2 | **Amyris Homme Extrait** | MFK | S | 2 (em casa −1) | fim | 85 | térmico 0.74 · Cozy N 3 |
 | 3 | **African Leather** | Memo Paris | S | 2 (em casa −1) | fim | 80 | térmico 0.77 · Td ↓ · Cozy N 3 |
 | 4 | **Bijou Zafran** | Ormonde Jayne | S | 2 (em casa −1) | fim | 80 | térmico 0.77 · Td ↓ · chuva ↓ · Cozy N 3 |
-| 5 | **New York** | Widian | A | 2 (em casa −1) | fim | 71 | térmico 0.93 · Cozy N 2 |
-| 6 | **Gris Charnel** | BDK | S | 3 (em casa −1) | fim | 69 | térmico 0.72 · chuva ↓ · Cozy N 2 |
-| 7 | **Les Sables Roses** | Louis Vuitton | S | 2 (em casa −1) | fim | 65 | térmico 0.77 · Td ↓ · Cozy N 2 |
-| 8 | **Black Saffron Absolu** | Byredo | A | 2 (em casa −1) | fim | 64 | térmico 0.79 · Cozy N 2 |
-| 9 | **Omnia Omnibus Ubique** | Memo Paris | S | 2 (em casa −1) | fim | 63 | térmico 0.74 · Td ↓ · Cozy N 2 |
-| 10 | **Brompton** | Ex Nihilo | S | 1 (em casa −1) | fim | 63 | térmico 0.72 · Td ↓ · Cozy N 2 |
+| 5 | **Omnia Omnibus Ubique** | Memo Paris | S | 2 (em casa −1) | fim | 78 | térmico 0.74 · Td ↓ · Cozy N 3 |
+| 6 | **New York** | Widian | A | 2 (em casa −1) | fim | 71 | térmico 0.93 · Cozy N 2 |
+| 7 | **Gris Charnel** | BDK | S | 3 (em casa −1) | fim | 69 | térmico 0.72 · chuva ↓ · Cozy N 2 |
+| 8 | **Les Sables Roses** | Louis Vuitton | S | 2 (em casa −1) | fim | 65 | térmico 0.77 · Td ↓ · Cozy N 2 |
+| 9 | **Favonius** | Nishane | S | 2 (em casa −1) | fim | 65 | térmico 0.77 · Td ↓ · Cozy N 2 |
+| 10 | **Black Saffron Absolu** | Byredo | A | 2 (em casa −1) | fim | 64 | térmico 0.79 · Cozy N 2 |
 ★ Testar Grand Soir: reprovado nos filtros deste slot — 3.5h na rua acima do envelope (Fresco é o teto)
 S/A fora neste slot: Blonde Amber (S: 3.5h na rua acima do envelope (Fresco é o teto)) · Grand Soir (S: 3.5h na rua acima do envelope (Fresco é o teto)) · Ombre Nomade (S: 3.5h na rua acima do envelope (Fresco é o teto)) · Oud Satin Mood (S: 3.5h na rua acima do envelope (Fresco é o teto)) · Outlands (S: 3.5h na rua acima do envelope (Fresco é o teto)) · Radical Rose (S: 3.5h na rua acima do envelope (Fresco é o teto)) · Caden (A: 3.5h na rua acima do envelope (Fresco é o teto)) · Imperial (A: 3.5h na rua acima do envelope (Fresco é o teto))
 
-_Modelo v1.6 (dois slots · base frascos_v7, grade 69) · pesos declarados no CFG · longevidade/projeção/curva são estimativas (16 com lastro na ficha, 63 por regra) · calibrar com o diário._
+_Modelo v1.7 (dois slots · base frascos_v8, grade 71) · pesos declarados no CFG · longevidade/projeção/curva são estimativas (17 com lastro na ficha, 64 por regra) · calibrar com o diário._
 📓 Depois me diga o que usou de manhã e à noite pra eu registrar as duas linhas.

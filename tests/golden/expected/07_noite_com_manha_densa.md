@@ -21,23 +21,23 @@
 | 9 | **Search** | Amouage | A | 4 | ~15h45 | 84 | térmico 0.94 · T.Inf 3 |
 | 10 | **Wood Whisper** | OJAR | A | 3 | ~16h45 | 84 | térmico 0.92 · T.Inf 3 |
 🔁 = ainda vivo na hora do banho: entra como resíduo sob o perfume da noite (informe em 'Manhã:' para o slot Noite considerar)
-S/A fora neste slot: Blonde Amber (S: 11.5h vivas fora de casa sem aptidão (T.Inf)) · Brompton (S: 12.5h vivas fora de casa sem aptidão (T.Inf)) · Favonius (S: 12.5h vivas fora de casa sem aptidão (T.Inf)) · Grand Soir (S: 12.5h vivas fora de casa sem aptidão (T.Inf)) · Les Sables Roses (S: 10.5h vivas fora de casa sem aptidão (T.Inf)) · Liwa (S: 11.5h vivas fora de casa sem aptidão (T.Inf)) · Odéon (S: 9.5h vivas fora de casa sem aptidão (T.Inf)) · Ombre Nomade (S: 12.5h vivas fora de casa sem aptidão (T.Inf))
+S/A fora neste slot: Blonde Amber (S: 11.5h vivas fora de casa sem aptidão (T.Inf)) · Blue Sapphire Supercharged (S: 11.5h vivas fora de casa sem aptidão (T.Inf)) · Brompton (S: 12.5h vivas fora de casa sem aptidão (T.Inf)) · Favonius (S: 12.5h vivas fora de casa sem aptidão (T.Inf)) · Grand Soir (S: 12.5h vivas fora de casa sem aptidão (T.Inf)) · Les Sables Roses (S: 10.5h vivas fora de casa sem aptidão (T.Inf)) · Liwa (S: 11.5h vivas fora de casa sem aptidão (T.Inf)) · Odéon (S: 9.5h vivas fora de casa sem aptidão (T.Inf))
 
 ## Slot Noite (19h30→23h) — Top 10 da grade
 🧴 Onde aplicar: pós-banho: pele limpa e ainda morna absorve mais — pescoço/peito, sem esfregar; esperar a pele secar antes de vestir
 | # | Perfume | Casa | Tier | Sprays | Vivo até | Score | Por quê |
 |---|---|---|---|---|---|---|---|
 | 1 | **Bijou Zafran** | Ormonde Jayne | S | 3 | fim | 100 | térmico 0.98 · Td ↑ · chuva ↓ · N.Inf 3 |
-| 2 | **Omnia Omnibus Ubique** | Memo Paris | S | 3 | fim | 100 | térmico 0.99 · Td ↑ · N.Inf 3 |
-| 3 | **Aventus Absolu** | Creed | S | 3 | fim | 100 | térmico 1.00 · N.Inf 3 |
-| 4 | **Scarlet Sands** | Ex Nihilo | S | 3 | fim | 96 | térmico 0.92 · N.Inf 3 |
-| 5 | **Hacivat** | Nishane | S | 3 | fim | 93 | térmico 0.88 · N.Inf 3 |
-| 6 | **Lucius** | Fragrance du Bois | S | 3 | fim | 93 | térmico 0.88 · N.Inf 3 |
+| 2 | **Aventus Absolu** | Creed | S | 3 | fim | 100 | térmico 1.00 · N.Inf 3 |
+| 3 | **Scarlet Sands** | Ex Nihilo | S | 3 | fim | 99 | térmico 0.97 · N.Inf 3 |
+| 4 | **Hacivat** | Nishane | S | 3 | fim | 93 | térmico 0.88 · N.Inf 3 |
+| 5 | **Lucius** | Fragrance du Bois | S | 3 | fim | 93 | térmico 0.88 · N.Inf 3 |
+| 6 | **Blue Sapphire Supercharged** | Boadicea | S | 3 | fim | 90 | térmico 0.95 · Td ↑ · N.Inf 3 · sobre resíduo denso de Grand Soir ↓ |
 | 7 | **Brompton** | Ex Nihilo | S | 2 | fim | 90 | térmico 0.95 · Td ↑ · N.Inf 3 · sobre resíduo denso de Grand Soir ↓ |
 | 8 | **Favonius** | Nishane | S | 3 | fim | 90 | térmico 0.95 · Td ↑ · N.Inf 3 · sobre resíduo denso de Grand Soir ↓ |
 | 9 | **Les Sables Roses** | Louis Vuitton | S | 3 | fim | 90 | térmico 0.95 · Td ↑ · N.Inf 3 · sobre resíduo denso de Grand Soir ↓ |
 | 10 | **Radical Rose** | Matière Première | S | 3 | fim | 90 | térmico 0.90 · Td ↑ · N.Inf 3 · sobre resíduo denso de Grand Soir ↓ |
 S/A fora neste slot: 1872 for Men (S: 3.5h abaixo do envelope (Ameno é o piso)) · Crab Apple Blossom (S: 3.5h abaixo do envelope (Ameno é o piso)) · Grand Soir (S: já usado hoje de manhã (o slot Noite é o segundo perfume do dia)) · Météore (S: 3.5h abaixo do envelope (Ameno é o piso)) · Reflection Man (S: 3.5h vivas fora de casa sem aptidão (N.Inf)) · Tygar Extrait (S: 3.5h abaixo do envelope (Ameno é o piso)) · Anelo (A: 3.5h abaixo do envelope (Ameno é o piso)) · Beach Hut Man (A: 3.5h vivas fora de casa sem aptidão (N.Inf))
 
-_Modelo v1.6 (dois slots · base frascos_v7, grade 69) · pesos declarados no CFG · longevidade/projeção/curva são estimativas (16 com lastro na ficha, 63 por regra) · calibrar com o diário._
+_Modelo v1.7 (dois slots · base frascos_v8, grade 71) · pesos declarados no CFG · longevidade/projeção/curva são estimativas (17 com lastro na ficha, 64 por regra) · calibrar com o diário._
 📓 Depois me diga o que usou de manhã e à noite pra eu registrar as duas linhas.

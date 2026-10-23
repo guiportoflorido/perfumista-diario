@@ -22,7 +22,7 @@
 | 9 | **Torino 21** | Xerjoff | A | 3 (MQ máx 3) | ~12h30 | 80 | térmico 0.95 · Td ↓ · Lazer 3 |
 | 10 | **Vibrato** | Sospiro | A | 2 | ~18h15 | 80 | térmico 0.96 · Td ↓ · Lazer 3 |
 🔁 = ainda vivo na hora do banho: entra como resíduo sob o perfume da noite (informe em 'Manhã:' para o slot Noite considerar)
-S/A fora neste slot: African Leather (S: 10.5h na rua acima do envelope (Ameno é o teto)) · Amyris Homme Extrait (S: 9.5h na rua acima do envelope (Ameno é o teto)) · Aventus Absolu (S: 4.5h na rua acima do envelope (Quente é o teto)) · Bijou Zafran (S: 8h na rua acima do envelope (Ameno é o teto)) · Blonde Amber (S: 11.5h na rua acima do envelope (Fresco é o teto)) · Bois Impérial (S: 4.5h na rua acima do envelope (Quente é o teto)) · Brompton (S: 11.5h na rua acima do envelope (Ameno é o teto)) · Decision (S: 8h na rua acima do envelope (Ameno é o teto))
+S/A fora neste slot: African Leather (S: 10.5h na rua acima do envelope (Ameno é o teto)) · Amyris Homme Extrait (S: 9.5h na rua acima do envelope (Ameno é o teto)) · Aventus Absolu (S: 4.5h na rua acima do envelope (Quente é o teto)) · Bijou Zafran (S: 8h na rua acima do envelope (Ameno é o teto)) · Blonde Amber (S: 11.5h na rua acima do envelope (Fresco é o teto)) · Blue Sapphire Supercharged (S: 10.5h na rua acima do envelope (Ameno é o teto)) · Bois Impérial (S: 4.5h na rua acima do envelope (Quente é o teto)) · Brompton (S: 11.5h na rua acima do envelope (Ameno é o teto))
 
 ## Slot Noite (19h30→23h) — Top 10 da grade
 🧴 Onde aplicar: pós-banho: pele limpa e ainda morna absorve mais — pescoço/peito, sem esfregar; esperar a pele secar antes de vestir · noite em casa: o perfume é para você e para quem está perto — projeção pesa menos que o drydown
@@ -33,12 +33,12 @@ S/A fora neste slot: African Leather (S: 10.5h na rua acima do envelope (Ameno �
 | 3 | **Lucius** | Fragrance du Bois | S | 2 (em casa −1) | fim | 54 | térmico 0.99 |
 | 4 | **Tygar Extrait** | Bvlgari (Le Gemme) | S | 1 (em casa −1) | fim | 51 | térmico 0.92 |
 | 5 | **Gentle Fluidity Silver** | MFK | S | 3 (em casa −1) | fim | 50 | térmico 0.91 |
-| 6 | **Scarlet Sands** | Ex Nihilo | S | 2 (em casa −1) | fim | 50 | térmico 0.90 |
-| 7 | **Aventus** | Creed | A | 2 (em casa −1) | fim | 48 | térmico 0.99 |
-| 8 | **Imagination** | Louis Vuitton | S | 2 (em casa −1) | fim | 48 | térmico 0.99 · Td ↓ |
-| 9 | **Aventus Absolu** | Creed | S | 2 (em casa −1) | fim | 47 | térmico 0.86 |
-| 10 | **Search** | Amouage | A | 3 (em casa −1) | fim | 47 | térmico 1.00 |
-S/A fora neste slot: African Leather (S: 2h na rua acima do envelope (Ameno é o teto)) · Amyris Homme Extrait (S: 2h na rua acima do envelope (Ameno é o teto)) · Bijou Zafran (S: 2h na rua acima do envelope (Ameno é o teto)) · Blonde Amber (S: 3.5h na rua acima do envelope (Fresco é o teto)) · Brompton (S: 2h na rua acima do envelope (Ameno é o teto)) · Decision (S: 2h na rua acima do envelope (Ameno é o teto)) · Favonius (S: 2h na rua acima do envelope (Ameno é o teto)) · Grand Soir (S: 3.5h na rua acima do envelope (Fresco é o teto))
+| 6 | **Aventus** | Creed | A | 2 (em casa −1) | fim | 48 | térmico 0.99 |
+| 7 | **Imagination** | Louis Vuitton | S | 2 (em casa −1) | fim | 48 | térmico 0.99 · Td ↓ |
+| 8 | **Aventus Absolu** | Creed | S | 2 (em casa −1) | fim | 47 | térmico 0.86 |
+| 9 | **Search** | Amouage | A | 3 (em casa −1) | fim | 47 | térmico 1.00 |
+| 10 | **Désobéissant** | Givenchy | S | 6 (6–7 fixo) | fim | 47 | térmico 0.99 · Td ↓ |
+S/A fora neste slot: African Leather (S: 2h na rua acima do envelope (Ameno é o teto)) · Amyris Homme Extrait (S: 2h na rua acima do envelope (Ameno é o teto)) · Bijou Zafran (S: 2h na rua acima do envelope (Ameno é o teto)) · Blonde Amber (S: 3.5h na rua acima do envelope (Fresco é o teto)) · Blue Sapphire Supercharged (S: 2h na rua acima do envelope (Ameno é o teto)) · Brompton (S: 2h na rua acima do envelope (Ameno é o teto)) · Decision (S: 2h na rua acima do envelope (Ameno é o teto)) · Favonius (S: 2h na rua acima do envelope (Ameno é o teto))
 
-_Modelo v1.6 (dois slots · base frascos_v7, grade 69) · pesos declarados no CFG · longevidade/projeção/curva são estimativas (16 com lastro na ficha, 63 por regra) · calibrar com o diário._
+_Modelo v1.7 (dois slots · base frascos_v8, grade 71) · pesos declarados no CFG · longevidade/projeção/curva são estimativas (17 com lastro na ficha, 64 por regra) · calibrar com o diário._
 📓 Depois me diga o que usou de manhã e à noite pra eu registrar as duas linhas.

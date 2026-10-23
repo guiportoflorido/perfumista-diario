@@ -10,7 +10,7 @@ import { janelasPorFrasco, ajustarSprays, deAnalise, notaPorFrascoFaixa, sobrevi
 import { telaColecao, telaPlaybook, telaHistorico, idRegistro, periodo } from "./telas.js";
 import { telaRoda } from "./roda.js";
 import { ordsDe, tocarOrd, mudarOrds, slotNome, slotBase, slotIcone, opcoesSlot, slotExpandido } from "./util.js";
-import { definirCores, arqTag, arqIcone, corArq, humorDoSlot } from "./icones.js";
+import { definirCores, arqTag, arqIcone, corArq, humorDoSlot, humorSVG } from "./icones.js";
 import { confete, ceuHTML, abrirRoleta, animarSpray, nomeDoDia, definirMateriais, raspadinhaHTML, ligarRaspadinha, ativarChacoalho, pedirMovimento, movimentoPedePermissao } from "./diversao.js";
 import { chave as mercadoChave, telaMercado, fichaEditavel, camposAlterados, baseComTiers, deLinhas, linhasParaCriar, cachePlanilha, baixarMercado, criarNaPlanilha, editarNaPlanilha, adicionarNaPlanilha, removerNaPlanilha, fotoNoCache } from "./mercado.js";
 import { contagens } from "./estatisticas.js";
@@ -20,9 +20,9 @@ import { ler, gravar } from "./store.js";
 import { storiesDoMes, abrirWrapped, MESES } from "./wrapped.js";
 import { lerDuelos, duelosUnificados, pareamento, elo, fmtElo, filaDuelos, adicionarDuelo, enviarDuelos, telaDuelo, blocoDuelos, telaRanking,
   gerarCenario, textoCenario, periodoDaHora, CHUVAS, MAE_DA_SUB, brilhaCai, rotuloValor, previsao, ehZebra, META_DIA } from "./duelo.js";
-import { fotoFicha, iconeFicha, fotoMini, reduzirImagem, subirFoto, removerFotoPlanilha, iniciarFotos } from "./fotos.js";
+import { fotoFicha, iconeFicha, fotoMini, fotoIcone, reduzirImagem, subirFoto, removerFotoPlanilha, iniciarFotos } from "./fotos.js";
 
-export const APP_VERSAO = "5.40";  // sobe a cada publicação: confere no topo da tela se o celular pegou a versão nova
+export const APP_VERSAO = "5.42";  // sobe a cada publicação: confere no topo da tela se o celular pegou a versão nova
 const S = { dueloModo: ler("dueloModo", "agora"), rkFiltro: ler("rkFiltro", {}), cenario: null, motionOk: !movimentoPedePermissao() && "DeviceMotionEvent" in globalThis, aba: "hoje", frascos: [], frascosAtivos: [], avisosTiers: null, medidos: [], fichas: {}, versao: {}, prev: null, prevOffline: false,
   prevErro: null, metar: null, metarMotivo: null, clima: null, resultado: null, erroMotor: null, entrada: "", carregandoClima: true,
   sync: { estado: "ocioso", msg: "" }, hr: ler("hr", { preset: "tudo" }), tokenNovo: null, playbook: null, janelas: new Map(),
@@ -165,7 +165,8 @@ function doMercado(casa, nome) {
 
 function abrirRoletaSlot(slot) {
   const so = S.resultado.slots.find(x => (x.nome === "Dia" ? "M" : "N") === slot);
-  abrirRoleta($("#folha"), so.nome, so.top, t => abrirRegistro({ perfume: t.nome, slot, sprays: ajustarSprays(t.r.f, t.sprays, ajSpray()), sugerido: t.sprays, ocasiao: ocasiaoDominante(so) }));
+  abrirRoleta($("#folha"), so.nome, so.top, t => abrirRegistro({ perfume: t.nome, slot, sprays: ajustarSprays(t.r.f, t.sprays, ajSpray()), sugerido: t.sprays, ocasiao: ocasiaoDominante(so) }),
+    (t, tam) => iconeFrasco(t.r?.f || t, tam));
 }
 
 // chacoalhar o iPhone em Hoje abre a roleta do slot da hora; fora de Hoje o ouvinte sai (não dispara na Coleção)
@@ -180,6 +181,14 @@ function cuidarChacoalho() {
   });
   else if (!quer && desligarChacoalho) { desligarChacoalho(); desligarChacoalho = null; }
 }
+
+/** Foto do perfume (aba Mercado) no lugar do ícone do arquétipo, sempre que houver; sem foto, o ícone. */
+function iconeFrasco(f, tam = 24) {
+  if (!f) return "";
+  return fotoIcone(doMercado(f.casa, f.nome), tam) || arqIcone(f.arquetipo, tam);
+}
+const frascoDe = nome => S.frascosAtivos.find(f => f.nome === nome) || S.frascos.find(f => f.nome === nome);
+const iconeNome = (nome, tam) => iconeFrasco(frascoDe(nome), tam);
 
 function render() {
   cuidarChacoalho();
@@ -208,7 +217,7 @@ function render() {
   };
   try {
     let html = ({ hoje: telaHoje, registrar: telaRegistrar, ajustes: telaAjustes,
-      colecao: () => telaColecaoTudo(ctx), duelo: telaDueloAba, ranking: () => telaRanking({ duelos: duelosTodos(), frascos: S.frascosAtivos, filtro: S.rkFiltro, hoje: hojeISO(), arqIcone }), mercado: telaMercadoAba, amostras: telaAmostrasAba, playbook: () => telaPlaybook(ctx), historico: () => telaHistorico(ctx) }[S.aba])();
+      colecao: () => telaColecaoTudo(ctx), duelo: telaDueloAba, ranking: () => telaRanking({ duelos: duelosTodos(), frascos: S.frascosAtivos, filtro: S.rkFiltro, hoje: hojeISO(), icone: iconeFrasco }), mercado: telaMercadoAba, amostras: telaAmostrasAba, playbook: () => telaPlaybook({ ...ctx, iconeNome }), historico: () => telaHistorico(ctx) }[S.aba])();
     // telas agrupadas: segmentos (sub-abas) logo abaixo do 1º h2; o h2 continua com o nome da sub-aba
     if (SUBS[grupo]) html = html.replace("</h2>", `</h2>${segmentosGrupo(grupo)}`);
     $("#tela").innerHTML = html;
@@ -414,10 +423,11 @@ function blocoSlot(s, expandido = true) {
   const usado = historico().filter(r => r.data === dia.data && slotBase(r.slot) === slotCod).at(-1);
   const card = (t, i, custo = false) => {
     const ja = usado && usado.perfume === t.nome;
-    const hero = i === 0 && !custo;
+    const hero = i === 0 && !custo, fotoHero = hero ? fotoIcone(doMercado(t.casa, t.nome), 44) : "";
+    const humor = hero && slotCod === slotDaHora(dia) ? humorDoSlot(s, S.clima?.chuva?.v ?? 0) : null;
     return `<article class="card ${hero ? "top1" : ""}" style="--i:${i};--cor:${corArq(t.arquetipo)}">
-      ${hero ? `<span class="pos pos-hero">${arqIcone(t.arquetipo, 30, slotCod === slotDaHora(dia) ? humorDoSlot(s, S.clima?.chuva?.v ?? 0) : null)}<span class="n1">1</span></span>` : `<span class="pos">${i + 1}</span>`}
-      <div style="min-width:0" class="card-tx">${fotoMini(doMercado(t.casa, t.nome), hero ? "foto-hero" : "foto-mini")}<button class="nome" data-ficha="${esc(t.nome)}">${esc(t.nome)}</button>${tierHTML(t.tier)}<div class="casa">${esc(t.casa)} · ${arqTag(t.arquetipo, 13)}</div></div>
+      ${hero ? `<span class="pos pos-hero${fotoHero ? " com-foto" : ""}">${fotoHero ? fotoHero + humorSVG(humor) : arqIcone(t.arquetipo, 30, humor)}<span class="n1">1</span></span>` : `<span class="pos">${i + 1}</span>`}
+      <div style="min-width:0" class="card-tx">${hero ? "" : fotoMini(doMercado(t.casa, t.nome), "foto-mini")}<button class="nome" data-ficha="${esc(t.nome)}">${esc(t.nome)}</button>${tierHTML(t.tier)}<div class="casa">${esc(t.casa)} · ${arqTag(t.arquetipo, 13)}</div></div>
       <span class="score" title="Score">${t.score.toFixed(0)}</span>
       <div class="meta">${spraysHTML(t)}<span>vivo até <b>${vivoTxt(t)}</b>${seloMedido(t.r.f)}</span></div>
       ${porqueHTML(t)}
@@ -807,7 +817,8 @@ const mesAnterior = (hoje = hojeISO()) => { const [a, m] = hoje.split("-").map(N
 const nomeMes = am => { const [a, m] = am.split("-").map(Number); return `${MESES[m - 1]} ${a}`; };
 function storiesDe(am) {
   const [a, m] = am.split("-").map(Number);
-  return storiesDoMes(resumoMes(historico(), S.frascosAtivos, a, m, { duelos: duelosTodos(), eloDe: ds => elo(ds, S.frascosAtivos) }), a, m);
+  return storiesDoMes(resumoMes(historico(), S.frascosAtivos, a, m, { duelos: duelosTodos(), eloDe: ds => elo(ds, S.frascosAtivos) }), a, m,
+    (nome, tam) => fotoIcone(doMercado(frascoDe(nome)?.casa, nome), tam));
 }
 function abrirWrappedMes(am) {
   const st = storiesDe(am);
@@ -910,7 +921,7 @@ function blocoRaspadinha() {
   const usado = historico().some(r => r.data === estadoDia().data && slotBase(r.slot) === cod);
   const ult = historico().filter(r => r.perfume === f.nome && deAnalise(r)).at(-1);
   const dias = ult ? Math.round((new Date(hojeISO()) - new Date(ult.data)) / 864e5) : null;
-  const conteudo = `<div class="raspa-fr">${fotoMini(doMercado(f.casa, f.nome), "foto-mini")}<span class="ic">${arqIcone(f.arquetipo, 30)}</span>
+  const conteudo = `<div class="raspa-fr"><span class="ic">${iconeFrasco(f, 44)}</span>
       <div style="min-width:0"><button class="nome" data-ficha="${esc(f.nome)}">${esc(f.nome)}</button>${tierHTML(f.tier)}<div class="casa">${esc(f.casa)} · ${arqTag(f.arquetipo, 13)}</div>
       <div class="nota">${dias == null ? "sem registro no diário" : `parado há ${dias} dias`}</div></div></div>
     ${t ? `<div class="linha-flex"><span>${spraysHTML(t)} · score ${t.score.toFixed(0)}</span><span class="esp"></span>

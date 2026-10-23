@@ -132,16 +132,6 @@
      "porque": "térmico 0.97 · chuva ↓ · Lazer 3"
     },
     {
-     "nome": "Scarlet Sands",
-     "tier": "S",
-     "score": 84.50585728780271,
-     "sprays": 3,
-     "nota": "",
-     "vivo_ate": 16.75,
-     "vivo_fim": false,
-     "porque": "térmico 0.99 · Lazer 2"
-    },
-    {
      "nome": "L'Immensité",
      "tier": "A",
      "score": 83.68422808284497,
@@ -150,6 +140,16 @@
      "vivo_ate": 16.25,
      "vivo_fim": false,
      "porque": "térmico 0.90 · Lazer 3"
+    },
+    {
+     "nome": "Scarlet Sands",
+     "tier": "S",
+     "score": 83.56537700904758,
+     "sprays": 3,
+     "nota": "",
+     "vivo_ate": 16.75,
+     "vivo_fim": false,
+     "porque": "térmico 0.97 · Lazer 2"
     },
     {
      "nome": "Wild Vetiver",
@@ -189,6 +189,7 @@
     "Black Saffron Absolu": null,
     "Bleu de Chanel": null,
     "Blonde Amber": null,
+    "Blue Sapphire Supercharged": 60.79970914312136,
     "Blue Talisman": 80.08996727707196,
     "Bois du Portugal": null,
     "Bois Impérial": 68.56975118425856,
@@ -231,7 +232,7 @@
     "Reflection Man": 79.28674206595655,
     "Royal Oud": null,
     "Santal 33": 81.54002531525681,
-    "Scarlet Sands": 84.50585728780271,
+    "Scarlet Sands": 83.56537700904758,
     "Search": 72.58024019323499,
     "Serenity": null,
     "Terre d'Hermès": null,
@@ -251,12 +252,13 @@
     "Sky": 80.08996727707196,
     "Belgravia": 85.25468137935366,
     "Inception": 83.15514175573946,
-    "Dubai Musk": 70.81965947143114
+    "Dubai Musk": 70.81965947143114,
+    "Empire": 80.57396727707196
    },
    "fora": {
     "Amyris Homme Extrait": "10.5h vivas fora de casa sem aptidão (Lazer)",
     "Apotecário": "9h na rua acima do envelope (Fresco é o teto)",
-    "Bedouin Rose": "9h na rua acima do envelope (Fresco é o teto)",
+    "Bedouin Rose": "11.5h na rua acima do envelope (Frio é o teto)",
     "Bijou Zafran": "9h vivas fora de casa sem aptidão (Lazer)",
     "Black Saffron Absolu": "10h vivas fora de casa sem aptidão (Lazer)",
     "Bleu de Chanel": "6.5h vivas fora de casa sem aptidão (Lazer)",
@@ -344,12 +346,12 @@
     {
      "nome": "Scarlet Sands",
      "tier": "S",
-     "score": 99.3540379176815,
+     "score": 99.8779786377956,
      "sprays": 3,
      "nota": "",
      "vivo_ate": 29.0,
      "vivo_fim": true,
-     "porque": "térmico 0.98 · N.Inf 3"
+     "porque": "térmico 0.99 · N.Inf 3"
     },
     {
      "nome": "Aventus Absolu",
@@ -392,16 +394,6 @@
      "porque": "térmico 0.95 · N.Inf 3"
     },
     {
-     "nome": "Omnia Omnibus Ubique",
-     "tier": "S",
-     "score": 95.28607219751169,
-     "sprays": 3,
-     "nota": "",
-     "vivo_ate": 29.0,
-     "vivo_fim": true,
-     "porque": "térmico 0.92 · N.Inf 3"
-    },
-    {
      "nome": "Bijou Zafran",
      "tier": "S",
      "score": 94.15056057296806,
@@ -440,6 +432,16 @@
      "vivo_ate": 30.5,
      "vivo_fim": true,
      "porque": "térmico 0.86 · N.Inf 3"
+    },
+    {
+     "nome": "Blue Sapphire Supercharged",
+     "tier": "S",
+     "score": 92.53088802129932,
+     "sprays": 3,
+     "nota": "",
+     "vivo_ate": 31.0,
+     "vivo_fim": true,
+     "porque": "térmico 0.88 · N.Inf 3"
     }
    ],
    "scores": {
@@ -459,6 +461,7 @@
     "Black Saffron Absolu": 85.52566289469942,
     "Bleu de Chanel": null,
     "Blonde Amber": null,
+    "Blue Sapphire Supercharged": 92.53088802129932,
     "Blue Talisman": 67.13168860843714,
     "Bois du Portugal": null,
     "Bois Impérial": 68.6543769964902,
@@ -491,7 +494,7 @@
     "New York": 86.7055533675597,
     "Odéon": 82.90984094978543,
     "Ombre Nomade": null,
-    "Omnia Omnibus Ubique": 95.28607219751169,
+    "Omnia Omnibus Ubique": 80.28607219751167,
     "Oud Kyphi": null,
     "Oud Satin Mood": null,
     "Oudós Lux Solis": 88.0,
@@ -501,7 +504,7 @@
     "Reflection Man": null,
     "Royal Oud": null,
     "Santal 33": null,
-    "Scarlet Sands": 99.3540379176815,
+    "Scarlet Sands": 99.8779786377956,
     "Search": 71.35414585885982,
     "Serenity": null,
     "Terre d'Hermès": null,
@@ -521,12 +524,13 @@
     "Sky": null,
     "Belgravia": 58.83129662247177,
     "Inception": 97.06916687589766,
-    "Dubai Musk": null
+    "Dubai Musk": null,
+    "Empire": null
    },
    "fora": {
     "Apotecário": "2.5h na rua acima do envelope (Fresco é o teto)",
     "Beach Hut Man": "6.5h vivas fora de casa sem aptidão (N.Inf)",
-    "Bedouin Rose": "2.5h na rua acima do envelope (Fresco é o teto)",
+    "Bedouin Rose": "6.5h na rua acima do envelope (Frio é o teto)",
     "Bleu de Chanel": "tier C fora da célula-lar (N.Inf não é aptidão 3)",
     "Blonde Amber": "2.5h na rua acima do envelope (Fresco é o teto)",
     "Bois du Portugal": "6.5h vivas fora de casa sem aptidão (N.Inf)",
@@ -557,7 +561,8 @@
     "Incense 01": "2.5h na rua acima do envelope (Fresco é o teto)",
     "Island Dreams": "6.5h vivas fora de casa sem aptidão (N.Inf)",
     "Sky": "6h vivas fora de casa sem aptidão (N.Inf)",
-    "Dubai Musk": "6.5h vivas fora de casa sem aptidão (N.Inf)"
+    "Dubai Musk": "6.5h vivas fora de casa sem aptidão (N.Inf)",
+    "Empire": "6h vivas fora de casa sem aptidão (N.Inf)"
    },
    "fora_sa": [
     {

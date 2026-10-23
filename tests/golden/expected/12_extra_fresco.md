@@ -30,15 +30,15 @@ S/A fora neste slot: Amyris Homme Extrait (S: 10.5h vivas fora de casa sem aptid
 |---|---|---|---|---|---|---|---|
 | 1 | **Odéon** | Memo Paris | S | 2 (em casa −1) | fim | 94 | térmico 1.00 · Cozy N 3 · intenção ↓ |
 | 2 | **Amyris Homme Extrait** | MFK | S | 2 (em casa −1) | fim | 93 | térmico 0.97 · Cozy N 3 · intenção ↓ |
-| 3 | **Bijou Zafran** | Ormonde Jayne | S | 2 (em casa −1) | fim | 92 | térmico 0.97 · chuva ↓ · Cozy N 3 · intenção ↓ |
-| 4 | **African Leather** | Memo Paris | S | 2 (em casa −1) | fim | 90 | térmico 0.92 · Cozy N 3 · intenção ↓ |
-| 5 | **Blonde Amber** | Clive Christian | S | 3 (em casa −1) | fim | 87 | térmico 0.87 · Cozy N 3 · intenção ↓ |
-| 6 | **Grand Soir** | MFK | S | 2 (em casa −1) | fim | 86 | térmico 0.83 · Cozy N 3 · intenção ↓ |
-| 7 | **Oud Satin Mood** | MFK | S | 1 (em casa −1) | fim | 86 | térmico 0.83 · Cozy N 3 · intenção ↓ |
-| 8 | **Omnia Omnibus Ubique** | Memo Paris | S | 2 (em casa −1) | fim | 79 | térmico 0.97 · Cozy N 2 · intenção ↓ |
+| 3 | **Omnia Omnibus Ubique** | Memo Paris | S | 2 (em casa −1) | fim | 93 | térmico 0.97 · Cozy N 3 · intenção ↓ |
+| 4 | **Bijou Zafran** | Ormonde Jayne | S | 2 (em casa −1) | fim | 92 | térmico 0.97 · chuva ↓ · Cozy N 3 · intenção ↓ |
+| 5 | **African Leather** | Memo Paris | S | 2 (em casa −1) | fim | 90 | térmico 0.92 · Cozy N 3 · intenção ↓ |
+| 6 | **Blonde Amber** | Clive Christian | S | 3 (em casa −1) | fim | 87 | térmico 0.87 · Cozy N 3 · intenção ↓ |
+| 7 | **Grand Soir** | MFK | S | 2 (em casa −1) | fim | 86 | térmico 0.83 · Cozy N 3 · intenção ↓ |
+| 8 | **Oud Satin Mood** | MFK | S | 1 (em casa −1) | fim | 86 | térmico 0.83 · Cozy N 3 · intenção ↓ |
 | 9 | **Brompton** | Ex Nihilo | S | 1 (em casa −1) | fim | 76 | térmico 0.92 · Cozy N 2 · intenção ↓ |
 | 10 | **Les Sables Roses** | Louis Vuitton | S | 2 (em casa −1) | fim | 76 | térmico 0.92 · Cozy N 2 · intenção ↓ |
 S/A fora neste slot: 1872 for Men (S: 2.5h abaixo do envelope (Ameno é o piso)) · Crab Apple Blossom (S: 2.5h abaixo do envelope (Ameno é o piso)) · Météore (S: 2.5h abaixo do envelope (Ameno é o piso)) · Tygar Extrait (S: 2.5h abaixo do envelope (Ameno é o piso)) · Anelo (A: 2.5h abaixo do envelope (Ameno é o piso)) · Blue Talisman (A: 2.5h abaixo do envelope (Ameno é o piso)) · L'Immensité (A: 2.5h abaixo do envelope (Ameno é o piso)) · Torino 21 (A: 2.5h abaixo do envelope (Ameno é o piso))
 
-_Modelo v1.6 (dois slots · base frascos_v7, grade 69) · pesos declarados no CFG · longevidade/projeção/curva são estimativas (16 com lastro na ficha, 63 por regra) · calibrar com o diário._
+_Modelo v1.7 (dois slots · base frascos_v8, grade 71) · pesos declarados no CFG · longevidade/projeção/curva são estimativas (17 com lastro na ficha, 64 por regra) · calibrar com o diário._
 📓 Depois me diga o que usou de manhã e à noite pra eu registrar as duas linhas.

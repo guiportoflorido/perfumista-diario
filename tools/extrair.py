@@ -2,7 +2,7 @@
 """
 extrair.py — gera data/frascos.json, data/fichas.json e data/playbook.json a partir dos arquivos de spec/.
 
-Nada é digitado à mão: frascos vêm de frascos_v7.carregar(); fichas e playbook são lidos das tabelas/células
+Nada é digitado à mão: frascos vêm de frascos_v8.carregar(); fichas e playbook são lidos das tabelas/células
 dos .md. O script falha (assert) se alguma contagem não bater com o que o projeto declara.
 
 Uso:  python3 tools/extrair.py            (lê spec/, escreve data/)
@@ -14,10 +14,10 @@ SPEC = os.path.join(RAIZ, "spec")
 DATA = os.path.join(RAIZ, "data")
 sys.path.insert(0, SPEC)
 
-import frascos_v7 as FV  # noqa: E402
+import frascos_v8 as FV  # noqa: E402
 
-# Janelas declaradas por ele vs estimadas pelo Claude (00_LEIA_PRIMEIRO §4)
-JANELAS_ESTIMADAS = {"Favonius", "Omnia Omnibus Ubique", "Scarlet Sands"}
+# Janelas declaradas por ele vs decididas pelo Claude a pedido dele (00_LEIA_PRIMEIRO §4, 23/out/2026)
+JANELAS_ESTIMADAS = {"Favonius", "Omnia Omnibus Ubique", "Scarlet Sands", "Blue Sapphire Supercharged"}
 
 OCAS_PLAYBOOK = {"Lazer": "Lazer", "Trab. Informal": "T.Inf", "Trab. Formal": "T.For", "Noite Informal": "N.Inf",
                  "Noite Formal": "N.For", "Cozy Dia": "Cozy D", "Cozy Noite": "Cozy N"}
@@ -48,8 +48,8 @@ def extrair_frascos():
             "janelas_estimadas": f["nome"] in JANELAS_ESTIMADAS,
         })
     grade = [f for f in out if f["camada"] == "grade" and f["tier"] != "D"]
-    assert len(out) == 79 and len(grade) == 70, (len(out), len(grade))
-    assert sum(f["janelas"] or 0 for f in out) == 654
+    assert len(out) == 81 and len(grade) == 71, (len(out), len(grade))
+    assert sum(f["janelas"] or 0 for f in out) == 668
     return out
 
 
@@ -73,7 +73,7 @@ def extrair_fichas(frascos):
         fichas[d["nome"]] = d
     nomes = {f["nome"] for f in frascos}
     assert set(fichas) == nomes, (set(fichas) ^ nomes)
-    # conferência cruzada com frascos_v7 (tier, arquétipo, Td, peso, doçura, sprays, janelas)
+    # conferência cruzada com frascos_v8 (tier, arquétipo, Td, peso, doçura, sprays, janelas)
     for f in frascos:
         x = fichas[f["nome"]]
         assert x["tier"] == f["tier"] and x["arquetipo"] == f["arquetipo"] and x["td"] == f["td"], f["nome"]
@@ -118,7 +118,7 @@ def extrair_playbook(frascos):
             total += (1 if c["seguro"] else 0) + (1 if c["jogada"] else 0) + len(c["tambem"])
             celulas[OCAS_PLAYBOOK[oc_txt]] = c
         grade[faixa] = {"nota": nota, "celulas": celulas}
-    assert total == 654, total
+    assert total == 668, total
     n_cel = sum(len(g["celulas"]) for g in grade.values())
     assert n_cel == 38, n_cel  # 42 nominais − Cozy D/N em Muito Quente e Quente (Cozy só de Ameno para baixo)
     # contagem de janelas por frasco = coluna Janelas das fichas
@@ -145,12 +145,26 @@ def sem_artigo(n):
     return re.sub(r"^(O|A) ", "", n.strip())
 
 
+# Materiais do "Nome do dia" do app (3 por arquétipo). Não existem no observatório: ficam aqui para a regeneração
+# do arquetipos.json não apagá-los.
+MATERIAIS = {
+    "Mediterrâneo": ["Neroli", "Bergamota", "Limão-siciliano"], "Marinho": ["Sal", "Maresia", "Alga"],
+    "Minimalista": ["Almíscar", "Ambroxan", "Algodão"], "Botânico": ["Gálbano", "Folha Verde", "Chá"],
+    "Barbeiro": ["Fougère", "Lavanda", "Musgo"], "Geólogo": ["Vetiver", "Sílex", "Pimenta"],
+    "Chiprista": ["Chypre", "Patchouli", "Musgo de Carvalho"], "Florista Branco": ["Jasmim", "Tuberosa", "Flor de Laranjeira"],
+    "Rosal": ["Rosa", "Peônia", "Gerânio"], "Empoado": ["Íris", "Violeta", "Pó de Arroz"],
+    "Marceneiro": ["Cedro", "Sândalo", "Serragem"], "Monge": ["Incenso", "Olíbano", "Mirra"],
+    "Curtidor": ["Couro", "Camurça", "Bétula"], "Sultão": ["Oud", "Âmbar", "Açafrão"],
+    "Lareira": ["Fumaça", "Tabaco", "Brasa"], "Confeiteiro": ["Baunilha", "Tonka", "Caramelo"],
+}
+
+
 def extrair_arquetipos(frascos):
     path = achar("observatorio_colecao_v")
     txt = open(path, encoding="utf-8").read()
     bloco = txt[txt.index("const ARCH = ["):]
     bloco = bloco[:bloco.index("];")]
-    arqs = [{"nome": sem_artigo(n), "rotulo": n, "cor": c} for n, c in re.findall(r'\{n:"([^"]+)",\s*c:"(#[0-9A-Fa-f]{6})"', bloco)]
+    arqs = [{"nome": sem_artigo(n), "rotulo": n, "cor": c, "materiais": MATERIAIS[sem_artigo(n)]} for n, c in re.findall(r'\{n:"([^"]+)",\s*c:"(#[0-9A-Fa-f]{6})"', bloco)]
     assert len(arqs) == 16, len(arqs)
     nomes = {a["nome"] for a in arqs}
     falta = {f["arquetipo"] for f in frascos} - nomes
@@ -168,7 +182,7 @@ def extrair_arquetipos(frascos):
     return {"fonte": os.path.basename(path), "arquetipos": arqs, "gaps": gaps}
 
 
-# ───────────────────────── mercado (avaliação v51) ─────────────────────────
+# ───────────────────────── mercado (avaliação v52) ─────────────────────────
 # Só campos descritivos. Ficam de fora, por regra do projeto: veredicto histórico (PASSAR/MONITORAR/…),
 # coluna Observação (histórico com "PASSAR por default") e a escala "Agrega".
 def extrair_mercado():
@@ -192,7 +206,7 @@ def main():
     frascos = extrair_frascos()
     fichas = extrair_fichas(frascos)
     playbook = extrair_playbook(frascos)
-    versao = {"frascos": "frascos_v7.py", "fichas": fichas["fonte"], "playbook": playbook["fonte"],
+    versao = {"frascos": "frascos_v8.py", "fichas": fichas["fonte"], "playbook": playbook["fonte"],
               "modelo": os.path.basename(achar("modelo_diario_v"))}
     arquetipos = extrair_arquetipos(frascos)
     mercado = extrair_mercado()
@@ -201,7 +215,7 @@ def main():
                       ("playbook.json", playbook), ("arquetipos.json", arquetipos), ("mercado.json", mercado)):
         with open(os.path.join(DATA, nome), "w", encoding="utf-8") as fh:
             if nome == "mercado.json":
-                json.dump(obj, fh, ensure_ascii=False, separators=(",", ":"))   # 1.205 linhas: compacto
+                json.dump(obj, fh, ensure_ascii=False, separators=(",", ":"))   # 1.207 linhas: compacto
             else:
                 json.dump(obj, fh, ensure_ascii=False, indent=1)
     g = [f for f in frascos if f["camada"] == "grade" and f["tier"] != "D"]

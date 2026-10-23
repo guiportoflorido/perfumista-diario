@@ -190,6 +190,7 @@
     "Black Saffron Absolu": null,
     "Bleu de Chanel": null,
     "Blonde Amber": null,
+    "Blue Sapphire Supercharged": null,
     "Blue Talisman": 84.53588188696837,
     "Bois du Portugal": null,
     "Bois Impérial": 67.40644329075548,
@@ -232,7 +233,7 @@
     "Reflection Man": 82.20245995493191,
     "Royal Oud": null,
     "Santal 33": null,
-    "Scarlet Sands": 79.90747303842649,
+    "Scarlet Sands": 77.5599846784252,
     "Search": 73.27668446026479,
     "Serenity": null,
     "Terre d'Hermès": null,
@@ -252,17 +253,19 @@
     "Sky": 84.53588188696837,
     "Belgravia": 86.60737322141192,
     "Inception": 83.91200524117886,
-    "Dubai Musk": 73.28474428752963
+    "Dubai Musk": 73.28474428752963,
+    "Empire": 85.01988188696836
    },
    "fora": {
     "African Leather": "7.5h na rua acima do envelope (Ameno é o teto)",
     "Amyris Homme Extrait": "6.5h na rua acima do envelope (Ameno é o teto)",
     "Apotecário": "11h na rua acima do envelope (Fresco é o teto)",
-    "Bedouin Rose": "11h na rua acima do envelope (Fresco é o teto)",
+    "Bedouin Rose": "11.5h na rua acima do envelope (Frio é o teto)",
     "Bijou Zafran": "5h na rua acima do envelope (Ameno é o teto)",
     "Black Saffron Absolu": "6h na rua acima do envelope (Ameno é o teto)",
     "Bleu de Chanel": "6.5h vivas fora de casa sem aptidão (Lazer)",
     "Blonde Amber": "11h na rua acima do envelope (Fresco é o teto)",
+    "Blue Sapphire Supercharged": "7.5h na rua acima do envelope (Ameno é o teto)",
     "Bois du Portugal": "8h vivas fora de casa sem aptidão (Lazer)",
     "Brompton": "8.5h na rua acima do envelope (Ameno é o teto)",
     "Caden": "12h na rua acima do envelope (Fresco é o teto)",
@@ -320,6 +323,11 @@
      "motivo": "11h na rua acima do envelope (Fresco é o teto)"
     },
     {
+     "nome": "Blue Sapphire Supercharged",
+     "tier": "S",
+     "motivo": "7.5h na rua acima do envelope (Ameno é o teto)"
+    },
+    {
      "nome": "Brompton",
      "tier": "S",
      "motivo": "8.5h na rua acima do envelope (Ameno é o teto)"
@@ -333,11 +341,6 @@
      "nome": "Favonius",
      "tier": "S",
      "motivo": "8.5h na rua acima do envelope (Ameno é o teto)"
-    },
-    {
-     "nome": "Grand Soir",
-     "tier": "S",
-     "motivo": "12h na rua acima do envelope (Fresco é o teto)"
     }
    ],
    "custo": [
@@ -362,9 +365,9 @@
      "porque": "térmico 0.98 · Lazer 3"
     },
     {
-     "nome": "Sky",
+     "nome": "Empire",
      "tier": "A",
-     "score": 84.53588188696837,
+     "score": 85.01988188696836,
      "sprays": 4,
      "nota": "",
      "vivo_ate": 13.5,
@@ -400,6 +403,16 @@
      "porque": "térmico 0.88 · Cozy N 3"
     },
     {
+     "nome": "Omnia Omnibus Ubique",
+     "tier": "S",
+     "score": 93.14901491728033,
+     "sprays": 2,
+     "nota": "em casa −1",
+     "vivo_ate": 29.0,
+     "vivo_fim": true,
+     "porque": "térmico 0.88 · Cozy N 3"
+    },
+    {
      "nome": "Bijou Zafran",
      "tier": "S",
      "score": 92.20815861032797,
@@ -418,16 +431,6 @@
      "vivo_ate": 31.0,
      "vivo_fim": true,
      "porque": "térmico 0.84 · Cozy N 3"
-    },
-    {
-     "nome": "Omnia Omnibus Ubique",
-     "tier": "S",
-     "score": 78.14901491728033,
-     "sprays": 2,
-     "nota": "em casa −1",
-     "vivo_ate": 29.0,
-     "vivo_fim": true,
-     "porque": "térmico 0.88 · Cozy N 2"
     },
     {
      "nome": "Brompton",
@@ -450,6 +453,16 @@
      "porque": "térmico 0.84 · Cozy N 2"
     },
     {
+     "nome": "Favonius",
+     "tier": "S",
+     "score": 75.72089286476023,
+     "sprays": 2,
+     "nota": "em casa −1",
+     "vivo_ate": 32.0,
+     "vivo_fim": true,
+     "porque": "térmico 0.84 · Cozy N 2"
+    },
+    {
      "nome": "Liwa",
      "tier": "S",
      "score": 75.09389286476022,
@@ -468,16 +481,6 @@
      "vivo_ate": 32.0,
      "vivo_fim": true,
      "porque": "térmico 0.84 · chuva ↓ · Cozy N 2"
-    },
-    {
-     "nome": "New York",
-     "tier": "A",
-     "score": 74.27735335946895,
-     "sprays": 2,
-     "nota": "em casa −1",
-     "vivo_ate": 29.0,
-     "vivo_fim": true,
-     "porque": "térmico 1.00 · Cozy N 2"
     }
    ],
    "scores": {
@@ -497,6 +500,7 @@
     "Black Saffron Absolu": 70.87456157465236,
     "Bleu de Chanel": null,
     "Blonde Amber": null,
+    "Blue Sapphire Supercharged": 60.77589286476024,
     "Blue Talisman": 42.8968743217277,
     "Bois du Portugal": 35.32359216165529,
     "Bois Impérial": 54.40722117518595,
@@ -508,7 +512,7 @@
     "Decision": 47.15315861032797,
     "Drunk Lovers": 71.3125291936391,
     "Désobéissant": 50.79912958499192,
-    "Favonius": 45.72089286476024,
+    "Favonius": 75.72089286476023,
     "Gentle Fluidity Silver": 53.444295687312085,
     "Grand Soir": null,
     "Green Irish Tweed": 37.36983050069764,
@@ -529,7 +533,7 @@
     "New York": 74.27735335946895,
     "Odéon": 96.12496499277172,
     "Ombre Nomade": null,
-    "Omnia Omnibus Ubique": 78.14901491728033,
+    "Omnia Omnibus Ubique": 93.14901491728033,
     "Oud Kyphi": null,
     "Oud Satin Mood": null,
     "Oudós Lux Solis": 48.400000000000006,
@@ -539,7 +543,7 @@
     "Reflection Man": 50.631697895543724,
     "Royal Oud": 44.76496157465236,
     "Santal 33": 41.494779577088615,
-    "Scarlet Sands": 55.00000000000001,
+    "Scarlet Sands": 54.26684216181019,
     "Search": 46.642328085627824,
     "Serenity": null,
     "Terre d'Hermès": 46.82556052145248,
@@ -559,11 +563,12 @@
     "Sky": 42.8968743217277,
     "Belgravia": 46.95017548659132,
     "Inception": 53.79386422892327,
-    "Dubai Musk": 45.39805414807847
+    "Dubai Musk": 45.39805414807847,
+    "Empire": 43.3808743217277
    },
    "fora": {
     "Apotecário": "3.5h na rua acima do envelope (Fresco é o teto)",
-    "Bedouin Rose": "3.5h na rua acima do envelope (Fresco é o teto)",
+    "Bedouin Rose": "3.5h na rua acima do envelope (Frio é o teto)",
     "Bleu de Chanel": "tier C fora da célula-lar (Cozy N não é aptidão 3)",
     "Blonde Amber": "3.5h na rua acima do envelope (Fresco é o teto)",
     "Caden": "3.5h na rua acima do envelope (Fresco é o teto)",

@@ -186,6 +186,7 @@
     "Black Saffron Absolu": 60.422686162296,
     "Bleu de Chanel": 42.55575030018507,
     "Blonde Amber": null,
+    "Blue Sapphire Supercharged": null,
     "Blue Talisman": 74.79164052832573,
     "Bois du Portugal": null,
     "Bois Impérial": 95.00470035955881,
@@ -248,12 +249,14 @@
     "Sky": 61.59164052832571,
     "Belgravia": 68.18194208597892,
     "Inception": 92.5409835275734,
-    "Dubai Musk": 81.502806298498
+    "Dubai Musk": 81.502806298498,
+    "Empire": 48.87564052832572
    },
    "fora": {
     "Al Qurashi Blend": "9h vivas fora de casa sem aptidão (T.Inf)",
     "Bedouin Rose": "11.5h vivas fora de casa sem aptidão (T.Inf)",
     "Blonde Amber": "11.5h vivas fora de casa sem aptidão (T.Inf)",
+    "Blue Sapphire Supercharged": "11.5h vivas fora de casa sem aptidão (T.Inf)",
     "Bois du Portugal": "8h vivas fora de casa sem aptidão (T.Inf)",
     "Brompton": "13.5h vivas fora de casa sem aptidão (T.Inf)",
     "Caden": "13.5h vivas fora de casa sem aptidão (T.Inf)",
@@ -288,6 +291,11 @@
      "motivo": "11.5h vivas fora de casa sem aptidão (T.Inf)"
     },
     {
+     "nome": "Blue Sapphire Supercharged",
+     "tier": "S",
+     "motivo": "11.5h vivas fora de casa sem aptidão (T.Inf)"
+    },
+    {
      "nome": "Brompton",
      "tier": "S",
      "motivo": "13.5h vivas fora de casa sem aptidão (T.Inf)"
@@ -316,11 +324,6 @@
      "nome": "Odéon",
      "tier": "S",
      "motivo": "9.5h vivas fora de casa sem aptidão (T.Inf)"
-    },
-    {
-     "nome": "Ombre Nomade",
-     "tier": "S",
-     "motivo": "13.5h vivas fora de casa sem aptidão (T.Inf)"
     }
    ]
   },
@@ -341,16 +344,6 @@
      "porque": "térmico 0.99 · Td ↑ · N.Inf 3"
     },
     {
-     "nome": "Scarlet Sands",
-     "tier": "S",
-     "score": 100.0,
-     "sprays": 3,
-     "nota": "",
-     "vivo_ate": 29.5,
-     "vivo_fim": true,
-     "porque": "térmico 1.00 · N.Inf 3"
-    },
-    {
      "nome": "Hacivat",
      "tier": "S",
      "score": 99.2822170212859,
@@ -369,6 +362,16 @@
      "vivo_ate": 30.0,
      "vivo_fim": true,
      "porque": "térmico 0.99 · N.Inf 3"
+    },
+    {
+     "nome": "Scarlet Sands",
+     "tier": "S",
+     "score": 98.48861894889647,
+     "sprays": 3,
+     "nota": "",
+     "vivo_ate": 29.5,
+     "vivo_fim": true,
+     "porque": "térmico 0.97 · N.Inf 3"
     },
     {
      "nome": "Tygar Extrait",
@@ -448,6 +451,7 @@
     "Black Saffron Absolu": 83.15386063789295,
     "Bleu de Chanel": null,
     "Blonde Amber": null,
+    "Blue Sapphire Supercharged": 83.60394784686143,
     "Blue Talisman": 74.8,
     "Bois du Portugal": null,
     "Bois Impérial": 70.0,
@@ -480,7 +484,7 @@
     "New York": 87.33938365260994,
     "Odéon": 80.10117046413534,
     "Ombre Nomade": null,
-    "Omnia Omnibus Ubique": 85.66323273071477,
+    "Omnia Omnibus Ubique": 70.66323273071475,
     "Oud Kyphi": null,
     "Oud Satin Mood": null,
     "Oudós Lux Solis": 87.83158467502888,
@@ -490,7 +494,7 @@
     "Reflection Man": null,
     "Royal Oud": null,
     "Santal 33": null,
-    "Scarlet Sands": 100.0,
+    "Scarlet Sands": 98.48861894889647,
     "Search": 73.52406413947284,
     "Serenity": null,
     "Terre d'Hermès": null,
@@ -510,12 +514,13 @@
     "Sky": null,
     "Belgravia": 61.599999999999994,
     "Inception": 100.0,
-    "Dubai Musk": null
+    "Dubai Musk": null,
+    "Empire": null
    },
    "fora": {
     "Apotecário": "3.5h na rua acima do envelope (Fresco é o teto)",
     "Beach Hut Man": "3.5h vivas fora de casa sem aptidão (N.Inf)",
-    "Bedouin Rose": "3.5h na rua acima do envelope (Fresco é o teto)",
+    "Bedouin Rose": "3.5h na rua acima do envelope (Frio é o teto)",
     "Bleu de Chanel": "tier C fora da célula-lar (N.Inf não é aptidão 3)",
     "Blonde Amber": "3.5h na rua acima do envelope (Fresco é o teto)",
     "Bois du Portugal": "3.5h vivas fora de casa sem aptidão (N.Inf)",
@@ -546,7 +551,8 @@
     "Incense 01": "3.5h na rua acima do envelope (Fresco é o teto)",
     "Island Dreams": "3.5h vivas fora de casa sem aptidão (N.Inf)",
     "Sky": "3.5h vivas fora de casa sem aptidão (N.Inf)",
-    "Dubai Musk": "3.5h vivas fora de casa sem aptidão (N.Inf)"
+    "Dubai Musk": "3.5h vivas fora de casa sem aptidão (N.Inf)",
+    "Empire": "3.5h vivas fora de casa sem aptidão (N.Inf)"
    },
    "fora_sa": [
     {

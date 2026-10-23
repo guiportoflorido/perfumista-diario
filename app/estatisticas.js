@@ -77,7 +77,7 @@ export function esquecidoDaSemana(esq, so, semana) {
   return { nome: c.f.nome, dias: c.dias, score: null, usavel: false, semana };
 }
 
-/** Uso × janelas: participação de cada frasco nos usos vs. participação nas janelas do playbook (654 desde 14/out/2026). */
+/** Uso × janelas: participação de cada frasco nos usos vs. participação nas janelas do playbook (668 desde 23/out/2026, playbook v60). */
 export function usoVsJanelas(por) {
   const totJ = [...por.values()].reduce((s, c) => s + (c.f.janelas || 0), 0);
   const totU = [...por.values()].reduce((s, c) => s + c.n, 0);
@@ -171,7 +171,7 @@ export function sobrevivencia(hist, frascos) {
   return out;
 }
 
-// Tetos próprios dos beasts (playbook v59, regra 4) — o ajuste opcional nunca passa deles.
+// Tetos próprios dos beasts (playbook v60, regra 4) — o ajuste opcional nunca passa deles.
 export const TETO_BEAST = { "Ombre Nomade": 3, "Oud Satin Mood": 2, "Purpose 50": 3, "Brompton": 3, "Vibrato": 3, "Tygar Extrait": 3,
   "Beach Hut Man": 3, "Hacivat": 3, "Outlands": 3, "Caden": 3, "Grand Soir": 3 };
 

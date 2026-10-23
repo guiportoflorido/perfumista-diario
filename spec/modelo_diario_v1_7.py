@@ -1,6 +1,10 @@
 # -*- coding: utf-8 -*-
 """
-modelo_diario_v1_6.py — Top 10 do dia em DOIS SLOTS (v1.6, 05/out/2026 — base frascos_v7)
+modelo_diario_v1_7.py — Top 10 do dia em DOIS SLOTS (v1.7, 23/out/2026 — base frascos_v8)
+
+v1.7 vs v1.6: (1) base frascos_v8 (grade 71: entram Blue Sapphire Supercharged e Bedouin Rose C; Empire na camada
+custo); (2) linhas do diário com slot E (Esporte — camada custo, corrida/academia) são lidas: "(esporte)" ou "(e)"
+no fim do nome é removido como "(manhã)"/"(noite)". Pesos, filtros e ranking idênticos à v1.6.
 
 v1.6 vs v1.5: (1) a camada custo só aparece quando a entrada traz "Extra: corrida" ou "Extra: academia" — regra
 dele (25/set/2026): camada custo é usada só em academia e corrida e fica fora de qualquer análise; (2) cabeçalho e
@@ -9,8 +13,8 @@ Rotina (19/set/2026): 2x/dia, sempre — manhã 7h00–7h30 e noite após o banh
 precisa durar até a noite (25/set/2026): a "presença" estimada serve só aos filtros de clima/ocasião e ao resíduo.
 
 Uso:
-    python3 modelo_diario_v1_6.py entrada.txt      # ou: cat entrada.txt | python3 modelo_diario_v1_6.py -
-    python3 modelo_diario_v1_6.py --exemplo        # roda o dia de exemplo embutido
+    python3 modelo_diario_v1_7.py entrada.txt      # ou: cat entrada.txt | python3 modelo_diario_v1_7.py -
+    python3 modelo_diario_v1_7.py --exemplo        # roda o dia de exemplo embutido
 
 Entrada (texto, uma chave por linha; ordem livre; só T e Td são obrigatórias):
     Data: 2026-09-21                      (default: hoje)
@@ -44,7 +48,7 @@ coluna Td da ficha; nunca estimar Td externo; tier D fora; tier C só em célula
 do playbook continuam valendo quando ele consultar o playbook — aqui sprays vêm da ficha + regra de faixa.
 """
 import sys, re, math, datetime as dt
-from frascos_v7 import carregar, FAIXAS, FAIXA_LIM, OCASIOES
+from frascos_v8 import carregar, FAIXAS, FAIXA_LIM, OCASIOES
 
 CFG = {
     "passo_h": 0.5,            # resolução temporal
@@ -100,7 +104,7 @@ def _num(s):
 
 
 def _nome_diario(s):
-    return re.sub(r"\s*\((manh[ãa]|noite|dia|m|n)\)\s*$", "", s.strip(), flags=re.I).strip()
+    return re.sub(r"\s*\((manh[ãa]|noite|dia|esporte|m|n|e)\)\s*$", "", s.strip(), flags=re.I).strip()
 
 
 def parse_entrada(txt):
@@ -542,7 +546,7 @@ def rodar(txt):
             out.append("S/A fora neste slot: " + " · ".join(f"{r['f']['nome']} ({r['f']['tier']}: {r['fora']})" for r in sorted(fora, key=lambda r: ({'S': 0, 'A': 1}[r['f']['tier']], r['f']['nome']))[:8]))
 
     out.append("")
-    out.append(f"_Modelo v1.6 (dois slots · base frascos_v7, grade 69) · pesos declarados no CFG · longevidade/projeção/curva são estimativas ({sum(1 for f in frascos if f['perf_origem']=='leitura')} com lastro na ficha, {sum(1 for f in frascos if f['perf_origem']=='regra')} por regra) · calibrar com o diário._")
+    out.append(f"_Modelo v1.7 (dois slots · base frascos_v8, grade 71) · pesos declarados no CFG · longevidade/projeção/curva são estimativas ({sum(1 for f in frascos if f['perf_origem']=='leitura')} com lastro na ficha, {sum(1 for f in frascos if f['perf_origem']=='regra')} por regra) · calibrar com o diário._")
     out.append("📓 Depois me diga o que usou de manhã e à noite pra eu registrar as duas linhas.")
     return "\n".join(out)
 

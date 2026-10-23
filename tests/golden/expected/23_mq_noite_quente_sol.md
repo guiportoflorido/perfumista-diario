@@ -20,7 +20,7 @@
 | 9 | **Vibrato** | Sospiro | A | 2 | ~18h15 | 88 | térmico 0.94 · Td ↑ · Lazer 3 |
 | 10 | **Wild Vetiver** | Creed | A | 4 | ~13h30 | 88 | térmico 0.96 · Td ↑ · Lazer 3 |
 🔁 = ainda vivo na hora do banho: entra como resíduo sob o perfume da noite (informe em 'Manhã:' para o slot Noite considerar)
-S/A fora neste slot: African Leather (S: 11.5h na rua acima do envelope (Ameno é o teto)) · Amyris Homme Extrait (S: 10.5h na rua acima do envelope (Ameno é o teto)) · Aventus Absolu (S: 5.5h na rua acima do envelope (Quente é o teto)) · Bijou Zafran (S: 9h na rua acima do envelope (Ameno é o teto)) · Blonde Amber (S: 11.5h na rua acima do envelope (Fresco é o teto)) · Bois Impérial (S: 5.5h na rua acima do envelope (Quente é o teto)) · Brompton (S: 12.5h na rua acima do envelope (Ameno é o teto)) · Decision (S: 9h na rua acima do envelope (Ameno é o teto))
+S/A fora neste slot: African Leather (S: 11.5h na rua acima do envelope (Ameno é o teto)) · Amyris Homme Extrait (S: 10.5h na rua acima do envelope (Ameno é o teto)) · Aventus Absolu (S: 5.5h na rua acima do envelope (Quente é o teto)) · Bijou Zafran (S: 9h na rua acima do envelope (Ameno é o teto)) · Blonde Amber (S: 11.5h na rua acima do envelope (Fresco é o teto)) · Blue Sapphire Supercharged (S: 11.5h na rua acima do envelope (Ameno é o teto)) · Bois Impérial (S: 5.5h na rua acima do envelope (Quente é o teto)) · Brompton (S: 12.5h na rua acima do envelope (Ameno é o teto))
 
 ## Slot Noite (19h30→23h) — Top 10 da grade
 🧴 Onde aplicar: pós-banho: pele limpa e ainda morna absorve mais — pescoço/peito, sem esfregar; esperar a pele secar antes de vestir
@@ -34,9 +34,9 @@ S/A fora neste slot: African Leather (S: 11.5h na rua acima do envelope (Ameno �
 | 6 | **Désobéissant** | Givenchy | S | 6 (6–7 fixo) | fim | 85 | térmico 0.97 · Td ↑ · N.Inf 2 |
 | 7 | **Aventus** | Creed | A | 4 (vento +1) | fim | 84 | térmico 0.92 · N.Inf 3 |
 | 8 | **Aventus Absolu** | Creed | S | 4 (vento +1) | fim | 84 | térmico 0.71 · N.Inf 3 |
-| 9 | **Scarlet Sands** | Ex Nihilo | S | 4 (vento +1) | fim | 81 | térmico 0.66 · N.Inf 3 |
+| 9 | **Scarlet Sands** | Ex Nihilo | S | 4 (vento +1) | fim | 81 | térmico 0.65 · N.Inf 3 |
 | 10 | **L'Immensité** | Louis Vuitton | A | 4 | fim | 75 | térmico 0.97 · Td ↑ · N.Inf 2 |
-S/A fora neste slot: African Leather (S: 3.5h na rua acima do envelope (Ameno é o teto)) · Amyris Homme Extrait (S: 3.5h na rua acima do envelope (Ameno é o teto)) · Bijou Zafran (S: 3.5h na rua acima do envelope (Ameno é o teto)) · Blonde Amber (S: 3.5h na rua acima do envelope (Fresco é o teto)) · Brompton (S: 3.5h na rua acima do envelope (Ameno é o teto)) · Decision (S: 3.5h na rua acima do envelope (Ameno é o teto)) · Favonius (S: 3.5h na rua acima do envelope (Ameno é o teto)) · Grand Soir (S: 3.5h na rua acima do envelope (Fresco é o teto))
+S/A fora neste slot: African Leather (S: 3.5h na rua acima do envelope (Ameno é o teto)) · Amyris Homme Extrait (S: 3.5h na rua acima do envelope (Ameno é o teto)) · Bijou Zafran (S: 3.5h na rua acima do envelope (Ameno é o teto)) · Blonde Amber (S: 3.5h na rua acima do envelope (Fresco é o teto)) · Blue Sapphire Supercharged (S: 3.5h na rua acima do envelope (Ameno é o teto)) · Brompton (S: 3.5h na rua acima do envelope (Ameno é o teto)) · Decision (S: 3.5h na rua acima do envelope (Ameno é o teto)) · Favonius (S: 3.5h na rua acima do envelope (Ameno é o teto))
 
-_Modelo v1.6 (dois slots · base frascos_v7, grade 69) · pesos declarados no CFG · longevidade/projeção/curva são estimativas (16 com lastro na ficha, 63 por regra) · calibrar com o diário._
+_Modelo v1.7 (dois slots · base frascos_v8, grade 71) · pesos declarados no CFG · longevidade/projeção/curva são estimativas (17 com lastro na ficha, 64 por regra) · calibrar com o diário._
 📓 Depois me diga o que usou de manhã e à noite pra eu registrar as duas linhas.

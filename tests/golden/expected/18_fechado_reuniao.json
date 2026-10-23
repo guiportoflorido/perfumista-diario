@@ -204,6 +204,7 @@
     "Black Saffron Absolu": null,
     "Bleu de Chanel": null,
     "Blonde Amber": null,
+    "Blue Sapphire Supercharged": null,
     "Blue Talisman": null,
     "Bois du Portugal": 67.9707360255117,
     "Bois Impérial": 96.4126097486239,
@@ -215,7 +216,7 @@
     "Decision": 96.34094731346887,
     "Drunk Lovers": null,
     "Désobéissant": 76.6560442990986,
-    "Favonius": 76.98896325881222,
+    "Favonius": null,
     "Gentle Fluidity Silver": 69.01055220452359,
     "Grand Soir": null,
     "Green Irish Tweed": null,
@@ -266,7 +267,8 @@
     "Sky": null,
     "Belgravia": null,
     "Inception": null,
-    "Dubai Musk": null
+    "Dubai Musk": null,
+    "Empire": null
    },
    "fora": {
     "Al Qurashi Blend": "9h vivas fora de casa sem aptidão (T.For)",
@@ -277,16 +279,18 @@
     "Aventus": "9h vivas fora de casa sem aptidão (T.For)",
     "Aventus Absolu": "9h vivas fora de casa sem aptidão (T.For)",
     "Beach Hut Man": "11h vivas fora de casa sem aptidão (T.For)",
-    "Bedouin Rose": "2.5h na rua acima do envelope (Fresco é o teto)",
+    "Bedouin Rose": "3h na rua acima do envelope (Frio é o teto)",
     "Bijou Zafran": "9h vivas fora de casa sem aptidão (T.For)",
     "Black Saffron Absolu": "10h vivas fora de casa sem aptidão (T.For)",
     "Bleu de Chanel": "tier C fora da célula-lar (T.For não é aptidão 3)",
     "Blonde Amber": "2.5h na rua acima do envelope (Fresco é o teto)",
+    "Blue Sapphire Supercharged": "11.5h vivas fora de casa sem aptidão (T.For)",
     "Blue Talisman": "6.5h vivas fora de casa sem aptidão (T.For)",
     "Brompton": "12.5h vivas fora de casa sem aptidão (T.For)",
     "Caden": "3.5h na rua acima do envelope (Fresco é o teto)",
     "Crab Apple Blossom": "5.5h vivas fora de casa sem aptidão (T.For)",
     "Drunk Lovers": "9.5h vivas fora de casa sem aptidão (T.For)",
+    "Favonius": "12.5h vivas fora de casa sem aptidão (T.For)",
     "Grand Soir": "3.5h na rua acima do envelope (Fresco é o teto)",
     "Green Irish Tweed": "6.5h vivas fora de casa sem aptidão (T.For)",
     "Gris Charnel": "12.5h vivas fora de casa sem aptidão (T.For)",
@@ -320,7 +324,8 @@
     "Sky": "6.5h vivas fora de casa sem aptidão (T.For)",
     "Belgravia": "6.5h vivas fora de casa sem aptidão (T.For)",
     "Inception": "10h vivas fora de casa sem aptidão (T.For)",
-    "Dubai Musk": "7.5h vivas fora de casa sem aptidão (T.For)"
+    "Dubai Musk": "7.5h vivas fora de casa sem aptidão (T.For)",
+    "Empire": "6.5h vivas fora de casa sem aptidão (T.For)"
    },
    "fora_sa": [
     {
@@ -344,6 +349,11 @@
      "motivo": "2.5h na rua acima do envelope (Fresco é o teto)"
     },
     {
+     "nome": "Blue Sapphire Supercharged",
+     "tier": "S",
+     "motivo": "11.5h vivas fora de casa sem aptidão (T.For)"
+    },
+    {
      "nome": "Brompton",
      "tier": "S",
      "motivo": "12.5h vivas fora de casa sem aptidão (T.For)"
@@ -354,12 +364,7 @@
      "motivo": "5.5h vivas fora de casa sem aptidão (T.For)"
     },
     {
-     "nome": "Grand Soir",
-     "tier": "S",
-     "motivo": "3.5h na rua acima do envelope (Fresco é o teto)"
-    },
-    {
-     "nome": "Gris Charnel",
+     "nome": "Favonius",
      "tier": "S",
      "motivo": "12.5h vivas fora de casa sem aptidão (T.For)"
     }
@@ -380,6 +385,16 @@
      "vivo_ate": 28.5,
      "vivo_fim": true,
      "porque": "térmico 0.99 · N.For 3"
+    },
+    {
+     "nome": "Omnia Omnibus Ubique",
+     "tier": "S",
+     "score": 97.05521477587821,
+     "sprays": 3,
+     "nota": "",
+     "vivo_ate": 29.0,
+     "vivo_fim": true,
+     "porque": "térmico 0.96 · N.For 3"
     },
     {
      "nome": "Lucius",
@@ -408,6 +423,16 @@
      "sprays": 3,
      "nota": "",
      "vivo_ate": 30.0,
+     "vivo_fim": true,
+     "porque": "térmico 0.91 · N.For 3"
+    },
+    {
+     "nome": "Blue Sapphire Supercharged",
+     "tier": "S",
+     "score": 94.17987795726629,
+     "sprays": 3,
+     "nota": "",
+     "vivo_ate": 31.0,
      "vivo_fim": true,
      "porque": "térmico 0.91 · N.For 3"
     },
@@ -450,26 +475,6 @@
      "vivo_ate": 33.0,
      "vivo_fim": true,
      "porque": "térmico 0.82 · N.For 3"
-    },
-    {
-     "nome": "Outlands",
-     "tier": "S",
-     "score": 89.56520772554384,
-     "sprays": 3,
-     "nota": "",
-     "vivo_ate": 33.0,
-     "vivo_fim": true,
-     "porque": "térmico 0.82 · N.For 3"
-    },
-    {
-     "nome": "Ombre Nomade",
-     "tier": "S",
-     "score": 89.52120772554383,
-     "sprays": 2,
-     "nota": "",
-     "vivo_ate": 35.0,
-     "vivo_fim": true,
-     "porque": "térmico 0.82 · N.For 3"
     }
    ],
    "scores": {
@@ -489,6 +494,7 @@
     "Black Saffron Absolu": null,
     "Bleu de Chanel": null,
     "Blonde Amber": 75.2958881281299,
+    "Blue Sapphire Supercharged": 94.17987795726629,
     "Blue Talisman": null,
     "Bois du Portugal": 68.95096877277932,
     "Bois Impérial": null,
@@ -521,7 +527,7 @@
     "New York": null,
     "Odéon": null,
     "Ombre Nomade": 89.52120772554383,
-    "Omnia Omnibus Ubique": 82.05521477587821,
+    "Omnia Omnibus Ubique": 97.05521477587821,
     "Oud Kyphi": null,
     "Oud Satin Mood": 89.92820772554384,
     "Oudós Lux Solis": 61.599999999999994,
@@ -531,7 +537,7 @@
     "Reflection Man": 76.86690101953076,
     "Royal Oud": 87.03937788577973,
     "Santal 33": null,
-    "Scarlet Sands": 83.25306285417118,
+    "Scarlet Sands": 84.94890341953013,
     "Search": null,
     "Serenity": 63.59212168969095,
     "Terre d'Hermès": 83.27913403797709,
@@ -551,7 +557,8 @@
     "Sky": null,
     "Belgravia": null,
     "Inception": null,
-    "Dubai Musk": null
+    "Dubai Musk": null,
+    "Empire": null
    },
    "fora": {
     "1872 for Men": "3.5h vivas fora de casa sem aptidão (N.For)",
@@ -560,7 +567,7 @@
     "Ani X": "3.5h vivas fora de casa sem aptidão (N.For)",
     "Apotecário": "3.5h vivas fora de casa sem aptidão (N.For)",
     "Beach Hut Man": "3.5h vivas fora de casa sem aptidão (N.For)",
-    "Bedouin Rose": "tier C fora da célula-lar (N.For não é aptidão 3)",
+    "Bedouin Rose": "3.5h na rua acima do envelope (Frio é o teto)",
     "Black Saffron Absolu": "3.5h vivas fora de casa sem aptidão (N.For)",
     "Bleu de Chanel": "3.5h vivas fora de casa sem aptidão (N.For)",
     "Blue Talisman": "3.5h vivas fora de casa sem aptidão (N.For)",
@@ -595,7 +602,8 @@
     "Sky": "3.5h vivas fora de casa sem aptidão (N.For)",
     "Belgravia": "3.5h vivas fora de casa sem aptidão (N.For)",
     "Inception": "3.5h vivas fora de casa sem aptidão (N.For)",
-    "Dubai Musk": "3.5h vivas fora de casa sem aptidão (N.For)"
+    "Dubai Musk": "3.5h vivas fora de casa sem aptidão (N.For)",
+    "Empire": "3.5h vivas fora de casa sem aptidão (N.For)"
    },
    "fora_sa": [
     {

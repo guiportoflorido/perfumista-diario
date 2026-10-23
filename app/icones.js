@@ -46,6 +46,12 @@ export function humorDoSlot(so, chuva = 0) {
   return "normal";
 }
 
+/** Só a camada de humor (sem o ícone), para pôr por cima da foto do perfume. "" no estado normal ou sem estado. */
+export function humorSVG(estado) {
+  if (!estado || !HUMOR[estado]) return "";
+  return `<svg class="arq-ic com-humor humor-solo" viewBox="0 0 24 24" overflow="visible" aria-hidden="true" focusable="false"><g class="humor" data-estado="${estado}">${HUMOR[estado]}</g></svg>`;
+}
+
 /** Ícone HTML (SVG inline) do arquétipo, na cor dele. `estado` (normal · calor · frio · chuva) põe a camada de humor por
  *  cima, com uma animação curta de um ciclo; sem `estado`, o ícone simples de sempre. */
 export function arqIcone(nome, tam = 16, estado = null) {

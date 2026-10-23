@@ -183,6 +183,7 @@
     "Black Saffron Absolu": null,
     "Bleu de Chanel": null,
     "Blonde Amber": null,
+    "Blue Sapphire Supercharged": null,
     "Blue Talisman": 88.0,
     "Bois du Portugal": null,
     "Bois Impérial": null,
@@ -245,7 +246,8 @@
     "Sky": 88.0,
     "Belgravia": null,
     "Inception": 85.00000000000001,
-    "Dubai Musk": 72.74259030757551
+    "Dubai Musk": 72.74259030757551,
+    "Empire": 88.0
    },
    "fora": {
     "7 Loewe": "3h na rua acima do envelope (Quente é o teto)",
@@ -255,11 +257,12 @@
     "Ani X": "9h na rua acima do envelope (Quente é o teto)",
     "Apotecário": "11.5h na rua acima do envelope (Fresco é o teto)",
     "Aventus Absolu": "5.5h na rua acima do envelope (Quente é o teto)",
-    "Bedouin Rose": "11.5h na rua acima do envelope (Fresco é o teto)",
+    "Bedouin Rose": "11.5h na rua acima do envelope (Frio é o teto)",
     "Bijou Zafran": "9h na rua acima do envelope (Ameno é o teto)",
     "Black Saffron Absolu": "10h na rua acima do envelope (Ameno é o teto)",
     "Bleu de Chanel": "6.5h vivas fora de casa sem aptidão (Lazer)",
     "Blonde Amber": "11.5h na rua acima do envelope (Fresco é o teto)",
+    "Blue Sapphire Supercharged": "11.5h na rua acima do envelope (Ameno é o teto)",
     "Bois du Portugal": "4.5h na rua acima do envelope (Quente é o teto)",
     "Bois Impérial": "5.5h na rua acima do envelope (Quente é o teto)",
     "Brompton": "12.5h na rua acima do envelope (Ameno é o teto)",
@@ -330,6 +333,11 @@
      "motivo": "11.5h na rua acima do envelope (Fresco é o teto)"
     },
     {
+     "nome": "Blue Sapphire Supercharged",
+     "tier": "S",
+     "motivo": "11.5h na rua acima do envelope (Ameno é o teto)"
+    },
+    {
      "nome": "Bois Impérial",
      "tier": "S",
      "motivo": "5.5h na rua acima do envelope (Quente é o teto)"
@@ -338,11 +346,6 @@
      "nome": "Brompton",
      "tier": "S",
      "motivo": "12.5h na rua acima do envelope (Ameno é o teto)"
-    },
-    {
-     "nome": "Decision",
-     "tier": "S",
-     "motivo": "9h na rua acima do envelope (Ameno é o teto)"
     }
    ]
   },
@@ -435,12 +438,12 @@
     {
      "nome": "Scarlet Sands",
      "tier": "S",
-     "score": 81.4630062789479,
+     "score": 80.74546752855476,
      "sprays": 4,
      "nota": "vento +1",
      "vivo_ate": 29.0,
      "vivo_fim": true,
-     "porque": "térmico 0.66 · N.Inf 3"
+     "porque": "térmico 0.65 · N.Inf 3"
     },
     {
      "nome": "L'Immensité",
@@ -470,6 +473,7 @@
     "Black Saffron Absolu": null,
     "Bleu de Chanel": null,
     "Blonde Amber": null,
+    "Blue Sapphire Supercharged": null,
     "Blue Talisman": 74.8,
     "Bois du Portugal": null,
     "Bois Impérial": 61.563578799192456,
@@ -512,7 +516,7 @@
     "Reflection Man": null,
     "Royal Oud": null,
     "Santal 33": null,
-    "Scarlet Sands": 81.4630062789479,
+    "Scarlet Sands": 80.74546752855476,
     "Search": 71.03238537626022,
     "Serenity": null,
     "Terre d'Hermès": null,
@@ -532,18 +536,20 @@
     "Sky": null,
     "Belgravia": 54.04951565784971,
     "Inception": 100.0,
-    "Dubai Musk": null
+    "Dubai Musk": null,
+    "Empire": null
    },
    "fora": {
     "African Leather": "3.5h na rua acima do envelope (Ameno é o teto)",
     "Amyris Homme Extrait": "3.5h na rua acima do envelope (Ameno é o teto)",
     "Apotecário": "3.5h na rua acima do envelope (Fresco é o teto)",
     "Beach Hut Man": "3.5h vivas fora de casa sem aptidão (N.Inf)",
-    "Bedouin Rose": "3.5h na rua acima do envelope (Fresco é o teto)",
+    "Bedouin Rose": "3.5h na rua acima do envelope (Frio é o teto)",
     "Bijou Zafran": "3.5h na rua acima do envelope (Ameno é o teto)",
     "Black Saffron Absolu": "3.5h na rua acima do envelope (Ameno é o teto)",
     "Bleu de Chanel": "tier C fora da célula-lar (N.Inf não é aptidão 3)",
     "Blonde Amber": "3.5h na rua acima do envelope (Fresco é o teto)",
+    "Blue Sapphire Supercharged": "3.5h na rua acima do envelope (Ameno é o teto)",
     "Bois du Portugal": "3.5h vivas fora de casa sem aptidão (N.Inf)",
     "Brompton": "3.5h na rua acima do envelope (Ameno é o teto)",
     "Caden": "3.5h na rua acima do envelope (Fresco é o teto)",
@@ -585,7 +591,8 @@
     "Incense 01": "3.5h na rua acima do envelope (Fresco é o teto)",
     "Island Dreams": "3.5h vivas fora de casa sem aptidão (N.Inf)",
     "Sky": "3.5h vivas fora de casa sem aptidão (N.Inf)",
-    "Dubai Musk": "3.5h vivas fora de casa sem aptidão (N.Inf)"
+    "Dubai Musk": "3.5h vivas fora de casa sem aptidão (N.Inf)",
+    "Empire": "3.5h vivas fora de casa sem aptidão (N.Inf)"
    },
    "fora_sa": [
     {
@@ -609,6 +616,11 @@
      "motivo": "3.5h na rua acima do envelope (Fresco é o teto)"
     },
     {
+     "nome": "Blue Sapphire Supercharged",
+     "tier": "S",
+     "motivo": "3.5h na rua acima do envelope (Ameno é o teto)"
+    },
+    {
      "nome": "Brompton",
      "tier": "S",
      "motivo": "3.5h na rua acima do envelope (Ameno é o teto)"
@@ -622,11 +634,6 @@
      "nome": "Favonius",
      "tier": "S",
      "motivo": "3.5h na rua acima do envelope (Ameno é o teto)"
-    },
-    {
-     "nome": "Grand Soir",
-     "tier": "S",
-     "motivo": "3.5h na rua acima do envelope (Fresco é o teto)"
     }
    ]
   }

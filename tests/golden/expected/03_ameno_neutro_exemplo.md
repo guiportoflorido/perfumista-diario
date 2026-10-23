@@ -23,7 +23,7 @@
 | 9 | **Search** | Amouage | A | 4 | ~15h45 | 91 | térmico 0.95 · T.Inf 3 · sem uso em 45+d 🕸️ |
 | 10 | **Aventus** | Creed | A | 3 | ~16h15 | 91 | térmico 0.95 · T.Inf 3 · sem uso em 45+d 🕸️ |
 🔁 = ainda vivo na hora do banho: entra como resíduo sob o perfume da noite (informe em 'Manhã:' para o slot Noite considerar)
-S/A fora neste slot: Blonde Amber (S: 11.5h vivas fora de casa sem aptidão (T.Inf)) · Brompton (S: 12.5h vivas fora de casa sem aptidão (T.Inf)) · Favonius (S: 12.5h vivas fora de casa sem aptidão (T.Inf)) · Grand Soir (S: 12.5h vivas fora de casa sem aptidão (T.Inf)) · Les Sables Roses (S: 10.5h vivas fora de casa sem aptidão (T.Inf)) · Liwa (S: 11.5h vivas fora de casa sem aptidão (T.Inf)) · Odéon (S: 9.5h vivas fora de casa sem aptidão (T.Inf)) · Ombre Nomade (S: 12.5h vivas fora de casa sem aptidão (T.Inf))
+S/A fora neste slot: Blonde Amber (S: 11.5h vivas fora de casa sem aptidão (T.Inf)) · Blue Sapphire Supercharged (S: 11.5h vivas fora de casa sem aptidão (T.Inf)) · Brompton (S: 12.5h vivas fora de casa sem aptidão (T.Inf)) · Favonius (S: 12.5h vivas fora de casa sem aptidão (T.Inf)) · Grand Soir (S: 12.5h vivas fora de casa sem aptidão (T.Inf)) · Les Sables Roses (S: 10.5h vivas fora de casa sem aptidão (T.Inf)) · Liwa (S: 11.5h vivas fora de casa sem aptidão (T.Inf)) · Odéon (S: 9.5h vivas fora de casa sem aptidão (T.Inf))
 
 ## Slot Noite (19h30→23h) — Top 10 da grade
 🧴 Onde aplicar: pós-banho: pele limpa e ainda morna absorve mais — pescoço/peito, sem esfregar; esperar a pele secar antes de vestir · noite em casa: o perfume é para você e para quem está perto — projeção pesa menos que o drydown
@@ -31,14 +31,14 @@ S/A fora neste slot: Blonde Amber (S: 11.5h vivas fora de casa sem aptidão (T.I
 |---|---|---|---|---|---|---|---|
 | 1 | **Odéon** | Memo Paris | S | 2 (em casa −1) | fim | 104 | térmico 0.97 · Cozy N 3 · sem uso em 45+d 🕸️ |
 | 2 | **Amyris Homme Extrait** | MFK | S | 2 (em casa −1) | fim | 102 | térmico 0.92 · Cozy N 3 · sem uso em 45+d 🕸️ |
-| 3 | **Bijou Zafran** | Ormonde Jayne | S | 2 (em casa −1) | fim | 101 | térmico 0.92 · Cozy N 3 · sem uso em 45+d 🕸️ |
-| 4 | **African Leather** | Memo Paris | S | 2 (em casa −1) | fim | 99 | térmico 0.87 · Cozy N 3 · sem uso em 45+d 🕸️ |
-| 5 | **Blonde Amber** | Clive Christian | S | 3 (em casa −1) | fim | 91 | térmico 0.73 · Cozy N 3 · sem uso em 45+d 🕸️ |
-| 6 | **Grand Soir** | MFK | S | 2 (em casa −1) | fim | 90 | térmico 0.73 · Cozy N 3 · sem uso em 45+d 🕸️ |
-| 7 | **Oud Satin Mood** | MFK | S | 1 (em casa −1) | fim | 90 | térmico 0.73 · Cozy N 3 · sem uso em 45+d 🕸️ |
-| 8 | **Omnia Omnibus Ubique** | Memo Paris | S | 2 (em casa −1) | fim | 86 | térmico 0.92 · Cozy N 2 · sem uso em 45+d 🕸️ |
+| 3 | **Omnia Omnibus Ubique** | Memo Paris | S | 2 (em casa −1) | fim | 102 | térmico 0.92 · Cozy N 3 · sem uso em 45+d 🕸️ |
+| 4 | **Bijou Zafran** | Ormonde Jayne | S | 2 (em casa −1) | fim | 101 | térmico 0.92 · Cozy N 3 · sem uso em 45+d 🕸️ |
+| 5 | **African Leather** | Memo Paris | S | 2 (em casa −1) | fim | 99 | térmico 0.87 · Cozy N 3 · sem uso em 45+d 🕸️ |
+| 6 | **Blonde Amber** | Clive Christian | S | 3 (em casa −1) | fim | 91 | térmico 0.73 · Cozy N 3 · sem uso em 45+d 🕸️ |
+| 7 | **Grand Soir** | MFK | S | 2 (em casa −1) | fim | 90 | térmico 0.73 · Cozy N 3 · sem uso em 45+d 🕸️ |
+| 8 | **Oud Satin Mood** | MFK | S | 1 (em casa −1) | fim | 90 | térmico 0.73 · Cozy N 3 · sem uso em 45+d 🕸️ |
 | 9 | **Brompton** | Ex Nihilo | S | 1 (em casa −1) | fim | 83 | térmico 0.87 · Cozy N 2 · sem uso em 45+d 🕸️ |
-| 10 | **Gris Charnel** | BDK | S | 3 (em casa −1) | fim | 83 | térmico 0.87 · Cozy N 2 · sem uso em 45+d 🕸️ |
+| 10 | **Favonius** | Nishane | S | 2 (em casa −1) | fim | 83 | térmico 0.87 · Cozy N 2 · sem uso em 45+d 🕸️ |
 
-_Modelo v1.6 (dois slots · base frascos_v7, grade 69) · pesos declarados no CFG · longevidade/projeção/curva são estimativas (16 com lastro na ficha, 63 por regra) · calibrar com o diário._
+_Modelo v1.7 (dois slots · base frascos_v8, grade 71) · pesos declarados no CFG · longevidade/projeção/curva são estimativas (17 com lastro na ficha, 64 por regra) · calibrar com o diário._
 📓 Depois me diga o que usou de manhã e à noite pra eu registrar as duas linhas.

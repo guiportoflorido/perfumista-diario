@@ -22,7 +22,7 @@
 | 8 | **1872 for Men** | Clive Christian | S | 4 | ~12h30 | 85 | térmico 0.86 · Td ↓ · T.Inf 3 |
 | 9 | **Aventus** | Creed | A | 3 | ~16h15 | 84 | térmico 0.96 · T.Inf 3 |
 | 10 | **Search** | Amouage | A | 4 | ~15h45 | 83 | térmico 0.96 · T.Inf 3 |
-S/A fora neste slot: Blonde Amber (S: 11h vivas fora de casa sem aptidão (T.Inf)) · Brompton (S: 11h vivas fora de casa sem aptidão (T.Inf)) · Favonius (S: 11h vivas fora de casa sem aptidão (T.Inf)) · Grand Soir (S: 2.5h na rua acima do envelope (Fresco é o teto)) · Les Sables Roses (S: 10.5h vivas fora de casa sem aptidão (T.Inf)) · Liwa (S: 11h vivas fora de casa sem aptidão (T.Inf)) · Odéon (S: 9.5h vivas fora de casa sem aptidão (T.Inf)) · Ombre Nomade (S: 2.5h na rua acima do envelope (Fresco é o teto))
+S/A fora neste slot: Blonde Amber (S: 11h vivas fora de casa sem aptidão (T.Inf)) · Blue Sapphire Supercharged (S: 11h vivas fora de casa sem aptidão (T.Inf)) · Brompton (S: 11h vivas fora de casa sem aptidão (T.Inf)) · Favonius (S: 11h vivas fora de casa sem aptidão (T.Inf)) · Grand Soir (S: 2.5h na rua acima do envelope (Fresco é o teto)) · Les Sables Roses (S: 10.5h vivas fora de casa sem aptidão (T.Inf)) · Liwa (S: 11h vivas fora de casa sem aptidão (T.Inf)) · Odéon (S: 9.5h vivas fora de casa sem aptidão (T.Inf))
 
-_Modelo v1.6 (dois slots · base frascos_v7, grade 69) · pesos declarados no CFG · longevidade/projeção/curva são estimativas (16 com lastro na ficha, 63 por regra) · calibrar com o diário._
+_Modelo v1.7 (dois slots · base frascos_v8, grade 71) · pesos declarados no CFG · longevidade/projeção/curva são estimativas (17 com lastro na ficha, 64 por regra) · calibrar com o diário._
 📓 Depois me diga o que usou de manhã e à noite pra eu registrar as duas linhas.

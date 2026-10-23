@@ -12,7 +12,7 @@ const linha = (f, posse = "Frasco Gui", tier = f.tier) => [f.casa, f.nome + " (p
 test("planilha igual ao JSON → sem avisos", () => {
   const t = lerTiers([CAB, ...frascos.map(f => linha(f))]);
   const r = aplicarTiers(frascos, t);
-  assert.equal(r.frascos.length, 79);
+  assert.equal(r.frascos.length, 81);
   assert.deepEqual(r.avisos, { divergentes: [], sem_posse: [], sem_linha: [] });
 });
 

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Observatório da Coleção v4.6 — tiers S/A/B/C/D · 69 na grade · 16 arquétipos · playbook v59</title>
+<title>Observatório da Coleção v4.8 — tiers S/A/B/C · 71 na grade · 16 arquétipos · playbook v60</title>
 <style>
 :root{
   --ink:#14110E; --panel:#1C1814; --panel2:#221D18; --line:#342C23;
@@ -131,7 +131,7 @@ footer{padding:14px 34px;border-top:1px solid var(--line);color:var(--dim);
 
 <header>
   <h1 class="serif">Observatório <em>da Coleção</em></h1>
-  <div class="sub">v4.6 · 05/out/2026 (playbook v59 · fichas v9 · tabelão v2.7) · <b>69 na grade</b> + Bedouin Rose fora da grade (tier D) · tiers = aba Tiers do Google Sheets (fonte única desde 04/out/2026) · Vibrato só dia e trabalho desde 05/out/2026 · camada custo fora do painel (só academia e corrida, regra de 25/set/2026) — a órbita é o tier (S externo → D interno); nenhum número decimal de gosto.</div>
+  <div class="sub">v4.8 · 23/out/2026 (playbook v60 · fichas v10 · tabelão v2.8) · <b>71 na grade</b> (Blue Sapphire Supercharged entra; Bedouin Rose C, dentro da grade) · tiers = aba Tiers do Google Sheets (fonte única desde 04/out/2026) · Vibrato só dia e trabalho desde 05/out/2026 · camada custo fora do painel (só academia e corrida, regra de 25/set/2026) — a órbita é o tier (S externo → D interno); nenhum número decimal de gosto.</div>
   <div class="right">
     <button class="btn" id="gapBtn">Modo Gaps</button>
     <button class="btn" id="resetBtn" style="display:none">Restaurar arquivados</button>
@@ -140,7 +140,7 @@ footer{padding:14px 34px;border-top:1px solid var(--line);color:var(--dim);
 
 <main>
   <div id="wheelWrap">
-    <svg id="wheel" viewBox="0 0 900 900" role="img" aria-label="Roda dos 16 arquétipos com a grade de 69 frascos, camada custo de 10 e tiers S–D"></svg>
+    <svg id="wheel" viewBox="0 0 900 900" role="img" aria-label="Roda dos 16 arquétipos com a grade de 71 frascos e tiers S–D"></svg>
     <div class="tooltip" id="tt"></div>
   </div>
 
@@ -203,13 +203,13 @@ footer{padding:14px 34px;border-top:1px solid var(--line);color:var(--dim);
 
 <footer>
   <span>Livre: só frascos dentro do envelope climático (clima ≥ 5/9, com modificador de umidade por arquétipo), ordenados por <b>tier</b> (S → D) e, em empate, por clima. Sem nota, sem fit decimal.</span>
-  <span>Ocasião: célula literal do playbook v59 (seguro → jogada → também, na ordem tier → aptidão → centralidade). "clima x/9" = adequação à temperatura/umidade escolhidas.</span>
+  <span>Ocasião: célula literal do playbook v60 (seguro → jogada → também, na ordem tier → aptidão → centralidade). "clima x/9" = adequação à temperatura/umidade escolhidas.</span>
   <span>Camada custo: fora do painel (usada só em academia e corrida).</span>
 </footer>
 
 <script>
-/* ============ DADOS — 05/out/2026: 70 frascos (grade 69 + Bedouin Rose D); camada custo fora */
-const FR = [{"casa": "Abdul Samad Al Qurashi", "nome": "Al Qurashi Blend", "calor": 7, "ameno": 7, "frio": 5, "arq": "O Sultão", "tier": "A", "tv": 8}, {"casa": "Amouage", "nome": "Beach Hut Man", "calor": 8, "ameno": 7, "frio": 3, "arq": "O Botânico", "tier": "A", "tv": 8}, {"casa": "Amouage", "nome": "Decision", "calor": 4, "ameno": 6, "frio": 8, "arq": "O Monge", "tier": "S", "tv": 10}, {"casa": "Amouage", "nome": "Outlands", "calor": 2, "ameno": 5, "frio": 9, "arq": "O Monge", "tier": "S", "tv": 10}, {"casa": "Amouage", "nome": "Purpose 50", "calor": 5, "ameno": 7, "frio": 7, "arq": "O Monge", "tier": "S", "tv": 10}, {"casa": "Amouage", "nome": "Reflection Man", "calor": 9, "ameno": 6, "frio": 2, "arq": "O Florista Branco", "tier": "S", "tv": 10}, {"casa": "Amouage", "nome": "Search", "calor": 8, "ameno": 7, "frio": 4, "arq": "O Monge", "tier": "A", "tv": 8}, {"casa": "BDK", "nome": "Gris Charnel Extrait", "calor": 3, "ameno": 6, "frio": 9, "arq": "O Marceneiro", "tier": "S", "tv": 10}, {"casa": "Boadicea", "nome": "Imperial", "calor": 2, "ameno": 5, "frio": 9, "arq": "O Barbeiro", "tier": "A", "tv": 8}, {"casa": "Boadicea", "nome": "Monarch", "calor": 3, "ameno": 6, "frio": 9, "arq": "O Sultão", "tier": "B", "tv": 6}, {"casa": "Born to Stand Out", "nome": "Drunk Lovers", "calor": 4, "ameno": 7, "frio": 7, "arq": "A Lareira", "tier": "A", "tv": 8}, {"casa": "Bvlgari", "nome": "Tygar Extrait", "calor": 7, "ameno": 8, "frio": 4, "arq": "O Mediterrâneo", "tier": "S", "tv": 10}, {"casa": "By Kilian", "nome": "Intoxicated", "calor": 2, "ameno": 5, "frio": 9, "arq": "O Confeiteiro", "tier": "A", "tv": 8}, {"casa": "BYNOMADS", "nome": "Bedouin Rose", "calor": 2, "ameno": 5, "frio": 9, "arq": "O Rosal", "tier": "D", "tv": 2, "out": true}, {"casa": "BYNOMADS", "nome": "K-Musk", "calor": 8, "ameno": 7, "frio": 3, "arq": "O Minimalista", "tier": "B", "tv": 6}, {"casa": "BYNOMADS", "nome": "Oud Kyphi", "calor": 2, "ameno": 5, "frio": 9, "arq": "O Sultão", "tier": "C", "tv": 4}, {"casa": "Byredo", "nome": "Black Saffron Absolu", "calor": 6, "ameno": 7, "frio": 6, "arq": "O Curtidor", "tier": "A", "tv": 8}, {"casa": "Chanel", "nome": "Bleu de Chanel EDP", "calor": 6, "ameno": 7, "frio": 6, "arq": "O Mediterrâneo", "tier": "C", "tv": 4}, {"casa": "Clive Christian", "nome": "1872 for Men", "calor": 9, "ameno": 6, "frio": 2, "arq": "O Barbeiro", "tier": "S", "tv": 10}, {"casa": "Clive Christian", "nome": "Blonde Amber", "calor": 2, "ameno": 5, "frio": 9, "arq": "A Lareira", "tier": "S", "tv": 10}, {"casa": "Clive Christian", "nome": "Crab Apple Blossom", "calor": 9, "ameno": 6, "frio": 2, "arq": "O Marinho", "tier": "S", "tv": 10}, {"casa": "Clive Christian", "nome": "Town & Country", "calor": 6, "ameno": 7, "frio": 6, "arq": "O Mediterrâneo", "tier": "A", "tv": 8}, {"casa": "Creed", "nome": "Aventus", "calor": 8, "ameno": 7, "frio": 3, "arq": "O Chiprista", "tier": "A", "tv": 8}, {"casa": "Creed", "nome": "Aventus Absolu", "calor": 9, "ameno": 6, "frio": 2, "arq": "O Chiprista", "tier": "S", "tv": 10}, {"casa": "Creed", "nome": "Bois du Portugal", "calor": 7, "ameno": 8, "frio": 4, "arq": "O Barbeiro", "tier": "B", "tv": 6}, {"casa": "Creed", "nome": "Green Irish Tweed", "calor": 8, "ameno": 7, "frio": 3, "arq": "O Botânico", "tier": "B", "tv": 6}, {"casa": "Creed", "nome": "Himalaya", "calor": 9, "ameno": 6, "frio": 2, "arq": "O Geólogo", "tier": "B", "tv": 6}, {"casa": "Creed", "nome": "Royal Oud", "calor": 9, "ameno": 6, "frio": 2, "arq": "O Marceneiro", "tier": "A", "tv": 8}, {"casa": "Creed", "nome": "Wild Vetiver", "calor": 8, "ameno": 7, "frio": 3, "arq": "O Geólogo", "tier": "A", "tv": 8}, {"casa": "Essential Parfums", "nome": "Bois Impérial", "calor": 7, "ameno": 8, "frio": 4, "arq": "O Geólogo", "tier": "S", "tv": 10}, {"casa": "Ex Nihilo", "nome": "Blue Talisman EDP", "calor": 9, "ameno": 6, "frio": 2, "arq": "O Mediterrâneo", "tier": "A", "tv": 8}, {"casa": "Ex Nihilo", "nome": "Brompton Immortals Extrait", "calor": 4, "ameno": 6, "frio": 8, "arq": "O Rosal", "tier": "S", "tv": 10}, {"casa": "Fragrance du Bois", "nome": "Lucius", "calor": 8, "ameno": 7, "frio": 3, "arq": "O Mediterrâneo", "tier": "S", "tv": 10}, {"casa": "Givenchy", "nome": "Désobéissant", "calor": 8, "ameno": 8, "frio": 4, "arq": "O Botânico", "tier": "S", "tv": 10}, {"casa": "Nishane", "nome": "Favonius", "calor": 3, "ameno": 7, "frio": 9, "arq": "O Rosal", "tier": "S", "tv": 10}, {"casa": "Granado", "nome": "Apotecário", "calor": 3, "ameno": 6, "frio": 9, "arq": "O Curtidor", "tier": "B", "tv": 6}, {"casa": "Hermès", "nome": "Terre d'Hermès Parfum", "calor": 9, "ameno": 6, "frio": 2, "arq": "O Geólogo", "tier": "A", "tv": 8}, {"casa": "Hind Al Oud", "nome": "Ya'e", "calor": 4, "ameno": 6, "frio": 8, "arq": "O Empoado", "tier": "B", "tv": 6}, {"casa": "Le Labo", "nome": "Santal 33", "calor": 5, "ameno": 7, "frio": 7, "arq": "O Marceneiro", "tier": "A", "tv": 8}, {"casa": "Ex Nihilo", "nome": "Scarlet Sands", "calor": 6, "ameno": 8, "frio": 5, "arq": "O Florista Branco", "tier": "S", "tv": 10}, {"casa": "Loewe", "nome": "7 Loewe", "calor": 7, "ameno": 8, "frio": 4, "arq": "O Monge", "tier": "B", "tv": 6}, {"casa": "Louis Vuitton", "nome": "Imagination", "calor": 6, "ameno": 7, "frio": 6, "arq": "O Mediterrâneo", "tier": "S", "tv": 10}, {"casa": "Louis Vuitton", "nome": "L'Immensité", "calor": 9, "ameno": 6, "frio": 2, "arq": "O Mediterrâneo", "tier": "A", "tv": 8}, {"casa": "Louis Vuitton", "nome": "Les Sables Roses", "calor": 3, "ameno": 6, "frio": 9, "arq": "O Rosal", "tier": "S", "tv": 10}, {"casa": "Louis Vuitton", "nome": "Météore", "calor": 9, "ameno": 6, "frio": 2, "arq": "O Geólogo", "tier": "S", "tv": 10}, {"casa": "Louis Vuitton", "nome": "Ombre Nomade", "calor": 2, "ameno": 5, "frio": 9, "arq": "O Sultão", "tier": "S", "tv": 10}, {"casa": "Memo Paris", "nome": "Omnia Omnibus Ubique", "calor": 3, "ameno": 7, "frio": 8, "arq": "O Empoado", "tier": "S", "tv": 10}, {"casa": "Matière Première", "nome": "Radical Rose Extrait", "calor": 5, "ameno": 7, "frio": 7, "arq": "O Rosal", "tier": "S", "tv": 10}, {"casa": "Memo Paris", "nome": "African Leather", "calor": 3, "ameno": 6, "frio": 9, "arq": "O Curtidor", "tier": "S", "tv": 10}, {"casa": "Memo Paris", "nome": "Odéon", "calor": 4, "ameno": 6, "frio": 8, "arq": "O Rosal", "tier": "S", "tv": 10}, {"casa": "MFK", "nome": "Amyris Homme Extrait", "calor": 4, "ameno": 6, "frio": 8, "arq": "A Lareira", "tier": "S", "tv": 10}, {"casa": "MFK", "nome": "Gentle Fluidity Silver", "calor": 7, "ameno": 7, "frio": 5, "arq": "O Minimalista", "tier": "S", "tv": 10}, {"casa": "MFK", "nome": "Grand Soir", "calor": 2, "ameno": 5, "frio": 9, "arq": "A Lareira", "tier": "S", "tv": 10}, {"casa": "MFK", "nome": "Oud Satin Mood Extrait", "calor": 3, "ameno": 6, "frio": 9, "arq": "O Sultão", "tier": "S", "tv": 10}, {"casa": "Nishane", "nome": "Ani X", "calor": 7, "ameno": 8, "frio": 4, "arq": "A Lareira", "tier": "A", "tv": 8}, {"casa": "Nishane", "nome": "Hacivat", "calor": 8, "ameno": 7, "frio": 3, "arq": "O Chiprista", "tier": "S", "tv": 10}, {"casa": "Nishane", "nome": "Oudous Lux Solis", "calor": 8, "ameno": 7, "frio": 3, "arq": "O Sultão", "tier": "A", "tv": 8}, {"casa": "OJAR", "nome": "Wood Whisper", "calor": 4, "ameno": 6, "frio": 8, "arq": "O Marceneiro", "tier": "A", "tv": 8}, {"casa": "Omanluxury", "nome": "Caden", "calor": 2, "ameno": 5, "frio": 9, "arq": "A Lareira", "tier": "A", "tv": 8}, {"casa": "Omanluxury", "nome": "Serenity", "calor": 2, "ameno": 5, "frio": 9, "arq": "O Curtidor", "tier": "B", "tv": 6}, {"casa": "Ormonde Jayne", "nome": "Bijou Zafran", "calor": 2, "ameno": 5, "frio": 9, "arq": "O Curtidor", "tier": "S", "tv": 10}, {"casa": "Ormonde Jayne", "nome": "Montabaco Intensivo", "calor": 7, "ameno": 7, "frio": 5, "arq": "O Curtidor", "tier": "A", "tv": 8}, {"casa": "Parfums de Marly", "nome": "Castley", "calor": 4, "ameno": 6, "frio": 8, "arq": "O Mediterrâneo", "tier": "B", "tv": 6}, {"casa": "Pernoire", "nome": "Anelo", "calor": 7, "ameno": 8, "frio": 4, "arq": "O Chiprista", "tier": "A", "tv": 8}, {"casa": "Sospiro", "nome": "Vibrato", "calor": 8, "ameno": 7, "frio": 3, "arq": "O Mediterrâneo", "tier": "A", "tv": 8}, {"casa": "Thameen", "nome": "Carved Oud", "calor": 3, "ameno": 6, "frio": 9, "arq": "O Marceneiro", "tier": "A", "tv": 8}, {"casa": "Thomas de Monaco", "nome": "Ultima Storia", "calor": 6, "ameno": 7, "frio": 5, "arq": "O Empoado", "tier": "A", "tv": 8}, {"casa": "Widian", "nome": "Liwa", "calor": 3, "ameno": 6, "frio": 8, "arq": "O Sultão", "tier": "S", "tv": 10}, {"casa": "Widian", "nome": "New York", "calor": 7, "ameno": 7, "frio": 4, "arq": "A Lareira", "tier": "A", "tv": 8}, {"casa": "Xerjoff", "nome": "Torino 21", "calor": 9, "ameno": 6, "frio": 2, "arq": "O Botânico", "tier": "A", "tv": 8}];
+/* ============ DADOS — 23/out/2026: 71 frascos (grade v60); camada custo fora */
+const FR = [{"casa": "Abdul Samad Al Qurashi", "nome": "Al Qurashi Blend", "calor": 7, "ameno": 7, "frio": 5, "arq": "O Sultão", "tier": "A", "tv": 8}, {"casa": "Amouage", "nome": "Beach Hut Man", "calor": 8, "ameno": 7, "frio": 3, "arq": "O Botânico", "tier": "A", "tv": 8}, {"casa": "Amouage", "nome": "Decision", "calor": 4, "ameno": 6, "frio": 8, "arq": "O Monge", "tier": "S", "tv": 10}, {"casa": "Amouage", "nome": "Outlands", "calor": 2, "ameno": 5, "frio": 9, "arq": "O Monge", "tier": "S", "tv": 10}, {"casa": "Amouage", "nome": "Purpose 50", "calor": 5, "ameno": 7, "frio": 7, "arq": "O Monge", "tier": "S", "tv": 10}, {"casa": "Amouage", "nome": "Reflection Man", "calor": 9, "ameno": 6, "frio": 2, "arq": "O Florista Branco", "tier": "S", "tv": 10}, {"casa": "Amouage", "nome": "Search", "calor": 8, "ameno": 7, "frio": 4, "arq": "O Monge", "tier": "A", "tv": 8}, {"casa": "BDK", "nome": "Gris Charnel Extrait", "calor": 3, "ameno": 6, "frio": 9, "arq": "O Marceneiro", "tier": "S", "tv": 10}, {"casa": "Boadicea", "nome": "Blue Sapphire Supercharged", "calor": 3, "ameno": 7, "frio": 9, "arq": "O Rosal", "tier": "S", "tv": 10}, {"casa": "Boadicea", "nome": "Imperial", "calor": 2, "ameno": 5, "frio": 9, "arq": "O Barbeiro", "tier": "A", "tv": 8}, {"casa": "Boadicea", "nome": "Monarch", "calor": 3, "ameno": 6, "frio": 9, "arq": "O Sultão", "tier": "B", "tv": 6}, {"casa": "Born to Stand Out", "nome": "Drunk Lovers", "calor": 4, "ameno": 7, "frio": 7, "arq": "A Lareira", "tier": "A", "tv": 8}, {"casa": "Bvlgari", "nome": "Tygar Extrait", "calor": 7, "ameno": 8, "frio": 4, "arq": "O Mediterrâneo", "tier": "S", "tv": 10}, {"casa": "By Kilian", "nome": "Intoxicated", "calor": 2, "ameno": 5, "frio": 9, "arq": "O Confeiteiro", "tier": "A", "tv": 8}, {"casa": "BYNOMADS", "nome": "Bedouin Rose", "calor": 2, "ameno": 5, "frio": 9, "arq": "O Rosal", "tier": "C", "tv": 4}, {"casa": "BYNOMADS", "nome": "K-Musk", "calor": 8, "ameno": 7, "frio": 3, "arq": "O Minimalista", "tier": "B", "tv": 6}, {"casa": "BYNOMADS", "nome": "Oud Kyphi", "calor": 2, "ameno": 5, "frio": 9, "arq": "O Sultão", "tier": "C", "tv": 4}, {"casa": "Byredo", "nome": "Black Saffron Absolu", "calor": 6, "ameno": 7, "frio": 6, "arq": "O Curtidor", "tier": "A", "tv": 8}, {"casa": "Chanel", "nome": "Bleu de Chanel EDP", "calor": 6, "ameno": 7, "frio": 6, "arq": "O Mediterrâneo", "tier": "C", "tv": 4}, {"casa": "Clive Christian", "nome": "1872 for Men", "calor": 9, "ameno": 6, "frio": 2, "arq": "O Barbeiro", "tier": "S", "tv": 10}, {"casa": "Clive Christian", "nome": "Blonde Amber", "calor": 2, "ameno": 5, "frio": 9, "arq": "A Lareira", "tier": "S", "tv": 10}, {"casa": "Clive Christian", "nome": "Crab Apple Blossom", "calor": 9, "ameno": 6, "frio": 2, "arq": "O Marinho", "tier": "S", "tv": 10}, {"casa": "Clive Christian", "nome": "Town & Country", "calor": 6, "ameno": 7, "frio": 6, "arq": "O Mediterrâneo", "tier": "A", "tv": 8}, {"casa": "Creed", "nome": "Aventus", "calor": 8, "ameno": 7, "frio": 3, "arq": "O Chiprista", "tier": "A", "tv": 8}, {"casa": "Creed", "nome": "Aventus Absolu", "calor": 9, "ameno": 6, "frio": 2, "arq": "O Chiprista", "tier": "S", "tv": 10}, {"casa": "Creed", "nome": "Bois du Portugal", "calor": 7, "ameno": 8, "frio": 4, "arq": "O Barbeiro", "tier": "B", "tv": 6}, {"casa": "Creed", "nome": "Green Irish Tweed", "calor": 8, "ameno": 7, "frio": 3, "arq": "O Botânico", "tier": "B", "tv": 6}, {"casa": "Creed", "nome": "Himalaya", "calor": 9, "ameno": 6, "frio": 2, "arq": "O Geólogo", "tier": "B", "tv": 6}, {"casa": "Creed", "nome": "Royal Oud", "calor": 9, "ameno": 6, "frio": 2, "arq": "O Marceneiro", "tier": "A", "tv": 8}, {"casa": "Creed", "nome": "Wild Vetiver", "calor": 8, "ameno": 7, "frio": 3, "arq": "O Geólogo", "tier": "A", "tv": 8}, {"casa": "Essential Parfums", "nome": "Bois Impérial", "calor": 7, "ameno": 8, "frio": 4, "arq": "O Geólogo", "tier": "S", "tv": 10}, {"casa": "Ex Nihilo", "nome": "Blue Talisman EDP", "calor": 9, "ameno": 6, "frio": 2, "arq": "O Mediterrâneo", "tier": "A", "tv": 8}, {"casa": "Ex Nihilo", "nome": "Brompton Immortals Extrait", "calor": 4, "ameno": 6, "frio": 8, "arq": "O Rosal", "tier": "S", "tv": 10}, {"casa": "Ex Nihilo", "nome": "Scarlet Sands", "calor": 6, "ameno": 8, "frio": 6, "arq": "O Florista Branco", "tier": "S", "tv": 10}, {"casa": "Fragrance du Bois", "nome": "Lucius", "calor": 8, "ameno": 7, "frio": 3, "arq": "O Mediterrâneo", "tier": "S", "tv": 10}, {"casa": "Givenchy", "nome": "Désobéissant", "calor": 8, "ameno": 8, "frio": 4, "arq": "O Botânico", "tier": "S", "tv": 10}, {"casa": "Granado", "nome": "Apotecário", "calor": 3, "ameno": 6, "frio": 9, "arq": "O Curtidor", "tier": "B", "tv": 6}, {"casa": "Hermès", "nome": "Terre d'Hermès Parfum", "calor": 9, "ameno": 6, "frio": 2, "arq": "O Geólogo", "tier": "A", "tv": 8}, {"casa": "Hind Al Oud", "nome": "Ya'e", "calor": 4, "ameno": 6, "frio": 8, "arq": "O Empoado", "tier": "B", "tv": 6}, {"casa": "Le Labo", "nome": "Santal 33", "calor": 5, "ameno": 7, "frio": 7, "arq": "O Marceneiro", "tier": "A", "tv": 8}, {"casa": "Loewe", "nome": "7 Loewe", "calor": 7, "ameno": 8, "frio": 4, "arq": "O Monge", "tier": "B", "tv": 6}, {"casa": "Louis Vuitton", "nome": "Imagination", "calor": 6, "ameno": 7, "frio": 6, "arq": "O Mediterrâneo", "tier": "S", "tv": 10}, {"casa": "Louis Vuitton", "nome": "L'Immensité", "calor": 9, "ameno": 6, "frio": 2, "arq": "O Mediterrâneo", "tier": "A", "tv": 8}, {"casa": "Louis Vuitton", "nome": "Les Sables Roses", "calor": 3, "ameno": 6, "frio": 9, "arq": "O Rosal", "tier": "S", "tv": 10}, {"casa": "Louis Vuitton", "nome": "Météore", "calor": 9, "ameno": 6, "frio": 2, "arq": "O Geólogo", "tier": "S", "tv": 10}, {"casa": "Louis Vuitton", "nome": "Ombre Nomade", "calor": 2, "ameno": 5, "frio": 9, "arq": "O Sultão", "tier": "S", "tv": 10}, {"casa": "Matière Première", "nome": "Radical Rose Extrait", "calor": 5, "ameno": 7, "frio": 7, "arq": "O Rosal", "tier": "S", "tv": 10}, {"casa": "Memo Paris", "nome": "African Leather", "calor": 3, "ameno": 6, "frio": 9, "arq": "O Curtidor", "tier": "S", "tv": 10}, {"casa": "Memo Paris", "nome": "Odéon", "calor": 4, "ameno": 6, "frio": 8, "arq": "O Rosal", "tier": "S", "tv": 10}, {"casa": "Memo Paris", "nome": "Omnia Omnibus Ubique", "calor": 3, "ameno": 7, "frio": 8, "arq": "O Empoado", "tier": "S", "tv": 10}, {"casa": "MFK", "nome": "Amyris Homme Extrait", "calor": 4, "ameno": 6, "frio": 8, "arq": "A Lareira", "tier": "S", "tv": 10}, {"casa": "MFK", "nome": "Gentle Fluidity Silver", "calor": 7, "ameno": 7, "frio": 5, "arq": "O Minimalista", "tier": "S", "tv": 10}, {"casa": "MFK", "nome": "Grand Soir", "calor": 2, "ameno": 5, "frio": 9, "arq": "A Lareira", "tier": "S", "tv": 10}, {"casa": "MFK", "nome": "Oud Satin Mood Extrait", "calor": 3, "ameno": 6, "frio": 9, "arq": "O Sultão", "tier": "S", "tv": 10}, {"casa": "Nishane", "nome": "Ani X", "calor": 7, "ameno": 8, "frio": 4, "arq": "A Lareira", "tier": "A", "tv": 8}, {"casa": "Nishane", "nome": "Favonius", "calor": 3, "ameno": 7, "frio": 9, "arq": "O Rosal", "tier": "S", "tv": 10}, {"casa": "Nishane", "nome": "Hacivat", "calor": 8, "ameno": 7, "frio": 3, "arq": "O Chiprista", "tier": "S", "tv": 10}, {"casa": "Nishane", "nome": "Oudous Lux Solis", "calor": 8, "ameno": 7, "frio": 3, "arq": "O Sultão", "tier": "A", "tv": 8}, {"casa": "OJAR", "nome": "Wood Whisper", "calor": 4, "ameno": 6, "frio": 8, "arq": "O Marceneiro", "tier": "A", "tv": 8}, {"casa": "Omanluxury", "nome": "Caden", "calor": 2, "ameno": 5, "frio": 9, "arq": "A Lareira", "tier": "A", "tv": 8}, {"casa": "Omanluxury", "nome": "Serenity", "calor": 2, "ameno": 5, "frio": 9, "arq": "O Curtidor", "tier": "B", "tv": 6}, {"casa": "Ormonde Jayne", "nome": "Bijou Zafran", "calor": 2, "ameno": 5, "frio": 9, "arq": "O Curtidor", "tier": "S", "tv": 10}, {"casa": "Ormonde Jayne", "nome": "Montabaco Intensivo", "calor": 7, "ameno": 7, "frio": 5, "arq": "O Curtidor", "tier": "A", "tv": 8}, {"casa": "Parfums de Marly", "nome": "Castley", "calor": 4, "ameno": 6, "frio": 8, "arq": "O Mediterrâneo", "tier": "B", "tv": 6}, {"casa": "Pernoire", "nome": "Anelo", "calor": 7, "ameno": 8, "frio": 4, "arq": "O Chiprista", "tier": "A", "tv": 8}, {"casa": "Sospiro", "nome": "Vibrato", "calor": 8, "ameno": 7, "frio": 3, "arq": "O Mediterrâneo", "tier": "A", "tv": 8}, {"casa": "Thameen", "nome": "Carved Oud", "calor": 3, "ameno": 6, "frio": 9, "arq": "O Marceneiro", "tier": "A", "tv": 8}, {"casa": "Thomas de Monaco", "nome": "Ultima Storia", "calor": 6, "ameno": 7, "frio": 5, "arq": "O Empoado", "tier": "A", "tv": 8}, {"casa": "Widian", "nome": "Liwa", "calor": 3, "ameno": 6, "frio": 8, "arq": "O Sultão", "tier": "S", "tv": 10}, {"casa": "Widian", "nome": "New York", "calor": 7, "ameno": 7, "frio": 4, "arq": "A Lareira", "tier": "A", "tv": 8}, {"casa": "Xerjoff", "nome": "Torino 21", "calor": 9, "ameno": 6, "frio": 2, "arq": "O Botânico", "tier": "A", "tv": 8}];
 
 /* 16 arquétipos — ordem luminoso→escuro (arquetipos_v1) + matiz do setor */
 const ARCH = [
@@ -233,7 +233,7 @@ const ARCH = [
 const AIDX = Object.fromEntries(ARCH.map((a,i)=>[a.n,i]));
 FR.forEach((f,i)=>{f.id=i; f.color=ARCH[AIDX[f.arq]].c; f.archived=false;});
 
-/* ============ PLAYBOOK v59 — grade literal (651 alocações · 69 frascos · teto S 12 · A 9 · B 6 · C 3 · D 0 · sem exceções) */
+/* ============ PLAYBOOK v60 — grade literal (668 alocações · 71 frascos · teto S 12 · A 9 · B 6 · C 3 · D 0 · sem exceções) */
 /* Aliases nome-playbook → nome-tabelão */
 const ALIAS = {
  "Oudós Lux Solis":"Oudous Lux Solis","Blue Talisman":"Blue Talisman EDP","Terre d'Hermès":"Terre d'Hermès Parfum","Bleu de Chanel":"Bleu de Chanel EDP",
@@ -546,11 +546,11 @@ const PB = {
 "t": [
 "Hacivat",
 "Crab Apple Blossom",
-"Scarlet Sands",
 "Aventus Absolu",
 "Reflection Man",
 "1872 for Men",
 "Météore",
+"Scarlet Sands",
 "Bois Impérial",
 "Aventus",
 "Beach Hut Man",
@@ -626,7 +626,6 @@ const PB = {
 "Lucius",
 "Decision",
 "Météore",
-"Favonius",
 "1872 for Men",
 "Ultima Storia",
 "Search",
@@ -650,19 +649,20 @@ const PB = {
 "Cítrico sobre âmbar seco-tonka-vetiver: a seriedade que os frescos puros não entregam, sem somar calor"
 ],
 "t": [
-"Scarlet Sands",
 "Imagination",
 "Aventus Absolu",
 "Bijou Zafran",
-"Omnia Omnibus Ubique",
 "Tygar Extrait",
 "Brompton",
-"Favonius",
 "Les Sables Roses",
+"Favonius",
+"Scarlet Sands",
+"Blue Sapphire Supercharged",
 "Gentle Fluidity Silver",
 "Odéon",
 "Liwa",
 "Purpose 50",
+"Omnia Omnibus Ubique",
 "Bois Impérial",
 "1872 for Men",
 "Crab Apple Blossom",
@@ -694,14 +694,15 @@ const PB = {
 "Lucius",
 "Aventus Absolu",
 "Tygar Extrait",
-"Favonius",
 "Les Sables Roses",
-"Scarlet Sands",
+"Favonius",
+"Omnia Omnibus Ubique",
+"Blue Sapphire Supercharged",
 "Reflection Man",
 "Amyris Homme Extrait",
-"Omnia Omnibus Ubique",
 "Liwa",
 "Météore",
+"Scarlet Sands",
 "Ultima Storia",
 "Terre d'Hermès",
 "Royal Oud",
@@ -746,6 +747,7 @@ const PB = {
 "African Leather",
 "Omnia Omnibus Ubique",
 "Les Sables Roses",
+"Favonius",
 "New York",
 "Black Saffron Absolu",
 "Drunk Lovers"
@@ -768,6 +770,7 @@ const PB = {
 "Gris Charnel",
 "Scarlet Sands",
 "Bois Impérial",
+"Blue Sapphire Supercharged",
 "Santal 33",
 "Beach Hut Man",
 "Wild Vetiver",
@@ -821,7 +824,6 @@ const PB = {
 "Bois Impérial",
 "Imagination",
 "Lucius",
-"Favonius",
 "Radical Rose",
 "Ombre Nomade",
 "Royal Oud",
@@ -847,16 +849,16 @@ const PB = {
 "t": [
 "Aventus Absolu",
 "Bijou Zafran",
-"Omnia Omnibus Ubique",
-"Favonius",
 "Les Sables Roses",
 "Imagination",
 "Lucius",
-"Scarlet Sands",
 "Radical Rose",
 "Grand Soir",
 "Ombre Nomade",
 "Outlands",
+"Favonius",
+"Scarlet Sands",
+"Blue Sapphire Supercharged",
 "Odéon",
 "Amyris Homme Extrait",
 "Decision",
@@ -865,6 +867,7 @@ const PB = {
 "Purpose 50",
 "Blonde Amber",
 "Oud Satin Mood",
+"Omnia Omnibus Ubique",
 "Bois Impérial",
 "Black Saffron Absolu",
 "Drunk Lovers",
@@ -890,20 +893,21 @@ const PB = {
 ],
 "t": [
 "Aventus Absolu",
-"Favonius",
 "Les Sables Roses",
 "Lucius",
 "Radical Rose",
 "Ombre Nomade",
 "Oud Satin Mood",
 "Outlands",
+"Favonius",
+"Omnia Omnibus Ubique",
+"Blue Sapphire Supercharged",
 "Amyris Homme Extrait",
 "Decision",
-"Omnia Omnibus Ubique",
 "Liwa",
-"Scarlet Sands",
 "Blonde Amber",
 "Grand Soir",
+"Scarlet Sands",
 "Bijou Zafran",
 "Royal Oud",
 "Terre d'Hermès",
@@ -961,6 +965,8 @@ const PB = {
 "Gris Charnel",
 "Les Sables Roses",
 "Liwa",
+"Favonius",
+"Blue Sapphire Supercharged",
 "Caden",
 "Black Saffron Absolu",
 "Drunk Lovers",
@@ -982,6 +988,8 @@ const PB = {
 ],
 "t": [
 "Gentle Fluidity Silver",
+"Scarlet Sands",
+"Blue Sapphire Supercharged",
 "Santal 33",
 "Beach Hut Man",
 "Oudós Lux Solis"
@@ -1018,7 +1026,6 @@ const PB = {
 ],
 "t": [
 "Decision",
-"Favonius",
 "Outlands",
 "Ombre Nomade",
 "Carved Oud",
@@ -1038,14 +1045,15 @@ const PB = {
 "Opulência floral-resinosa em extrait — S"
 ],
 "t": [
-"Favonius",
 "Les Sables Roses",
 "Bijou Zafran",
-"Omnia Omnibus Ubique",
 "Aventus Absolu",
 "Radical Rose",
 "Grand Soir",
 "Ombre Nomade",
+"Favonius",
+"Scarlet Sands",
+"Blue Sapphire Supercharged",
 "African Leather",
 "Liwa",
 "Purpose 50",
@@ -1054,6 +1062,7 @@ const PB = {
 "Blonde Amber",
 "Odéon",
 "Oud Satin Mood",
+"Omnia Omnibus Ubique",
 "Black Saffron Absolu",
 "Caden",
 "Drunk Lovers",
@@ -1077,18 +1086,20 @@ const PB = {
 ],
 "t": [
 "Brompton",
-"Favonius",
 "Les Sables Roses",
 "Purpose 50",
 "Aventus Absolu",
 "Oud Satin Mood",
 "Outlands",
+"Favonius",
+"Omnia Omnibus Ubique",
+"Blue Sapphire Supercharged",
 "Liwa",
 "Amyris Homme Extrait",
 "Decision",
-"Omnia Omnibus Ubique",
 "Blonde Amber",
 "Grand Soir",
+"Scarlet Sands",
 "Bijou Zafran",
 "Imperial",
 "Royal Oud",
@@ -1135,18 +1146,21 @@ const PB = {
 "Blonde Amber",
 "Odéon",
 "Oud Satin Mood",
+"Omnia Omnibus Ubique",
 "Brompton",
 "Gris Charnel",
 "Les Sables Roses",
 "Liwa",
-"Omnia Omnibus Ubique",
 "Ombre Nomade",
 "Outlands",
+"Favonius",
+"Blue Sapphire Supercharged",
 "Caden",
 "Intoxicated",
 "Black Saffron Absolu",
 "Serenity",
-"Apotecário"
+"Apotecário",
+"Bedouin Rose"
 ]
 }
 },
@@ -1193,7 +1207,6 @@ const PB = {
 "t": [
 "Decision",
 "Outlands",
-"Favonius",
 "Ombre Nomade",
 "Imperial",
 "Carved Oud",
@@ -1213,16 +1226,17 @@ const PB = {
 "Grand Soir",
 "Ombre Nomade",
 "Radical Rose",
-"Favonius",
 "Les Sables Roses",
 "Aventus Absolu",
 "Bijou Zafran",
-"Omnia Omnibus Ubique",
+"Favonius",
+"Blue Sapphire Supercharged",
 "Oud Satin Mood",
 "Blonde Amber",
 "African Leather",
 "Liwa",
 "Purpose 50",
+"Omnia Omnibus Ubique",
 "Caden",
 "Imperial",
 "Intoxicated",
@@ -1245,13 +1259,14 @@ const PB = {
 "Outlands",
 "Radical Rose",
 "Brompton",
-"Favonius",
 "Les Sables Roses",
 "Aventus Absolu",
+"Favonius",
+"Omnia Omnibus Ubique",
+"Blue Sapphire Supercharged",
 "Grand Soir",
 "Blonde Amber",
 "Liwa",
-"Omnia Omnibus Ubique",
 "Imperial",
 "Royal Oud",
 "Serenity",
@@ -1291,15 +1306,17 @@ const PB = {
 "African Leather",
 "Amyris Homme Extrait",
 "Bijou Zafran",
+"Omnia Omnibus Ubique",
 "Outlands",
 "Brompton",
 "Les Sables Roses",
 "Liwa",
-"Omnia Omnibus Ubique",
+"Favonius",
 "Caden",
 "Intoxicated",
 "Serenity",
-"Apotecário"
+"Apotecário",
+"Bedouin Rose"
 ]
 }
 }

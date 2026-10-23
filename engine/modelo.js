@@ -1,4 +1,4 @@
-// modelo.js — porta fiel de spec/modelo_diario_v1_6.py (Top 10 do dia em dois slots).
+// modelo.js — porta fiel de spec/modelo_diario_v1_7.py (Top 10 do dia em dois slots).
 // Cada função espelha a homônima do Python; nada de "melhorias". Datas são strings AAAA-MM-DD.
 import { CFG, FAIXAS, OCASIOES, OCAS_ALIAS, ESCUROS, DIAS } from "./config.js";
 
@@ -37,7 +37,7 @@ function _hora(s) {
   return parseFloat(s);
 }
 const _num = s => parseFloat(s.replace(",", "."));
-const _nomeDiario = s => s.trim().replace(/\s*\((manh[ãa]|noite|dia|m|n)\)\s*$/i, "").trim();
+const _nomeDiario = s => s.trim().replace(/\s*\((manh[ãa]|noite|dia|esporte|m|n|e)\)\s*$/i, "").trim();   // v1.7: (esporte)/(e)
 const validaData = v => { if (!/^\d{4}-\d{2}-\d{2}$/.test(v.trim())) throw new Error(`Data inválida: '${v}'`); return v.trim(); };
 
 export function parseEntrada(txt, hoje = hojeISO()) {
