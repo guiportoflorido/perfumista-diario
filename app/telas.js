@@ -1,9 +1,9 @@
-// telas.js — Coleção, Playbook e Histórico (fase 4). Recebem o contexto pronto do main.js e devolvem HTML.
+// telas.js — Coleção, Playbook, Histórico e Análises. Recebem o contexto pronto do main.js e devolvem HTML.
 import { FAIXAS, faixaIdx } from "../engine/index.js";
 import { nomeDoDia } from "./diversao.js";
 import { esc, ROT_OC, OCAS_TODAS, pinta, faixaHTML, nf, tierHTML, slotNome, slotIcone, md, ordsDe, compararMulti, cmpValor, cabOrd, painelOrd, OPC_AMOSTRA, passaAmostra, temFiltro } from "./util.js";
 import { chave } from "./mercado.js";
-import { contagens, agrupar, esquecidos, usoVsJanelas, calibracao, deAnalise, notaPorFrascoFaixa } from "./estatisticas.js";
+import { contagens, agrupar, esquecidos, usoVsJanelas, calibracao, deAnalise, notaPorFrascoFaixa, aderenciaPlaybook, concentracao, usoPorTier, porDiaSemana, constancia, sobrevivencia } from "./estatisticas.js";
 import { arqIcone, corArq, ARQ_PATHS } from "./icones.js";
 
 const TIERS = ["S", "A", "B", "C"];
@@ -153,36 +153,72 @@ export function blocoExportar(preset = "tudo") {
     <div id="expSaida"></div></div>`;
 }
 
-export function telaHistorico({ frascos, hist: histTodo, hoje, fila: filaToda, ajSpray, limiteEsq = 45, hr = {}, arqTag, limiteEdicao = "", exp = "tudo", raspadinha = "", duelos = "", wrapped = "" }) {
+/** Seletor de período (chips + intervalo livre), comum a Histórico e Análises. */
+function seletorPeriodo(hr, hoje, de, ate, n) {
+  const preset = hr.preset || "tudo";
+  return `<div class="bloco periodo">
+    <div class="chips rolagem">${PRESETS.map(([v, r]) => `<button class="chip" data-hr="${v}" aria-pressed="${preset === v}">${r}</button>`).join("")}</div>
+    ${preset === "livre" ? `<div class="campos"><label>De<input type="date" id="hr-de" value="${esc(hr.de || "")}" max="${hoje}"></label><label>Até<input type="date" id="hr-ate" value="${esc(hr.ate || hoje)}" max="${hoje}"></label></div>` : ""}
+    <p class="nota">${de ? `${dataBR(de)} a ${dataBR(ate)}` : `Todo o diário até ${dataBR(ate)}`} · ${n} registro${n === 1 ? "" : "s"} de Dia/Noite</p>
+  </div>`;
+}
+const barras = (pares, max) => `<div class="barras">${pares.map(([k, v]) => `<div class="barra"><span class="t">${k}</span><span class="trilho"><span style="width:${max ? (v / max) * 100 : 0}%"></span></span><span class="n">${v}</span></div>`).join("")}</div>`;
+
+/** Mais › Histórico: o diário em si — período, registros recentes (editar), Wrapped, calendário, registros e exportar.
+ *  As contas foram para Mais › Análises. */
+export function telaHistorico({ frascos, hist: histTodo, hoje, hr = {}, limiteEdicao = "", exp = "tudo", wrapped = "" }) {
+  const { de, ate } = periodo(hr.preset || "tudo", hoje, hr.de, hr.ate);
+  const dentro = r => (!de || r.data >= de) && r.data <= ate;
+  const hist = histTodo.filter(dentro).filter(deAnalise);
+  const seletor = seletorPeriodo(hr, hoje, de, ate, hist.length);
+  const recentes = limiteEdicao ? registrosRecentes(histTodo, limiteEdicao) : "";
+  if (!hist.length) return `<h2>Histórico</h2>${seletor}${histTodo.length ? recentes : ""}<div class="bloco"><p class="vazio">${histTodo.length ? "Nenhum registro nesse período." : "Sem registros ainda. Conecte a planilha em Ajustes ou registre um uso."}</p></div>${histTodo.length ? blocoExportar(exp) : ""}`;
+  const doPeriodo = (hr.preset || "tudo") !== "tudo";
+  return `<h2>Histórico</h2>
+  ${seletor}
+  ${recentes}
+  ${wrapped}
+  ${calendario(histTodo.filter(deAnalise), frascos, ate, de)}
+  <div class="bloco"><h3>${doPeriodo ? "Registros do período" : "Últimos 30 registros"} · Dia e Noite</h3><div class="lista">${hist.slice(-30).reverse().map(r => `<article class="card compacto"><span class="pos">${slotIcone(r.slot)}</span><div style="min-width:0"><b>${esc(r.perfume)}</b><div class="casa">${esc(r.data)} · ${slotNome(r.slot)}${r.sprays ? ` · ${esc(r.sprays)} sprays` : ""}${r.pendente ? " · na fila" : ""}</div></div><span></span></article>`).join("")}</div></div>
+  <p class="nota">Contas do período (mais usados, esquecidos, NotaDia, sprays, duelos…) estão em <button class="nome-inline" data-sub-grupo="mais" data-sub="analises">Análises</button>.</p>
+  ${blocoExportar(exp)}`;
+}
+
+const DIAS_CURTOS = ["seg", "ter", "qua", "qui", "sex", "sáb", "dom"];
+const FX_CURTA = ["MQ", "Q", "A", "F", "Fr", "MF"];
+const OC_CURTA = { Lazer: "Lz", "T.Inf": "TI", "T.For": "TF", "N.Inf": "NI", "N.For": "NF", "Cozy D": "CD", "Cozy N": "CN" };
+const pct = x => `${Math.round(x * 100)}%`;
+
+/** Mais › Análises: as contas do período (mesmo seletor do Histórico) + análises novas. */
+export function telaAnalises({ frascos, hist: histTodo, hoje, fila: filaToda, ajSpray, janelas, limiteEsq = 45, hr = {}, arqTag, raspadinha = "", duelos = "" }) {
   const preset = hr.preset || "tudo";
   const { de, ate } = periodo(preset, hoje, hr.de, hr.ate);
   const dentro = r => (!de || r.data >= de) && r.data <= ate;
-  // análises: só Dia (M) e Noite (N); Esportes e 2ª aplicação aparecem só nas listas de registros
   const hist = histTodo.filter(dentro).filter(deAnalise), fila = filaToda.filter(dentro);
-  const seletor = `<div class="bloco periodo">
-    <div class="chips rolagem">${PRESETS.map(([v, r]) => `<button class="chip" data-hr="${v}" aria-pressed="${preset === v}">${r}</button>`).join("")}</div>
-    ${preset === "livre" ? `<div class="campos"><label>De<input type="date" id="hr-de" value="${esc(hr.de || "")}" max="${hoje}"></label><label>Até<input type="date" id="hr-ate" value="${esc(hr.ate || hoje)}" max="${hoje}"></label></div>` : ""}
-    <p class="nota">${de ? `${dataBR(de)} a ${dataBR(ate)}` : `Todo o diário até ${dataBR(ate)}`} · ${hist.length} registro${hist.length === 1 ? "" : "s"} de Dia/Noite</p>
-  </div>`;
+  const seletor = seletorPeriodo(hr, hoje, de, ate, hist.length);
+  if (!hist.length) return `<h2>Análises</h2>${seletor}<div class="bloco"><p class="vazio">${histTodo.length ? "Nenhum registro nesse período." : "Sem registros ainda."}</p></div>${duelos}`;
   const c = contagens(hist, frascos, ate);
-  const recentes = limiteEdicao ? registrosRecentes(histTodo, limiteEdicao) : "";
-  if (!hist.length) return `<h2>Histórico</h2>${seletor}${histTodo.length ? recentes : ""}<div class="bloco"><p class="vazio">${histTodo.length ? "Nenhum registro nesse período." : "Sem registros ainda. Conecte a planilha em Ajustes ou registre um uso."}</p></div>${histTodo.length ? blocoExportar(exp) : ""}`;
   const doPeriodo = preset !== "tudo";
-  const barras = (pares, max) => `<div class="barras">${pares.map(([k, v]) => `<div class="barra"><span class="t">${k}</span><span class="trilho"><span style="width:${max ? (v / max) * 100 : 0}%"></span></span><span class="n">${v}</span></div>`).join("")}</div>`;
   const usados = [...c.por.values()].filter(x => x.n).sort((a, b) => b.n - a.n || (a.ultimo < b.ultimo ? 1 : -1));
   const porArq = agrupar(c.por, f => f.arquetipo).filter(([, v]) => v);
-  const porTier = TIERS.map(t => [`Tier ${t}`, [...c.por.values()].filter(x => x.f.tier === t).reduce((s, x) => s + x.n, 0)]);
   const slots = [["☀︎ Dia", hist.filter(r => r.slot === "M").length], ["☾ Noite", hist.filter(r => r.slot === "N").length]];
-  // no período: frascos sem uso dentro dele; em "Tudo": regra dos 45 dias
   const esq = doPeriodo ? [...c.por.values()].filter(x => !x.n).sort((a, b) => TIERS.indexOf(a.f.tier) - TIERS.indexOf(b.f.tier) || a.f.nome.localeCompare(b.f.nome)) : esquecidos(c.por, limiteEsq);
   const uv = usoVsJanelas(c.por).filter(x => x.usos || x.janelas);
   const acima = uv.filter(x => x.desvio >= 1).sort((a, b) => b.desvio - a.desvio).slice(0, 8);
-  const cal = calibracao([...histTodo.filter(dentro), ...fila]);   // planilha (coluna Sugerido) + fila do aparelho
-  // NotaDia: piores médias primeiro (é para desbaste); mínimo 2 notas; por faixa só com n ≥ 2
+  const cal = calibracao([...histTodo.filter(dentro), ...fila]);
   const notas = [...notaPorFrascoFaixa(hist, frascos).values()].filter(x => x.n >= 2)
     .sort((a, b) => a.media - b.media || b.n - a.n || a.f.nome.localeCompare(b.f.nome, "pt"));
   const diasPeriodo = de ? Math.round((new Date(ate) - new Date(de)) / 864e5) + 1 : c.cobertura;
-  return `<h2>Histórico</h2>
+  // novas
+  const cons = constancia(hist, de, ate);
+  const conc = concentracao(c.por);
+  const tiers = usoPorTier(c.por);
+  const sem = porDiaSemana(hist), maxSem = Math.max(1, ...sem.map(d => d.M + d.N));
+  const ader = aderenciaPlaybook(hist, frascos, janelas);
+  const maxCel = Math.max(1, ...ader.mapa.values());
+  const sv = [...sobrevivencia(histTodo.filter(dentro), frascos.filter(f => f.camada === "grade"))].filter(([, x]) => x.n >= 2).sort((a, b) => (b[1].vivo / b[1].n) - (a[1].vivo / a[1].n) || b[1].n - a[1].n);
+  const nomeBtn = n => `<button class="nome-inline" data-ficha="${esc(n)}">${esc(n)}</button>`;
+  return `<h2>Análises</h2>
   ${seletor}
   <div class="kpis">
     <div class="kpi"><span class="v">${c.total}</span><span class="l">usos de frascos da grade</span></div>
@@ -190,34 +226,72 @@ export function telaHistorico({ frascos, hist: histTodo, hoje, fila: filaToda, a
     <div class="kpi"><span class="v">${usados.length}/${c.por.size}</span><span class="l">frascos usados ao menos 1×</span></div>
   </div>
   ${!doPeriodo && c.cobertura < 90 ? `<p class="nota">Diário com menos de 90 dias: não serve ainda para conclusões de desbaste sobre os B.</p>` : ""}
-  ${recentes}
-  ${wrapped}
-  ${calendario(histTodo.filter(deAnalise), frascos, ate, de)}
-  ${passaporte(c.por, hist, frascos)}
-  <div class="bloco"><h3>Mais usados</h3>${usados.length ? barras(usados.slice(0, 15).map(x => [`<button class="nome-inline" data-ficha="${esc(x.f.nome)}">${esc(x.f.nome)}</button>`, x.n]), usados[0].n) : `<p class="nota">Nenhum.</p>`}</div>
+
+  ${cons ? `<div class="bloco"><h3>Constância do diário</h3>
+    <div class="kpis kpis-peq">
+      <div class="kpi"><span class="v">${pct(cons.comRegistro / cons.total)}</span><span class="l">dos dias com registro (${cons.comRegistro}/${cons.total})</span></div>
+      <div class="kpi"><span class="v">${cons.ambos}</span><span class="l">dias com Dia e Noite</span></div>
+      <div class="kpi"><span class="v">${cons.atual}</span><span class="l">dias seguidos agora · recorde ${cons.maior}</span></div>
+    </div></div>` : ""}
+
+  <div class="bloco"><h3>Mais usados</h3>${usados.length ? barras(usados.slice(0, 15).map(x => [nomeBtn(x.f.nome), x.n]), usados[0].n) : `<p class="nota">Nenhum.</p>`}</div>
+
+  ${conc ? `<div class="bloco"><h3>Concentração do uso</h3>
+    <p>Os 5 mais usados somam <b>${pct(conc.top5)}</b> dos usos. <b>${conc.metade}</b> frasco${conc.metade === 1 ? "" : "s"} fazem metade do uso e <b>${conc.oitenta}</b>, 80 %.
+      Na prática, é como se você usasse <b>${nf(conc.efetivo)}</b> frascos por igual (de ${conc.usados} usados no período).</p>
+    <p class="nota">Quanto maior o “número efetivo”, mais espalhado o uso; perto de 1, um frasco domina.</p></div>` : ""}
+
   <div class="duas">
     <div class="bloco"><h3>Por slot</h3>${barras(slots, Math.max(...slots.map(s => s[1])))}</div>
-    <div class="bloco"><h3>Por tier</h3>${barras(porTier, Math.max(...porTier.map(s => s[1]), 1))}</div>
+    <div class="bloco"><h3>Uso por tier</h3>
+      <div class="tabela"><table><thead><tr><th>Tier</th><th>Frascos</th><th>Usos</th><th>Por frasco</th><th>Parados</th></tr></thead>
+      <tbody>${tiers.map(t => `<tr><td>${tierHTML(t.tier)}</td><td>${t.frascos}</td><td>${t.usos}</td><td><b>${nf(t.porFrasco)}</b></td><td>${t.parados}</td></tr>`).join("")}</tbody></table></div>
+      <p class="nota">“Por frasco” compara tiers de tamanhos diferentes: B usado como A, ou A parado, é sinal para revisar o tier.</p></div>
   </div>
+
+  <div class="bloco"><h3>Dia da semana</h3>
+    <div class="semana">${sem.map(d => `<div class="sem-col"><span class="sem-barra" title="${DIAS_CURTOS[d.dia]}: ${d.M} Dia · ${d.N} Noite"><span class="n" style="height:${(d.N / maxSem) * 100}%"></span><span class="m" style="height:${(d.M / maxSem) * 100}%"></span></span><span class="sem-n">${d.M + d.N}</span><span class="sem-d">${DIAS_CURTOS[d.dia]}</span></div>`).join("")}</div>
+    <p class="nota">Barra clara = Dia, escura = Noite. Mostra em que dias o diário fica vazio.</p></div>
+
   <div class="bloco"><h3>Por arquétipo</h3>${porArq.length ? barras(porArq.map(([k, v]) => [arqTag(k), v]), porArq[0][1]) : `<p class="nota">Nenhum.</p>`}</div>
+
+  <div class="bloco"><h3>Onde você usa × onde o playbook manda</h3>
+    ${ader.n ? `<p><b>${pct(ader.dentro / ader.n)}</b> dos usos (${ader.dentro} de ${ader.n} com temperatura e ocasião) caíram numa janela do próprio frasco no playbook.</p>
+    <div class="tabela"><table class="mapa-uso"><thead><tr><th></th>${OCAS_TODAS.map(o => `<th title="${esc(ROT_OC[o])}">${OC_CURTA[o]}</th>`).join("")}</tr></thead>
+      <tbody>${FX_CURTA.map((fx, i) => `<tr><th>${pinta(i)}${fx}</th>${OCAS_TODAS.map(o => { const v = ader.mapa.get(`${i}|${o}`) || 0;
+        return `<td style="--a:${(v / maxCel).toFixed(2)}" class="${v ? "com" : ""}">${v || ""}</td>`; }).join("")}</tr>`).join("")}</tbody></table></div>
+    <p class="nota">Células = faixa da temperatura do registro × ocasião (Lz Lazer · TI/TF Trabalho informal/formal · NI/NF Noite informal/formal · CD/CN Cozy Dia/Noite); mais escuro = mais usos.</p>
+    ${ader.fora.length ? `<details><summary>Fora da janela do frasco (${ader.fora.length})</summary><ul class="elo-lista">${ader.fora.slice(-12).reverse().map(x => `<li>${dataBR(x.data)} · ${nomeBtn(x.nome)} · ${FAIXAS[x.faixaIdx]} × ${esc(ROT_OC[x.oc])}</li>`).join("")}</ul>
+      <p class="nota">Uso fora da janela não é erro: com NotaDia 4–5 repetida, é candidato a janela nova; com 1–2, confirma o playbook.</p></details>` : ""}`
+    : `<p class="nota">Registre a ocasião e a temperatura no uso para ver este mapa.</p>`}</div>
+
   <div class="bloco"><h3>${doPeriodo ? `Sem uso no período · ${esq.length}` : `Esquecidos · sem uso há ${limiteEsq}+ dias ou sem registro · ${esq.length}`}</h3>
     ${raspadinha}
     <p class="nota">“Sem registro” é ausência no diário, não prova de que você não usou.</p>
     ${(() => { const item = x => `<article class="card compacto"><span class="pos">${tierHTML(x.f.tier)}</span><div style="min-width:0"><button class="nome" data-ficha="${esc(x.f.nome)}">${esc(x.f.nome)}</button><div class="casa">${arqTag(x.f.arquetipo, 13)} · ${x.f.janelas} janelas</div></div><span class="nota">${quando(x.dias)}</span></article>`;
       return `<div class="lista">${esq.slice(0, 8).map(item).join("")}</div>${esq.length > 8 ? `<details><summary>Ver os outros ${esq.length - 8}</summary><div class="lista" style="margin-top:8px">${esq.slice(8).map(item).join("")}</div></details>` : ""}`; })()}
   </div>
+
   <div class="bloco"><h3>Uso × janelas do playbook</h3>
     <p class="nota">Esperado = seus ${c.total} usos repartidos pelas janelas de cada frasco. Mostra quem você usa mais do que o playbook prevê.</p>
     ${acima.length ? `<div class="tabela"><table><thead><tr><th>Frasco</th><th>Janelas</th><th>Usos</th><th>Esperado</th></tr></thead><tbody>${acima.map(x => `<tr><td>${esc(x.nome)} ${tierHTML(x.tier)}</td><td>${x.janelas}</td><td>${x.usos}</td><td>${nf(x.esperado)}</td></tr>`).join("")}</tbody></table></div>` : `<p class="nota">Poucos usos para comparar.</p>`}
   </div>
+
   <div class="bloco"><h3>NotaDia · fit por frasco</h3>
     <p class="nota">Média da NotaDia (1–5, quanto o perfume combinou com o slot) no período, por frasco e por faixa de temperatura do registro. Piores médias em cima. Só frascos com 2+ notas; faixa só com 2+.</p>
     ${notas.length ? `<div class="tabela"><table><thead><tr><th>Frasco</th><th>n</th><th>Média</th><th>Por faixa</th></tr></thead><tbody>${notas.map(x => {
       const fx = [...x.faixas].filter(([, v]) => v.n >= 2).map(([i, v]) => `${pinta(i)}${esc(FAIXAS[i])} ${nf(v.media)} <span class="nota">(${v.n})</span>`).join(" · ");
-      return `<tr><td><button class="nome-inline" data-ficha="${esc(x.f.nome)}">${esc(x.f.nome)}</button> ${tierHTML(x.f.tier)}</td><td>${x.n}</td><td><b>${nf(x.media)}</b></td><td>${fx || `<span class="nota">—</span>`}</td></tr>`;
+      return `<tr><td>${nomeBtn(x.f.nome)} ${tierHTML(x.f.tier)}</td><td>${x.n}</td><td><b>${nf(x.media)}</b></td><td>${fx || `<span class="nota">—</span>`}</td></tr>`;
     }).join("")}</tbody></table></div>` : `<p class="nota">Ainda sem frascos com 2 ou mais notas no período. Dê a NotaDia ao registrar o uso.</p>`}
   </div>
+
+  <div class="bloco"><h3>Na pele · o perfume da manhã à noite</h3>
+    ${sv.length ? `<div class="tabela"><table><thead><tr><th>Frasco</th><th>Noites</th><th>Vivo</th><th>Fraco</th><th>Morto</th></tr></thead><tbody>${sv.map(([nome, x]) => `<tr><td>${nomeBtn(nome)}</td><td>${x.n}</td><td><b>${pct(x.vivo / x.n)}</b></td><td>${pct(x.fraco / x.n)}</td><td>${pct(x.morto / x.n)}</td></tr>`).join("")}</tbody></table></div>
+      <p class="nota">Resposta “vivo / fraco / morto” dada no registro da Noite sobre o perfume da manhã. Só frascos com 2+ noites. Com 5+, corrige a longevidade do modelo (Ajustes › Medições na pele).</p>`
+    : `<p class="nota">Ainda sem frascos com 2 noites respondidas. Ao registrar a Noite, diga como estava o perfume da manhã.</p>`}</div>
+
   ${duelos}
+
   <div class="bloco"><h3>Sprays · real × sugerido pelo modelo</h3>
     ${cal.n ? `<p>Desvio médio geral: <b>${cal.geral > 0 ? "+" : ""}${nf(cal.geral)}</b> spray${Math.abs(cal.geral) === 1 ? "" : "s"} em ${cal.n} registro${cal.n === 1 ? "" : "s"}.</p>
       <div class="tabela"><table><thead><tr><th>Frasco</th><th>Registros</th><th>Desvio médio</th></tr></thead><tbody>${cal.por.map(p => `<tr><td>${esc(p.nome)}</td><td>${p.n}</td><td>${p.media > 0 ? "+" : ""}${nf(p.media)}</td></tr>`).join("")}</tbody></table></div>`
@@ -231,8 +305,8 @@ export function telaHistorico({ frascos, hist: histTodo, hoje, fila: filaToda, a
     <p class="nota">Desligado por padrão. O número do modelo continua visível; o ajuste nunca passa do teto do frasco (EDP/extrait 4, EDT 5, beasts com teto próprio) e não mexe no Désobéissant (6–7).</p>
     <div class="linha-flex"><button class="btn peq" data-acao="salvar-spr">Salvar ajuste</button>${cal.n ? `<button class="btn sec peq" data-acao="spr-sugerir">Usar o desvio medido</button>` : ""}</div>
   </div>
-  <div class="bloco"><h3>${doPeriodo ? "Registros do período" : "Últimos 30 registros"} · Dia e Noite</h3><div class="lista">${hist.slice(-30).reverse().map(r => `<article class="card compacto"><span class="pos">${slotIcone(r.slot)}</span><div style="min-width:0"><b>${esc(r.perfume)}</b><div class="casa">${esc(r.data)} · ${slotNome(r.slot)}${r.sprays ? ` · ${esc(r.sprays)} sprays` : ""}${r.pendente ? " · na fila" : ""}</div></div><span></span></article>`).join("")}</div></div>
-  ${blocoExportar(exp)}`;
+
+  ${passaporte(c.por, hist, frascos)}`;
 }
 
 // ───────────────────────── calendário de cheiros ─────────────────────────

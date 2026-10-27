@@ -171,3 +171,30 @@ test("storiesDoMes: 6 a 8 stories, pula campos nulos, termina na grade dos dias;
   for (const s of pouco) assert.ok(!/\bnull\b|undefined|NaN/.test(s.numero + s.frase), s.rotulo);
   assert.deepEqual(storiesDoMes({ total: null }, 2026, 11), []);
 });
+
+// ───────────── Análises ─────────────
+test("análises: aderência ao playbook, concentração, uso por tier, dia da semana, constância", async () => {
+  const E = await import("../app/estatisticas.js");
+  const j = janelasPorFrasco(playbook);
+  const odeonJ = j.get("Odéon")[0];   // uma janela real do Odéon
+  const T = { 0: 34, 1: 29, 2: 24, 3: 19, 4: 14, 5: 10 }[odeonJ.faixaIdx];
+  const hist = [
+    { data: "2026-10-19", slot: "M", perfume: "Odéon", ocasiao: odeonJ.ocasiao, temp: String(T) },          // dentro
+    { data: "2026-10-19", slot: "N", perfume: "Odéon", ocasiao: "T.For", temp: "35" },                       // fora
+    { data: "2026-10-20", slot: "M", perfume: "Météore", ocasiao: "", temp: "" },                            // sem dados: não conta
+    { data: "2026-10-21", slot: "M", perfume: "Météore" }, { data: "2026-10-22", slot: "N", perfume: "Liwa" },
+  ];
+  const a = E.aderenciaPlaybook(hist, frascos, j);
+  assert.deepEqual([a.n, a.dentro, a.fora.length], [2, 1, 1]);
+  const c = contagens(hist, frascos, "2026-10-22");
+  const k = E.concentracao(c.por);
+  assert.deepEqual([k.total, k.usados, k.metade], [5, 3, 2]);
+  assert.ok(Math.abs(k.efetivo - 1 / ((2 / 5) ** 2 * 2 + (1 / 5) ** 2)) < 1e-12);
+  assert.equal(E.concentracao(contagens([], frascos, "2026-10-22").por), null);
+  const tS = E.usoPorTier(c.por).find(x => x.tier === "S");
+  assert.equal(tS.usos, 5); assert.equal(tS.parados, tS.frascos - 3);
+  const sem = E.porDiaSemana(hist);
+  assert.deepEqual([sem[0].M, sem[0].N, sem[1].M, sem[3].N], [1, 1, 1, 1]);   // 19/out/2026 = segunda
+  const cs = E.constancia(hist, "2026-10-18", "2026-10-23");
+  assert.deepEqual(cs, { total: 6, comRegistro: 4, ambos: 1, maior: 4, atual: 4 });   // 23 sem registro ainda: conta até 22
+});

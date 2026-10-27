@@ -7,7 +7,7 @@ import { configurado, chamar } from "./api.js";
 import { fila, adicionar, descartar, enviar, planilhaCache, baixarPlanilha, limiteEdicao, editarRegistro, removerRegistro, exportarDiario } from "./registro.js";
 import { lerTiers, lerDiario, aplicarTiers, aplicarMedicoes, MEDICOES_PADRAO, diarioUnificado, nomesRegistraveis } from "./planilha.js";
 import { janelasPorFrasco, ajustarSprays, deAnalise, notaPorFrascoFaixa, sobrevivencia, esquecidos, esquecidoDaSemana, semanaISO, resumoMes } from "./estatisticas.js";
-import { telaColecao, telaPlaybook, telaHistorico, idRegistro, periodo } from "./telas.js";
+import { telaColecao, telaPlaybook, telaHistorico, telaAnalises, idRegistro, periodo } from "./telas.js";
 import { telaRoda } from "./roda.js";
 import { ordsDe, tocarOrd, mudarOrds, slotNome, slotBase, slotIcone, opcoesSlot, slotExpandido } from "./util.js";
 import { definirCores, arqTag, arqIcone, corArq, humorDoSlot, humorSVG } from "./icones.js";
@@ -22,7 +22,7 @@ import { lerDuelos, duelosUnificados, pareamento, elo, fmtElo, filaDuelos, adici
   gerarCenario, textoCenario, periodoDaHora, CHUVAS, MAE_DA_SUB, brilhaCai, rotuloValor, previsao, ehZebra, META_DIA, plausiveisNoCenario, chavePar } from "./duelo.js";
 import { fotoFicha, iconeFicha, fotoMini, fotoIcone, reduzirImagem, subirFoto, removerFotoPlanilha, iniciarFotos } from "./fotos.js";
 
-export const APP_VERSAO = "5.46";  // sobe a cada publicação: confere no topo da tela se o celular pegou a versão nova
+export const APP_VERSAO = "5.47";  // sobe a cada publicação: confere no topo da tela se o celular pegou a versão nova
 const S = { dueloModo: ler("dueloModo", "agora"), rkFiltro: ler("rkFiltro", {}), cenario: null, motionOk: !movimentoPedePermissao() && "DeviceMotionEvent" in globalThis, aba: "hoje", frascos: [], frascosAtivos: [], avisosTiers: null, medidos: [], fichas: {}, versao: {}, prev: null, prevOffline: false,
   prevErro: null, metar: null, metarMotivo: null, clima: null, resultado: null, erroMotor: null, entrada: "", carregandoClima: true,
   sync: { estado: "ocioso", msg: "" }, hr: ler("hr", { preset: "tudo" }), tokenNovo: null, playbook: null, janelas: new Map(),
@@ -36,7 +36,7 @@ const ajSpray = () => ler("sprays_ajuste", { ativo: false, geral: 0, por: {} });
 // Grupos com sub-abas: Coleção (Roda · Lista · Playbook) · Mercado (Mercado · Amostras) · Mais (Histórico · Ajustes).
 // S.sub guarda a última sub-aba de cada grupo (reabre nela). Coleção absorve o antigo colModo (roda/lista).
 const SUBS = { colecao: [["roda", "Roda"], ["lista", "Lista"], ["playbook", "Playbook"], ["duelo", "Duelo"], ["ranking", "Ranking"]],
-  mercado: [["mercado", "Mercado"], ["amostras", "Amostras"]], mais: [["historico", "Histórico"], ["ajustes", "Ajustes"]] };
+  mercado: [["mercado", "Mercado"], ["amostras", "Amostras"]], mais: [["historico", "Histórico"], ["analises", "Análises"], ["ajustes", "Ajustes"]] };
 function carregarSub() {
   const s = ler("sub", null);
   if (s && s.colecao && s.mercado && s.mais) return s;
@@ -46,7 +46,7 @@ function carregarSub() {
   return novo;
 }
 function grupoDe(aba) {
-  return { colecao: "colecao", playbook: "colecao", duelo: "colecao", ranking: "colecao", mercado: "mercado", amostras: "mercado", historico: "mais", ajustes: "mais" }[aba] || aba;
+  return { colecao: "colecao", playbook: "colecao", duelo: "colecao", ranking: "colecao", mercado: "mercado", amostras: "mercado", historico: "mais", analises: "mais", ajustes: "mais" }[aba] || aba;
 }
 function abaDe(grupo, sub) {
   if (grupo === "colecao") return ["playbook", "duelo", "ranking"].includes(sub) ? sub : "colecao";
@@ -205,10 +205,10 @@ function render() {
   const arqDe = new Map(S.frascos.map(f => [f.nome, f.arquetipo]));
   const ctx = { fichas: S.fichas, arqTag, arqIcone, arqDe, hr: S.hr,
     frascos: S.frascosAtivos, hist: historico(), hoje: hojeISO(), janelas: S.janelas, filtro: S.filtro, playbook: S.playbook,
-    faixaSel: S.pbFaixa ?? S.clima?.faixaDia?.idx ?? 2, fila: fila(), ajSpray: ajSpray(), limiteEdicao: limiteEdicao(hojeISO()), exp: S.exp, raspadinha: S.aba === "historico" ? blocoRaspadinha() : "",
+    faixaSel: S.pbFaixa ?? S.clima?.faixaDia?.idx ?? 2, fila: fila(), ajSpray: ajSpray(), limiteEdicao: limiteEdicao(hojeISO()), exp: S.exp, raspadinha: S.aba === "analises" ? blocoRaspadinha() : "",
     elo: S.aba === "colecao" ? elo(duelosTodos(), S.frascosAtivos) : null,
     wrapped: S.aba === "historico" ? blocoWrapped() : "",
-    duelos: S.aba === "historico" ? (() => { const ds = duelosTodos(); return blocoDuelos(elo(ds, S.frascosAtivos), S.frascosAtivos, ds.length); })() : "",
+    duelos: S.aba === "analises" ? (() => { const ds = duelosTodos(); return blocoDuelos(elo(ds, S.frascosAtivos), S.frascosAtivos, ds.length); })() : "",
     amostras: S.aba === "colecao" ? amostrasEmMaos() : null };
   // mesma aba: guarda rolagem da página, das tabelas e painéis abertos para restaurar depois de redesenhar
   const antes = trocouAba ? null : {
@@ -218,7 +218,7 @@ function render() {
   };
   try {
     let html = ({ hoje: telaHoje, registrar: telaRegistrar, ajustes: telaAjustes,
-      colecao: () => telaColecaoTudo(ctx), duelo: telaDueloAba, ranking: () => telaRanking({ duelos: duelosTodos(), frascos: S.frascosAtivos, filtro: S.rkFiltro, hoje: hojeISO(), icone: iconeFrasco }), mercado: telaMercadoAba, amostras: telaAmostrasAba, playbook: () => telaPlaybook({ ...ctx, iconeNome }), historico: () => telaHistorico(ctx) }[S.aba])();
+      colecao: () => telaColecaoTudo(ctx), duelo: telaDueloAba, ranking: () => telaRanking({ duelos: duelosTodos(), frascos: S.frascosAtivos, filtro: S.rkFiltro, hoje: hojeISO(), icone: iconeFrasco }), mercado: telaMercadoAba, amostras: telaAmostrasAba, playbook: () => telaPlaybook({ ...ctx, iconeNome }), historico: () => telaHistorico(ctx), analises: () => telaAnalises(ctx) }[S.aba])();
     // telas agrupadas: segmentos (sub-abas) logo abaixo do 1º h2; o h2 continua com o nome da sub-aba
     if (SUBS[grupo]) html = html.replace("</h2>", `</h2>${segmentosGrupo(grupo)}`);
     $("#tela").innerHTML = html;

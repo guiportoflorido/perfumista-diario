@@ -249,3 +249,68 @@ export function resumoMes(hist, frascos, ano, mes, { duelos = [], eloDe = null }
     arquetipo: { nome: arq, pct: nArq / doMes.length }, maisQuente: ext(1), maisFrio: ext(-1),
     resgates: resgates.length ? resgates : null, notaMedia: media(notas), sequencia: seq >= 2 ? seq : null, subidao, material, dias };
 }
+
+// ───────────────────────── Análises (aba Mais › Análises) ─────────────────────────
+// Todas recebem o histórico já recortado no período e só de Dia/Noite (deAnalise) — a camada custo fica de fora.
+
+/** Onde ele usa × onde o playbook manda: cada registro com Temp e Ocasião vira uma célula faixa × ocasião; “dentro” =
+ *  o frasco tem janela nessa célula. Devolve {n, dentro, mapa: Map "fi|oc" → n, fora: [{nome, data, faixaIdx, oc}]}. */
+export function aderenciaPlaybook(hist, frascos, janelas) {
+  const grade = new Set(frascos.filter(daGrade).map(f => f.nome));
+  const mapa = new Map(), fora = [];
+  let n = 0, dentro = 0;
+  for (const r of hist) {
+    const oc = ocasiaoCod(r.ocasiao), T = r.temp === "" || r.temp == null ? NaN : Number(String(r.temp).replace(",", "."));
+    if (!grade.has(r.perfume) || !oc || !Number.isFinite(T)) continue;
+    const fi = faixaIdx(T), k = `${fi}|${oc}`;
+    n++; mapa.set(k, (mapa.get(k) || 0) + 1);
+    if ((janelas.get(r.perfume) || []).some(j => j.faixaIdx === fi && j.ocasiao === oc)) dentro++;
+    else fora.push({ nome: r.perfume, data: r.data, faixaIdx: fi, oc });
+  }
+  return { n, dentro, mapa, fora };
+}
+
+/** Concentração do uso: participação dos 5 mais usados, quantos frascos fazem 50 % e 80 % dos usos e o “número
+ *  efetivo” de frascos (1 / Σ p²: 10 = como se usasse 10 frascos por igual). */
+export function concentracao(por) {
+  const us = [...por.values()].map(c => c.n).filter(n => n > 0).sort((a, b) => b - a);
+  const tot = us.reduce((s, x) => s + x, 0);
+  if (!tot) return null;
+  const ate = frac => { let s = 0; for (let i = 0; i < us.length; i++) { s += us[i]; if (s >= frac * tot - 1e-9) return i + 1; } return us.length; };
+  return { total: tot, usados: us.length, top5: us.slice(0, 5).reduce((s, x) => s + x, 0) / tot, metade: ate(0.5), oitenta: ate(0.8),
+    efetivo: 1 / us.reduce((s, x) => s + (x / tot) ** 2, 0) };
+}
+
+/** Uso por tier normalizado: usos, frascos do tier e usos por frasco (B usado como A é sinal; A parado também). */
+export function usoPorTier(por) {
+  return ["S", "A", "B", "C"].map(t => {
+    const cs = [...por.values()].filter(c => c.f.tier === t), usos = cs.reduce((s, c) => s + c.n, 0);
+    return { tier: t, frascos: cs.length, usos, porFrasco: cs.length ? usos / cs.length : 0, parados: cs.filter(c => !c.n).length };
+  }).filter(x => x.frascos);
+}
+
+/** Dia da semana × slot: [{dia: 0..6 (seg..dom), M, N}] */
+export function porDiaSemana(hist) {
+  const out = Array.from({ length: 7 }, (_, d) => ({ dia: d, M: 0, N: 0 }));
+  for (const r of hist) { if (r.slot !== "M" && r.slot !== "N") continue; const d = (new Date(r.data + "T12:00:00Z").getUTCDay() + 6) % 7; out[d][r.slot]++; }
+  return out;
+}
+
+/** Constância do diário no período [de, ate]: dias com registro, dias com Dia e Noite, maior sequência e a atual. */
+export function constancia(hist, de, ate) {
+  const dias = new Map();
+  for (const r of hist) { if (!dias.has(r.data)) dias.set(r.data, new Set()); dias.get(r.data).add(r.slot); }
+  const ini = de || [...dias.keys()].sort()[0];
+  if (!ini) return null;
+  const total = diasEntre(ate, ini) + 1;
+  let maior = 0, run = 0, ontem = 0;
+  for (let i = 0; i < total; i++) {
+    const d = new Date(ini + "T12:00:00Z"); d.setUTCDate(d.getUTCDate() + i);
+    const k = d.toISOString().slice(0, 10);
+    if (i === total - 1) ontem = run;
+    run = dias.has(k) ? run + 1 : 0; maior = Math.max(maior, run);
+  }
+  const atual = run || ontem;   // hoje ainda sem registro não quebra a sequência
+  const ambos = [...dias.values()].filter(s => s.has("M") && s.has("N")).length;
+  return { total, comRegistro: dias.size, ambos, maior, atual };
+}
