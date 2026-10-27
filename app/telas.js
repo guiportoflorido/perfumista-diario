@@ -180,7 +180,7 @@ export function telaHistorico({ frascos, hist: histTodo, hoje, hr = {}, limiteEd
   ${wrapped}
   ${calendario(histTodo.filter(deAnalise), frascos, ate, de)}
   <div class="bloco"><h3>${doPeriodo ? "Registros do período" : "Últimos 30 registros"} · Dia e Noite</h3><div class="lista">${hist.slice(-30).reverse().map(r => `<article class="card compacto"><span class="pos">${slotIcone(r.slot)}</span><div style="min-width:0"><b>${esc(r.perfume)}</b><div class="casa">${esc(r.data)} · ${slotNome(r.slot)}${r.sprays ? ` · ${esc(r.sprays)} sprays` : ""}${r.pendente ? " · na fila" : ""}</div></div><span></span></article>`).join("")}</div></div>
-  <p class="nota">Contas do período (mais usados, esquecidos, NotaDia, sprays, duelos…) estão em <button class="nome-inline" data-sub-grupo="mais" data-sub="analises">Análises</button>.</p>
+  <p class="nota">Contas do período (mais usados, esquecidos, NotaDia, sprays, duelos…) estão em <button class="nome-inline" data-ir="analises">Análises</button>.</p>
   ${blocoExportar(exp)}`;
 }
 

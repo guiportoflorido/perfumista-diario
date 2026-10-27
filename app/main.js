@@ -32,11 +32,11 @@ const S = { dueloModo: ler("dueloModo", "agora"), rkFiltro: ler("rkFiltro", {}),
   am: ler("am", {}), amBaixando: false, amBaixadas: false, amErro: null };
 const ajSpray = () => ler("sprays_ajuste", { ativo: false, geral: 0, por: {} });
 
-// ───────────────────────── 5 abas na barra; S.aba continua com os 8 valores de sempre ─────────────────────────
+// ───────────────────────── 6 abas na barra (Análises é aba própria); S.aba continua com os valores de sempre ─────────────────────────
 // Grupos com sub-abas: Coleção (Roda · Lista · Playbook) · Mercado (Mercado · Amostras) · Mais (Histórico · Ajustes).
 // S.sub guarda a última sub-aba de cada grupo (reabre nela). Coleção absorve o antigo colModo (roda/lista).
 const SUBS = { colecao: [["roda", "Roda"], ["lista", "Lista"], ["playbook", "Playbook"], ["duelo", "Duelo"], ["ranking", "Ranking"]],
-  mercado: [["mercado", "Mercado"], ["amostras", "Amostras"]], mais: [["historico", "Histórico"], ["analises", "Análises"], ["ajustes", "Ajustes"]] };
+  mercado: [["mercado", "Mercado"], ["amostras", "Amostras"]], mais: [["historico", "Histórico"], ["ajustes", "Ajustes"]] };
 function carregarSub() {
   const s = ler("sub", null);
   if (s && s.colecao && s.mercado && s.mais) return s;
@@ -46,7 +46,7 @@ function carregarSub() {
   return novo;
 }
 function grupoDe(aba) {
-  return { colecao: "colecao", playbook: "colecao", duelo: "colecao", ranking: "colecao", mercado: "mercado", amostras: "mercado", historico: "mais", analises: "mais", ajustes: "mais" }[aba] || aba;
+  return { colecao: "colecao", playbook: "colecao", duelo: "colecao", ranking: "colecao", mercado: "mercado", amostras: "mercado", historico: "mais", ajustes: "mais" }[aba] || aba;
 }
 function abaDe(grupo, sub) {
   if (grupo === "colecao") return ["playbook", "duelo", "ranking"].includes(sub) ? sub : "colecao";
@@ -1210,6 +1210,7 @@ document.addEventListener("click", async e => {
   if (b.dataset.chip) { const k = b.dataset.chip, v = b.dataset.v; mudarDia(d => { d[k] = v; }); return; }
   if (b.dataset.extra) { const v = b.dataset.extra; mudarDia(d => { d.extras = d.extras.includes(v) ? d.extras.filter(x => x !== v) : [...d.extras, v]; }); return; }
   if (b.dataset.rodaVer) { S.rodaVer = b.dataset.rodaVer; gravar("rodaVer", S.rodaVer); render(); return; }
+  if (b.dataset.ir) { irPara(b.dataset.ir); render(); window.scrollTo(0, 0); return; }
   if (b.dataset.roletaSlot) { abrirRoletaSlot(b.dataset.roletaSlot); return; }
   if (b.dataset.acao === "wrapped") { abrirWrappedMes(b.dataset.mes); render(); return; }
   if (b.dataset.dueloVence) { escolherDuelo(Number(b.dataset.dueloVence)); return; }
