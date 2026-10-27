@@ -19,10 +19,10 @@ import { telaAmostras, fichaAmostra, deLinhas as amostrasDeLinhas, juntar, semRe
 import { ler, gravar } from "./store.js";
 import { storiesDoMes, abrirWrapped, MESES } from "./wrapped.js";
 import { lerDuelos, duelosUnificados, pareamento, elo, fmtElo, filaDuelos, adicionarDuelo, enviarDuelos, telaDuelo, blocoDuelos, telaRanking,
-  gerarCenario, textoCenario, periodoDaHora, CHUVAS, MAE_DA_SUB, brilhaCai, rotuloValor, previsao, ehZebra, META_DIA } from "./duelo.js";
+  gerarCenario, textoCenario, periodoDaHora, CHUVAS, MAE_DA_SUB, brilhaCai, rotuloValor, previsao, ehZebra, META_DIA, plausiveisNoCenario, chavePar } from "./duelo.js";
 import { fotoFicha, iconeFicha, fotoMini, fotoIcone, reduzirImagem, subirFoto, removerFotoPlanilha, iniciarFotos } from "./fotos.js";
 
-export const APP_VERSAO = "5.45";  // sobe a cada publicação: confere no topo da tela se o celular pegou a versão nova
+export const APP_VERSAO = "5.46";  // sobe a cada publicação: confere no topo da tela se o celular pegou a versão nova
 const S = { dueloModo: ler("dueloModo", "agora"), rkFiltro: ler("rkFiltro", {}), cenario: null, motionOk: !movimentoPedePermissao() && "DeviceMotionEvent" in globalThis, aba: "hoje", frascos: [], frascosAtivos: [], avisosTiers: null, medidos: [], fichas: {}, versao: {}, prev: null, prevOffline: false,
   prevErro: null, metar: null, metarMotivo: null, clima: null, resultado: null, erroMotor: null, entrada: "", carregandoClima: true,
   sync: { estado: "ocioso", msg: "" }, hr: ler("hr", { preset: "tudo" }), tokenNovo: null, playbook: null, janelas: new Map(),
@@ -852,9 +852,20 @@ function cenarioAtual() {
   if (!S.cenario) S.cenario = gerarCenario(duelosTodos());
   return S.cenario;
 }
+/** Candidatos do duelo pela situação: no Cenário, envelope e aptidão batem com o cenário; no Agora, só quem passa
+ *  nos filtros do motor no slot da hora. Menos de 2 → todos. */
+function candidatosDuelo() {
+  const fs = S.frascosAtivos, cen = cenarioAtual();
+  if (cen) return plausiveisNoCenario(fs, cen);
+  const so = slotHoraRes(), ok = so && new Set(so.ranking.map(r => r.nome));
+  const agora = ok ? fs.filter(f => ok.has(f.nome)) : fs;
+  return agora.filter(f => f.camada === "grade").length >= 2 ? agora : fs;
+}
 function parDuelo() {
   const fs = S.frascosAtivos, ok = n => fs.some(f => f.nome === n);
-  if (!S.parDuelo || !S.parDuelo.every(ok)) S.parDuelo = pareamento(fs, duelosTodos(), Math.random, cenarioAtual())?.map(f => f.nome) || null;
+  S.duelosPulados ||= new Set();
+  if (!S.parDuelo || !S.parDuelo.every(ok))
+    S.parDuelo = pareamento(candidatosDuelo(), duelosTodos(), Math.random, cenarioAtual(), S.duelosPulados)?.map(f => f.nome) || null;
   return S.parDuelo && S.parDuelo.map(n => fs.find(f => f.nome === n));
 }
 function telaDueloAba() {
@@ -1202,7 +1213,9 @@ document.addEventListener("click", async e => {
   if (b.dataset.roletaSlot) { abrirRoletaSlot(b.dataset.roletaSlot); return; }
   if (b.dataset.acao === "wrapped") { abrirWrappedMes(b.dataset.mes); render(); return; }
   if (b.dataset.dueloVence) { escolherDuelo(Number(b.dataset.dueloVence)); return; }
-  if (b.dataset.acao === "duelo-pular") { S.parDuelo = null; S.dueloSeguidos = 0; S.dueloReacao = ""; render(); return; }
+  if (b.dataset.acao === "duelo-pular") {   // o par pulado não volta nesta sessão
+    if (S.parDuelo) (S.duelosPulados ||= new Set()).add(chavePar(...S.parDuelo));
+    S.parDuelo = null; S.dueloSeguidos = 0; S.dueloReacao = ""; render(); return; }
   if (b.dataset.acao === "duelo-empate") { escolherDuelo("="); return; }
   if (b.dataset.acao === "duelo-cenario") { S.cenario = null; S.parDuelo = null; render(); return; }
   if (b.dataset.dueloModo) { S.dueloModo = b.dataset.dueloModo; gravar("dueloModo", S.dueloModo); S.cenario = null; S.parDuelo = null; render(); return; }

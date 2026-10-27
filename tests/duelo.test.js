@@ -12,21 +12,37 @@ const nomes = p => p.map(f => f.nome).sort().join("+");
 let seq = 0;
 const D = (a, b, vencedor) => { seq++; return { data: "2026-10-20", hora: `10:${String(seq).padStart(2, "0")}`, a, b, vencedor }; };
 
-test("pareamento: sem duelos, mesmo arquétipo e mesmo tier; nunca a camada custo nem tier D; nunca o mesmo frasco", () => {
+test("pareamento: sem duelos, prefere tier igual (qualquer arquétipo); nunca camada custo, tier D nem o mesmo frasco", () => {
   for (const r of [0, 0.3, 0.7, 0.99]) {
     const p = pareamento(fs, [], fixo(r));
-    assert.equal(nomes(p), "X1+X2");
+    assert.equal(nomes(p), "X1+X2");   // único par de mesmo tier (A) entre os da grade
     assert.notEqual(p[0].nome, p[1].nome);
   }
   assert.equal(pareamento([fs[0]], []), null);
+  const mix = [F("A1", "Rosal", "S"), F("A2", "Rosal", "S"), F("B1", "Monge", "S"), F("C1", "Sultão", "S")];
+  const vistos = new Set(); let s = 3;
+  const al = () => ((s = (s * 1103515245 + 12345) % 2147483648) / 2147483648);
+  for (let i = 0; i < 40; i++) vistos.add(nomes(pareamento(mix, [], al)));
+  assert.ok(vistos.size >= 4, `pares variados entre arquétipos: ${[...vistos]}`);
 });
 
-test("pareamento: com o par já visto, prefere pares menos vistos (mesmo arquétipo, tier vizinho)", () => {
+test("pareamento: com o par já visto, vai para outro; par pulado (evitar) não volta", () => {
   const p = pareamento(fs, [D("X1", "X2", "X1")], fixo(0));
-  assert.match(nomes(p), /^X[12]\+X3$/);
-  const muitos = [D("X1", "X2", "X1"), D("X1", "X3", "X1"), D("X2", "X3", "X3"), D("X1", "X2", "X2")];
-  const q = pareamento(fs, muitos, fixo(0));
-  assert.ok(!["X1+X2", "X1+X3", "X2+X3"].includes(nomes(q)), nomes(q));
+  assert.notEqual(nomes(p), "X1+X2");
+  const evitar = new Set(["X1|X2"]);
+  for (const r of [0, 0.5, 0.99]) assert.notEqual(nomes(pareamento(fs, [], fixo(r), null, evitar)), "X1+X2");
+});
+
+test("plausíveis no cenário: envelope cobre a temperatura e há aptidão para a ocasião; afrouxa com menos de 2", async () => {
+  const { plausiveisNoCenario } = await import("../app/duelo.js");
+  const quente = F("Quente", "Marinho", "A", { env_lo: 22, env_hi: 36, apt: { Lazer: 3 } });
+  const frio = F("Frio", "Sultão", "A", { env_lo: 4, env_hi: 22, apt: { "N.For": 3, Lazer: 1 } });
+  const quente2 = F("Quente2", "Mediterrâneo", "S", { env_lo: 24, env_hi: 38, apt: { Lazer: 2, "T.Inf": 3 } });
+  const lista = [quente, frio, quente2];
+  assert.deepEqual(plausiveisNoCenario(lista, { T: 33, ocasiao: "Lazer" }).map(f => f.nome), ["Quente", "Quente2"]);
+  assert.deepEqual(plausiveisNoCenario([frio, { ...frio, nome: "Frio2" }, quente], { T: 12, ocasiao: "Cozy N" }).map(f => f.nome), ["Frio", "Frio2"], "Cozy: sem exigir aptidão");
+  assert.equal(plausiveisNoCenario(lista, { T: 33, ocasiao: "T.Inf" }).length, 2, "só 1 apto → afrouxa para o envelope");
+  assert.equal(plausiveisNoCenario(lista, { T: 50 }).length, 3, "ninguém cobre → todos");
 });
 
 test("1 · sem duelos: todos em 1500, n 0", () => {
