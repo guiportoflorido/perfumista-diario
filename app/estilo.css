@@ -52,7 +52,7 @@ h1 span:not(.marca) { color: var(--suave); font-weight: 500; }
 .marca::before { content: ""; position: absolute; left: 9px; right: 9px; top: 4px; height: 3px; border-radius: 1px; background: rgba(255, 255, 255, .92); }
 .versao { font: 500 11px var(--f-num); color: var(--leve); background: var(--afund); padding: 3px 8px; border-radius: 99px; }
 
-.abas { position: fixed; left: 0; right: 0; bottom: 0; z-index: 20; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr));
+.abas { position: fixed; left: 0; right: 0; bottom: 0; z-index: 20; display: grid; grid-template-columns: repeat(6, minmax(0, 1fr));
   background: var(--vidro); -webkit-backdrop-filter: saturate(180%) blur(20px); backdrop-filter: saturate(180%) blur(20px);
   border-top: .5px solid var(--linha); padding: 6px 2px env(safe-area-inset-bottom, 0px); }
 .abas button { all: unset; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 4px 2px 6px;
@@ -725,3 +725,17 @@ select[disabled], input[readonly], textarea[readonly] { opacity: .75; }
 .raspa-fr .ic .foto-ic { box-shadow: 0 0 0 2px var(--afund); }
 .roleta .item .foto-ic, .roleta-card .ic .foto-ic { box-shadow: none; }
 .wr-foto .foto-ic { width: 120px !important; height: 120px !important; box-shadow: 0 0 0 4px rgba(255,255,255,.85); }
+
+/* Mais › Análises */
+.kpis.kpis-peq .kpi .v { font-size: 22px; }
+.semana { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px; align-items: end; margin: 6px 0 4px; }
+.sem-col { display: grid; justify-items: center; gap: 3px; }
+.sem-barra { width: 70%; height: 90px; display: flex; flex-direction: column-reverse; border-radius: 6px; overflow: hidden; background: var(--afund); }
+.sem-barra .m { background: color-mix(in srgb, var(--acento) 55%, var(--sup)); }
+.sem-barra .n { background: var(--acento); }
+.sem-n { font: 700 12.5px var(--f-num); }
+.sem-d { font: 500 11.5px var(--f); color: var(--suave); }
+.mapa-uso { table-layout: fixed; }
+.mapa-uso th, .mapa-uso td { text-align: center; padding: 6px 2px; font-size: 12px; }
+.mapa-uso tbody th { text-align: left; white-space: nowrap; }
+.mapa-uso td.com { background: color-mix(in srgb, var(--acento) calc(var(--a) * 70%), transparent); font-weight: 700; border-radius: 4px; }
