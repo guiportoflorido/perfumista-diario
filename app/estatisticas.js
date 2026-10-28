@@ -9,6 +9,10 @@ export const deAnalise = r => r.slot === "M" || r.slot === "N";
 
 export const daGrade = f => f.camada === "grade" && f.tier !== "D";
 
+/** É uso do frasco (para último uso, esquecidos, “sem uso”, contagens da Coleção): Dia e Noite, inclusive a 2ª aplicação
+ *  (M2/N2). Esportes (E) fica fora — é da camada custo. As demais análises (NotaDia, slots, rotação) seguem só M/N. */
+export const ehUso = r => r.slot === "M" || r.slot === "N" || r.slot === "M2" || r.slot === "N2";
+
 /** Janelas de cada frasco no playbook: [{faixa, faixaIdx, ocasiao, papel}] */
 export function janelasPorFrasco(playbook) {
   const m = new Map();
@@ -28,13 +32,13 @@ export function janelasPorFrasco(playbook) {
 export function contagens(hist, frascos, hoje, { todos = false } = {}) {
   const grade = todos ? frascos : frascos.filter(daGrade);
   const nomes = new Set(grade.map(f => f.nome));
-  hist = hist.filter(deAnalise);
+  hist = hist.filter(ehUso);   // 2ª aplicação também é uso (antes ficava fora e o frasco aparecia “sem uso”)
   const regs = hist.filter(r => nomes.has(r.perfume) && r.data <= hoje);
   const por = new Map(grade.map(f => [f.nome, { f, n: 0, n30: 0, M: 0, N: 0, ultimo: null }]));
   for (const r of regs) {
     const c = por.get(r.perfume);
     c.n++; if (diasEntre(hoje, r.data) < 30) c.n30++;
-    if (r.slot === "M") c.M++; else if (r.slot === "N") c.N++;
+    if (r.slot[0] === "M") c.M++; else c.N++;
     if (!c.ultimo || r.data > c.ultimo) c.ultimo = r.data;
   }
   for (const c of por.values()) c.dias = c.ultimo ? diasEntre(hoje, c.ultimo) : null;

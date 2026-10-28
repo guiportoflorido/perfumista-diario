@@ -22,10 +22,10 @@ test("histórico unificado ordena M · M2 · E · N · N2 dentro do dia", () => 
   assert.deepEqual(h.map(r => r.slot), ["M", "M2", "E", "N", "N2"]);
 });
 
-test("análises: só Dia (M) e Noite (N) contam", () => {
+test("análises (NotaDia, slots, rotação) só Dia (M) e Noite (N); uso do frasco conta também a 2ª aplicação, nunca Esportes", () => {
   const hist = [{ data: "2026-10-17", slot: "M", perfume: "Odéon" }, { data: "2026-10-17", slot: "M2", perfume: "Odéon" },
     { data: "2026-10-17", slot: "E", perfume: "Odéon" }, { data: "2026-10-17", slot: "N2", perfume: "Odéon" }, { data: "2026-10-17", slot: "N", perfume: "Liwa" }];
   assert.deepEqual(hist.filter(deAnalise).map(r => r.slot), ["M", "N"]);
   const c = contagens(hist, frascos, "2026-10-18");
-  assert.equal(c.total, 2); assert.equal(c.por.get("Odéon").n, 1); assert.equal(c.por.get("Odéon").M, 1);
+  assert.equal(c.total, 4); assert.equal(c.por.get("Odéon").n, 3); assert.equal(c.por.get("Odéon").M, 2); assert.equal(c.por.get("Odéon").N, 1);
 });

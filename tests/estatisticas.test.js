@@ -198,3 +198,15 @@ test("análises: aderência ao playbook, concentração, uso por tier, dia da se
   const cs = E.constancia(hist, "2026-10-18", "2026-10-23");
   assert.deepEqual(cs, { total: 6, comRegistro: 4, ambos: 1, maior: 4, atual: 4 });   // 23 sem registro ainda: conta até 22
 });
+
+test("uso conta a 2ª aplicação (M2/N2): Les Sables Roses usado como N2 não aparece como esquecido; Esportes não conta", () => {
+  const hist = [{ data: "2026-10-25", slot: "N", perfume: "Wood Whisper" }, { data: "2026-10-25", slot: "N2", perfume: "Les Sables Roses" },
+    { data: "2026-10-23", slot: "M2", perfume: "Black Saffron Absolu" }, { data: "2026-10-22", slot: "E", perfume: "Odéon" }];
+  const c = contagens(hist, frascos, "2026-10-27");
+  const lsr = c.por.get("Les Sables Roses");
+  assert.deepEqual([lsr.n, lsr.N, lsr.ultimo, lsr.dias], [1, 1, "2026-10-25", 2]);
+  assert.equal(c.por.get("Black Saffron Absolu").M, 1);
+  assert.equal(c.por.get("Odéon").n, 0, "Esportes (E) não conta como uso");
+  const esq = esquecidos(c.por).map(x => x.f.nome);
+  assert.ok(!esq.includes("Les Sables Roses") && !esq.includes("Black Saffron Absolu"));
+});
