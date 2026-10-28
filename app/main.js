@@ -6,7 +6,7 @@ import { montarEntrada, OCAS_DIA, OCAS_NOITE, AMBIENTES, EXTRAS } from "./entrad
 import { configurado, chamar } from "./api.js";
 import { fila, adicionar, descartar, enviar, planilhaCache, baixarPlanilha, limiteEdicao, editarRegistro, removerRegistro, exportarDiario } from "./registro.js";
 import { lerTiers, lerDiario, aplicarTiers, aplicarMedicoes, MEDICOES_PADRAO, diarioUnificado, nomesRegistraveis } from "./planilha.js";
-import { janelasPorFrasco, ajustarSprays, deAnalise, notaPorFrascoFaixa, sobrevivencia, esquecidos, esquecidoDaSemana, semanaISO, resumoMes } from "./estatisticas.js";
+import { janelasPorFrasco, ajustarSprays, deAnalise, ehUso, notaPorFrascoFaixa, sobrevivencia, esquecidos, esquecidoDaSemana, semanaISO, resumoMes } from "./estatisticas.js";
 import { telaColecao, telaPlaybook, telaHistorico, telaAnalises, idRegistro, periodo } from "./telas.js";
 import { telaRoda } from "./roda.js";
 import { ordsDe, tocarOrd, mudarOrds, slotNome, slotBase, slotIcone, opcoesSlot, slotExpandido } from "./util.js";
@@ -22,7 +22,7 @@ import { lerDuelos, duelosUnificados, pareamento, elo, fmtElo, filaDuelos, adici
   gerarCenario, textoCenario, periodoDaHora, CHUVAS, MAE_DA_SUB, brilhaCai, rotuloValor, previsao, ehZebra, META_DIA, plausiveisNoCenario, chavePar } from "./duelo.js";
 import { fotoFicha, iconeFicha, fotoMini, fotoIcone, reduzirImagem, subirFoto, removerFotoPlanilha, iniciarFotos } from "./fotos.js";
 
-export const APP_VERSAO = "5.48";  // sobe a cada publicação: confere no topo da tela se o celular pegou a versão nova
+export const APP_VERSAO = "5.49";  // sobe a cada publicação: confere no topo da tela se o celular pegou a versão nova
 const S = { dueloModo: ler("dueloModo", "agora"), rkFiltro: ler("rkFiltro", {}), cenario: null, motionOk: !movimentoPedePermissao() && "DeviceMotionEvent" in globalThis, aba: "hoje", frascos: [], frascosAtivos: [], avisosTiers: null, medidos: [], fichas: {}, versao: {}, prev: null, prevOffline: false,
   prevErro: null, metar: null, metarMotivo: null, clima: null, resultado: null, erroMotor: null, entrada: "", carregandoClima: true,
   sync: { estado: "ocioso", msg: "" }, hr: ler("hr", { preset: "tudo" }), tokenNovo: null, playbook: null, janelas: new Map(),
@@ -544,7 +544,7 @@ async function lerAmostras({ forcar = false } = {}) {
 /** Usos no Diário por amostra: pelo "Nome no diário" da aba Tiers ou pelo próprio nome. Lê planilha e diário uma vez só. */
 function contadorUsos() {
   const porNome = new Map();
-  for (const r of historico().filter(deAnalise)) porNome.set(r.perfume, (porNome.get(r.perfume) || 0) + 1);
+  for (const r of historico().filter(ehUso)) porNome.set(r.perfume, (porNome.get(r.perfume) || 0) + 1);
   const tiers = new Map(planilha().tiers.map(t => [mercadoChave(t.casa, t.perfume), t]));
   const memo = new Map();
   return a => {
@@ -831,12 +831,12 @@ function abrirWrappedMes(am) {
 function bannerWrapped() {
   const hoje = hojeISO(), am = mesAnterior(hoje);
   if (Number(hoje.slice(8)) > 3 || ler("wrappedVisto", "") === am) return "";
-  if (!historico().some(r => r.data.startsWith(am) && deAnalise(r))) return "";
+  if (!historico().some(r => r.data.startsWith(am) && ehUso(r))) return "";
   return `<button class="banner-wrapped" data-acao="wrapped" data-mes="${am}">Seu Wrapped de ${MESES[Number(am.slice(5)) - 1]} está pronto ✨</button>`;
 }
 /** Histórico: escolher o mês e reabrir qualquer Wrapped. */
 function blocoWrapped() {
-  const meses = [...new Set(historico().filter(deAnalise).map(r => r.data.slice(0, 7)))].sort().reverse();
+  const meses = [...new Set(historico().filter(ehUso).map(r => r.data.slice(0, 7)))].sort().reverse();
   if (!meses.length) return "";
   const sel = meses.includes(S.wrMes) ? S.wrMes : meses.includes(mesAnterior()) ? mesAnterior() : meses[0];
   return `<div class="bloco"><h3>Wrapped</h3>
@@ -931,7 +931,7 @@ function blocoRaspadinha() {
   // usável hoje? (refeito a cada dia da semana: o clima muda)
   const cod = slotDaHora(), so = slotHoraRes(), t = so && !so.fora[f.nome] ? itemDoDia(so, f.nome) : null;
   const usado = historico().some(r => r.data === estadoDia().data && slotBase(r.slot) === cod);
-  const ult = historico().filter(r => r.perfume === f.nome && deAnalise(r)).at(-1);
+  const ult = historico().filter(r => r.perfume === f.nome && ehUso(r)).at(-1);
   const dias = ult ? Math.round((new Date(hojeISO()) - new Date(ult.data)) / 864e5) : null;
   const conteudo = `<div class="raspa-fr"><span class="ic">${iconeFrasco(f, 44)}</span>
       <div style="min-width:0"><button class="nome" data-ficha="${esc(f.nome)}">${esc(f.nome)}</button>${tierHTML(f.tier)}<div class="casa">${esc(f.casa)} · ${arqTag(f.arquetipo, 13)}</div>
@@ -1023,7 +1023,7 @@ function abrirFicha(nome) {
   reabrirFicha = () => abrirFicha(nome);
   const f = S.frascosAtivos.find(x => x.nome === nome) || S.frascos.find(x => x.nome === nome), fi = S.fichas[nome];
   if (!f || !fi) return;
-  const usos = historico().filter(r => r.perfume === nome && deAnalise(r));
+  const usos = historico().filter(r => r.perfume === nome && ehUso(r));
   const ult = usos[usos.length - 1];
   $("#folha").innerHTML = `<div class="veu" data-fechar><div class="folha" role="dialog" aria-modal="true" aria-labelledby="fichaT">
     <div class="linha-flex">${iconeFicha(doMercado(f.casa, nome), arqIcone(f.arquetipo, 34))}<h2 id="fichaT">${esc(nome)}</h2>${tierHTML(f.tier)}<span class="esp"></span><button class="btn sec peq" data-fechar>Fechar</button></div>

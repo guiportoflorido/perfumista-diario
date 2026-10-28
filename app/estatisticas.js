@@ -4,7 +4,8 @@ import { diasEntre, faixaIdx, OCASIOES } from "../engine/index.js";
 import { ROT_OC } from "./util.js";
 import { materialDoDia } from "./diversao.js";
 
-/** Análises só contam Dia (M) e Noite (N); Esportes (E) e 2ª aplicação (M2/N2) ficam só no registro (decisão dele, 18/out/2026). */
+/** Só Dia (M) e Noite (N), sem a 2ª aplicação: vale para a rotação do motor, o calendário (uma cor por slot) e a resposta
+ *  “vivo/fraco/morto”. Para medir USO (último uso, esquecidos, NotaDia, Wrapped…) use ehUso, que inclui M2/N2. */
 export const deAnalise = r => r.slot === "M" || r.slot === "N";
 
 export const daGrade = f => f.camada === "grade" && f.tier !== "D";
@@ -117,12 +118,12 @@ export function notaNum(v) {
 }
 
 /** NotaDia por frasco da grade: média geral, n e média por faixa de temperatura (pela Temp do registro; sem Temp entra
- *  só na média geral). Só Dia e Noite (deAnalise). Devolve Map nome → {f, n, media, faixas: Map idx → {n, media}}. */
+ *  só na média geral). Dia e Noite, inclusive 2ª aplicação (ehUso). Devolve Map nome → {f, n, media, faixas: Map idx → {n, media}}. */
 export function notaPorFrascoFaixa(hist, frascos) {
   const grade = new Map(frascos.filter(daGrade).map(f => [f.nome, f]));
   const acc = new Map();
   for (const r of hist) {
-    if (!deAnalise(r) || !grade.has(r.perfume)) continue;
+    if (!ehUso(r) || !grade.has(r.perfume)) continue;
     const nota = notaNum(r.notaDia);
     if (nota == null) continue;
     if (!acc.has(r.perfume)) acc.set(r.perfume, { f: grade.get(r.perfume), soma: 0, n: 0, faixas: new Map() });
@@ -147,7 +148,7 @@ export function notaPorFrascoOcasiao(hist, frascos) {
   const grade = new Set(frascos.filter(daGrade).map(f => f.nome));
   const acc = new Map();
   for (const r of hist) {
-    if (!deAnalise(r) || !grade.has(r.perfume)) continue;
+    if (!ehUso(r) || !grade.has(r.perfume)) continue;
     const nota = notaNum(r.notaDia), oc = ocasiaoCod(r.ocasiao);
     if (nota == null || !oc) continue;
     if (!acc.has(r.perfume)) acc.set(r.perfume, new Map());
@@ -194,7 +195,7 @@ export function ajustarSprays(f, sprModelo, aj) {
 export function resumoMes(hist, frascos, ano, mes, { duelos = [], eloDe = null } = {}) {
   const pref = `${ano}-${String(mes).padStart(2, "0")}`;
   const grade = new Map(frascos.filter(daGrade).map(f => [f.nome, f]));
-  const doMes = hist.filter(r => deAnalise(r) && grade.has(r.perfume) && r.data.startsWith(pref));
+  const doMes = hist.filter(r => ehUso(r) && grade.has(r.perfume) && r.data.startsWith(pref));
   const nulo = { total: null, distintos: null, totalGrade: grade.size, frascoDoMes: null, arquetipo: null, maisQuente: null, maisFrio: null,
     resgates: null, notaMedia: null, sequencia: null, subidao: null, material: null, dias: new Map() };
   if (!doMes.length) return nulo;
@@ -215,8 +216,8 @@ export function resumoMes(hist, frascos, ano, mes, { duelos = [], eloDe = null }
   const comT = doMes.map(r => ({ r, T: num(r.temp) })).filter(x => x.T != null);
   const ext = sinal => { if (!comT.length) return null; const x = [...comT].sort((a, b) => sinal * (b.T - a.T) || (a.r.data < b.r.data ? -1 : 1))[0]; return { data: x.r.data, T: x.T, perfume: x.r.perfume }; };
   // resgates: 1º uso no mês de um frasco parado há 45+ dias (ou nunca usado, se o diário já cobria 45 dias antes)
-  const antes = hist.filter(r => deAnalise(r) && r.data < pref + "-01");
-  const inicioDiario = hist.filter(deAnalise).reduce((m, r) => (!m || r.data < m ? r.data : m), null);
+  const antes = hist.filter(r => ehUso(r) && r.data < pref + "-01");
+  const inicioDiario = hist.filter(ehUso).reduce((m, r) => (!m || r.data < m ? r.data : m), null);
   const resgates = [];
   for (const nome of por.keys()) {
     const pri = doMes.find(r => r.perfume === nome).data;
@@ -255,7 +256,7 @@ export function resumoMes(hist, frascos, ano, mes, { duelos = [], eloDe = null }
 }
 
 // ───────────────────────── Análises (aba Mais › Análises) ─────────────────────────
-// Todas recebem o histórico já recortado no período e só de Dia/Noite (deAnalise) — a camada custo fica de fora.
+// Todas recebem o histórico já recortado no período, de Dia/Noite inclusive 2ª aplicação (ehUso) — Esportes e a camada custo ficam de fora.
 
 /** Onde ele usa × onde o playbook manda: cada registro com Temp e Ocasião vira uma célula faixa × ocasião; “dentro” =
  *  o frasco tem janela nessa célula. Devolve {n, dentro, mapa: Map "fi|oc" → n, fora: [{nome, data, faixaIdx, oc}]}. */
@@ -296,7 +297,7 @@ export function usoPorTier(por) {
 /** Dia da semana × slot: [{dia: 0..6 (seg..dom), M, N}] */
 export function porDiaSemana(hist) {
   const out = Array.from({ length: 7 }, (_, d) => ({ dia: d, M: 0, N: 0 }));
-  for (const r of hist) { if (r.slot !== "M" && r.slot !== "N") continue; const d = (new Date(r.data + "T12:00:00Z").getUTCDay() + 6) % 7; out[d][r.slot]++; }
+  for (const r of hist) { if (!ehUso(r)) continue; const d = (new Date(r.data + "T12:00:00Z").getUTCDay() + 6) % 7; out[d][r.slot[0]]++; }
   return out;
 }
 
