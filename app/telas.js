@@ -197,7 +197,7 @@ export function telaAnalises({ frascos, hist: histTodo, hoje, fila: filaToda, aj
   const hist = histTodo.filter(dentro).filter(deAnalise), fila = filaToda.filter(dentro);
   const seletor = seletorPeriodo(hr, hoje, de, ate, hist.length);
   if (!hist.length) return `<h2>Análises</h2>${seletor}<div class="bloco"><p class="vazio">${histTodo.length ? "Nenhum registro nesse período." : "Sem registros ainda."}</p></div>${duelos}`;
-  const c = contagens(hist, frascos, ate);
+  const c = contagens(histTodo.filter(dentro), frascos, ate);   // uso conta a 2ª aplicação (M2/N2)
   const doPeriodo = preset !== "tudo";
   const usados = [...c.por.values()].filter(x => x.n).sort((a, b) => b.n - a.n || (a.ultimo < b.ultimo ? 1 : -1));
   const porArq = agrupar(c.por, f => f.arquetipo).filter(([, v]) => v);
