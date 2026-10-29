@@ -22,7 +22,7 @@ import { lerDuelos, duelosUnificados, pareamento, elo, fmtElo, filaDuelos, adici
   gerarCenario, textoCenario, periodoDaHora, CHUVAS, MAE_DA_SUB, brilhaCai, rotuloValor, previsao, ehZebra, META_DIA, plausiveisNoCenario, chavePar } from "./duelo.js";
 import { fotoFicha, iconeFicha, fotoMini, fotoIcone, reduzirImagem, subirFoto, removerFotoPlanilha, iniciarFotos } from "./fotos.js";
 
-export const APP_VERSAO = "5.49";  // sobe a cada publicação: confere no topo da tela se o celular pegou a versão nova
+export const APP_VERSAO = "5.50";  // sobe a cada publicação: confere no topo da tela se o celular pegou a versão nova
 const S = { dueloModo: ler("dueloModo", "agora"), rkFiltro: ler("rkFiltro", {}), cenario: null, motionOk: !movimentoPedePermissao() && "DeviceMotionEvent" in globalThis, aba: "hoje", frascos: [], frascosAtivos: [], avisosTiers: null, medidos: [], fichas: {}, versao: {}, prev: null, prevOffline: false,
   prevErro: null, metar: null, metarMotivo: null, clima: null, resultado: null, erroMotor: null, entrada: "", carregandoClima: true,
   sync: { estado: "ocioso", msg: "" }, hr: ler("hr", { preset: "tudo" }), tokenNovo: null, playbook: null, janelas: new Map(),
@@ -203,7 +203,7 @@ function render() {
   const foco = document.activeElement?.id;
   const trocouAba = S.abaRenderizada !== S.aba; S.abaRenderizada = S.aba;
   const arqDe = new Map(S.frascos.map(f => [f.nome, f.arquetipo]));
-  const ctx = { fichas: S.fichas, arqTag, arqIcone, arqDe, hr: S.hr,
+  const ctx = { fichas: S.fichas, arqTag, arqIcone, arqDe, hr: S.hr, arquetipos: S.arquetipos,
     frascos: S.frascosAtivos, hist: historico(), hoje: hojeISO(), janelas: S.janelas, filtro: S.filtro, playbook: S.playbook,
     faixaSel: S.pbFaixa ?? S.clima?.faixaDia?.idx ?? 2, fila: fila(), ajSpray: ajSpray(), limiteEdicao: limiteEdicao(hojeISO()), exp: S.exp, raspadinha: S.aba === "analises" ? blocoRaspadinha() : "",
     elo: S.aba === "colecao" ? elo(duelosTodos(), S.frascosAtivos) : null,
