@@ -266,7 +266,7 @@ details.fora > summary { font: 500 13.5px var(--f); color: var(--suave); }
 .roda .r-custo .r-ponto { fill-opacity: .22; stroke-width: 4; stroke-dasharray: 3 4; stroke-linecap: round; }
 .roda .r-fr.r-custo.ativo .r-ponto { stroke-width: 4; }
 .roda .r-orb-custo { stroke-dasharray: 1.5 7; stroke-linecap: round; stroke-opacity: .5; }
-.roda-ver { margin: 0 auto 6px; max-width: 420px; }
+.roda-ver, .md-per { margin: 0 auto 6px; max-width: 420px; }
 .roda .r-tambem .r-ponto { opacity: .9; }
 .roda .r-anel { fill: none; stroke: var(--tinta); stroke-width: 4; }
 .roda .r-jogada .r-anel { stroke-dasharray: 6 5; }
@@ -739,3 +739,46 @@ select[disabled], input[readonly], textarea[readonly] { opacity: .75; }
 .mapa-uso th, .mapa-uso td { text-align: center; padding: 6px 2px; font-size: 12px; }
 .mapa-uso tbody th { text-align: left; white-space: nowrap; }
 .mapa-uso td.com { background: color-mix(in srgb, var(--acento) calc(var(--a) * 70%), transparent); font-weight: 700; border-radius: 4px; }
+
+/* ── Análises gráficas ── */
+.mandala, .termometro, .rio, .dianoite { width: 100%; height: auto; display: block; overflow: visible; }
+.mandala { max-width: 520px; margin: 0 auto; }
+.mandala .md-setor { fill-opacity: .14; stroke-opacity: .25; stroke-width: 1; }
+.mandala .md-setor.nunca { fill-opacity: .04; }
+.mandala .md-setor.fundo { fill-opacity: .28; }
+.mandala .md-borda { fill: none; stroke-width: 5; stroke-linecap: round; opacity: .85; }
+.mandala .md-borda.transborda { stroke: #e0645c !important; stroke-dasharray: 3 5; stroke-width: 6; }
+.mandala .r-ic { fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+.mandala .md-ic.apagado { opacity: .3; }
+.mandala .md-rot { font: 700 15px var(--f); letter-spacing: .01em; }
+.mandala .md-rot.apagado { opacity: .38; }
+.mandala .md-rot.longo { font-size: 11.5px; letter-spacing: 0; }
+.mandala .md-colecao { fill: none; stroke: var(--suave); stroke-width: 1.6; stroke-dasharray: 4 5; opacity: .8; }
+.mandala .md-uso { fill: #d9a83a; fill-opacity: .22; stroke: #e2b448; stroke-width: 2.6; stroke-linejoin: round; }
+.mandala .md-pt { fill: #e2b448; stroke: var(--sup); stroke-width: 2; }
+.mandala .md-miolo { fill: var(--bg); stroke: var(--linha); }
+.mandala .md-centro { font: italic 400 22px Georgia, "Times New Roman", serif; fill: var(--tinta); }
+.md-selos { display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; margin: 2px 0 -4px; }
+.md-selo { font: 700 11px var(--f); letter-spacing: .12em; text-transform: uppercase; padding: 5px 11px; border-radius: 99px; border: 1.5px solid var(--suave); color: var(--suave); }
+.md-selo.fundo { border-color: #e2b448; color: #e2b448; margin-left: auto; }
+.md-legenda { display: flex; flex-wrap: wrap; gap: 4px 12px; justify-content: center; align-items: center; font-size: 12px; color: var(--suave); margin: 4px 0; }
+.md-legenda .sw { display: inline-block; width: 18px; height: 10px; border-radius: 3px; margin-right: 4px; vertical-align: -1px; }
+.md-legenda .sw.uso { background: rgba(217,168,58,.35); border: 2px solid #e2b448; }
+.md-legenda .sw.colecao { border: 1.6px dashed var(--suave); }
+.md-legenda .sw.transborda { border: 2px dashed #e0645c; }
+.md-frase { font: italic 400 17px/1.35 Georgia, "Times New Roman", serif; color: #e2b448; margin: 6px 0 0; }
+.termometro .tm-pt { stroke-width: 0; opacity: .92; }
+.termometro .tm-pt.noite { fill-opacity: .25; stroke-width: 2.2; }
+.termometro .tm-fx { font: 700 11px var(--f); fill: var(--suave); }
+.termometro .tm-t { font: 500 11px var(--f-num); fill: var(--leve); }
+.termometro .tm-med { stroke: var(--tinta); stroke-width: 1.4; stroke-dasharray: 3 4; opacity: .6; }
+.termometro .tm-medt { font: 600 11px var(--f); fill: var(--suave); }
+.rio .rio-fita { fill-opacity: .32; }
+.rio .rio-col { stroke: var(--sup); stroke-width: 1; }
+.rio .rio-t { font: 500 11px var(--f-num); fill: var(--suave); }
+.rio-leg { display: flex; flex-wrap: wrap; gap: 4px 10px; font-size: 11.5px; color: var(--suave); }
+.rio-leg i { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 4px; }
+.dianoite .dn-fita { fill-opacity: .38; }
+.dianoite .dn-fita:hover { fill-opacity: .7; }
+.dianoite .dn-rot { font: 600 13px var(--f); fill: var(--tinta); }
+.dn-cab { display: flex; justify-content: space-between; font: 700 12px var(--f); color: var(--suave); padding: 0 6px; }
