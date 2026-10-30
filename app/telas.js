@@ -3,7 +3,7 @@ import { FAIXAS, faixaIdx } from "../engine/index.js";
 import { nomeDoDia } from "./diversao.js";
 import { esc, ROT_OC, OCAS_TODAS, pinta, faixaHTML, nf, tierHTML, slotNome, slotIcone, md, ordsDe, compararMulti, cmpValor, cabOrd, painelOrd, OPC_AMOSTRA, passaAmostra, temFiltro } from "./util.js";
 import { chave } from "./mercado.js";
-import { contagens, agrupar, esquecidos, usoVsJanelas, calibracao, deAnalise, notaPorFrascoFaixa, aderenciaPlaybook, concentracao, usoPorTier, porDiaSemana, constancia, sobrevivencia } from "./estatisticas.js";
+import { contagens, agrupar, esquecidos, usoVsJanelas, calibracao, deAnalise, ehUso, notaPorFrascoFaixa, aderenciaPlaybook, concentracao, usoPorTier, porDiaSemana, constancia, sobrevivencia } from "./estatisticas.js";
 import { arqIcone, corArq, ARQ_PATHS } from "./icones.js";
 
 const TIERS = ["S", "A", "B", "C"];
@@ -169,7 +169,7 @@ const barras = (pares, max) => `<div class="barras">${pares.map(([k, v]) => `<di
 export function telaHistorico({ frascos, hist: histTodo, hoje, hr = {}, limiteEdicao = "", exp = "tudo", wrapped = "" }) {
   const { de, ate } = periodo(hr.preset || "tudo", hoje, hr.de, hr.ate);
   const dentro = r => (!de || r.data >= de) && r.data <= ate;
-  const hist = histTodo.filter(dentro).filter(deAnalise);
+  const hist = histTodo.filter(dentro).filter(ehUso);   // inclui a 2ª aplicação (M2/N2)
   const seletor = seletorPeriodo(hr, hoje, de, ate, hist.length);
   const recentes = limiteEdicao ? registrosRecentes(histTodo, limiteEdicao) : "";
   if (!hist.length) return `<h2>Histórico</h2>${seletor}${histTodo.length ? recentes : ""}<div class="bloco"><p class="vazio">${histTodo.length ? "Nenhum registro nesse período." : "Sem registros ainda. Conecte a planilha em Ajustes ou registre um uso."}</p></div>${histTodo.length ? blocoExportar(exp) : ""}`;
@@ -194,14 +194,14 @@ export function telaAnalises({ frascos, hist: histTodo, hoje, fila: filaToda, aj
   const preset = hr.preset || "tudo";
   const { de, ate } = periodo(preset, hoje, hr.de, hr.ate);
   const dentro = r => (!de || r.data >= de) && r.data <= ate;
-  const hist = histTodo.filter(dentro).filter(deAnalise), fila = filaToda.filter(dentro);
+  const hist = histTodo.filter(dentro).filter(ehUso), fila = filaToda.filter(dentro);   // uso: Dia e Noite, inclusive 2ª aplicação
   const seletor = seletorPeriodo(hr, hoje, de, ate, hist.length);
   if (!hist.length) return `<h2>Análises</h2>${seletor}<div class="bloco"><p class="vazio">${histTodo.length ? "Nenhum registro nesse período." : "Sem registros ainda."}</p></div>${duelos}`;
-  const c = contagens(histTodo.filter(dentro), frascos, ate);   // uso conta a 2ª aplicação (M2/N2)
+  const c = contagens(hist, frascos, ate);
   const doPeriodo = preset !== "tudo";
   const usados = [...c.por.values()].filter(x => x.n).sort((a, b) => b.n - a.n || (a.ultimo < b.ultimo ? 1 : -1));
   const porArq = agrupar(c.por, f => f.arquetipo).filter(([, v]) => v);
-  const slots = [["☀︎ Dia", hist.filter(r => r.slot === "M").length], ["☾ Noite", hist.filter(r => r.slot === "N").length]];
+  const slots = [["☀︎ Dia", hist.filter(r => r.slot[0] === "M").length], ["☾ Noite", hist.filter(r => r.slot[0] === "N").length]];
   const esq = doPeriodo ? [...c.por.values()].filter(x => !x.n).sort((a, b) => TIERS.indexOf(a.f.tier) - TIERS.indexOf(b.f.tier) || a.f.nome.localeCompare(b.f.nome)) : esquecidos(c.por, limiteEsq);
   const uv = usoVsJanelas(c.por).filter(x => x.usos || x.janelas);
   const acima = uv.filter(x => x.desvio >= 1).sort((a, b) => b.desvio - a.desvio).slice(0, 8);
@@ -210,7 +210,7 @@ export function telaAnalises({ frascos, hist: histTodo, hoje, fila: filaToda, aj
     .sort((a, b) => a.media - b.media || b.n - a.n || a.f.nome.localeCompare(b.f.nome, "pt"));
   const diasPeriodo = de ? Math.round((new Date(ate) - new Date(de)) / 864e5) + 1 : c.cobertura;
   // novas
-  const cons = constancia(hist, de, ate);
+  const cons = constancia(hist.filter(deAnalise), de, ate);
   const conc = concentracao(c.por);
   const tiers = usoPorTier(c.por);
   const sem = porDiaSemana(hist), maxSem = Math.max(1, ...sem.map(d => d.M + d.N));

@@ -65,13 +65,13 @@ test("ajuste +N: desligado por padrão, respeita tetos dos beasts e não mexe no
 });
 
 import { notaPorFrascoFaixa, notaNum } from "../app/estatisticas.js";
-test("NotaDia: média geral e por faixa de temperatura; sem Temp só na geral; só Dia/Noite e só a grade", () => {
+test("NotaDia: média geral e por faixa de temperatura; sem Temp só na geral; sem Esportes e só a grade", () => {
   const hist = [
     { data: "2026-10-01", slot: "M", perfume: "Odéon", notaDia: "4", temp: "24" },      // Ameno
     { data: "2026-10-02", slot: "N", perfume: "Odéon", notaDia: "2", temp: "23,5" },    // Ameno
     { data: "2026-10-03", slot: "M", perfume: "Odéon", notaDia: "3", temp: "29" },      // Quente
     { data: "2026-10-04", slot: "N", perfume: "Odéon", notaDia: "5", temp: "" },        // sem Temp: só na geral
-    { data: "2026-10-05", slot: "M2", perfume: "Odéon", notaDia: "1", temp: "24" },     // 2ª aplicação: fora
+    { data: "2026-10-05", slot: "E", perfume: "Odéon", notaDia: "1", temp: "24" },      // Esportes: fora
     { data: "2026-10-06", slot: "M", perfume: "Odéon", notaDia: "8,5", temp: "24" },    // escala antiga: fora
     { data: "2026-10-07", slot: "M", perfume: "Sky", notaDia: "2", temp: "30" },        // camada custo: fora
     { data: "2026-10-08", slot: "N", perfume: "Liwa", notaDia: "", temp: "20" }];       // sem nota
@@ -97,15 +97,17 @@ test("sobrevivência: a resposta da Noite conta para o último perfume do Dia da
   assert.deepEqual(Object.fromEntries(s), { "Odéon": { n: 2, vivo: 1, fraco: 1, morto: 0 }, "Hacivat": { n: 1, vivo: 0, fraco: 0, morto: 1 } });
 });
 
-test("NotaDia por ocasião: código do engine ou rótulo de tela, só Dia/Noite e grade", async () => {
+test("NotaDia por ocasião: código do engine ou rótulo de tela, sem Esportes, só a grade; 2ª aplicação conta", async () => {
   const { notaPorFrascoOcasiao } = await import("../app/estatisticas.js");
   const hist = [{ data: "2026-10-01", slot: "M", perfume: "Odéon", ocasiao: "T.Inf", notaDia: "4" },
     { data: "2026-10-02", slot: "N", perfume: "Odéon", ocasiao: "Trab. Informal", notaDia: "5" },
-    { data: "2026-10-03", slot: "M2", perfume: "Odéon", ocasiao: "T.Inf", notaDia: "1" },
+    { data: "2026-10-03", slot: "E", perfume: "Odéon", ocasiao: "T.Inf", notaDia: "1" },
     { data: "2026-10-04", slot: "M", perfume: "Odéon", ocasiao: "", notaDia: "1" },
     { data: "2026-10-05", slot: "M", perfume: "Odéon", ocasiao: "Cozy N", notaDia: "3" }];
   const m = notaPorFrascoOcasiao(hist, frascos).get("Odéon");
   assert.deepEqual([...m], [["T.Inf", { n: 2, media: 4.5 }], ["Cozy N", { n: 1, media: 3 }]]);
+  const n2 = notaPorFrascoOcasiao([...hist, { data: "2026-10-06", slot: "N2", perfume: "Odéon", ocasiao: "Cozy N", notaDia: "5" }], frascos).get("Odéon");
+  assert.deepEqual(n2.get("Cozy N"), { n: 2, media: 4 });   // N2 (2ª aplicação) é uso com nota
 });
 
 test("semana ISO", async () => {
