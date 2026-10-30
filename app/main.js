@@ -22,12 +22,13 @@ import { lerDuelos, duelosUnificados, pareamento, elo, fmtElo, filaDuelos, adici
   gerarCenario, textoCenario, periodoDaHora, CHUVAS, MAE_DA_SUB, brilhaCai, rotuloValor, previsao, ehZebra, META_DIA, plausiveisNoCenario, chavePar } from "./duelo.js";
 import { fotoFicha, iconeFicha, fotoMini, fotoIcone, reduzirImagem, subirFoto, removerFotoPlanilha, iniciarFotos } from "./fotos.js";
 
-export const APP_VERSAO = "5.50";  // sobe a cada publicação: confere no topo da tela se o celular pegou a versão nova
+export const APP_VERSAO = "5.51";  // sobe a cada publicação: confere no topo da tela se o celular pegou a versão nova
 const S = { dueloModo: ler("dueloModo", "agora"), rkFiltro: ler("rkFiltro", {}), cenario: null, motionOk: !movimentoPedePermissao() && "DeviceMotionEvent" in globalThis, aba: "hoje", frascos: [], frascosAtivos: [], avisosTiers: null, medidos: [], fichas: {}, versao: {}, prev: null, prevOffline: false,
   prevErro: null, metar: null, metarMotivo: null, clima: null, resultado: null, erroMotor: null, entrada: "", carregandoClima: true,
   sync: { estado: "ocioso", msg: "" }, hr: ler("hr", { preset: "tudo" }), tokenNovo: null, playbook: null, janelas: new Map(),
   filtro: ler("filtro", {}), pbFaixa: null, arquetipos: [], gaps: [], sub: carregarSub(), exp: ler("exp", "tudo"), sim: null, verGaps: false,
   mercadoBase: null, mercadoErro: null, mf: ler("mf", {}), mfLimite: 60, mercadoBaixado: false, criandoMercado: false, salvandoMercado: false,
+  mdPer: ler("mdPer", "tudo"),   // mandala da aba Análises: tudo | M (Dia) | N (Noite)
   rodaVer: ler("rodaVer", ler("rodaCusto", true) ? "tudo" : "grade"),   // migra o antigo liga/desliga da camada custo
   am: ler("am", {}), amBaixando: false, amBaixadas: false, amErro: null };
 const ajSpray = () => ler("sprays_ajuste", { ativo: false, geral: 0, por: {} });
@@ -203,7 +204,7 @@ function render() {
   const foco = document.activeElement?.id;
   const trocouAba = S.abaRenderizada !== S.aba; S.abaRenderizada = S.aba;
   const arqDe = new Map(S.frascos.map(f => [f.nome, f.arquetipo]));
-  const ctx = { fichas: S.fichas, arqTag, arqIcone, arqDe, hr: S.hr, arquetipos: S.arquetipos,
+  const ctx = { fichas: S.fichas, arqTag, arqIcone, arqDe, hr: S.hr, arquetipos: S.arquetipos, mdPer: S.mdPer,
     frascos: S.frascosAtivos, hist: historico(), hoje: hojeISO(), janelas: S.janelas, filtro: S.filtro, playbook: S.playbook,
     faixaSel: S.pbFaixa ?? S.clima?.faixaDia?.idx ?? 2, fila: fila(), ajSpray: ajSpray(), limiteEdicao: limiteEdicao(hojeISO()), exp: S.exp, raspadinha: S.aba === "analises" ? blocoRaspadinha() : "",
     elo: S.aba === "colecao" ? elo(duelosTodos(), S.frascosAtivos) : null,
@@ -1209,6 +1210,7 @@ document.addEventListener("click", async e => {
   if (b.dataset.pbfaixa) { S.pbFaixa = Number(b.dataset.pbfaixa); render(); return; }
   if (b.dataset.chip) { const k = b.dataset.chip, v = b.dataset.v; mudarDia(d => { d[k] = v; }); return; }
   if (b.dataset.extra) { const v = b.dataset.extra; mudarDia(d => { d.extras = d.extras.includes(v) ? d.extras.filter(x => x !== v) : [...d.extras, v]; }); return; }
+  if (b.dataset.mdPer) { S.mdPer = b.dataset.mdPer; gravar("mdPer", S.mdPer); render(); return; }
   if (b.dataset.rodaVer) { S.rodaVer = b.dataset.rodaVer; gravar("rodaVer", S.rodaVer); render(); return; }
   if (b.dataset.ir) { irPara(b.dataset.ir); render(); window.scrollTo(0, 0); return; }
   if (b.dataset.roletaSlot) { abrirRoletaSlot(b.dataset.roletaSlot); return; }

@@ -44,3 +44,15 @@ test("rio: semanas (segunda) × arquétipo; Dia → Noite: pares do mesmo dia", 
   const b = blocoDiaNoite(pares);
   assert.match(b, /class="dianoite"/); assert.match(b, /1 dia ficou no mesmo arquétipo/);
 });
+
+test("mandala separa Dia (M/M2) e Noite (N/N2)", () => {
+  const arq = [{ nome: "Rosal", cor: "#b56a78" }, { nome: "Lareira", cor: "#a0522d" }];
+  const fr = [{ nome: "A", arquetipo: "Rosal" }, { nome: "B", arquetipo: "Lareira" }];
+  const por = new Map([["A", { n: 3, M: 3, N: 0 }], ["B", { n: 2, M: 0, N: 2 }]]);
+  assert.deepEqual(dadosMandala(arq, fr, por, "M").map(d => d.usos), [3, 0]);
+  assert.deepEqual(dadosMandala(arq, fr, por, "N").map(d => d.usos), [0, 2]);
+  assert.deepEqual(dadosMandala(arq, fr, por).map(d => d.usos), [3, 2]);
+  const b = blocoMandala(dadosMandala(arq, fr, por, "N"), "N");
+  assert.match(b, /data-md-per="N" aria-selected="true"/);
+  assert.match(b, /de Noite no período/);
+});

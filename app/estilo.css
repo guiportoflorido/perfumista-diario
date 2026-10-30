@@ -266,7 +266,7 @@ details.fora > summary { font: 500 13.5px var(--f); color: var(--suave); }
 .roda .r-custo .r-ponto { fill-opacity: .22; stroke-width: 4; stroke-dasharray: 3 4; stroke-linecap: round; }
 .roda .r-fr.r-custo.ativo .r-ponto { stroke-width: 4; }
 .roda .r-orb-custo { stroke-dasharray: 1.5 7; stroke-linecap: round; stroke-opacity: .5; }
-.roda-ver { margin: 0 auto 6px; max-width: 420px; }
+.roda-ver, .md-per { margin: 0 auto 6px; max-width: 420px; }
 .roda .r-tambem .r-ponto { opacity: .9; }
 .roda .r-anel { fill: none; stroke: var(--tinta); stroke-width: 4; }
 .roda .r-jogada .r-anel { stroke-dasharray: 6 5; }

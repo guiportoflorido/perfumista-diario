@@ -13,11 +13,14 @@ const FX_CURTA = ["MQ", "Q", "A", "F", "Fr", "MF"];
 // ───────────────────────── 1 · mandala: sua forma ─────────────────────────
 export const TRANSBORDA = 7;   // frascos no mesmo arquétipo a partir dos quais a fatia “transborda”
 
-/** Dados da mandala: por arquétipo, frascos da grade e usos no período (contagens.por). */
-export function dadosMandala(arquetipos, frascos, por) {
+export const PER_MANDALA = [["tudo", "Dia e Noite"], ["M", "Dia"], ["N", "Noite"]];
+
+/** Dados da mandala: por arquétipo, frascos da grade e usos no período (contagens.por). per = "tudo" | "M" (Dia, M/M2) | "N" (Noite, N/N2). */
+export function dadosMandala(arquetipos, frascos, por, per = "tudo") {
+  const campo = per === "M" || per === "N" ? per : "n";
   return arquetipos.map(a => {
     const fs = frascos.filter(f => f.arquetipo === a.nome);
-    const usos = fs.reduce((s, f) => s + (por.get(f.nome)?.n || 0), 0);
+    const usos = fs.reduce((s, f) => s + (por.get(f.nome)?.[campo] || 0), 0);
     return { nome: a.nome, cor: a.cor, frascos: fs.length, usos };
   });
 }
@@ -56,17 +59,20 @@ export function mandalaSVG(dados) {
   return `<svg class="mandala" viewBox="-20 -20 ${W + 40} ${W + 40}" role="img" aria-label="Mandala dos arquétipos: forma dourada = uso no período, contorno tracejado = coleção">${partes.join("")}</svg>`;
 }
 
-/** Bloco completo da mandala com os selos e a leitura em texto. */
-export function blocoMandala(dados) {
+/** Bloco completo da mandala com os selos, o seletor Dia/Noite e a leitura em texto. */
+export function blocoMandala(dados, per = "tudo") {
+  const quando = { tudo: "no período", M: "de Dia no período", N: "de Noite no período" }[per] || "no período";
   const maxU = Math.max(0, ...dados.map(d => d.usos));
   const fundo = dados.filter(d => d.usos === maxU && maxU > 0).map(d => d.nome);
   const nunca = dados.filter(d => d.frascos && !d.usos).map(d => d.nome);
   const transb = dados.filter(d => d.frascos >= TRANSBORDA);
   return `<div class="bloco mandala-bloco"><h3>Sua forma</h3>
+    <div class="segmentos md-per" role="tablist" aria-label="Período do dia">${PER_MANDALA.map(([v, r]) =>
+      `<button role="tab" data-md-per="${v}" aria-selected="${per === v}">${r}</button>`).join("")}</div>
     <div class="md-selos">${nunca.length ? `<span class="md-selo nunca">nunca alcançado · ${nunca.length}</span>` : ""}${fundo.length ? `<span class="md-selo fundo">onde você vai fundo · ${esc(fundo.join(", "))}</span>` : ""}</div>
     ${mandalaSVG(dados)}
-    <p class="md-legenda"><span class="sw uso"></span>uso no período <span class="sw colecao"></span>coleção (frascos)${transb.length ? ` <span class="sw transborda"></span>transborda (${TRANSBORDA}+)` : ""}</p>
-    ${nunca.length ? `<p class="nota">Tem frasco e não usou no período: <b>${esc(nunca.join(", "))}</b>.</p>` : ""}
+    <p class="md-legenda"><span class="sw uso"></span>uso ${quando} <span class="sw colecao"></span>coleção (frascos)${transb.length ? ` <span class="sw transborda"></span>transborda (${TRANSBORDA}+)` : ""}</p>
+    ${nunca.length ? `<p class="nota">Tem frasco e não usou ${quando}: <b>${esc(nunca.join(", "))}</b>.</p>` : ""}
     ${transb.length ? `<p class="md-frase">Quando uma fatia transborda (${esc(transb.map(d => `${d.nome} ${d.frascos}`).join(", "))}), fique com os melhores e deixe o resto ir.</p>` : ""}
   </div>`;
 }

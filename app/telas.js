@@ -191,7 +191,7 @@ const OC_CURTA = { Lazer: "Lz", "T.Inf": "TI", "T.For": "TF", "N.Inf": "NI", "N.
 const pct = x => `${Math.round(x * 100)}%`;
 
 /** Mais › Análises: as contas do período (mesmo seletor do Histórico) + análises novas. */
-export function telaAnalises({ arquetipos = [], frascos, hist: histTodo, hoje, fila: filaToda, ajSpray, janelas, limiteEsq = 45, hr = {}, arqTag, raspadinha = "", duelos = "" }) {
+export function telaAnalises({ mdPer = "tudo", arquetipos = [], frascos, hist: histTodo, hoje, fila: filaToda, ajSpray, janelas, limiteEsq = 45, hr = {}, arqTag, raspadinha = "", duelos = "" }) {
   const preset = hr.preset || "tudo";
   const { de, ate } = periodo(preset, hoje, hr.de, hr.ate);
   const dentro = r => (!de || r.data >= de) && r.data <= ate;
@@ -229,7 +229,7 @@ export function telaAnalises({ arquetipos = [], frascos, hist: histTodo, hoje, f
   ${!doPeriodo && c.cobertura < 90 ? `<p class="nota">Diário com menos de 90 dias: não serve ainda para conclusões de desbaste sobre os B.</p>` : ""}
 
   ${(() => { const g = frascos.filter(f => f.camada === "grade" && f.tier !== "D");
-    return (arquetipos.length ? blocoMandala(dadosMandala(arquetipos, g, c.por)) : "") + blocoTermometro(dadosTermometro(hist, g))
+    return (arquetipos.length ? blocoMandala(dadosMandala(arquetipos, g, c.por, mdPer), mdPer) : "") + blocoTermometro(dadosTermometro(hist, g))
       + blocoDiaNoite(dadosDiaNoite(hist, g)) + (arquetipos.length ? blocoRio(dadosRio(hist, g), arquetipos) : ""); })()}
 
   ${cons ? `<div class="bloco"><h3>Constância do diário</h3>
