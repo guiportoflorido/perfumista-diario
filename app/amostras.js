@@ -87,7 +87,8 @@ export function filtrar(lista, f = {}, { usosDe = null, hoje = hojeISO() } = {})
     if (f.dono && a.dono !== f.dono) return false;
     if (f.arq === "sem" ? a.m?.arquetipo : f.arq && a.m?.arquetipo !== f.arq) return false;
     if (f.tier === "sem" ? a.m?.tier : f.tier && a.m?.tier !== f.tier) return false;
-    if (f.posse === "sem" ? a.m?.posse : f.posse && a.m?.posse !== f.posse) return false;
+    const ps = a.m?.posse || "";   // também os valores do filtro do Mercado: "amostra" = qualquer amostra, "nao" = sem frasco
+    if (f.posse === "amostra" ? !/amostra/i.test(ps) : f.posse === "nao" ? /frasco/i.test(ps) : f.posse === "sem" ? ps : f.posse && ps !== f.posse) return false;
     if (f.wish === "sim" ? !a.m?.wish : f.wish === "nao" && a.m?.wish) return false;
     if (q && !norm(`${a.nome} ${a.casa} ${a.origem} ${a.impressao} ${a.obs} ${a.m?.arquetipo || ""}`).includes(q)) return false;
     return true;
@@ -140,11 +141,11 @@ const SEL_STATUS = { Pendente: "pend", "Em teste": "teste", Realizado: "ok", Esg
 const op = (v, r, at) => `<option value="${esc(v)}" ${String(at ?? "") === String(v) ? "selected" : ""}>${esc(r)}</option>`;
 const dataBR = iso => (/^\d{4}-\d{2}-\d{2}$/.test(iso || "") ? `${iso.slice(8, 10)}/${iso.slice(5, 7)}/${iso.slice(2, 4)}` : "");
 
-export function telaAmostras({ lista, filtro, configurado, existe, erro, sem, usosDe, hoje = hojeISO(), editavel = false, arquetipos = [] }) {
+/** Topo das amostras (nota, “+ Entrada”, KPIs) ou a mensagem de estado (sem planilha / carregando). */
+export function topoAmostras({ lista, configurado, existe, erro }) {
   if (!configurado) return `<div class="bloco"><p class="nota">As amostras ficam numa aba <b>Amostras</b> da planilha. Conecte a planilha em Ajustes para começar.</p></div>`;
   if (!lista) return `<div class="bloco"><p class="nota">${erro ? `<span class="erro-txt">Não consegui ler a aba Amostras: ${esc(erro)}</span>` : "Carregando as amostras…"}</p></div>`;
-  const r = resumo(lista), res = filtrar(lista, filtro, { usosDe, hoje });
-  const chip = (v, rot) => `<button class="chip" data-am="status" data-v="${v}" aria-pressed="${(filtro.status || "") === v}">${rot}</button>`;
+  const r = resumo(lista);
   return `
   <div class="linha-flex"><p class="nota" style="flex:1">${existe ? "Lido da aba <b>Amostras</b> da planilha." : "A aba <b>Amostras</b> é criada na planilha na primeira entrada."} Avaliação (tier, arquétipo…) é a da aba Mercado.</p>
     <button class="btn peq" data-acao="nova-amostra">+ Entrada</button></div>
@@ -155,28 +156,48 @@ export function telaAmostras({ lista, filtro, configurado, existe, erro, sem, us
     <div class="kpi"><span class="v">${r.realizado}</span><span class="l">testadas, em mãos</span></div>
     <div class="kpi"><span class="v">${r.esgotado}</span><span class="l">esgotadas / saíram</span></div>
   </div>
-  <p class="nota">${r.mao} em mãos${r.ml ? ` · ${String(r.ml).replace(".", ",")} ml no total` : ""}.</p>
-  <div class="bloco">
-    <input type="search" id="am-q" placeholder="Buscar perfume, casa ou impressão" value="${esc(filtro.q || "")}" aria-label="Buscar amostras">
-    <div class="chips rolagem">${chip("", "Todas")}${chip("mao", "Em mãos")}${STATUS.map(s => chip(s, s)).join("")}</div>
-    <div class="campos">
-      <label>Dono<select id="amf-dono">${op("", "Gui e Bia", filtro.dono)}${op("Gui", "G · Gui", filtro.dono)}${op("Bia", "B · Bia", filtro.dono)}</select></label>
-      <label>Casa<select id="amf-casa">${op("", "Todas", filtro.casa)}${[...new Set(lista.map(a => a.casa))].sort((x, y) => x.localeCompare(y, "pt")).map(c => op(c, c, filtro.casa)).join("")}</select></label>
-      <label>Arquétipo<select id="amf-arq">${op("", "Todos", filtro.arq)}${arquetipos.map(x => op(x.nome, x.nome, filtro.arq)).join("")}${op("sem", "Sem arquétipo", filtro.arq)}</select></label>
-      <label>Tier<select id="amf-tier">${op("", "Todos", filtro.tier)}${["S", "A", "B", "C", "D"].map(t => op(t, `Tier ${t}`, filtro.tier)).join("")}${op("sem", "Sem tier", filtro.tier)}</select></label>
-      <label>Posse (Mercado)<select id="amf-posse">${op("", "Todas", filtro.posse)}${POSSES_EDIT.filter(Boolean).map(p => op(p, posseRot(p), filtro.posse)).join("")}${op("sem", "Sem posse", filtro.posse)}</select></label>
-      <label>Wishlist<select id="amf-wish">${op("", "Todos", filtro.wish)}${op("sim", "Só wishlist", filtro.wish)}${op("nao", "Fora da wishlist", filtro.wish)}</select></label>
-      <label>Tipo<select id="am-tipo">${op("", "Amostra e decant", filtro.tipo)}${TIPOS.map(t => op(t, t, filtro.tipo)).join("")}</select></label>
-    </div>
-    <p class="nota">${res.length} de ${lista.length}.${["dono", "casa", "arq", "tier", "posse", "wish", "tipo", "q", "status"].some(k => filtro[k]) ? ` <button class="btn sec peq" data-acao="am-limpar">Limpar filtros</button>` : ""}</p>
-  </div>
-  ${res.length ? tabela(res, filtro, { usosDe, hoje, editavel, arquetipos })
+  <p class="nota">${r.mao} em mãos${r.ml ? ` · ${String(r.ml).replace(".", ",")} ml no total` : ""}.</p>`;
+}
+
+/** Filtros só das amostras: chips de status + Dono e Tipo (os campos ficam dentro de um .campos). */
+export function filtrosAmostras(filtro) {
+  const chip = (v, rot) => `<button class="chip" data-am="status" data-v="${v}" aria-pressed="${(filtro.status || "") === v}">${rot}</button>`;
+  return {
+    chips: `<div class="chips rolagem">${chip("", "Todas")}${chip("mao", "Em mãos")}${STATUS.map(s => chip(s, s)).join("")}</div>`,
+    campos: `<label>Dono<select id="amf-dono">${op("", "Gui e Bia", filtro.dono)}${op("Gui", "G · Gui", filtro.dono)}${op("Bia", "B · Bia", filtro.dono)}</select></label>
+      <label>Tipo<select id="am-tipo">${op("", "Amostra e decant", filtro.tipo)}${TIPOS.map(t => op(t, t, filtro.tipo)).join("")}</select></label>` };
+}
+
+/** Tabela das amostras já filtradas + lista das posses “Amostra” sem lançamento. */
+export function corpoAmostras({ res, lista, filtro, sem, usosDe, hoje = hojeISO(), editavel = false, arquetipos = [] }) {
+  return `${res.length ? tabela(res, filtro, { usosDe, hoje, editavel, arquetipos })
     : `<div class="bloco"><p class="vazio">${lista.length ? "Nada com esses filtros." : "Nenhuma amostra lançada ainda. Toque em “+ Entrada”."}</p></div>`}
   ${sem.length ? `<details class="bloco"><summary>Posse “Amostra” na aba Tiers sem lançamento aqui · ${sem.length}</summary>
     <p class="nota">Toque para lançar a entrada (o volume fica por sua conta: não invento).</p>
     <div class="lista">${sem.map(p => `<button class="card compacto merc" data-am-nova="${esc(p.casa + "||" + p.nome)}"><span class="pos">${p.tier ? tierHTML(p.tier) : "+"}</span>
       <div style="min-width:0"><b>${esc(p.nome)}</b><div class="casa">${esc(p.casa)}${p.arquetipo ? ` · ${esc(p.arquetipo)}` : ""}</div></div><span></span></button>`).join("")}</div>
   </details>` : ""}`;
+}
+
+export function telaAmostras({ lista, filtro, configurado, existe, erro, sem, usosDe, hoje = hojeISO(), editavel = false, arquetipos = [] }) {
+  const topo = topoAmostras({ lista, configurado, existe, erro });
+  if (!configurado || !lista) return topo;
+  const res = filtrar(lista, filtro, { usosDe, hoje }), fa = filtrosAmostras(filtro);
+  return `${topo}
+  <div class="bloco">
+    <input type="search" id="am-q" placeholder="Buscar perfume, casa ou impressão" value="${esc(filtro.q || "")}" aria-label="Buscar amostras">
+    ${fa.chips}
+    <div class="campos">
+      <label>Casa<select id="amf-casa">${op("", "Todas", filtro.casa)}${[...new Set(lista.map(a => a.casa))].sort((x, y) => x.localeCompare(y, "pt")).map(c => op(c, c, filtro.casa)).join("")}</select></label>
+      <label>Arquétipo<select id="amf-arq">${op("", "Todos", filtro.arq)}${arquetipos.map(x => op(x.nome, x.nome, filtro.arq)).join("")}${op("sem", "Sem arquétipo", filtro.arq)}</select></label>
+      <label>Tier<select id="amf-tier">${op("", "Todos", filtro.tier)}${["S", "A", "B", "C", "D"].map(t => op(t, `Tier ${t}`, filtro.tier)).join("")}${op("sem", "Sem tier", filtro.tier)}</select></label>
+      <label>Posse (Mercado)<select id="amf-posse">${op("", "Todas", filtro.posse)}${POSSES_EDIT.filter(Boolean).map(p => op(p, posseRot(p), filtro.posse)).join("")}${op("sem", "Sem posse", filtro.posse)}</select></label>
+      <label>Wishlist<select id="amf-wish">${op("", "Todos", filtro.wish)}${op("sim", "Só wishlist", filtro.wish)}${op("nao", "Fora da wishlist", filtro.wish)}</select></label>
+      ${fa.campos}
+    </div>
+    <p class="nota">${res.length} de ${lista.length}.${["dono", "casa", "arq", "tier", "posse", "wish", "tipo", "q", "status"].some(k => filtro[k]) ? ` <button class="btn sec peq" data-acao="am-limpar">Limpar filtros</button>` : ""}</p>
+  </div>
+  ${corpoAmostras({ res, lista, filtro, sem, usosDe, hoje, editavel, arquetipos })}`;
 }
 
 // colunas da tabela (formato do Mercado): chave, rótulo

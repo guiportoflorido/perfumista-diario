@@ -132,15 +132,21 @@ function comparador(ords) {
 }
 
 // ───────────────────────── tela ─────────────────────────
-export function telaMercado({ lista, fonte, arquetipos, filtro, limite, podeCriar, criando, amostras = null }) {
+/** Mercado e amostras na mesma tela: o seletor “Perfumes / Amostras” troca a lista; busca, casa, arquétipo, tier, posse e
+ *  wishlist valem para os dois. vistaAmostras = {topo, chips, campos, corpo, n, total, casas} quando filtro.ver === "amostras". */
+export function telaMercado({ lista, fonte, arquetipos, filtro, limite, podeCriar, criando, amostras = null, vistaAmostras = null, nAmostras = null }) {
   if (!lista) return `<div class="bloco"><p class="nota">Carregando a base…</p></div>`;
+  const va = filtro.ver === "amostras" ? vistaAmostras : null;
+  const ver = `<div class="segmentos mf-ver" role="tablist" aria-label="Mostrar">
+    <button role="tab" data-mf="ver" data-v="" aria-selected="${!va}">Perfumes</button>
+    <button role="tab" data-mf="ver" data-v="amostras" aria-selected="${Boolean(va)}">Amostras${nAmostras != null ? ` · ${nAmostras}` : ""}</button></div>`;
   const comTier = lista.filter(p => p.tier).length, meus = lista.filter(p => p.posse === "Frasco Gui").length, wish = lista.filter(p => p.wish).length;
   const res = filtrar(lista, filtro, { amostras });
   const porArq = arquetipos.map(a => ({ a, merc: lista.filter(p => p.arquetipo === a.nome).length, meus: lista.filter(p => p.arquetipo === a.nome && p.posse === "Frasco Gui").length }));
   const maxM = Math.max(...porArq.map(x => x.merc), 1);
   const op = (v, r, at) => `<option value="${esc(v)}" ${String(at ?? "") === String(v) ? "selected" : ""}>${esc(r)}</option>`;
-  return `
-  ${fonte === "planilha" ? `<div class="linha-flex"><p class="nota" style="flex:1">Lido da aba <b>Mercado</b> da planilha. Toque num perfume para ver, editar ou remover.</p><button class="btn peq" data-acao="novo-mercado">+ Novo perfume</button></div>`
+  return `${ver}
+  ${va ? va.topo : `${fonte === "planilha" ? `<div class="linha-flex"><p class="nota" style="flex:1">Lido da aba <b>Mercado</b> da planilha. Toque num perfume para ver, editar ou remover.</p><button class="btn peq" data-acao="novo-mercado">+ Novo perfume</button></div>`
     : podeCriar ? `<div class="bloco destaque"><h3>Editar exige a aba Mercado na planilha</h3>
         <p class="nota">Crio na planilha “Diário de Uso” uma aba <b>Mercado</b> com os ${lista.length} perfumes (tier e posse da aba Tiers, resto da avaliação v51). Depois disso, o que você editar aqui fica salvo lá. É feito uma vez só.</p>
         <div class="linha-flex"><button class="btn" data-acao="criar-mercado" ${criando ? "disabled" : ""}>${criando ? "Criando…" : "Criar aba Mercado"}</button></div></div>`
@@ -149,20 +155,22 @@ export function telaMercado({ lista, fonte, arquetipos, filtro, limite, podeCria
     <div class="kpi"><span class="v">${lista.length.toLocaleString("pt-BR")}</span><span class="l">perfumes na base</span></div>
     <div class="kpi"><span class="v">${comTier}</span><span class="l">com tier seu</span></div>
     <div class="kpi"><span class="v">${meus}</span><span class="l">na sua coleção</span></div>
-  </div>
-  <div class="bloco">
-    <input type="search" id="mf-q" placeholder="Buscar perfume, casa, nariz ou nota" value="${esc(filtro.q || "")}" aria-label="Buscar no mercado">
+  </div>`}
+  ${va && !va.corpo ? "" : `<div class="bloco">
+    <input type="search" id="mf-q" placeholder="${va ? "Buscar perfume, casa ou impressão" : "Buscar perfume, casa, nariz ou nota"}" value="${esc(filtro.q || "")}" aria-label="${va ? "Buscar amostras" : "Buscar no mercado"}">
+    ${va ? va.chips : ""}
     <div class="campos">
-      <label>Casa<select id="mf-casa">${op("", "Todas", filtro.casa)}${[...new Set(lista.map(p => p.casa))].sort((x, y) => x.localeCompare(y, "pt")).map(c => op(c, c, filtro.casa)).join("")}</select></label>
+      ${va ? va.campos : ""}
+      <label>Casa<select id="mf-casa">${op("", "Todas", filtro.casa)}${[...new Set(va ? va.casas : lista.map(p => p.casa))].sort((x, y) => x.localeCompare(y, "pt")).map(c => op(c, c, filtro.casa)).join("")}</select></label>
       <label>Arquétipo<select id="mf-arq">${op("", "Todos", filtro.arq)}${arquetipos.map(a => op(a.nome, a.nome, filtro.arq)).join("")}${op("sem", "Sem arquétipo", filtro.arq)}</select></label>
       <label>Tier<select id="mf-tier">${op("", "Todos", filtro.tier)}${["S", "A", "B", "C", "D"].map(t => op(t, `Tier ${t}`, filtro.tier)).join("")}${op("sem", "Sem tier", filtro.tier)}</select></label>
       <label>Posse<select id="mf-posse">${POSSES_FILTRO.map(([v, r]) => op(v, r, filtro.posse)).join("")}</select></label>
       <label>Wishlist<select id="mf-wish">${op("", "Todos", filtro.wish === "1" ? "sim" : filtro.wish)}${op("sim", `Só wishlist (${wish})`, filtro.wish === "1" ? "sim" : filtro.wish)}${op("nao", "Fora da wishlist", filtro.wish === "1" ? "sim" : filtro.wish)}</select></label>
-      ${amostras ? `<label>Amostra<select id="mf-am">${OPC_AMOSTRA.map(([v, r]) => op(v, r, filtro.am)).join("")}</select></label>` : ""}
+      ${amostras && !va ? `<label>Amostra<select id="mf-am">${OPC_AMOSTRA.map(([v, r]) => op(v, r, filtro.am)).join("")}</select></label>` : ""}
     </div>
-    <p class="nota">${res.length} perfume${res.length === 1 ? "" : "s"}.${temFiltro(filtro, FILTROS_MF) ? ` <button class="btn sec peq" data-acao="mf-limpar">Limpar filtros</button>` : ""}</p>
-  </div>
-  ${res.length ? tabela(res.slice(0, limite), filtro, { editavel: fonte === "planilha", arquetipos }) : `<div class="bloco"><p class="vazio">Nada com esses filtros.</p></div>`}
+    <p class="nota">${va ? `${va.n} de ${va.total} amostra${va.total === 1 ? "" : "s"}` : `${res.length} perfume${res.length === 1 ? "" : "s"}`}.${temFiltro(filtro, va ? FILTROS_MF.filter(k => k !== "am") : FILTROS_MF) || va?.filtrado ? ` <button class="btn sec peq" data-acao="mf-limpar">Limpar filtros</button>` : ""}</p>
+  </div>`}
+  ${va ? va.corpo || "" : `${res.length ? tabela(res.slice(0, limite), filtro, { editavel: fonte === "planilha", arquetipos }) : `<div class="bloco"><p class="vazio">Nada com esses filtros.</p></div>`}
   ${res.length > limite ? `<button class="btn sec" data-acao="mf-mais">Mostrar mais (${res.length - limite})</button>` : ""}
   <details class="bloco"><summary>Mercado × coleção por arquétipo</summary>
     <div class="mxc">${porArq.sort((x, y) => y.merc - x.merc).map(x => `<button class="mxc-l" data-mf-arq="${esc(x.a.nome)}">
@@ -170,7 +178,7 @@ export function telaMercado({ lista, fonte, arquetipos, filtro, limite, podeCria
       <span class="trilho"><span style="width:${(x.merc / maxM) * 100}%;background:${x.a.cor};opacity:.35"></span><span style="width:${(x.meus / maxM) * 100}%;background:${x.a.cor}"></span></span>
       <span class="n">${x.meus}/${x.merc}</span></button>`).join("")}</div>
     <p class="nota">Barra clara = perfumes da base; barra cheia = seus frascos. Toque para filtrar.</p>
-  </details>`;
+  </details>`}`;
 }
 
 export const posseRot = p => (p === "Frasco Gui" ? "na coleção" : p);

@@ -94,3 +94,18 @@ test("filtros iguais aos de Amostras: casa, arquétipo/tier/posse “sem”, amo
   const h = telaMercado({ lista: l, fonte: "planilha", arquetipos: [{ nome: "Monge", cor: "#000" }], filtro: { casa: "Amouage" }, limite: 60, amostras: new Map() });
   assert.match(h, /id="mf-casa"/); assert.match(h, /id="mf-tier"/); assert.match(h, /id="mf-am"/); assert.match(h, /data-acao="mf-limpar"/);
 });
+
+test("Mercado e Amostras na mesma tela: seletor Perfumes/Amostras e filtros compartilhados", () => {
+  const l = [{ casa: "Amouage", nome: "Search", tier: "A", posse: "Amostra", arquetipo: "Monge" }];
+  const base = { lista: l, fonte: "planilha", arquetipos: [{ nome: "Monge", cor: "#000" }], limite: 60, amostras: new Map(), nAmostras: 3 };
+  const p = telaMercado({ ...base, filtro: {} });
+  assert.match(p, /data-mf="ver" data-v="amostras" aria-selected="false">Amostras · 3/);
+  assert.match(p, /id="mf-am"/);
+  const va = { topo: "<p>TOPO</p>", chips: "<i>CHIPS</i>", campos: "<i>DONO</i>", corpo: "<p>TABELA</p>", n: 1, total: 4, casas: ["Xerjoff"] };
+  const a = telaMercado({ ...base, filtro: { ver: "amostras", am: "tem" }, vistaAmostras: va });
+  assert.match(a, /aria-selected="true">Amostras/);
+  assert.match(a, /TOPO[\s\S]*CHIPS[\s\S]*DONO[\s\S]*id="mf-arq"[\s\S]*1 de 4 amostras[\s\S]*TABELA/);
+  assert.doesNotMatch(a, /id="mf-am"|perfumes na base|Mercado × coleção/);
+  assert.match(a, /<option value="Xerjoff"/);
+  assert.doesNotMatch(a, /Limpar filtros/);   // "am" escondido não conta como filtro na vista de amostras
+});
