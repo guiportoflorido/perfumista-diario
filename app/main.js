@@ -14,7 +14,7 @@ import { definirCores, arqTag, arqIcone, corArq, humorDoSlot, humorSVG } from ".
 import { confete, ceuHTML, abrirRoleta, animarSpray, nomeDoDia, definirMateriais, raspadinhaHTML, ligarRaspadinha, ativarChacoalho, pedirMovimento, movimentoPedePermissao } from "./diversao.js";
 import { chave as mercadoChave, telaMercado, fichaEditavel, camposAlterados, baseComTiers, deLinhas, linhasParaCriar, cachePlanilha, baixarMercado, criarNaPlanilha, editarNaPlanilha, adicionarNaPlanilha, removerNaPlanilha, fotoNoCache } from "./mercado.js";
 import { contagens } from "./estatisticas.js";
-import { telaAmostras, fichaAmostra, deLinhas as amostrasDeLinhas, juntar, semRegistro, camposAmostra, camposAvaliacaoMexidos, cacheAmostras, baixarAmostras,
+import { topoAmostras, filtrosAmostras, corpoAmostras, filtrar as filtrarAmostras, fichaAmostra, deLinhas as amostrasDeLinhas, juntar, semRegistro, camposAmostra, camposAvaliacaoMexidos, cacheAmostras, baixarAmostras,
   adicionarAmostra, editarAmostra, removerAmostra, novoId } from "./amostras.js";
 import { ler, gravar } from "./store.js";
 import { storiesDoMes, abrirWrapped, MESES } from "./wrapped.js";
@@ -22,7 +22,7 @@ import { lerDuelos, duelosUnificados, pareamento, elo, fmtElo, filaDuelos, adici
   gerarCenario, textoCenario, periodoDaHora, CHUVAS, MAE_DA_SUB, brilhaCai, rotuloValor, previsao, ehZebra, META_DIA, plausiveisNoCenario, chavePar } from "./duelo.js";
 import { fotoFicha, iconeFicha, fotoMini, fotoIcone, reduzirImagem, subirFoto, removerFotoPlanilha, iniciarFotos } from "./fotos.js";
 
-export const APP_VERSAO = "5.51";  // sobe a cada publicação: confere no topo da tela se o celular pegou a versão nova
+export const APP_VERSAO = "5.52";  // sobe a cada publicação: confere no topo da tela se o celular pegou a versão nova
 const S = { dueloModo: ler("dueloModo", "agora"), rkFiltro: ler("rkFiltro", {}), cenario: null, motionOk: !movimentoPedePermissao() && "DeviceMotionEvent" in globalThis, aba: "hoje", frascos: [], frascosAtivos: [], avisosTiers: null, medidos: [], fichas: {}, versao: {}, prev: null, prevOffline: false,
   prevErro: null, metar: null, metarMotivo: null, clima: null, resultado: null, erroMotor: null, entrada: "", carregandoClima: true,
   sync: { estado: "ocioso", msg: "" }, hr: ler("hr", { preset: "tudo" }), tokenNovo: null, playbook: null, janelas: new Map(),
@@ -37,7 +37,7 @@ const ajSpray = () => ler("sprays_ajuste", { ativo: false, geral: 0, por: {} });
 // Grupos com sub-abas: Coleção (Roda · Lista · Playbook) · Mercado (Mercado · Amostras) · Mais (Histórico · Ajustes).
 // S.sub guarda a última sub-aba de cada grupo (reabre nela). Coleção absorve o antigo colModo (roda/lista).
 const SUBS = { colecao: [["roda", "Roda"], ["lista", "Lista"], ["playbook", "Playbook"], ["duelo", "Duelo"], ["ranking", "Ranking"]],
-  mercado: [["mercado", "Mercado"], ["amostras", "Amostras"]], mais: [["historico", "Histórico"], ["ajustes", "Ajustes"]] };
+  mais: [["historico", "Histórico"], ["ajustes", "Ajustes"]] };
 function carregarSub() {
   const s = ler("sub", null);
   if (s && s.colecao && s.mercado && s.mais) return s;
@@ -51,11 +51,13 @@ function grupoDe(aba) {
 }
 function abaDe(grupo, sub) {
   if (grupo === "colecao") return ["playbook", "duelo", "ranking"].includes(sub) ? sub : "colecao";
-  if (grupo === "mercado" || grupo === "mais") return SUBS[grupo].some(([v]) => v === sub) ? sub : SUBS[grupo][0][0];
+  if (grupo === "mercado") return "mercado";   // Amostras virou o filtro “Amostras” dentro do Mercado
+  if (grupo === "mais") return SUBS[grupo].some(([v]) => v === sub) ? sub : SUBS[grupo][0][0];
   return grupo;
 }
 /** Vai para uma aba (valor de S.aba) e lembra a sub-aba do grupo dela. */
 function irPara(aba) {
+  if (aba === "amostras") { aba = "mercado"; S.mf = { ...S.mf, ver: "amostras" }; gravar("mf", S.mf); }   // antiga sub-aba Amostras
   S.aba = aba;
   const g = grupoDe(aba);
   if (SUBS[g] && aba !== "colecao") { S.sub = { ...S.sub, [g]: aba }; gravar("sub", S.sub); }
@@ -219,7 +221,7 @@ function render() {
   };
   try {
     let html = ({ hoje: telaHoje, registrar: telaRegistrar, ajustes: telaAjustes,
-      colecao: () => telaColecaoTudo(ctx), duelo: telaDueloAba, ranking: () => telaRanking({ duelos: duelosTodos(), frascos: S.frascosAtivos, filtro: S.rkFiltro, hoje: hojeISO(), icone: iconeFrasco }), mercado: telaMercadoAba, amostras: telaAmostrasAba, playbook: () => telaPlaybook({ ...ctx, iconeNome }), historico: () => telaHistorico(ctx), analises: () => telaAnalises(ctx) }[S.aba])();
+      colecao: () => telaColecaoTudo(ctx), duelo: telaDueloAba, ranking: () => telaRanking({ duelos: duelosTodos(), frascos: S.frascosAtivos, filtro: S.rkFiltro, hoje: hojeISO(), icone: iconeFrasco }), mercado: telaMercadoAba, playbook: () => telaPlaybook({ ...ctx, iconeNome }), historico: () => telaHistorico(ctx), analises: () => telaAnalises(ctx) }[S.aba])();
     // telas agrupadas: segmentos (sub-abas) logo abaixo do 1º h2; o h2 continua com o nome da sub-aba
     if (SUBS[grupo]) html = html.replace("</h2>", `</h2>${segmentosGrupo(grupo)}`);
     $("#tela").innerHTML = html;
@@ -492,7 +494,7 @@ function garantirMercado() {
   if (!S.mercadoBase && !S.mercadoErro) carregarMercado();
   if (configurado() && !S.mercadoBaixado) {
     S.mercadoBaixado = true;
-    baixarMercado().then(() => { if (S.aba === "mercado" || S.aba === "amostras") render(); }).catch(e => { S.mercadoBaixado = false; toast(`Aba Mercado: ${e.message}`); });
+    baixarMercado().then(() => { if (S.aba === "mercado") render(); }).catch(e => { S.mercadoBaixado = false; toast(`Aba Mercado: ${e.message}`); });
   }
 }
 
@@ -503,13 +505,29 @@ function telaMercadoAba() {
   return `<h2>Mercado</h2>
   ${S.mercadoErro && !lista ? `<div class="bloco"><p class="erro-txt">Não consegui carregar a base: ${esc(S.mercadoErro)}</p></div>`
     : telaMercado({ lista, fonte, arquetipos: S.arquetipos, filtro: S.mf, limite: S.mfLimite, amostras: amostrasEmMaos(),
-      podeCriar: configurado() && cachePlanilha()?.existe === false, criando: S.criandoMercado })}`;
+      podeCriar: configurado() && cachePlanilha()?.existe === false, criando: S.criandoMercado,
+      vistaAmostras: S.mf.ver === "amostras" ? vistaAmostras(lista || []) : null, nAmostras: nAmostrasEmMaos() })}`;
 }
+
+/** Amostras dentro do Mercado: busca, casa, arquétipo, tier, posse e wishlist vêm do filtro do Mercado (S.mf);
+ *  status, dono, tipo e ordem são só das amostras (S.am). */
+function vistaAmostras(merc) {
+  const lista = listaAmostras(), base = { lista, configurado: configurado(), existe: Boolean(cacheAmostras()?.existe), erro: S.amErro };
+  const topo = topoAmostras(base);
+  if (!base.configurado || !lista) return { topo };
+  const { q, casa, arq, tier, posse } = S.mf, wish = S.mf.wish === "1" ? "sim" : S.mf.wish;
+  const filtro = { ...S.am, q, casa, arq, tier, posse, wish }, usosDe = contadorUsos();
+  const res = filtrarAmostras(lista, filtro, { usosDe });
+  return { topo, ...filtrosAmostras(filtro), n: res.length, total: lista.length, filtrado: ["status", "dono", "tipo"].some(k => S.am[k]),
+    casas: lista.map(a => a.casa),
+    corpo: corpoAmostras({ res, lista, filtro, sem: semRegistro(lista, merc), usosDe, editavel: Boolean(cachePlanilha()?.existe), arquetipos: S.arquetipos }) };
+}
+const nAmostrasEmMaos = () => { const c = cacheAmostras(); return c?.existe ? amostrasDeLinhas(c.linhas).filter(a => a.status !== "Esgotado").length : null; };
 
 async function carregarMercado() {
   try { const j = await fetch("data/mercado.json").then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); }); S.mercadoBase = j.perfumes; }
   catch (e) { S.mercadoErro = e.message; }
-  if (S.aba === "mercado" || S.aba === "amostras") render();
+  if (S.aba === "mercado") render();
 }
 
 // ───────────────────────── amostras ─────────────────────────
@@ -539,7 +557,7 @@ async function lerAmostras({ forcar = false } = {}) {
   try { await baixarAmostras(); S.amErro = null; S.amBaixadas = true; }
   catch (e) { S.amErro = e.message; }
   S.amBaixando = false;
-  if (["amostras", "mercado", "colecao"].includes(S.aba)) render();   // Coleção e Mercado usam as amostras no filtro "Amostra"
+  if (["mercado", "colecao"].includes(S.aba)) render();   // Coleção e Mercado usam as amostras no filtro "Amostra"
 }
 
 /** Usos no Diário por amostra: pelo "Nome no diário" da aba Tiers ou pelo próprio nome. Lê planilha e diário uma vez só. */
@@ -555,15 +573,6 @@ function contadorUsos() {
   };
 }
 const usosAmostra = a => contadorUsos()(a);
-
-function telaAmostrasAba() {
-  garantirMercado();
-  lerAmostras();
-  const lista = listaAmostras(), merc = listaMercado().lista || [];
-  return `<h2>Amostras e decants</h2>
-  ${telaAmostras({ lista, filtro: S.am, configurado: configurado(), existe: Boolean(cacheAmostras()?.existe), erro: S.amErro,
-    sem: lista ? semRegistro(lista, merc) : [], usosDe: contadorUsos(), editavel: Boolean(cachePlanilha()?.existe), arquetipos: S.arquetipos })}`;
-}
 
 function abrirAmostra(id, { prefixo = null, confirmarRemover = false } = {}) {
   if (id !== null) reabrirFicha = () => abrirAmostra(id);
@@ -1264,7 +1273,11 @@ document.addEventListener("click", async e => {
   else if (acao === "remover-mercado") removerMercado();
   else if (acao === "nova-amostra") { S.confirmandoRemocao = false; abrirAmostra(null); }
   else if (acao === "remover-amostra") excluirAmostra();
-  else if (acao === "mf-limpar") { S.mf = { ords: S.mf.ords }; S.mfLimite = 60; gravar("mf", S.mf); render(); }
+  else if (acao === "mf-limpar") {
+    S.mf = { ords: S.mf.ords, ver: S.mf.ver }; S.mfLimite = 60; gravar("mf", S.mf);
+    if (S.mf.ver === "amostras") { S.am = { ords: S.am.ords }; gravar("am", S.am); }
+    render();
+  }
   else if (acao === "col-limpar") { S.filtro = { ords: S.filtro.ords }; gravar("filtro", S.filtro); render(); }
   else if (acao === "am-limpar") { S.am = { ords: S.am.ords }; gravar("am", S.am); render(); }
   else if (acao === "ler-planilha") {
