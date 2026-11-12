@@ -4,8 +4,8 @@ import { diasEntre, faixaIdx, OCASIOES } from "../engine/index.js";
 import { ROT_OC } from "./util.js";
 import { materialDoDia } from "./diversao.js";
 
-/** Só Dia (M) e Noite (N), sem a 2ª aplicação: vale para a rotação do motor, o calendário (uma cor por slot) e a resposta
- *  “vivo/fraco/morto”. Para medir USO (último uso, esquecidos, NotaDia, Wrapped…) use ehUso, que inclui M2/N2. */
+/** Só Dia (M) e Noite (N), sem a 2ª aplicação: vale para o calendário (uma cor por slot) e a resposta “vivo/fraco/morto”.
+ *  Para medir USO (último uso, esquecidos, rotação do motor, NotaDia, Wrapped…) use ehUso, que inclui M2/N2. */
 export const deAnalise = r => r.slot === "M" || r.slot === "N";
 
 export const daGrade = f => f.camada === "grade" && f.tier !== "D";
@@ -13,6 +13,13 @@ export const daGrade = f => f.camada === "grade" && f.tier !== "D";
 /** É uso do frasco (para último uso, esquecidos, “sem uso”, contagens da Coleção): Dia e Noite, inclusive a 2ª aplicação
  *  (M2/N2). Esportes (E) fica fora — é da camada custo. As demais análises (NotaDia, slots, rotação) seguem só M/N. */
 export const ehUso = r => r.slot === "M" || r.slot === "N" || r.slot === "M2" || r.slot === "N2";
+
+/** Usos para a rotação do motor: ehUso, com o mesmo perfume no mesmo dia contado uma vez só (a 2ª aplicação do mesmo
+ *  frasco não vira “uso extra” nem conta duas vezes na adaptação ao arquétipo). Mantém a ordem do histórico. */
+export function usoPorDia(hist) {
+  const vistos = new Set();
+  return hist.filter(ehUso).filter(r => { const k = `${r.data}|${r.perfume}`; if (vistos.has(k)) return false; vistos.add(k); return true; });
+}
 
 /** Janelas de cada frasco no playbook: [{faixa, faixaIdx, ocasiao, papel}] */
 export function janelasPorFrasco(playbook) {
@@ -58,28 +65,6 @@ export function agrupar(por, chave) {
 export function esquecidos(por, limite = 45) {
   return [...por.values()].filter(c => c.dias === null || c.dias >= limite)
     .sort((a, b) => "SABC".indexOf(a.f.tier) - "SABC".indexOf(b.f.tier) || (b.dias ?? 1e9) - (a.dias ?? 1e9) || a.f.nome.localeCompare(b.f.nome));
-}
-
-/** Semana ISO da data (AAAA-MM-DD) → "AAAA-Www" (segunda a domingo; a semana 1 tem a 1ª quinta do ano). */
-export function semanaISO(iso) {
-  const d = new Date(iso + "T12:00:00Z");
-  d.setUTCDate(d.getUTCDate() - ((d.getUTCDay() + 6) % 7) + 3);   // quinta da mesma semana decide o ano
-  const ano = d.getUTCFullYear(), jan4 = new Date(Date.UTC(ano, 0, 4, 12));
-  const sem = 1 + Math.round((d - jan4) / 864e5 / 7 + ((jan4.getUTCDay() + 6) % 7 - 3) / 7);
-  return `${ano}-W${String(sem).padStart(2, "0")}`;
-}
-
-/** Esquecido da semana (raspadinha do Histórico). `esq` = esquecidos(…); `so` = slot da hora de hoje (rodar()).
- *  Entre os esquecidos que passam nos filtros de hoje (fora de so.fora e no ranking), o de maior score; se nenhum
- *  serve, o esquecido há mais tempo (sem registro conta como o mais antigo), marcado usavel: false. Sem esquecidos → null. */
-export function esquecidoDaSemana(esq, so, semana) {
-  if (!esq?.length) return null;
-  const score = new Map((so?.ranking || []).map(x => [x.nome, x.score]));
-  const usaveis = esq.filter(c => !so?.fora?.[c.f.nome] && score.has(c.f.nome))
-    .sort((a, b) => score.get(b.f.nome) - score.get(a.f.nome) || a.f.nome.localeCompare(b.f.nome, "pt"));
-  if (usaveis.length) { const c = usaveis[0]; return { nome: c.f.nome, dias: c.dias, score: score.get(c.f.nome), usavel: true, semana }; }
-  const c = [...esq].sort((a, b) => (b.dias ?? Infinity) - (a.dias ?? Infinity) || a.f.nome.localeCompare(b.f.nome, "pt"))[0];
-  return { nome: c.f.nome, dias: c.dias, score: null, usavel: false, semana };
 }
 
 /** Uso × janelas: participação de cada frasco nos usos vs. participação nas janelas do playbook (668 desde 23/out/2026, playbook v60). */

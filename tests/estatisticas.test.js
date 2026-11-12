@@ -110,21 +110,11 @@ test("NotaDia por ocasião: código do engine ou rótulo de tela, sem Esportes, 
   assert.deepEqual(n2.get("Cozy N"), { n: 2, media: 4 });   // N2 (2ª aplicação) é uso com nota
 });
 
-test("semana ISO", async () => {
-  const { semanaISO } = await import("../app/estatisticas.js");
-  assert.equal(semanaISO("2026-10-21"), "2026-W43");
-  assert.equal(semanaISO("2026-10-19"), "2026-W43"); assert.equal(semanaISO("2026-10-25"), "2026-W43"); assert.equal(semanaISO("2026-10-26"), "2026-W44");
-  assert.equal(semanaISO("2026-01-01"), "2026-W01"); assert.equal(semanaISO("2025-12-29"), "2026-W01"); assert.equal(semanaISO("2027-01-01"), "2026-W53");
-});
-
-test("esquecido da semana: usável de maior score; só não-usáveis → o mais antigo com aviso; sem esquecidos → null", async () => {
-  const { esquecidoDaSemana } = await import("../app/estatisticas.js");
-  const esq = [{ f: f("Odéon"), dias: 50 }, { f: f("Météore"), dias: 80 }, { f: f("Liwa"), dias: null }];
-  const so = { ranking: [{ nome: "Odéon", score: 70 }, { nome: "Météore", score: 82 }], fora: { Liwa: "frio" } };
-  assert.deepEqual(esquecidoDaSemana(esq, so, "2026-W43"), { nome: "Météore", dias: 80, score: 82, usavel: true, semana: "2026-W43" });
-  const so2 = { ranking: [], fora: { "Odéon": "x", "Météore": "x", Liwa: "x" } };
-  assert.deepEqual(esquecidoDaSemana(esq, so2, "2026-W43"), { nome: "Liwa", dias: null, score: null, usavel: false, semana: "2026-W43" });
-  assert.equal(esquecidoDaSemana([], so, "2026-W43"), null);
+test("rotação do motor: 2ª aplicação conta como uso, o mesmo perfume no mesmo dia conta uma vez", async () => {
+  const { usoPorDia } = await import("../app/estatisticas.js");
+  const h = [{ data: "2026-11-01", slot: "M", perfume: "A" }, { data: "2026-11-01", slot: "M2", perfume: "A" },
+    { data: "2026-11-02", slot: "N2", perfume: "B" }, { data: "2026-11-02", slot: "E", perfume: "C" }];
+  assert.deepEqual(usoPorDia(h).map(r => `${r.slot}:${r.perfume}`), ["M:A", "N2:B"]);
 });
 
 // ───────────── Wrapped do mês ─────────────
