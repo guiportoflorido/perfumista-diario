@@ -19,13 +19,13 @@ const quando = d => (d === null ? "sem registro" : d === 0 ? "hoje" : d === 1 ? 
 
 // ───────────────────────── Coleção (tabela) ─────────────────────────
 const COLS_COL = [["nome", "Perfume"], ["casa", "Casa"], ["tier", "Tier"], ["arquetipo", "Arquétipo"], ["eixo", "Eixo"], ["td", "Td"],
-  ["peso", "Peso"], ["doc", "Doçura"], ["envelope", "Envelope"], ["janelas", "Janelas"], ["usos", "Usos"], ["elo", "Elo"], ["ultimo", "Último uso"]];
+  ["peso", "Peso"], ["doc", "Doçura"], ["janelas", "Janelas"], ["usos", "Usos"], ["elo", "Elo"], ["ultimo", "Último uso"]];
 const TD_ROT = { C: "C · carregado", S: "S · seco", N: "N · indiferente" };
 
 const eloDe = x => (x.e && x.e.n >= 5 ? x.e.rating : "");   // Elo só conta com 5+ duelos
 function ordenarColecao(linhas, ords) {
   const v = (k, x) => ({ tier: TIERS_ORD.indexOf(x.f.tier), nome: x.f.nome, casa: x.f.casa, arquetipo: x.f.arquetipo, eixo: x.f.eixo, td: x.f.td,
-    peso: x.f.peso, doc: x.f.doc, envelope: x.f.env_hot * 10 + x.f.env_cold, janelas: x.f.janelas ?? "", usos: x.k.n, elo: eloDe(x), ultimo: x.k.ultimo || "" }[k]);
+    peso: x.f.peso, doc: x.f.doc, janelas: x.f.janelas ?? "", usos: x.k.n, elo: eloDe(x), ultimo: x.k.ultimo || "" }[k]);
   const padrao = (a, b) => TIERS_ORD.indexOf(a.f.tier) - TIERS_ORD.indexOf(b.f.tier) || a.f.nome.localeCompare(b.f.nome, "pt");
   return [...linhas].sort(compararMulti(ords, (k, a, b) => cmpValor(v(k, a), v(k, b)), padrao));
 }
@@ -78,7 +78,6 @@ export function telaColecao({ frascos, hist, hoje, janelas, filtro, fichas, arqT
       <td class="cc-eixo">${esc(f.eixo)}</td>
       <td class="cc-td">${esc(TD_ROT[f.td] || f.td)}</td>
       <td class="cc-num">${f.peso}</td><td class="cc-num">${f.doc}</td>
-      <td class="cc-env">${esc(fichas[f.nome]?.envelope || "")}</td>
       <td class="cc-num">${f.janelas ?? "—"}</td>
       <td class="cc-num">${k.n}${k.n ? ` <span class="nota">☀︎${k.M} ☾${k.N}</span>` : ""}</td>
       <td class="cc-num">${e && e.n >= 5 ? Math.round(e.rating) : "—"}</td>
@@ -191,7 +190,7 @@ const OC_CURTA = { Lazer: "Lz", "T.Inf": "TI", "T.For": "TF", "N.Inf": "NI", "N.
 const pct = x => `${Math.round(x * 100)}%`;
 
 /** Mais › Análises: as contas do período (mesmo seletor do Histórico) + análises novas. */
-export function telaAnalises({ mdPer = "tudo", arquetipos = [], frascos, hist: histTodo, hoje, fila: filaToda, ajSpray, janelas, limiteEsq = 45, hr = {}, arqTag, raspadinha = "", duelos = "" }) {
+export function telaAnalises({ mdPer = "tudo", arquetipos = [], frascos, hist: histTodo, hoje, fila: filaToda, ajSpray, janelas, limiteEsq = 45, hr = {}, arqTag, duelos = "" }) {
   const preset = hr.preset || "tudo";
   const { de, ate } = periodo(preset, hoje, hr.de, hr.ate);
   const dentro = r => (!de || r.data >= de) && r.data <= ate;
@@ -199,6 +198,7 @@ export function telaAnalises({ mdPer = "tudo", arquetipos = [], frascos, hist: h
   const seletor = seletorPeriodo(hr, hoje, de, ate, hist.length);
   if (!hist.length) return `<h2>Análises</h2>${seletor}<div class="bloco"><p class="vazio">${histTodo.length ? "Nenhum registro nesse período." : "Sem registros ainda."}</p></div>${duelos}`;
   const c = contagens(hist, frascos, ate);
+  const ultimoUso = contagens(histTodo, frascos, hoje).por;   // “há N d” sempre pelo diário inteiro, não pelo recorte do período
   const doPeriodo = preset !== "tudo";
   const usados = [...c.por.values()].filter(x => x.n).sort((a, b) => b.n - a.n || (a.ultimo < b.ultimo ? 1 : -1));
   const porArq = agrupar(c.por, f => f.arquetipo).filter(([, v]) => v);
@@ -271,9 +271,8 @@ export function telaAnalises({ mdPer = "tudo", arquetipos = [], frascos, hist: h
     : `<p class="nota">Registre a ocasião e a temperatura no uso para ver este mapa.</p>`}</div>
 
   <div class="bloco"><h3>${doPeriodo ? `Sem uso no período · ${esq.length}` : `Esquecidos · sem uso há ${limiteEsq}+ dias ou sem registro · ${esq.length}`}</h3>
-    ${raspadinha}
     <p class="nota">“Sem registro” é ausência no diário, não prova de que você não usou.</p>
-    ${(() => { const item = x => `<article class="card compacto"><span class="pos">${tierHTML(x.f.tier)}</span><div style="min-width:0"><button class="nome" data-ficha="${esc(x.f.nome)}">${esc(x.f.nome)}</button><div class="casa">${arqTag(x.f.arquetipo, 13)} · ${x.f.janelas} janelas</div></div><span class="nota">${quando(x.dias)}</span></article>`;
+    ${(() => { const item = x => `<article class="card compacto"><span class="pos">${tierHTML(x.f.tier)}</span><div style="min-width:0"><button class="nome" data-ficha="${esc(x.f.nome)}">${esc(x.f.nome)}</button><div class="casa">${arqTag(x.f.arquetipo, 13)} · ${x.f.janelas} janelas</div></div><span class="nota">${quando(ultimoUso.get(x.f.nome)?.dias ?? null)}</span></article>`;
       return `<div class="lista">${esq.slice(0, 8).map(item).join("")}</div>${esq.length > 8 ? `<details><summary>Ver os outros ${esq.length - 8}</summary><div class="lista" style="margin-top:8px">${esq.slice(8).map(item).join("")}</div></details>` : ""}`; })()}
   </div>
 
