@@ -1710,6 +1710,44 @@
    "janelas": "—",
    "vizinhos": "Musamam Black, Wood Whisper",
    "leitura": "Especiado-fresco que vai para rooibos e camurça sobre cedro e amberwood: amadeirado fumê e versátil. **Camada custo (tier A dado por ele, 12/nov/2026): corrida e academia — fora de qualquer análise.** Envelope, aptidão, sprays e performance são estimativa do Claude."
+  },
+  "Bracken Man": {
+   "n": 91,
+   "nome": "Bracken Man",
+   "casa": "Amouage",
+   "conc": "EDP",
+   "arquetipo": "Barbeiro",
+   "tier": "S",
+   "perfil": "cravo-cipreste-lavanda-noz-moscada-limão-bergamota / gerânio-cedro-sândalo-canela / patchouli-musk (2016, Olivier Cresp — pirâmide Fragrantica, verificada em 12/nov/2026)",
+   "eixo": "P",
+   "doc": "1",
+   "peso": "3",
+   "td": "N",
+   "envelope": "🟡A–⚫MF",
+   "aptidao": "T.Inf 3 · T.For 3 · N.Inf 2 · N.For 2",
+   "sprays_base": "3",
+   "janelas": "—",
+   "vizinhos": "Masculin Pluriel, 1872 for Men",
+   "leitura": "Fougère aromático especiado: lavanda e cipreste com cravo e noz-moscada sobre cedro-sândalo e patchouli. **Decant de 10 ml na grade (tier S dado por ele, 12/nov/2026).** Envelope, aptidão, sprays e performance são estimativa do Claude; sem janelas no playbook até a próxima geração."
+  },
+  "Masculin Pluriel": {
+   "n": 92,
+   "nome": "Masculin Pluriel",
+   "casa": "MFK",
+   "conc": "EDT",
+   "arquetipo": "Barbeiro",
+   "tier": "A",
+   "perfil": "lavanda-vetiver-patchouli-cedro-couro-madeiras (2014, Francis Kurkdjian — notas Fragrantica, verificadas em 12/nov/2026)",
+   "eixo": "P",
+   "doc": "0",
+   "peso": "3",
+   "td": "N",
+   "envelope": "🟠Q–🟣Fr",
+   "aptidao": "T.Inf 3 · T.For 3 · N.Inf 2 · N.For 2",
+   "sprays_base": "3",
+   "janelas": "—",
+   "vizinhos": "Bracken Man, Green Irish Tweed",
+   "leitura": "Lavanda limpa sobre vetiver, cedro e um couro discreto: amadeirado aromático elegante de escritório. **Decant de 10 ml na grade (tier A dado por ele, 12/nov/2026).** Envelope, aptidão, sprays e performance são estimativa do Claude; sem janelas no playbook até a próxima geração."
   }
  }
 }

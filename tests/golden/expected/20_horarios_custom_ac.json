@@ -89,6 +89,16 @@
      "porque": "térmico 0.95 · Td ↑ · chuva ↓ · T.Inf 3"
     },
     {
+     "nome": "Bracken Man",
+     "tier": "S",
+     "score": 97.16781669332708,
+     "sprays": 3,
+     "nota": "",
+     "vivo_ate": 15.5,
+     "vivo_fim": false,
+     "porque": "térmico 0.95 · T.Inf 3"
+    },
+    {
      "nome": "Bois Impérial",
      "tier": "S",
      "score": 95.00470035955881,
@@ -129,6 +139,16 @@
      "porque": "térmico 0.87 · Td ↓ · T.Inf 3"
     },
     {
+     "nome": "Masculin Pluriel",
+     "tier": "A",
+     "score": 87.49193367034923,
+     "sprays": 3,
+     "nota": "",
+     "vivo_ate": 14.5,
+     "vivo_fim": false,
+     "porque": "térmico 1.00 · T.Inf 3"
+    },
+    {
      "nome": "Montabaco Intensivo",
      "tier": "A",
      "score": 87.15314164215454,
@@ -147,26 +167,6 @@
      "vivo_ate": 16.0,
      "vivo_fim": false,
      "porque": "térmico 0.95 · T.Inf 3"
-    },
-    {
-     "nome": "Météore",
-     "tier": "S",
-     "score": 85.13350060037016,
-     "sprays": 3,
-     "nota": "",
-     "vivo_ate": 12.75,
-     "vivo_fim": false,
-     "porque": "térmico 0.77 · Td ↓ · T.Inf 3"
-    },
-    {
-     "nome": "1872 for Men",
-     "tier": "S",
-     "score": 84.76849767616683,
-     "sprays": 4,
-     "nota": "",
-     "vivo_ate": 11.75,
-     "vivo_fim": false,
-     "porque": "térmico 0.77 · Td ↓ · T.Inf 3"
     }
    ],
    "scores": {
@@ -241,6 +241,8 @@
     "Wild Vetiver": 79.19368020107817,
     "Wood Whisper": 85.44589989137326,
     "Ya'e": 69.49193397517008,
+    "Bracken Man": 97.16781669332708,
+    "Masculin Pluriel": 87.49193367034923,
     "Supremacy CE": null,
     "Musamam Black": null,
     "Aquatica": null,
@@ -516,6 +518,8 @@
     "Wild Vetiver": null,
     "Wood Whisper": null,
     "Ya'e": 57.86406336167619,
+    "Bracken Man": 77.31672898334926,
+    "Masculin Pluriel": 72.79179394039292,
     "Supremacy CE": 84.52364244384675,
     "Musamam Black": null,
     "Aquatica": null,

@@ -12,7 +12,7 @@ const linha = (f, posse = "Frasco Gui", tier = f.tier) => [f.casa, f.nome + " (p
 test("planilha igual ao JSON → sem avisos", () => {
   const t = lerTiers([CAB, ...frascos.map(f => linha(f))]);
   const r = aplicarTiers(frascos, t);
-  assert.equal(r.frascos.length, 90);
+  assert.equal(r.frascos.length, 92);
   assert.deepEqual(r.avisos, { divergentes: [], sem_posse: [], sem_linha: [] });
 });
 
@@ -100,4 +100,18 @@ test("medições não tocam no engine: com tudo abaixo do mínimo o ranking é o
   const a = rodar("Data: 2026-10-10\nT: 15-24 pico 15 noite 18\nTd: 14\n", frascos);
   const b = rodar("Data: 2026-10-10\nT: 15-24 pico 15 noite 18\nTd: 14\n", aplicarMedicoes(frascos, hist).frascos);
   assert.deepEqual(a.slots.map(s => s.ranking), b.slots.map(s => s.ranking));
+});
+
+test("decant de 10 ml (f.decant) fica na coleção só com decant de 10+ ml em mãos na aba Amostras", async () => {
+  const { decantesDaColecao } = await import("../app/amostras.js");
+  const bracken = frascos.find(f => f.nome === "Bracken Man");
+  assert.ok(bracken?.decant && bracken.camada === "grade");
+  const t = lerTiers([CAB, ...frascos.map(f => linha(f, f.decant ? "Amostra" : "Frasco Gui"))]);
+  const nomes = r => new Set(r.frascos.map(f => f.nome));
+  assert.ok(nomes(aplicarTiers(frascos, t)).has("Bracken Man"), "sem a aba Amostras lida: vale a posse Amostra");
+  assert.ok(nomes(aplicarTiers(frascos, t, { decantes: new Set(["bracken man"]) })).has("Bracken Man"));
+  assert.ok(!nomes(aplicarTiers(frascos, t, { decantes: new Set() })).has("Masculin Pluriel"), "esgotado/abaixo de 10 ml sai");
+  const lista = [{ tipo: "Decant", ml: "10", status: "Realizado", nome: "A" }, { tipo: "Decant", ml: "5", status: "Realizado", nome: "B" },
+    { tipo: "Amostra", ml: "10", status: "Realizado", nome: "C" }, { tipo: "Decant", ml: "10", status: "Esgotado", nome: "D" }];
+  assert.deepEqual(decantesDaColecao(lista).map(a => a.nome), ["A"]);
 });

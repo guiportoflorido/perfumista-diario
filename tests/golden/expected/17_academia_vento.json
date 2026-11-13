@@ -239,6 +239,8 @@
     "Wild Vetiver": 73.74224108520805,
     "Wood Whisper": 59.54674926461629,
     "Ya'e": null,
+    "Bracken Man": null,
+    "Masculin Pluriel": null,
     "Supremacy CE": 95.802282311127,
     "Musamam Black": null,
     "Aquatica": null,
@@ -303,6 +305,8 @@
     "Ultima Storia": "9h vivas fora de casa sem aptidão (Lazer)",
     "Vibrato": "5h abaixo do envelope (Ameno é o piso)",
     "Ya'e": "9h vivas fora de casa sem aptidão (Lazer)",
+    "Bracken Man": "9h vivas fora de casa sem aptidão (Lazer)",
+    "Masculin Pluriel": "8h vivas fora de casa sem aptidão (Lazer)",
     "Musamam Black": "11.5h vivas fora de casa sem aptidão (Lazer)",
     "Aquatica": "5.5h abaixo do envelope (Quente é o piso)",
     "Incense 01": "12.5h vivas fora de casa sem aptidão (Lazer)",
@@ -336,6 +340,11 @@
      "motivo": "11.5h vivas fora de casa sem aptidão (Lazer)"
     },
     {
+     "nome": "Bracken Man",
+     "tier": "S",
+     "motivo": "9h vivas fora de casa sem aptidão (Lazer)"
+    },
+    {
      "nome": "Brompton",
      "tier": "S",
      "motivo": "12.5h vivas fora de casa sem aptidão (Lazer)"
@@ -349,11 +358,6 @@
      "nome": "Decision",
      "tier": "S",
      "motivo": "9h vivas fora de casa sem aptidão (Lazer)"
-    },
-    {
-     "nome": "Favonius",
-     "tier": "S",
-     "motivo": "12.5h vivas fora de casa sem aptidão (Lazer)"
     }
    ],
    "custo": [
@@ -568,6 +572,8 @@
     "Wild Vetiver": 34.52024626928967,
     "Wood Whisper": 73.65629977760008,
     "Ya'e": 37.43233809616408,
+    "Bracken Man": 53.66256751525523,
+    "Masculin Pluriel": 47.10619646374913,
     "Supremacy CE": 51.146025390109926,
     "Musamam Black": 88.0,
     "Aquatica": null,

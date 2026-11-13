@@ -46,9 +46,10 @@ def extrair_frascos():
             "sem_piramide": f["sem_piramide"], "longev": f["longev"], "proj": f["proj"], "curva": f["curva"],
             "perf_estimada": f["perf_origem"] == "regra", "perf_origem": f["perf_origem"],
             "janelas_estimadas": f["nome"] in JANELAS_ESTIMADAS,
+            **({"decant": True} if f["nome"] in getattr(FV, "DECANTES", set()) else {}),
         })
     grade = [f for f in out if f["camada"] == "grade" and f["tier"] != "D"]
-    assert len(out) == 90 and len(grade) == 71, (len(out), len(grade))
+    assert len(out) == 92 and len(grade) == 73, (len(out), len(grade))
     assert sum(1 for f in out if f["camada"] == "custo") == 19
     assert sum(f["janelas"] or 0 for f in out) == 668
     return out

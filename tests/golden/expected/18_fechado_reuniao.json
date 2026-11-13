@@ -117,6 +117,16 @@
      "porque": "térmico 0.92 · Td ↑ · chuva ↓ · T.For 3"
     },
     {
+     "nome": "Bracken Man",
+     "tier": "S",
+     "score": 95.20387443110421,
+     "sprays": 3,
+     "nota": "",
+     "vivo_ate": 16.25,
+     "vivo_fim": false,
+     "porque": "térmico 0.92 · T.For 3"
+    },
+    {
      "nome": "Imagination",
      "tier": "S",
      "score": 94.62914466341348,
@@ -135,6 +145,16 @@
      "vivo_ate": 20.75,
      "vivo_fim": true,
      "porque": "térmico 0.87 · Td ↑ · T.For 3 · fechado ↓"
+    },
+    {
+     "nome": "Masculin Pluriel",
+     "tier": "A",
+     "score": 87.17856581161013,
+     "sprays": 3,
+     "nota": "",
+     "vivo_ate": 15.25,
+     "vivo_fim": false,
+     "porque": "térmico 0.99 · T.For 3"
     },
     {
      "nome": "Ultima Storia",
@@ -165,26 +185,6 @@
      "vivo_ate": 16.25,
      "vivo_fim": false,
      "porque": "térmico 0.96 · T.For 3"
-    },
-    {
-     "nome": "Montabaco Intensivo",
-     "tier": "A",
-     "score": 85.09356917435171,
-     "sprays": 3,
-     "nota": "",
-     "vivo_ate": 17.25,
-     "vivo_fim": false,
-     "porque": "térmico 0.92 · Td ↑ · T.For 3"
-    },
-    {
-     "nome": "Search",
-     "tier": "A",
-     "score": 84.91485300372757,
-     "sprays": 4,
-     "nota": "",
-     "vivo_ate": 15.75,
-     "vivo_fim": false,
-     "porque": "térmico 0.95 · T.For 3"
     }
    ],
    "scores": {
@@ -259,6 +259,8 @@
     "Wild Vetiver": 67.48037578447165,
     "Wood Whisper": null,
     "Ya'e": 58.83048654316653,
+    "Bracken Man": 95.20387443110421,
+    "Masculin Pluriel": 87.17856581161013,
     "Supremacy CE": null,
     "Musamam Black": null,
     "Aquatica": null,
@@ -567,6 +569,8 @@
     "Wild Vetiver": null,
     "Wood Whisper": null,
     "Ya'e": null,
+    "Bracken Man": 82.07520164212619,
+    "Masculin Pluriel": 74.21648124898218,
     "Supremacy CE": null,
     "Musamam Black": null,
     "Aquatica": null,

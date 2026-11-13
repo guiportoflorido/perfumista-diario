@@ -103,6 +103,16 @@
      "porque": "térmico 0.99 · Td ↓ · T.Inf 3 · sem uso em 45+d 🕸️"
     },
     {
+     "nome": "Bracken Man",
+     "tier": "S",
+     "score": 101.36375382956213,
+     "sprays": 3,
+     "nota": "",
+     "vivo_ate": 16.25,
+     "vivo_fim": false,
+     "porque": "térmico 0.92 · T.Inf 3 · sem uso em 45+d 🕸️"
+    },
+    {
      "nome": "Reflection Man",
      "tier": "S",
      "score": 97.12725255776215,
@@ -121,6 +131,16 @@
      "vivo_ate": 14.25,
      "vivo_fim": false,
      "porque": "térmico 0.90 · Td ↓ · T.Inf 3 · usado há 51d 🕸️"
+    },
+    {
+     "nome": "Masculin Pluriel",
+     "tier": "A",
+     "score": 92.9902120257647,
+     "sprays": 3,
+     "nota": "",
+     "vivo_ate": 15.25,
+     "vivo_fim": false,
+     "porque": "térmico 0.99 · T.Inf 3 · sem uso em 45+d 🕸️"
     },
     {
      "nome": "Météore",
@@ -151,26 +171,6 @@
      "vivo_ate": 17.25,
      "vivo_fim": false,
      "porque": "térmico 0.92 · Td ↑ · T.Inf 3 · sem uso em 45+d 🕸️"
-    },
-    {
-     "nome": "Search",
-     "tier": "A",
-     "score": 90.72064075355395,
-     "sprays": 4,
-     "nota": "",
-     "vivo_ate": 15.75,
-     "vivo_fim": false,
-     "porque": "térmico 0.95 · T.Inf 3 · sem uso em 45+d 🕸️"
-    },
-    {
-     "nome": "Aventus",
-     "tier": "A",
-     "score": 90.62622979200526,
-     "sprays": 3,
-     "nota": "",
-     "vivo_ate": 16.25,
-     "vivo_fim": false,
-     "porque": "térmico 0.95 · T.Inf 3 · sem uso em 45+d 🕸️"
     }
    ],
    "scores": {
@@ -245,6 +245,8 @@
     "Wild Vetiver": 85.47198225083069,
     "Wood Whisper": 89.06595801543742,
     "Ya'e": 73.96703270890328,
+    "Bracken Man": 101.36375382956213,
+    "Masculin Pluriel": 92.9902120257647,
     "Supremacy CE": null,
     "Musamam Black": null,
     "Aquatica": null,
@@ -520,6 +522,8 @@
     "Wild Vetiver": 46.15208468916988,
     "Wood Whisper": 75.32909944804679,
     "Ya'e": 40.65211065869779,
+    "Bracken Man": 53.66016295401688,
+    "Masculin Pluriel": 51.105510542362936,
     "Supremacy CE": 57.604423668230666,
     "Musamam Black": 79.68103914037745,
     "Aquatica": null,

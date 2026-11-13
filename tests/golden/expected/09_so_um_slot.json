@@ -94,6 +94,16 @@
      "porque": "térmico 0.99 · Td ↓ · T.Inf 3"
     },
     {
+     "nome": "Bracken Man",
+     "tier": "S",
+     "score": 92.43310087281725,
+     "sprays": 3,
+     "nota": "",
+     "vivo_ate": 16.25,
+     "vivo_fim": false,
+     "porque": "térmico 0.91 · T.Inf 3"
+    },
+    {
      "nome": "Imagination",
      "tier": "S",
      "score": 91.66073176626159,
@@ -134,6 +144,16 @@
      "porque": "térmico 0.86 · Td ↓ · T.Inf 3"
     },
     {
+     "nome": "Masculin Pluriel",
+     "tier": "A",
+     "score": 85.39939153079084,
+     "sprays": 3,
+     "nota": "",
+     "vivo_ate": 15.25,
+     "vivo_fim": false,
+     "porque": "térmico 1.00 · T.Inf 3"
+    },
+    {
      "nome": "1872 for Men",
      "tier": "S",
      "score": 85.12195669620812,
@@ -142,26 +162,6 @@
      "vivo_ate": 12.5,
      "vivo_fim": false,
      "porque": "térmico 0.86 · Td ↓ · T.Inf 3"
-    },
-    {
-     "nome": "Aventus",
-     "tier": "A",
-     "score": 83.5603603371791,
-     "sprays": 3,
-     "nota": "",
-     "vivo_ate": 16.25,
-     "vivo_fim": false,
-     "porque": "térmico 0.96 · T.Inf 3"
-    },
-    {
-     "nome": "Search",
-     "tier": "A",
-     "score": 83.16387571153095,
-     "sprays": 4,
-     "nota": "",
-     "vivo_ate": 15.75,
-     "vivo_fim": false,
-     "porque": "térmico 0.96 · T.Inf 3"
     }
    ],
    "scores": {
@@ -236,6 +236,8 @@
     "Wild Vetiver": 77.20769311209745,
     "Wood Whisper": 82.79480917577449,
     "Ya'e": 67.8659105323536,
+    "Bracken Man": 92.43310087281725,
+    "Masculin Pluriel": 85.39939153079084,
     "Supremacy CE": null,
     "Musamam Black": null,
     "Aquatica": null,

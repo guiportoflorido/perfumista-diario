@@ -240,6 +240,8 @@
     "Wild Vetiver": 90.78826009359857,
     "Wood Whisper": 55.166546068217315,
     "Ya'e": null,
+    "Bracken Man": null,
+    "Masculin Pluriel": null,
     "Supremacy CE": 92.72606961187107,
     "Musamam Black": null,
     "Aquatica": null,
@@ -295,6 +297,8 @@
     "Tygar Extrait": "11h vivas fora de casa sem aptidão (Lazer)",
     "Ultima Storia": "9h vivas fora de casa sem aptidão (Lazer)",
     "Ya'e": "9h vivas fora de casa sem aptidão (Lazer)",
+    "Bracken Man": "9h vivas fora de casa sem aptidão (Lazer)",
+    "Masculin Pluriel": "8h vivas fora de casa sem aptidão (Lazer)",
     "Musamam Black": "5.5h na rua acima do envelope (Fresco é o teto)",
     "Aquatica": "5.5h abaixo do envelope (Quente é o piso)",
     "Incense 01": "5.5h na rua acima do envelope (Fresco é o teto)",
@@ -319,6 +323,11 @@
      "motivo": "5.5h na rua acima do envelope (Fresco é o teto)"
     },
     {
+     "nome": "Bracken Man",
+     "tier": "S",
+     "motivo": "9h vivas fora de casa sem aptidão (Lazer)"
+    },
+    {
      "nome": "Brompton",
      "tier": "S",
      "motivo": "12.5h vivas fora de casa sem aptidão (Lazer)"
@@ -337,11 +346,6 @@
      "nome": "Grand Soir",
      "tier": "S",
      "motivo": "5.5h na rua acima do envelope (Fresco é o teto)"
-    },
-    {
-     "nome": "Les Sables Roses",
-     "tier": "S",
-     "motivo": "10.5h vivas fora de casa sem aptidão (Lazer)"
     }
    ]
   },
@@ -524,6 +528,8 @@
     "Wild Vetiver": 45.92513376183578,
     "Wood Whisper": 69.31418064936986,
     "Ya'e": 35.959807515822014,
+    "Bracken Man": 50.1996290330469,
+    "Masculin Pluriel": 45.252595162747674,
     "Supremacy CE": 49.580229903198294,
     "Musamam Black": 77.60523036938197,
     "Aquatica": null,

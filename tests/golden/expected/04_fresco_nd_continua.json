@@ -93,6 +93,16 @@
      "porque": "térmico 0.88 · Td ↑ · chuva ↑ · T.For 3"
     },
     {
+     "nome": "Bracken Man",
+     "tier": "S",
+     "score": 96.56863305879098,
+     "sprays": 3,
+     "nota": "",
+     "vivo_ate": 16.25,
+     "vivo_fim": false,
+     "porque": "térmico 0.93 · T.For 3"
+    },
+    {
      "nome": "Lucius",
      "tier": "S",
      "score": 96.43639734921746,
@@ -133,6 +143,16 @@
      "porque": "térmico 0.93 · Td ↑ · chuva ↑ · T.For 3"
     },
     {
+     "nome": "Masculin Pluriel",
+     "tier": "A",
+     "score": 87.75170579844442,
+     "sprays": 3,
+     "nota": "",
+     "vivo_ate": 15.25,
+     "vivo_fim": false,
+     "porque": "térmico 0.98 · T.For 3"
+    },
+    {
      "nome": "Royal Oud",
      "tier": "A",
      "score": 87.14373880444415,
@@ -151,26 +171,6 @@
      "vivo_ate": 19.75,
      "vivo_fim": true,
      "porque": "térmico 0.88 · Td ↑ · chuva ↑ · T.For 3"
-    },
-    {
-     "nome": "Ultima Storia",
-     "tier": "A",
-     "score": 86.39021418792379,
-     "sprays": 3,
-     "nota": "",
-     "vivo_ate": 16.25,
-     "vivo_fim": false,
-     "porque": "térmico 0.96 · T.For 3"
-    },
-    {
-     "nome": "Search",
-     "tier": "A",
-     "score": 86.15144629792681,
-     "sprays": 4,
-     "nota": "",
-     "vivo_ate": 15.75,
-     "vivo_fim": false,
-     "porque": "térmico 0.93 · chuva ↑ · T.For 3"
     }
    ],
    "scores": {
@@ -245,6 +245,8 @@
     "Wild Vetiver": 66.805659134245,
     "Wood Whisper": null,
     "Ya'e": 58.47975284892091,
+    "Bracken Man": 96.56863305879098,
+    "Masculin Pluriel": 87.75170579844442,
     "Supremacy CE": null,
     "Musamam Black": null,
     "Aquatica": null,
@@ -549,6 +551,8 @@
     "Wild Vetiver": null,
     "Wood Whisper": null,
     "Ya'e": null,
+    "Bracken Man": 85.00000000000001,
+    "Masculin Pluriel": 72.7806911084011,
     "Supremacy CE": null,
     "Musamam Black": null,
     "Aquatica": null,

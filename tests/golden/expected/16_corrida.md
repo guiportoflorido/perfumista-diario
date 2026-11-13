@@ -22,7 +22,7 @@
 | 10 | **Anelo** | Pernoire | A | 3 | ~14h30 | 86 | térmico 0.93 · Lazer 3 |
 🔁 = ainda vivo na hora do banho: entra como resíduo sob o perfume da noite (informe em 'Manhã:' para o slot Noite considerar)
 **Custo do slot** (camada custo — corrida/academia, fora do ranking): Supremacy CE (S, 3 sprays, 98) · Hawas Boa (A, 3 sprays, 87) · Belgravia (A, 4 sprays, 87)
-S/A fora neste slot: African Leather (S: 7.5h na rua acima do envelope (Ameno é o teto)) · Amyris Homme Extrait (S: 6.5h na rua acima do envelope (Ameno é o teto)) · Bijou Zafran (S: 5h na rua acima do envelope (Ameno é o teto)) · Blonde Amber (S: 11h na rua acima do envelope (Fresco é o teto)) · Blue Sapphire Supercharged (S: 7.5h na rua acima do envelope (Ameno é o teto)) · Brompton (S: 8.5h na rua acima do envelope (Ameno é o teto)) · Decision (S: 5h na rua acima do envelope (Ameno é o teto)) · Favonius (S: 8.5h na rua acima do envelope (Ameno é o teto))
+S/A fora neste slot: African Leather (S: 7.5h na rua acima do envelope (Ameno é o teto)) · Amyris Homme Extrait (S: 6.5h na rua acima do envelope (Ameno é o teto)) · Bijou Zafran (S: 5h na rua acima do envelope (Ameno é o teto)) · Blonde Amber (S: 11h na rua acima do envelope (Fresco é o teto)) · Blue Sapphire Supercharged (S: 7.5h na rua acima do envelope (Ameno é o teto)) · Bracken Man (S: 5h na rua acima do envelope (Ameno é o teto)) · Brompton (S: 8.5h na rua acima do envelope (Ameno é o teto)) · Decision (S: 5h na rua acima do envelope (Ameno é o teto))
 
 ## Slot Noite (19h30→23h) — Top 10 da grade
 🧴 Onde aplicar: pós-banho: pele limpa e ainda morna absorve mais — pescoço/peito, sem esfregar; esperar a pele secar antes de vestir · noite em casa: o perfume é para você e para quem está perto — projeção pesa menos que o drydown
@@ -41,5 +41,5 @@ S/A fora neste slot: African Leather (S: 7.5h na rua acima do envelope (Ameno é
 **Custo do slot** (camada custo — corrida/academia, fora do ranking): Conception (B, 2 sprays, 55) · Supremacy CE (S, 2 sprays, 55) · Inception (S, 2 sprays, 54)
 S/A fora neste slot: Blonde Amber (S: 3.5h na rua acima do envelope (Fresco é o teto)) · Grand Soir (S: 3.5h na rua acima do envelope (Fresco é o teto)) · Ombre Nomade (S: 3.5h na rua acima do envelope (Fresco é o teto)) · Oud Satin Mood (S: 3.5h na rua acima do envelope (Fresco é o teto)) · Outlands (S: 3.5h na rua acima do envelope (Fresco é o teto)) · Radical Rose (S: 3.5h na rua acima do envelope (Fresco é o teto)) · Caden (A: 3.5h na rua acima do envelope (Fresco é o teto)) · Imperial (A: 3.5h na rua acima do envelope (Fresco é o teto))
 
-_Modelo v1.8 (dois slots · base frascos_v9, grade 71 + camada custo 11) · pesos declarados no CFG · longevidade/projeção/curva são estimativas (18 com lastro na ficha, 72 por regra) · calibrar com o diário._
+_Modelo v1.8 (dois slots · base frascos_v9, grade 71 + camada custo 11) · pesos declarados no CFG · longevidade/projeção/curva são estimativas (18 com lastro na ficha, 74 por regra) · calibrar com o diário._
 📓 Depois me diga o que usou de manhã e à noite pra eu registrar as duas linhas.

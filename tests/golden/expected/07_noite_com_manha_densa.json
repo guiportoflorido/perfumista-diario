@@ -91,6 +91,16 @@
      "porque": "térmico 0.93 · Td ↑ · chuva ↓ · T.Inf 3"
     },
     {
+     "nome": "Bracken Man",
+     "tier": "S",
+     "score": 95.58054847107617,
+     "sprays": 3,
+     "nota": "",
+     "vivo_ate": 16.25,
+     "vivo_fim": false,
+     "porque": "térmico 0.93 · T.Inf 3"
+    },
+    {
      "nome": "Bois Impérial",
      "tier": "S",
      "score": 93.78092529403229,
@@ -131,6 +141,16 @@
      "porque": "térmico 0.88 · Td ↓ · T.Inf 3"
     },
     {
+     "nome": "Masculin Pluriel",
+     "tier": "A",
+     "score": 87.0450139261606,
+     "sprays": 3,
+     "nota": "",
+     "vivo_ate": 15.25,
+     "vivo_fim": false,
+     "porque": "térmico 0.99 · T.Inf 3"
+    },
+    {
      "nome": "Montabaco Intensivo",
      "tier": "A",
      "score": 86.83391494534149,
@@ -149,26 +169,6 @@
      "vivo_ate": 16.25,
      "vivo_fim": false,
      "porque": "térmico 0.93 · T.Inf 3"
-    },
-    {
-     "nome": "Search",
-     "tier": "A",
-     "score": 84.23146396918634,
-     "sprays": 4,
-     "nota": "",
-     "vivo_ate": 15.75,
-     "vivo_fim": false,
-     "porque": "térmico 0.94 · T.Inf 3"
-    },
-    {
-     "nome": "Wood Whisper",
-     "tier": "A",
-     "score": 83.93251468914045,
-     "sprays": 3,
-     "nota": "",
-     "vivo_ate": 16.75,
-     "vivo_fim": false,
-     "porque": "térmico 0.92 · T.Inf 3"
     }
    ],
    "scores": {
@@ -243,6 +243,8 @@
     "Wild Vetiver": 78.08481785449534,
     "Wood Whisper": 83.93251468914045,
     "Ya'e": 68.537524468784,
+    "Bracken Man": 95.58054847107617,
+    "Masculin Pluriel": 87.0450139261606,
     "Supremacy CE": null,
     "Musamam Black": null,
     "Aquatica": null,
@@ -518,6 +520,8 @@
     "Wild Vetiver": null,
     "Wood Whisper": null,
     "Ya'e": 58.182222519785384,
+    "Bracken Man": 83.79021089429762,
+    "Masculin Pluriel": 73.19176545344449,
     "Supremacy CE": 80.75388136036202,
     "Musamam Black": 67.32,
     "Aquatica": null,
