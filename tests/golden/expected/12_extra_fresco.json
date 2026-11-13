@@ -250,7 +250,15 @@
     "Inception": 90.44402184835508,
     "Dubai Musk": 76.69487281876918,
     "Empire": 81.43887652122976,
-    "Enigma of Taif": null
+    "Enigma of Taif": null,
+    "Hawas Boa": 91.60138009359855,
+    "Hawas Sapphire": 81.22204452122976,
+    "Energetically New York": 52.685467709439834,
+    "Fashionably London Elixir": null,
+    "Sunrise on the Red Sand Dunes Intense": 72.6060141653625,
+    "Conception": null,
+    "Clash Extreme": 75.2404306559091,
+    "Dynasty": 70.22256220516535
    },
    "fora": {
     "Amyris Homme Extrait": "10.5h vivas fora de casa sem aptidão (Lazer)",
@@ -290,7 +298,9 @@
     "Musamam Black": "5.5h na rua acima do envelope (Fresco é o teto)",
     "Aquatica": "5.5h abaixo do envelope (Quente é o piso)",
     "Incense 01": "5.5h na rua acima do envelope (Fresco é o teto)",
-    "Enigma of Taif": "5.5h na rua acima do envelope (Fresco é o teto)"
+    "Enigma of Taif": "5.5h na rua acima do envelope (Fresco é o teto)",
+    "Fashionably London Elixir": "9h vivas fora de casa sem aptidão (Lazer)",
+    "Conception": "9h vivas fora de casa sem aptidão (Lazer)"
    },
    "fora_sa": [
     {
@@ -524,7 +534,15 @@
     "Inception": 55.30883032496856,
     "Dubai Musk": 46.413005761835784,
     "Empire": null,
-    "Enigma of Taif": 64.60543036938196
+    "Enigma of Taif": 64.60543036938196,
+    "Hawas Boa": 46.73825376183577,
+    "Hawas Sapphire": null,
+    "Energetically New York": 40.96214315539191,
+    "Fashionably London Elixir": 44.17567354908127,
+    "Sunrise on the Red Sand Dunes Intense": 36.91943640146028,
+    "Conception": 55.08974032313283,
+    "Clash Extreme": 39.00939722747799,
+    "Dynasty": 45.43651516274767
    },
    "fora": {
     "1872 for Men": "2.5h abaixo do envelope (Ameno é o piso)",
@@ -545,7 +563,8 @@
     "Aquatica": "3.5h abaixo do envelope (Quente é o piso)",
     "Island Dreams": "2.5h abaixo do envelope (Ameno é o piso)",
     "Sky": "2.5h abaixo do envelope (Ameno é o piso)",
-    "Empire": "2.5h abaixo do envelope (Ameno é o piso)"
+    "Empire": "2.5h abaixo do envelope (Ameno é o piso)",
+    "Hawas Sapphire": "2.5h abaixo do envelope (Ameno é o piso)"
    },
    "fora_sa": [
     {

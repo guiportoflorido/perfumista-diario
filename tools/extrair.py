@@ -48,8 +48,8 @@ def extrair_frascos():
             "janelas_estimadas": f["nome"] in JANELAS_ESTIMADAS,
         })
     grade = [f for f in out if f["camada"] == "grade" and f["tier"] != "D"]
-    assert len(out) == 82 and len(grade) == 71, (len(out), len(grade))
-    assert sum(1 for f in out if f["camada"] == "custo") == 11
+    assert len(out) == 90 and len(grade) == 71, (len(out), len(grade))
+    assert sum(1 for f in out if f["camada"] == "custo") == 19
     assert sum(f["janelas"] or 0 for f in out) == 668
     return out
 
