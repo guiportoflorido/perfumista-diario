@@ -98,6 +98,16 @@
      "porque": "térmico 0.93 · chuva ↓ · Lazer 3 · intenção ↑"
     },
     {
+     "nome": "Pomar",
+     "tier": "A",
+     "score": 92.11565633028938,
+     "sprays": 3,
+     "nota": "",
+     "vivo_ate": 14.75,
+     "vivo_fim": false,
+     "porque": "térmico 0.88 · Lazer 3 · intenção ↑"
+    },
+    {
      "nome": "Crab Apple Blossom",
      "tier": "S",
      "score": 91.08474613106281,
@@ -156,16 +166,6 @@
      "vivo_ate": 18.25,
      "vivo_fim": false,
      "porque": "térmico 0.78 · Lazer 3 · intenção ↑"
-    },
-    {
-     "nome": "Reflection Man",
-     "tier": "S",
-     "score": 85.85103737908926,
-     "sprays": 4,
-     "nota": "",
-     "vivo_ate": 13.5,
-     "vivo_fim": false,
-     "porque": "térmico 0.87 · Lazer 2 · intenção ↑"
     }
    ],
    "scores": {
@@ -242,6 +242,10 @@
     "Ya'e": null,
     "Bracken Man": null,
     "Masculin Pluriel": null,
+    "Nosso Wood": 70.13060220516536,
+    "Dueto": 72.86473416536249,
+    "Brasa": null,
+    "Pomar": 92.11565633028938,
     "Supremacy CE": 92.72606961187107,
     "Musamam Black": null,
     "Aquatica": null,
@@ -299,6 +303,7 @@
     "Ya'e": "9h vivas fora de casa sem aptidão (Lazer)",
     "Bracken Man": "9h vivas fora de casa sem aptidão (Lazer)",
     "Masculin Pluriel": "8h vivas fora de casa sem aptidão (Lazer)",
+    "Brasa": "5.5h na rua acima do envelope (Fresco é o teto)",
     "Musamam Black": "5.5h na rua acima do envelope (Fresco é o teto)",
     "Aquatica": "5.5h abaixo do envelope (Quente é o piso)",
     "Incense 01": "5.5h na rua acima do envelope (Fresco é o teto)",
@@ -530,6 +535,10 @@
     "Ya'e": 35.959807515822014,
     "Bracken Man": 50.1996290330469,
     "Masculin Pluriel": 45.252595162747674,
+    "Nosso Wood": 45.344555162747675,
+    "Dueto": 37.17815640146027,
+    "Brasa": 61.36568324837203,
+    "Pomar": 46.479189055598276,
     "Supremacy CE": 49.580229903198294,
     "Musamam Black": 77.60523036938197,
     "Aquatica": null,

@@ -15,10 +15,10 @@
 | 4 | **Crab Apple Blossom** | Clive Christian | S | 4 | ~12h30 | 90 | térmico 0.80 · Lazer 3 |
 | 5 | **Aventus** | Creed | A | 3 | ~16h15 | 86 | térmico 0.97 · Lazer 3 |
 | 6 | **Beach Hut Man** | Amouage | A | 3 | ~18h15 | 85 | térmico 0.97 · chuva ↓ · Lazer 3 |
-| 7 | **L'Immensité** | Louis Vuitton | A | 4 | ~16h15 | 84 | térmico 0.90 · Lazer 3 |
-| 8 | **Scarlet Sands** | Ex Nihilo | S | 3 | ~16h45 | 84 | térmico 0.97 · Lazer 2 |
-| 9 | **Wild Vetiver** | Creed | A | 4 | ~13h30 | 83 | térmico 0.91 · Lazer 3 |
-| 10 | **Vibrato** | Sospiro | A | 2 | ~18h15 | 83 | térmico 0.91 · Lazer 3 |
+| 7 | **Pomar** | Brasco | A | 3 | ~14h45 | 85 | térmico 0.93 · Lazer 3 |
+| 8 | **L'Immensité** | Louis Vuitton | A | 4 | ~16h15 | 84 | térmico 0.90 · Lazer 3 |
+| 9 | **Scarlet Sands** | Ex Nihilo | S | 3 | ~16h45 | 84 | térmico 0.97 · Lazer 2 |
+| 10 | **Wild Vetiver** | Creed | A | 4 | ~13h30 | 83 | térmico 0.91 · Lazer 3 |
 🔁 = ainda vivo na hora do banho: entra como resíduo sob o perfume da noite (informe em 'Manhã:' para o slot Noite considerar)
 S/A fora neste slot: Amyris Homme Extrait (S: 10.5h vivas fora de casa sem aptidão (Lazer)) · Bijou Zafran (S: 9h vivas fora de casa sem aptidão (Lazer)) · Blonde Amber (S: 9h na rua acima do envelope (Fresco é o teto)) · Bracken Man (S: 9h vivas fora de casa sem aptidão (Lazer)) · Brompton (S: 12.5h vivas fora de casa sem aptidão (Lazer)) · Decision (S: 9h vivas fora de casa sem aptidão (Lazer)) · Favonius (S: 12.5h vivas fora de casa sem aptidão (Lazer)) · Grand Soir (S: 10h na rua acima do envelope (Fresco é o teto))
 
@@ -38,5 +38,5 @@ S/A fora neste slot: Amyris Homme Extrait (S: 10.5h vivas fora de casa sem aptid
 | 10 | **Blue Sapphire Supercharged** | Boadicea | S | 3 | fim | 93 | térmico 0.88 · N.Inf 3 |
 S/A fora neste slot: Blonde Amber (S: 2.5h na rua acima do envelope (Fresco é o teto)) · Grand Soir (S: 2.5h na rua acima do envelope (Fresco é o teto)) · Météore (S: 6h vivas fora de casa sem aptidão (N.Inf)) · Ombre Nomade (S: 2.5h na rua acima do envelope (Fresco é o teto)) · Oud Satin Mood (S: 2.5h na rua acima do envelope (Fresco é o teto)) · Outlands (S: 2.5h na rua acima do envelope (Fresco é o teto)) · Radical Rose (S: 2.5h na rua acima do envelope (Fresco é o teto)) · Reflection Man (S: 6h vivas fora de casa sem aptidão (N.Inf))
 
-_Modelo v1.8 (dois slots · base frascos_v9, grade 71 + camada custo 11) · pesos declarados no CFG · longevidade/projeção/curva são estimativas (18 com lastro na ficha, 74 por regra) · calibrar com o diário._
+_Modelo v1.8 (dois slots · base frascos_v9, grade 71 + camada custo 11) · pesos declarados no CFG · longevidade/projeção/curva são estimativas (18 com lastro na ficha, 78 por regra) · calibrar com o diário._
 📓 Depois me diga o que usou de manhã e à noite pra eu registrar as duas linhas.

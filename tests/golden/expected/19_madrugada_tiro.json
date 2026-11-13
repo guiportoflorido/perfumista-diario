@@ -132,6 +132,16 @@
      "porque": "térmico 0.97 · chuva ↓ · Lazer 3"
     },
     {
+     "nome": "Pomar",
+     "tier": "A",
+     "score": 84.63666871432572,
+     "sprays": 3,
+     "nota": "",
+     "vivo_ate": 14.75,
+     "vivo_fim": false,
+     "porque": "térmico 0.93 · Lazer 3"
+    },
+    {
      "nome": "L'Immensité",
      "tier": "A",
      "score": 83.68422808284497,
@@ -158,16 +168,6 @@
      "sprays": 4,
      "nota": "",
      "vivo_ate": 13.5,
-     "vivo_fim": false,
-     "porque": "térmico 0.91 · Lazer 3"
-    },
-    {
-     "nome": "Vibrato",
-     "tier": "A",
-     "score": 83.12974429085921,
-     "sprays": 2,
-     "nota": "",
-     "vivo_ate": 18.25,
      "vivo_fim": false,
      "porque": "térmico 0.91 · Lazer 3"
     }
@@ -246,6 +246,10 @@
     "Ya'e": null,
     "Bracken Man": null,
     "Masculin Pluriel": null,
+    "Nosso Wood": 73.17928421201823,
+    "Dueto": 66.90161944616958,
+    "Brasa": null,
+    "Pomar": 84.63666871432572,
     "Supremacy CE": 98.87775118425854,
     "Musamam Black": null,
     "Aquatica": null,
@@ -303,6 +307,7 @@
     "Ya'e": "9h vivas fora de casa sem aptidão (Lazer)",
     "Bracken Man": "9h vivas fora de casa sem aptidão (Lazer)",
     "Masculin Pluriel": "8h vivas fora de casa sem aptidão (Lazer)",
+    "Brasa": "9h na rua acima do envelope (Fresco é o teto)",
     "Musamam Black": "9h na rua acima do envelope (Fresco é o teto)",
     "Aquatica": "5.5h abaixo do envelope (Quente é o piso)",
     "Incense 01": "10h na rua acima do envelope (Fresco é o teto)",
@@ -534,6 +539,10 @@
     "Ya'e": 58.85598920379444,
     "Bracken Man": 80.15156057296808,
     "Masculin Pluriel": 74.03878642762729,
+    "Nosso Wood": 74.13558642762729,
+    "Dueto": null,
+    "Brasa": null,
+    "Pomar": 69.96910331138517,
     "Supremacy CE": 83.9623769964902,
     "Musamam Black": null,
     "Aquatica": null,
@@ -583,6 +592,8 @@
     "Vibrato": "6.5h vivas fora de casa sem aptidão (N.Inf)",
     "Wild Vetiver": "6h vivas fora de casa sem aptidão (N.Inf)",
     "Wood Whisper": "6.5h vivas fora de casa sem aptidão (N.Inf)",
+    "Dueto": "6h vivas fora de casa sem aptidão (N.Inf)",
+    "Brasa": "2.5h na rua acima do envelope (Fresco é o teto)",
     "Musamam Black": "2.5h na rua acima do envelope (Fresco é o teto)",
     "Aquatica": "5h abaixo do envelope (Quente é o piso)",
     "Incense 01": "2.5h na rua acima do envelope (Fresco é o teto)",

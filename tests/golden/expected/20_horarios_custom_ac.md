@@ -17,9 +17,9 @@
 | 5 | **Imagination** | Louis Vuitton | S | 3 | ~15h30 | 92 | térmico 0.91 · Td ↓ · T.Inf 3 |
 | 6 | **Reflection Man** | Amouage | S | 4 | ~12h45 | 90 | térmico 0.87 · Td ↓ · T.Inf 3 |
 | 7 | **Désobéissant** | Givenchy | S | 6 (6–7 fixo) | ~13h30 | 90 | térmico 0.87 · Td ↓ · T.Inf 3 |
-| 8 | **Masculin Pluriel** | MFK | A | 3 | ~14h30 | 87 | térmico 1.00 · T.Inf 3 |
-| 9 | **Montabaco Intensivo** | Ormonde Jayne | A | 3 | ~16h30 | 87 | térmico 0.95 · Td ↑ · T.Inf 3 |
-| 10 | **Wood Whisper** | OJAR | A | 3 | ~16h | 85 | térmico 0.95 · T.Inf 3 |
+| 8 | **Nosso Wood** | Brasco | A | 3 | ~15h30 | 88 | térmico 1.00 · T.Inf 3 |
+| 9 | **Masculin Pluriel** | MFK | A | 3 | ~14h30 | 87 | térmico 1.00 · T.Inf 3 |
+| 10 | **Montabaco Intensivo** | Ormonde Jayne | A | 3 | ~16h30 | 87 | térmico 0.95 · Td ↑ · T.Inf 3 |
 🔁 = ainda vivo na hora do banho: entra como resíduo sob o perfume da noite (informe em 'Manhã:' para o slot Noite considerar)
 S/A fora neste slot: Blonde Amber (S: 11.5h vivas fora de casa sem aptidão (T.Inf)) · Blue Sapphire Supercharged (S: 11.5h vivas fora de casa sem aptidão (T.Inf)) · Brompton (S: 13.5h vivas fora de casa sem aptidão (T.Inf)) · Favonius (S: 12.5h vivas fora de casa sem aptidão (T.Inf)) · Grand Soir (S: 13.5h vivas fora de casa sem aptidão (T.Inf)) · Les Sables Roses (S: 10.5h vivas fora de casa sem aptidão (T.Inf)) · Liwa (S: 11.5h vivas fora de casa sem aptidão (T.Inf)) · Odéon (S: 9.5h vivas fora de casa sem aptidão (T.Inf))
 
@@ -39,5 +39,5 @@ S/A fora neste slot: Blonde Amber (S: 11.5h vivas fora de casa sem aptidão (T.I
 | 10 | **Aventus** | Creed | A | 3 | fim | 87 | térmico 0.99 · N.Inf 3 |
 S/A fora neste slot: Blonde Amber (S: 3.5h na rua acima do envelope (Fresco é o teto)) · Grand Soir (S: 3.5h na rua acima do envelope (Fresco é o teto)) · Météore (S: 3.5h vivas fora de casa sem aptidão (N.Inf)) · Ombre Nomade (S: 3.5h na rua acima do envelope (Fresco é o teto)) · Oud Satin Mood (S: 3.5h na rua acima do envelope (Fresco é o teto)) · Outlands (S: 3.5h na rua acima do envelope (Fresco é o teto)) · Radical Rose (S: 3.5h na rua acima do envelope (Fresco é o teto)) · Reflection Man (S: 3.5h vivas fora de casa sem aptidão (N.Inf))
 
-_Modelo v1.8 (dois slots · base frascos_v9, grade 71 + camada custo 11) · pesos declarados no CFG · longevidade/projeção/curva são estimativas (18 com lastro na ficha, 74 por regra) · calibrar com o diário._
+_Modelo v1.8 (dois slots · base frascos_v9, grade 71 + camada custo 11) · pesos declarados no CFG · longevidade/projeção/curva são estimativas (18 com lastro na ficha, 78 por regra) · calibrar com o diário._
 📓 Depois me diga o que usou de manhã e à noite pra eu registrar as duas linhas.

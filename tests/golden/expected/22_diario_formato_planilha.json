@@ -144,6 +144,16 @@
      "porque": "térmico 0.86 · Td ↓ · T.Inf 3/N.Inf 1"
     },
     {
+     "nome": "Nosso Wood",
+     "tier": "A",
+     "score": 87.18766512381795,
+     "sprays": 3,
+     "nota": "",
+     "vivo_ate": 16.25,
+     "vivo_fim": false,
+     "porque": "térmico 0.99 · T.Inf 3/N.Inf 2"
+    },
+    {
      "nome": "Masculin Pluriel",
      "tier": "A",
      "score": 87.15751744684917,
@@ -162,16 +172,6 @@
      "vivo_ate": 16.25,
      "vivo_fim": false,
      "porque": "térmico 0.96 · T.Inf 3/N.Inf 3"
-    },
-    {
-     "nome": "Search",
-     "tier": "A",
-     "score": 84.85028342076363,
-     "sprays": 4,
-     "nota": "",
-     "vivo_ate": 15.75,
-     "vivo_fim": false,
-     "porque": "térmico 0.96 · T.Inf 3/N.Inf 2"
     }
    ],
    "scores": {
@@ -248,6 +248,10 @@
     "Ya'e": 68.69968477192941,
     "Bracken Man": 93.74721712084668,
     "Masculin Pluriel": 87.15751744684917,
+    "Nosso Wood": 87.18766512381795,
+    "Dueto": 63.43332744505259,
+    "Brasa": null,
+    "Pomar": 67.4868726747089,
     "Supremacy CE": null,
     "Musamam Black": null,
     "Aquatica": null,
@@ -295,6 +299,7 @@
     "Scarlet Sands": "9.5h vivas fora de casa sem aptidão (T.Inf)",
     "Serenity": "11h vivas fora de casa sem aptidão (T.Inf)",
     "Tygar Extrait": "11h vivas fora de casa sem aptidão (T.Inf)",
+    "Brasa": "11h vivas fora de casa sem aptidão (T.Inf)",
     "Supremacy CE": "9h vivas fora de casa sem aptidão (T.Inf)",
     "Musamam Black": "11h vivas fora de casa sem aptidão (T.Inf)",
     "Aquatica": "5.5h abaixo do envelope (Quente é o piso)",
@@ -525,6 +530,10 @@
     "Ya'e": 37.119105988097516,
     "Bracken Man": 47.738363934067,
     "Masculin Pluriel": 46.71241895646544,
+    "Nosso Wood": 46.80921895646544,
+    "Dueto": 36.72848596108888,
+    "Brasa": null,
+    "Pomar": 45.839554531222646,
     "Supremacy CE": 54.59296234293865,
     "Musamam Black": null,
     "Aquatica": null,
@@ -561,6 +570,7 @@
     "Outlands": "3.5h na rua acima do envelope (Fresco é o teto)",
     "Radical Rose": "3.5h na rua acima do envelope (Fresco é o teto)",
     "Serenity": "3.5h na rua acima do envelope (Fresco é o teto)",
+    "Brasa": "3.5h na rua acima do envelope (Fresco é o teto)",
     "Musamam Black": "3.5h na rua acima do envelope (Fresco é o teto)",
     "Aquatica": "3h abaixo do envelope (Quente é o piso)",
     "Incense 01": "3.5h na rua acima do envelope (Fresco é o teto)",
