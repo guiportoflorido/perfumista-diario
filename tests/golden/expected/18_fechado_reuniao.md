@@ -14,13 +14,13 @@
 | 1 | **Lucius** | Fragrance du Bois | S | 3 | ~17h15 | 97 | térmico 0.95 · T.For 3 |
 | 2 | **Bois Impérial** | Essential Parfums | S | 3 | ~16h15 | 96 | térmico 0.98 · Td ↓ · T.For 3 |
 | 3 | **Decision** | Amouage | S | 3 | ~16h15 | 96 | térmico 0.92 · Td ↑ · chuva ↓ · T.For 3 |
-| 4 | **Imagination** | Louis Vuitton | S | 3 | ~16h15 | 95 | térmico 0.95 · Td ↓ · T.For 3 |
-| 5 | **Purpose 50** | Amouage | S | 1 (fechado −1) | fim 🔁 | 89 | térmico 0.87 · Td ↑ · T.For 3 · fechado ↓ |
-| 6 | **Ultima Storia** | Thomas de Monaco | A | 3 | ~16h15 | 87 | térmico 0.98 · T.For 3 |
-| 7 | **Météore** | Louis Vuitton | S | 3 | ~13h30 | 86 | térmico 0.78 · Td ↓ · T.For 3 |
-| 8 | **Royal Oud** | Creed | A | 3 | ~16h15 | 86 | térmico 0.96 · T.For 3 |
-| 9 | **Montabaco Intensivo** | Ormonde Jayne | A | 3 | ~17h15 | 85 | térmico 0.92 · Td ↑ · T.For 3 |
-| 10 | **Search** | Amouage | A | 4 | ~15h45 | 85 | térmico 0.95 · T.For 3 |
+| 4 | **Bracken Man** | Amouage | S | 3 | ~16h15 | 95 | térmico 0.92 · T.For 3 |
+| 5 | **Imagination** | Louis Vuitton | S | 3 | ~16h15 | 95 | térmico 0.95 · Td ↓ · T.For 3 |
+| 6 | **Purpose 50** | Amouage | S | 1 (fechado −1) | fim 🔁 | 89 | térmico 0.87 · Td ↑ · T.For 3 · fechado ↓ |
+| 7 | **Masculin Pluriel** | MFK | A | 3 | ~15h15 | 87 | térmico 0.99 · T.For 3 |
+| 8 | **Ultima Storia** | Thomas de Monaco | A | 3 | ~16h15 | 87 | térmico 0.98 · T.For 3 |
+| 9 | **Météore** | Louis Vuitton | S | 3 | ~13h30 | 86 | térmico 0.78 · Td ↓ · T.For 3 |
+| 10 | **Royal Oud** | Creed | A | 3 | ~16h15 | 86 | térmico 0.96 · T.For 3 |
 🔁 = ainda vivo na hora do banho: entra como resíduo sob o perfume da noite (informe em 'Manhã:' para o slot Noite considerar)
 S/A fora neste slot: Amyris Homme Extrait (S: 10.5h vivas fora de casa sem aptidão (T.For)) · Aventus Absolu (S: 9h vivas fora de casa sem aptidão (T.For)) · Bijou Zafran (S: 9h vivas fora de casa sem aptidão (T.For)) · Blonde Amber (S: 2.5h na rua acima do envelope (Fresco é o teto)) · Blue Sapphire Supercharged (S: 11.5h vivas fora de casa sem aptidão (T.For)) · Brompton (S: 12.5h vivas fora de casa sem aptidão (T.For)) · Crab Apple Blossom (S: 5.5h vivas fora de casa sem aptidão (T.For)) · Favonius (S: 12.5h vivas fora de casa sem aptidão (T.For))
 
@@ -40,5 +40,5 @@ S/A fora neste slot: Amyris Homme Extrait (S: 10.5h vivas fora de casa sem aptid
 | 10 | **Oud Satin Mood** | MFK | S | 2 | fim | 90 | térmico 0.82 · N.For 3 |
 S/A fora neste slot: 1872 for Men (S: 3.5h vivas fora de casa sem aptidão (N.For)) · Bois Impérial (S: 3.5h vivas fora de casa sem aptidão (N.For)) · Crab Apple Blossom (S: 3.5h vivas fora de casa sem aptidão (N.For)) · Désobéissant (S: 3.5h vivas fora de casa sem aptidão (N.For)) · Gentle Fluidity Silver (S: 3.5h vivas fora de casa sem aptidão (N.For)) · Gris Charnel (S: 3.5h vivas fora de casa sem aptidão (N.For)) · Odéon (S: 3.5h vivas fora de casa sem aptidão (N.For)) · Anelo (A: 3.5h vivas fora de casa sem aptidão (N.For))
 
-_Modelo v1.8 (dois slots · base frascos_v9, grade 71 + camada custo 11) · pesos declarados no CFG · longevidade/projeção/curva são estimativas (18 com lastro na ficha, 72 por regra) · calibrar com o diário._
+_Modelo v1.8 (dois slots · base frascos_v9, grade 71 + camada custo 11) · pesos declarados no CFG · longevidade/projeção/curva são estimativas (18 com lastro na ficha, 74 por regra) · calibrar com o diário._
 📓 Depois me diga o que usou de manhã e à noite pra eu registrar as duas linhas.

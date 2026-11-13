@@ -14,7 +14,7 @@ import { definirCores, arqTag, arqIcone, corArq, humorDoSlot, humorSVG } from ".
 import { confete, ceuHTML, abrirRoleta, animarSpray, nomeDoDia, definirMateriais, ativarChacoalho, pedirMovimento, movimentoPedePermissao } from "./diversao.js";
 import { chave as mercadoChave, telaMercado, fichaEditavel, camposAlterados, baseComTiers, deLinhas, linhasParaCriar, cachePlanilha, baixarMercado, criarNaPlanilha, editarNaPlanilha, adicionarNaPlanilha, removerNaPlanilha, fotoNoCache } from "./mercado.js";
 import { contagens } from "./estatisticas.js";
-import { topoAmostras, filtrosAmostras, corpoAmostras, filtrar as filtrarAmostras, fichaAmostra, deLinhas as amostrasDeLinhas, juntar, semRegistro, camposAmostra, camposAvaliacaoMexidos, cacheAmostras, baixarAmostras,
+import { decantesDaColecao, topoAmostras, filtrosAmostras, corpoAmostras, filtrar as filtrarAmostras, fichaAmostra, deLinhas as amostrasDeLinhas, juntar, semRegistro, camposAmostra, camposAvaliacaoMexidos, cacheAmostras, baixarAmostras,
   adicionarAmostra, editarAmostra, removerAmostra, novoId } from "./amostras.js";
 import { ler, gravar } from "./store.js";
 import { storiesDoMes, abrirWrapped, MESES } from "./wrapped.js";
@@ -22,7 +22,7 @@ import { lerDuelos, duelosUnificados, pareamento, elo, fmtElo, filaDuelos, adici
   gerarCenario, textoCenario, periodoDaHora, CHUVAS, MAE_DA_SUB, brilhaCai, rotuloValor, previsao, ehZebra, META_DIA, plausiveisNoCenario, chavePar } from "./duelo.js";
 import { fotoFicha, iconeFicha, fotoMini, fotoIcone, reduzirImagem, subirFoto, removerFotoPlanilha, iniciarFotos } from "./fotos.js";
 
-export const APP_VERSAO = "5.55";  // sobe a cada publicação: confere no topo da tela se o celular pegou a versão nova
+export const APP_VERSAO = "5.56";  // sobe a cada publicação: confere no topo da tela se o celular pegou a versão nova
 const S = { dueloModo: ler("dueloModo", "agora"), rkFiltro: ler("rkFiltro", {}), cenario: null, motionOk: !movimentoPedePermissao() && "DeviceMotionEvent" in globalThis, aba: "hoje", frascos: [], frascosAtivos: [], avisosTiers: null, medidos: [], fichas: {}, versao: {}, prev: null, prevOffline: false,
   prevErro: null, metar: null, metarMotivo: null, clima: null, resultado: null, erroMotor: null, entrada: "", carregandoClima: true,
   sync: { estado: "ocioso", msg: "" }, hr: ler("hr", { preset: "tudo" }), tokenNovo: null, playbook: null, janelas: new Map(),
@@ -97,8 +97,14 @@ function planilha() {
 }
 // tiers da planilha e depois as medições na pele: Hoje, Testar, ficha, Coleção e Playbook veem o mesmo frasco
 const opcoesMedicoes = () => ({ ...MEDICOES_PADRAO, ...(ajustes().medicoes || {}) });
+/** Nomes (normalizados) dos decants de 10+ ml em mãos na aba Amostras; null se a aba ainda não foi lida. */
+function decantesEmMaos() {
+  const c = cacheAmostras();
+  if (!c?.existe) return null;
+  return new Set(decantesDaColecao(amostrasDeLinhas(c.linhas)).map(a => a.nome.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim()));
+}
 function aplicarPlanilha() {
-  const r = aplicarTiers(S.frascos, planilha().tiers);
+  const r = aplicarTiers(S.frascos, planilha().tiers, { decantes: decantesEmMaos() });
   const m = aplicarMedicoes(r.frascos, historico(), opcoesMedicoes());
   S.frascosAtivos = m.frascos; S.medidos = m.medidos; S.avisosTiers = r.aplicado ? r.avisos : null;
 }
@@ -475,7 +481,11 @@ function telaColecaoTudo(ctx) {
     const usosPor = new Map([...contagens(ctx.hist, ctx.frascos, ctx.hoje, { todos: true }).por.values()].map(c => [c.f.nome, c.n30]));
     corpo = telaRoda({ frascos: ctx.frascos, arquetipos: S.arquetipos, gaps: S.gaps, verGaps: S.verGaps, usosPor, ver: S.rodaVer });
   }
+  // decant de 10+ ml em mãos sem ficha no app: avisa (a ficha técnica é o que põe o frasco no motor)
+  const comFicha = new Set(S.frascos.map(f => f.nome.toLowerCase()));
+  const c = cacheAmostras(), semFicha = c?.existe ? decantesDaColecao(amostrasDeLinhas(c.linhas)).filter(a => !comFicha.has(a.nome.toLowerCase())) : [];
   return `<h2>Coleção</h2>
+  ${semFicha.length ? `<div class="bloco destaque"><p class="nota">Decant de 10 ml sem ficha técnica ainda: <b>${esc(semFicha.map(a => `${a.nome} (${a.casa})`).join(", "))}</b>. Peça a ficha ao Claude para ele entrar na coleção e nas sugestões.</p></div>` : ""}
   ${corpo}`;
 }
 
@@ -553,6 +563,9 @@ async function lerAmostras({ forcar = false } = {}) {
   try { await baixarAmostras(); S.amErro = null; S.amBaixadas = true; }
   catch (e) { S.amErro = e.message; }
   S.amBaixando = false;
+  const antes = S.frascosAtivos.map(f => f.nome).join("|");
+  aplicarPlanilha();   // decants de 10 ml entram/saem da coleção conforme a aba Amostras
+  if (S.frascosAtivos.map(f => f.nome).join("|") !== antes) { recalcular(); return; }
   if (["mercado", "colecao"].includes(S.aba)) render();   // Coleção e Mercado usam as amostras no filtro "Amostra"
 }
 
@@ -1350,7 +1363,7 @@ function previaRoda(g) {
     ${(() => { const ft = fotoMini(doMercado(f.casa, nome), "prev-foto");   // foto do perfume no lugar do ícone do arquétipo, se houver
       return `<span class="prev-ic${ft ? " com-foto" : ""}">${ft || arqIcone(f.arquetipo, 30)}</span>`; })()}
     <span class="prev-tx"><b>${esc(nome)}</b>${tierHTML(f.tier)}<span class="nota">${esc(f.casa)} · ${esc(f.arquetipo)}</span>
-      <span class="prev-meta">${k?.n30 || 0} uso${k?.n30 === 1 ? "" : "s"} em 30 d · último ${quando} · ${f.camada === "custo" ? "camada custo (academia/corrida)" : `${f.janelas} janelas`}</span>
+      <span class="prev-meta">${k?.n30 || 0} uso${k?.n30 === 1 ? "" : "s"} em 30 d · último ${quando} · ${f.camada === "custo" ? "camada custo (academia/corrida)" : f.decant ? "decant de 10 ml" : `${f.janelas} janelas`}</span>
       ${fi?.perfil ? `<span class="prev-perfil">${esc(fi.perfil)}</span>` : ""}</span>
     <span class="prev-abrir">Abrir ›</span></button>`;
   box.hidden = false;

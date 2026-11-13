@@ -238,6 +238,8 @@
     "Wild Vetiver": 88.0,
     "Wood Whisper": null,
     "Ya'e": null,
+    "Bracken Man": null,
+    "Masculin Pluriel": null,
     "Supremacy CE": null,
     "Musamam Black": null,
     "Aquatica": 70.0,
@@ -310,6 +312,8 @@
     "Ultima Storia": "5.5h na rua acima do envelope (Quente é o teto)",
     "Wood Whisper": "9.5h na rua acima do envelope (Ameno é o teto)",
     "Ya'e": "9h na rua acima do envelope (Ameno é o teto)",
+    "Bracken Man": "9h na rua acima do envelope (Ameno é o teto)",
+    "Masculin Pluriel": "4.5h na rua acima do envelope (Quente é o teto)",
     "Supremacy CE": "5.5h na rua acima do envelope (Quente é o teto)",
     "Musamam Black": "11.5h na rua acima do envelope (Fresco é o teto)",
     "Incense 01": "12.5h na rua acima do envelope (Fresco é o teto)",
@@ -357,9 +361,9 @@
      "motivo": "5.5h na rua acima do envelope (Quente é o teto)"
     },
     {
-     "nome": "Brompton",
+     "nome": "Bracken Man",
      "tier": "S",
-     "motivo": "12.5h na rua acima do envelope (Ameno é o teto)"
+     "motivo": "9h na rua acima do envelope (Ameno é o teto)"
     }
    ]
   },
@@ -542,6 +546,8 @@
     "Wild Vetiver": null,
     "Wood Whisper": null,
     "Ya'e": null,
+    "Bracken Man": null,
+    "Masculin Pluriel": 61.02668011237345,
     "Supremacy CE": 69.96357879919245,
     "Musamam Black": null,
     "Aquatica": null,
@@ -609,6 +615,7 @@
     "Wild Vetiver": "3.5h vivas fora de casa sem aptidão (N.Inf)",
     "Wood Whisper": "3.5h na rua acima do envelope (Ameno é o teto)",
     "Ya'e": "3.5h na rua acima do envelope (Ameno é o teto)",
+    "Bracken Man": "3.5h na rua acima do envelope (Ameno é o teto)",
     "Musamam Black": "3.5h na rua acima do envelope (Fresco é o teto)",
     "Aquatica": "3.5h vivas fora de casa sem aptidão (N.Inf)",
     "Incense 01": "3.5h na rua acima do envelope (Fresco é o teto)",
@@ -649,17 +656,17 @@
      "motivo": "3.5h na rua acima do envelope (Ameno é o teto)"
     },
     {
+     "nome": "Bracken Man",
+     "tier": "S",
+     "motivo": "3.5h na rua acima do envelope (Ameno é o teto)"
+    },
+    {
      "nome": "Brompton",
      "tier": "S",
      "motivo": "3.5h na rua acima do envelope (Ameno é o teto)"
     },
     {
      "nome": "Decision",
-     "tier": "S",
-     "motivo": "3.5h na rua acima do envelope (Ameno é o teto)"
-    },
-    {
-     "nome": "Favonius",
      "tier": "S",
      "motivo": "3.5h na rua acima do envelope (Ameno é o teto)"
     }

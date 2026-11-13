@@ -240,6 +240,8 @@
     "Wild Vetiver": 80.32694694000224,
     "Wood Whisper": null,
     "Ya'e": null,
+    "Bracken Man": null,
+    "Masculin Pluriel": null,
     "Supremacy CE": null,
     "Musamam Black": null,
     "Aquatica": 62.82400384193485,
@@ -312,6 +314,8 @@
     "Ultima Storia": "4.5h na rua acima do envelope (Quente é o teto)",
     "Wood Whisper": "8.5h na rua acima do envelope (Ameno é o teto)",
     "Ya'e": "8h na rua acima do envelope (Ameno é o teto)",
+    "Bracken Man": "8h na rua acima do envelope (Ameno é o teto)",
+    "Masculin Pluriel": "3.5h na rua acima do envelope (Quente é o teto)",
     "Supremacy CE": "4.5h na rua acima do envelope (Quente é o teto)",
     "Musamam Black": "11.5h na rua acima do envelope (Fresco é o teto)",
     "Incense 01": "12.5h na rua acima do envelope (Fresco é o teto)",
@@ -359,9 +363,9 @@
      "motivo": "4.5h na rua acima do envelope (Quente é o teto)"
     },
     {
-     "nome": "Brompton",
+     "nome": "Bracken Man",
      "tier": "S",
-     "motivo": "11.5h na rua acima do envelope (Ameno é o teto)"
+     "motivo": "8h na rua acima do envelope (Ameno é o teto)"
     }
    ]
   },
@@ -544,6 +548,8 @@
     "Wild Vetiver": 41.80511686123499,
     "Wood Whisper": null,
     "Ya'e": null,
+    "Bracken Man": null,
+    "Masculin Pluriel": 43.89406379175567,
     "Supremacy CE": 52.792160376167274,
     "Musamam Black": null,
     "Aquatica": 29.40938898709176,
@@ -600,6 +606,7 @@
     "Serenity": "3.5h na rua acima do envelope (Fresco é o teto)",
     "Wood Whisper": "2h na rua acima do envelope (Ameno é o teto)",
     "Ya'e": "2h na rua acima do envelope (Ameno é o teto)",
+    "Bracken Man": "2h na rua acima do envelope (Ameno é o teto)",
     "Musamam Black": "3.5h na rua acima do envelope (Fresco é o teto)",
     "Incense 01": "3.5h na rua acima do envelope (Fresco é o teto)",
     "Enigma of Taif": "3.5h na rua acima do envelope (Fresco é o teto)",
@@ -633,17 +640,17 @@
      "motivo": "2h na rua acima do envelope (Ameno é o teto)"
     },
     {
+     "nome": "Bracken Man",
+     "tier": "S",
+     "motivo": "2h na rua acima do envelope (Ameno é o teto)"
+    },
+    {
      "nome": "Brompton",
      "tier": "S",
      "motivo": "2h na rua acima do envelope (Ameno é o teto)"
     },
     {
      "nome": "Decision",
-     "tier": "S",
-     "motivo": "2h na rua acima do envelope (Ameno é o teto)"
-    },
-    {
-     "nome": "Favonius",
      "tier": "S",
      "motivo": "2h na rua acima do envelope (Ameno é o teto)"
     }

@@ -16,12 +16,12 @@
 | 2 | **Decision** | Amouage | S | 3 | ~16h15 | 95 | térmico 0.89 · Td ↑ · chuva ↓ · T.Inf 3/N.Inf 2 |
 | 3 | **Bois Impérial** | Essential Parfums | S | 3 | ~16h15 | 95 | térmico 0.99 · Td ↓ · T.Inf 3/N.Inf 1 |
 | 4 | **Imagination** | Louis Vuitton | S | 3 | ~16h15 | 94 | térmico 0.96 · Td ↓ · T.Inf 3/N.Inf 3 |
-| 5 | **Désobéissant** | Givenchy | S | 6 (6–7 fixo) | ~14h15 | 91 | térmico 0.90 · Td ↓ · T.Inf 3/N.Inf 2 |
-| 6 | **Reflection Man** | Amouage | S | 4 | ~13h30 | 89 | térmico 0.91 · Td ↓ · T.Inf 3 |
-| 7 | **Météore** | Louis Vuitton | S | 3 | ~13h30 | 88 | térmico 0.86 · Td ↓ · T.Inf 3 |
-| 8 | **1872 for Men** | Clive Christian | S | 4 | ~12h30 | 88 | térmico 0.86 · Td ↓ · T.Inf 3/N.Inf 1 |
-| 9 | **Aventus** | Creed | A | 3 | ~16h15 | 86 | térmico 0.96 · T.Inf 3/N.Inf 3 |
-| 10 | **Search** | Amouage | A | 4 | ~15h45 | 85 | térmico 0.96 · T.Inf 3/N.Inf 2 |
+| 5 | **Bracken Man** | Amouage | S | 3 | ~16h15 | 93 | térmico 0.89 · T.Inf 3/N.Inf 2 |
+| 6 | **Désobéissant** | Givenchy | S | 6 (6–7 fixo) | ~14h15 | 91 | térmico 0.90 · Td ↓ · T.Inf 3/N.Inf 2 |
+| 7 | **Reflection Man** | Amouage | S | 4 | ~13h30 | 89 | térmico 0.91 · Td ↓ · T.Inf 3 |
+| 8 | **Météore** | Louis Vuitton | S | 3 | ~13h30 | 88 | térmico 0.86 · Td ↓ · T.Inf 3 |
+| 9 | **1872 for Men** | Clive Christian | S | 4 | ~12h30 | 88 | térmico 0.86 · Td ↓ · T.Inf 3/N.Inf 1 |
+| 10 | **Masculin Pluriel** | MFK | A | 3 | ~15h15 | 87 | térmico 0.99 · T.Inf 3/N.Inf 2 |
 🔁 = ainda vivo na hora do banho: entra como resíduo sob o perfume da noite (informe em 'Manhã:' para o slot Noite considerar)
 ★ Testar Grand Soir: reprovado nos filtros deste slot — 11h vivas fora de casa sem aptidão (T.Inf)
 S/A fora neste slot: Blonde Amber (S: 11h vivas fora de casa sem aptidão (T.Inf)) · Blue Sapphire Supercharged (S: 11h vivas fora de casa sem aptidão (T.Inf)) · Brompton (S: 11h vivas fora de casa sem aptidão (T.Inf)) · Favonius (S: 11h vivas fora de casa sem aptidão (T.Inf)) · Grand Soir (S: 11h vivas fora de casa sem aptidão (T.Inf)) · Les Sables Roses (S: 10.5h vivas fora de casa sem aptidão (T.Inf)) · Liwa (S: 11h vivas fora de casa sem aptidão (T.Inf)) · Odéon (S: 9.5h vivas fora de casa sem aptidão (T.Inf))
@@ -43,5 +43,5 @@ S/A fora neste slot: Blonde Amber (S: 11h vivas fora de casa sem aptidão (T.Inf
 ★ Testar Grand Soir: reprovado nos filtros deste slot — 3.5h na rua acima do envelope (Fresco é o teto)
 S/A fora neste slot: Blonde Amber (S: 3.5h na rua acima do envelope (Fresco é o teto)) · Grand Soir (S: 3.5h na rua acima do envelope (Fresco é o teto)) · Ombre Nomade (S: 3.5h na rua acima do envelope (Fresco é o teto)) · Oud Satin Mood (S: 3.5h na rua acima do envelope (Fresco é o teto)) · Outlands (S: 3.5h na rua acima do envelope (Fresco é o teto)) · Radical Rose (S: 3.5h na rua acima do envelope (Fresco é o teto)) · Caden (A: 3.5h na rua acima do envelope (Fresco é o teto)) · Imperial (A: 3.5h na rua acima do envelope (Fresco é o teto))
 
-_Modelo v1.8 (dois slots · base frascos_v9, grade 71 + camada custo 11) · pesos declarados no CFG · longevidade/projeção/curva são estimativas (18 com lastro na ficha, 72 por regra) · calibrar com o diário._
+_Modelo v1.8 (dois slots · base frascos_v9, grade 71 + camada custo 11) · pesos declarados no CFG · longevidade/projeção/curva são estimativas (18 com lastro na ficha, 74 por regra) · calibrar com o diário._
 📓 Depois me diga o que usou de manhã e à noite pra eu registrar as duas linhas.

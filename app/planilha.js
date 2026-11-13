@@ -23,15 +23,23 @@ export function lerDiario(rows) {
 }
 
 /** Aplica a aba Tiers sobre os frascos do JSON. Devolve frascos ajustados e os avisos. */
-export function aplicarTiers(frascos, tiers) {
+export function aplicarTiers(frascos, tiers, { decantes = null } = {}) {
   const avisos = { divergentes: [], sem_posse: [], sem_linha: [] };
-  if (!tiers.length) return { frascos, avisos, aplicado: false };
+  // decant de 10 ml (f.decant): fica ativo enquanto houver decant de 10+ ml em mãos na aba Amostras (`decantes` = Set de
+  // nomes normalizados); sem a aba lida ainda, vale a posse da aba Tiers (Frasco Gui ou Amostra).
+  const nrm = s => String(s || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
+  const decAtivo = (f, t) => (decantes ? decantes.has(nrm(f.nome)) : !t || ["Frasco Gui", "Amostra"].includes(t.posse));
+  if (!tiers.length) return { frascos: decantes ? frascos.filter(f => !f.decant || decAtivo(f, null)) : frascos, avisos, aplicado: false };
   const porNome = new Map();
   for (const t of tiers) { if (t.nomeDiario) porNome.set(t.nomeDiario, t); }
   for (const t of tiers) { if (!porNome.has(t.perfume)) porNome.set(t.perfume, t); }
   const out = [];
   for (const f of frascos) {
     const t = porNome.get(f.nome);
+    if (f.decant) {
+      if (!decAtivo(f, t)) { avisos.sem_posse.push({ nome: f.nome, posse: "decant esgotado ou abaixo de 10 ml" }); continue; }
+      out.push(t?.tier && t.tier !== f.tier ? { ...f, tier: t.tier } : f); continue;
+    }
     if (!t) { avisos.sem_linha.push(f.nome); out.push(f); continue; }
     if (t.posse !== "Frasco Gui") { avisos.sem_posse.push({ nome: f.nome, posse: t.posse }); continue; }
     if (t.tier && t.tier !== f.tier) {

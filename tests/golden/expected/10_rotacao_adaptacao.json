@@ -94,6 +94,16 @@
      "porque": "térmico 0.99 · Td ↓ · T.Inf 3/N.Inf 1 · sem uso em 45+d 🕸️"
     },
     {
+     "nome": "Bracken Man",
+     "tier": "S",
+     "score": 100.20099667822045,
+     "sprays": 3,
+     "nota": "",
+     "vivo_ate": 16.25,
+     "vivo_fim": false,
+     "porque": "térmico 0.91 · T.Inf 3/N.Inf 2 · sem uso em 45+d 🕸️"
+    },
+    {
      "nome": "Imagination",
      "tier": "S",
      "score": 99.69468416067252,
@@ -144,6 +154,16 @@
      "porque": "térmico 0.86 · Td ↓ · T.Inf 3/N.Inf 1 · sem uso em 45+d 🕸️"
     },
     {
+     "nome": "Masculin Pluriel",
+     "tier": "A",
+     "score": 92.50225694847147,
+     "sprays": 3,
+     "nota": "",
+     "vivo_ate": 15.25,
+     "vivo_fim": false,
+     "porque": "térmico 1.00 · T.Inf 3/N.Inf 2 · sem uso em 45+d 🕸️"
+    },
+    {
      "nome": "Gentle Fluidity Silver",
      "tier": "S",
      "score": 91.10144246163972,
@@ -152,26 +172,6 @@
      "vivo_ate": 16.25,
      "vivo_fim": false,
      "porque": "térmico 1.00 · T.Inf 3/N.Inf 2 · usado há 6d"
-    },
-    {
-     "nome": "Aventus",
-     "tier": "A",
-     "score": 90.89838902190242,
-     "sprays": 3,
-     "nota": "",
-     "vivo_ate": 16.25,
-     "vivo_fim": false,
-     "porque": "térmico 0.96 · T.Inf 3/N.Inf 3 · sem uso em 45+d 🕸️"
-    },
-    {
-     "nome": "Montabaco Intensivo",
-     "tier": "A",
-     "score": 90.2899358684683,
-     "sprays": 3,
-     "nota": "",
-     "vivo_ate": 17.25,
-     "vivo_fim": false,
-     "porque": "térmico 0.91 · Td ↑ · T.Inf 3/N.Inf 2 · sem uso em 45+d 🕸️"
     }
    ],
    "scores": {
@@ -246,6 +246,8 @@
     "Wild Vetiver": 83.65953105587884,
     "Wood Whisper": 87.36784183558821,
     "Ya'e": 73.4997798114529,
+    "Bracken Man": 100.20099667822045,
+    "Masculin Pluriel": 92.50225694847147,
     "Supremacy CE": null,
     "Musamam Black": null,
     "Aquatica": null,
@@ -521,6 +523,8 @@
     "Wild Vetiver": 44.712829975697026,
     "Wood Whisper": 75.98898238399033,
     "Ya'e": 40.44480497297886,
+    "Bracken Man": 54.457080765391865,
+    "Masculin Pluriel": 50.89620168031628,
     "Supremacy CE": 56.737613089707004,
     "Musamam Black": 84.17911631192595,
     "Aquatica": null,

@@ -38,6 +38,12 @@ export function juntar(amostras, mercado) {
 }
 
 const mlNum = s => { const n = Number(String(s || "").replace(",", ".")); return Number.isFinite(n) ? n : 0; };
+
+export const ML_DECANT_COLECAO = 10;
+/** Decants que contam como coleção (decisão dele, 12/nov/2026): Tipo Decant, 10+ ml, não esgotado. */
+export function decantesDaColecao(lista) {
+  return (lista || []).filter(a => a.tipo === "Decant" && mlNum(a.ml) >= ML_DECANT_COLECAO && a.status !== "Esgotado");
+}
 export function resumo(lista) {
   const n = s => lista.filter(a => a.status === s).length;
   const mao = lista.filter(a => a.status !== "Esgotado");

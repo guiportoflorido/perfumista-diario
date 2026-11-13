@@ -71,7 +71,7 @@ export function telaColecao({ frascos, hist, hoje, janelas, filtro, fichas, arqT
     <thead><tr><th class="c-n" scope="col">#</th>${COLS_COL.map(th).join("")}</tr></thead>
     <tbody>${linhas.map(({ f, k, e }, i) => `<tr data-ficha="${esc(f.nome)}" tabindex="0">
       <td class="c-n">${i + 1}</td>
-      <td class="c-nome">${esc(f.nome)}${camadaDe(f) === "fora" ? ` <span class="selo aviso" title="Fora da grade">fora</span>` : ""}</td>
+      <td class="c-nome">${esc(f.nome)}${camadaDe(f) === "fora" ? ` <span class="selo aviso" title="Fora da grade">fora</span>` : ""}${f.decant ? ` <span class="selo" title="Decant de 10 ml: conta como coleção enquanto estiver na aba Amostras">decant</span>` : ""}</td>
       <td class="cc-casa">${esc(f.casa)}</td>
       <td class="c-tier">${tierHTML(f.tier)}</td>
       <td class="cc-arquetipo">${arqTag(f.arquetipo)}</td>
@@ -272,7 +272,7 @@ export function telaAnalises({ mdPer = "tudo", arquetipos = [], frascos, hist: h
 
   <div class="bloco"><h3>${doPeriodo ? `Sem uso no período · ${esq.length}` : `Esquecidos · sem uso há ${limiteEsq}+ dias ou sem registro · ${esq.length}`}</h3>
     <p class="nota">“Sem registro” é ausência no diário, não prova de que você não usou.</p>
-    ${(() => { const item = x => `<article class="card compacto"><span class="pos">${tierHTML(x.f.tier)}</span><div style="min-width:0"><button class="nome" data-ficha="${esc(x.f.nome)}">${esc(x.f.nome)}</button><div class="casa">${arqTag(x.f.arquetipo, 13)} · ${x.f.janelas} janelas</div></div><span class="nota">${quando(ultimoUso.get(x.f.nome)?.dias ?? null)}</span></article>`;
+    ${(() => { const item = x => `<article class="card compacto"><span class="pos">${tierHTML(x.f.tier)}</span><div style="min-width:0"><button class="nome" data-ficha="${esc(x.f.nome)}">${esc(x.f.nome)}</button><div class="casa">${arqTag(x.f.arquetipo, 13)} · ${x.f.decant ? "decant 10 ml" : `${x.f.janelas} janelas`}</div></div><span class="nota">${quando(ultimoUso.get(x.f.nome)?.dias ?? null)}</span></article>`;
       return `<div class="lista">${esq.slice(0, 8).map(item).join("")}</div>${esq.length > 8 ? `<details><summary>Ver os outros ${esq.length - 8}</summary><div class="lista" style="margin-top:8px">${esq.slice(8).map(item).join("")}</div></details>` : ""}`; })()}
   </div>
 

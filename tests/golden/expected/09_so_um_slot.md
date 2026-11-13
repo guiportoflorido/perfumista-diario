@@ -15,14 +15,14 @@
 | 1 | **Gentle Fluidity Silver** | MFK | S | 4 | ~16h15 | 97 | térmico 1.00 · T.Inf 3 |
 | 2 | **Decision** | Amouage | S | 3 | ~16h15 | 94 | térmico 0.91 · Td ↑ · chuva ↓ · T.Inf 3 |
 | 3 | **Bois Impérial** | Essential Parfums | S | 3 | ~16h15 | 94 | térmico 0.99 · Td ↓ · T.Inf 3 |
-| 4 | **Imagination** | Louis Vuitton | S | 3 | ~16h15 | 92 | térmico 0.96 · Td ↓ · T.Inf 3 |
-| 5 | **Désobéissant** | Givenchy | S | 6 (6–7 fixo) | ~14h15 | 88 | térmico 0.90 · Td ↓ · T.Inf 3 |
-| 6 | **Reflection Man** | Amouage | S | 4 | ~13h30 | 87 | térmico 0.90 · Td ↓ · T.Inf 3 |
-| 7 | **Météore** | Louis Vuitton | S | 3 | ~13h30 | 86 | térmico 0.86 · Td ↓ · T.Inf 3 |
-| 8 | **1872 for Men** | Clive Christian | S | 4 | ~12h30 | 85 | térmico 0.86 · Td ↓ · T.Inf 3 |
-| 9 | **Aventus** | Creed | A | 3 | ~16h15 | 84 | térmico 0.96 · T.Inf 3 |
-| 10 | **Search** | Amouage | A | 4 | ~15h45 | 83 | térmico 0.96 · T.Inf 3 |
+| 4 | **Bracken Man** | Amouage | S | 3 | ~16h15 | 92 | térmico 0.91 · T.Inf 3 |
+| 5 | **Imagination** | Louis Vuitton | S | 3 | ~16h15 | 92 | térmico 0.96 · Td ↓ · T.Inf 3 |
+| 6 | **Désobéissant** | Givenchy | S | 6 (6–7 fixo) | ~14h15 | 88 | térmico 0.90 · Td ↓ · T.Inf 3 |
+| 7 | **Reflection Man** | Amouage | S | 4 | ~13h30 | 87 | térmico 0.90 · Td ↓ · T.Inf 3 |
+| 8 | **Météore** | Louis Vuitton | S | 3 | ~13h30 | 86 | térmico 0.86 · Td ↓ · T.Inf 3 |
+| 9 | **Masculin Pluriel** | MFK | A | 3 | ~15h15 | 85 | térmico 1.00 · T.Inf 3 |
+| 10 | **1872 for Men** | Clive Christian | S | 4 | ~12h30 | 85 | térmico 0.86 · Td ↓ · T.Inf 3 |
 S/A fora neste slot: Blonde Amber (S: 11h vivas fora de casa sem aptidão (T.Inf)) · Blue Sapphire Supercharged (S: 11h vivas fora de casa sem aptidão (T.Inf)) · Brompton (S: 11h vivas fora de casa sem aptidão (T.Inf)) · Favonius (S: 11h vivas fora de casa sem aptidão (T.Inf)) · Grand Soir (S: 2.5h na rua acima do envelope (Fresco é o teto)) · Les Sables Roses (S: 10.5h vivas fora de casa sem aptidão (T.Inf)) · Liwa (S: 11h vivas fora de casa sem aptidão (T.Inf)) · Odéon (S: 9.5h vivas fora de casa sem aptidão (T.Inf))
 
-_Modelo v1.8 (dois slots · base frascos_v9, grade 71 + camada custo 11) · pesos declarados no CFG · longevidade/projeção/curva são estimativas (18 com lastro na ficha, 72 por regra) · calibrar com o diário._
+_Modelo v1.8 (dois slots · base frascos_v9, grade 71 + camada custo 11) · pesos declarados no CFG · longevidade/projeção/curva são estimativas (18 com lastro na ficha, 74 por regra) · calibrar com o diário._
 📓 Depois me diga o que usou de manhã e à noite pra eu registrar as duas linhas.

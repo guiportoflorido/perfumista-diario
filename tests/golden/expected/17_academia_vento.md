@@ -23,7 +23,7 @@
 | 10 | **Beach Hut Man** | Amouage | A | 4 (vento +1) | ~18h15 | 76 | térmico 0.90 · Td ↓ · chuva ↓ · Lazer 3 |
 🔁 = ainda vivo na hora do banho: entra como resíduo sob o perfume da noite (informe em 'Manhã:' para o slot Noite considerar)
 **Custo do slot** (camada custo — corrida/academia, fora do ranking): Supremacy CE (S, 4 sprays, 96) · Belgravia (A, 4 sprays, 75) · Hawas Boa (A, 4 sprays, 74)
-S/A fora neste slot: 1872 for Men (S: 5h abaixo do envelope (Ameno é o piso)) · Amyris Homme Extrait (S: 10.5h vivas fora de casa sem aptidão (Lazer)) · Bijou Zafran (S: 9h vivas fora de casa sem aptidão (Lazer)) · Blonde Amber (S: 11.5h vivas fora de casa sem aptidão (Lazer)) · Brompton (S: 12.5h vivas fora de casa sem aptidão (Lazer)) · Crab Apple Blossom (S: 5h abaixo do envelope (Ameno é o piso)) · Decision (S: 9h vivas fora de casa sem aptidão (Lazer)) · Favonius (S: 12.5h vivas fora de casa sem aptidão (Lazer))
+S/A fora neste slot: 1872 for Men (S: 5h abaixo do envelope (Ameno é o piso)) · Amyris Homme Extrait (S: 10.5h vivas fora de casa sem aptidão (Lazer)) · Bijou Zafran (S: 9h vivas fora de casa sem aptidão (Lazer)) · Blonde Amber (S: 11.5h vivas fora de casa sem aptidão (Lazer)) · Bracken Man (S: 9h vivas fora de casa sem aptidão (Lazer)) · Brompton (S: 12.5h vivas fora de casa sem aptidão (Lazer)) · Crab Apple Blossom (S: 5h abaixo do envelope (Ameno é o piso)) · Decision (S: 9h vivas fora de casa sem aptidão (Lazer))
 
 ## Slot Noite (19h30→23h) — Top 10 da grade
 🧴 Onde aplicar: pós-banho: pele limpa e ainda morna absorve mais — pescoço/peito, sem esfregar; esperar a pele secar antes de vestir · noite em casa: o perfume é para você e para quem está perto — projeção pesa menos que o drydown
@@ -42,5 +42,5 @@ S/A fora neste slot: 1872 for Men (S: 5h abaixo do envelope (Ameno é o piso)) �
 **Custo do slot** (camada custo — corrida/academia, fora do ranking): Musamam Black (A, 2 sprays, 88) · Enigma of Taif (A, 1 sprays, 75) · Incense 01 (B, 2 sprays, 69)
 S/A fora neste slot: 1872 for Men (S: 3.5h abaixo do envelope (Ameno é o piso)) · Crab Apple Blossom (S: 3.5h abaixo do envelope (Ameno é o piso)) · Météore (S: 3.5h abaixo do envelope (Ameno é o piso)) · Tygar Extrait (S: 3.5h abaixo do envelope (Ameno é o piso)) · Anelo (A: 3.5h abaixo do envelope (Ameno é o piso)) · Blue Talisman (A: 3.5h abaixo do envelope (Ameno é o piso)) · L'Immensité (A: 3.5h abaixo do envelope (Ameno é o piso)) · Torino 21 (A: 3.5h abaixo do envelope (Ameno é o piso))
 
-_Modelo v1.8 (dois slots · base frascos_v9, grade 71 + camada custo 11) · pesos declarados no CFG · longevidade/projeção/curva são estimativas (18 com lastro na ficha, 72 por regra) · calibrar com o diário._
+_Modelo v1.8 (dois slots · base frascos_v9, grade 71 + camada custo 11) · pesos declarados no CFG · longevidade/projeção/curva são estimativas (18 com lastro na ficha, 74 por regra) · calibrar com o diário._
 📓 Depois me diga o que usou de manhã e à noite pra eu registrar as duas linhas.

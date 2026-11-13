@@ -104,6 +104,16 @@
      "porque": "térmico 0.99 · Td ↓ · T.Inf 3/N.Inf 1"
     },
     {
+     "nome": "Bracken Man",
+     "tier": "S",
+     "score": 94.51050870244377,
+     "sprays": 3,
+     "nota": "",
+     "vivo_ate": 16.25,
+     "vivo_fim": false,
+     "porque": "térmico 0.91 · T.Inf 3/N.Inf 2"
+    },
+    {
      "nome": "Désobéissant",
      "tier": "S",
      "score": 90.4800979752101,
@@ -134,6 +144,16 @@
      "porque": "térmico 0.86 · Td ↓ · T.Inf 3/N.Inf 1"
     },
     {
+     "nome": "Masculin Pluriel",
+     "tier": "A",
+     "score": 87.25461943962527,
+     "sprays": 3,
+     "nota": "",
+     "vivo_ate": 15.25,
+     "vivo_fim": false,
+     "porque": "térmico 1.00 · T.Inf 3/N.Inf 2"
+    },
+    {
      "nome": "Aventus",
      "tier": "A",
      "score": 85.76402893881617,
@@ -152,26 +172,6 @@
      "vivo_ate": 17.25,
      "vivo_fim": false,
      "porque": "térmico 0.91 · Td ↑ · T.Inf 3/N.Inf 2"
-    },
-    {
-     "nome": "Search",
-     "tier": "A",
-     "score": 84.86510462367316,
-     "sprays": 4,
-     "nota": "",
-     "vivo_ate": 15.75,
-     "vivo_fim": false,
-     "porque": "térmico 0.96 · T.Inf 3/N.Inf 2"
-    },
-    {
-     "nome": "Hacivat",
-     "tier": "S",
-     "score": 82.99350290816798,
-     "sprays": 3,
-     "nota": "",
-     "vivo_ate": 17.25,
-     "vivo_fim": false,
-     "porque": "térmico 0.96 · T.Inf 2/N.Inf 3"
     }
    ],
    "scores": {
@@ -246,6 +246,8 @@
     "Wild Vetiver": 78.94626194944676,
     "Wood Whisper": 82.40439552559248,
     "Ya'e": 69.32831713684908,
+    "Bracken Man": 94.51050870244377,
+    "Masculin Pluriel": 87.25461943962527,
     "Supremacy CE": null,
     "Musamam Black": null,
     "Aquatica": null,
@@ -521,6 +523,8 @@
     "Wild Vetiver": 42.42955044992346,
     "Wood Whisper": 71.45799177536767,
     "Ya'e": 38.13810803282149,
+    "Bracken Man": 51.09390939804291,
+    "Masculin Pluriel": 47.99345009840415,
     "Supremacy CE": 53.692578650720314,
     "Musamam Black": 78.59545067650227,
     "Aquatica": null,
