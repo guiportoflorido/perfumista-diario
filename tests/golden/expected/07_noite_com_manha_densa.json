@@ -253,7 +253,9 @@
     "Inception": 92.37513183737411,
     "Dubai Musk": 82.17414735043396,
     "Empire": 45.31452441312598,
-    "Enigma of Taif": null
+    "Enigma of Taif": null,
+    "Hawas Boa": 65.61081785449532,
+    "Hawas Sapphire": 45.120924413125984
    },
    "fora": {
     "Al Qurashi Blend": "9h vivas fora de casa sem aptidão (T.Inf)",
@@ -520,7 +522,9 @@
     "Inception": 86.44419497162899,
     "Dubai Musk": null,
     "Empire": null,
-    "Enigma of Taif": 67.32
+    "Enigma of Taif": 67.32,
+    "Hawas Boa": null,
+    "Hawas Sapphire": null
    },
    "fora": {
     "1872 for Men": "3.5h abaixo do envelope (Ameno é o piso)",
@@ -553,7 +557,9 @@
     "Island Dreams": "3.5h abaixo do envelope (Ameno é o piso)",
     "Sky": "3.5h abaixo do envelope (Ameno é o piso)",
     "Dubai Musk": "3.5h vivas fora de casa sem aptidão (N.Inf)",
-    "Empire": "3.5h abaixo do envelope (Ameno é o piso)"
+    "Empire": "3.5h abaixo do envelope (Ameno é o piso)",
+    "Hawas Boa": "3.5h vivas fora de casa sem aptidão (N.Inf)",
+    "Hawas Sapphire": "3.5h abaixo do envelope (Ameno é o piso)"
    },
    "fora_sa": [
     {

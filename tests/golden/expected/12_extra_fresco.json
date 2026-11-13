@@ -250,7 +250,9 @@
     "Inception": 90.44402184835508,
     "Dubai Musk": 76.69487281876918,
     "Empire": 81.43887652122976,
-    "Enigma of Taif": null
+    "Enigma of Taif": null,
+    "Hawas Boa": 91.60138009359855,
+    "Hawas Sapphire": 81.22204452122976
    },
    "fora": {
     "Amyris Homme Extrait": "10.5h vivas fora de casa sem aptidão (Lazer)",
@@ -524,7 +526,9 @@
     "Inception": 55.30883032496856,
     "Dubai Musk": 46.413005761835784,
     "Empire": null,
-    "Enigma of Taif": 64.60543036938196
+    "Enigma of Taif": 64.60543036938196,
+    "Hawas Boa": 46.73825376183577,
+    "Hawas Sapphire": null
    },
    "fora": {
     "1872 for Men": "2.5h abaixo do envelope (Ameno é o piso)",
@@ -545,7 +549,8 @@
     "Aquatica": "3.5h abaixo do envelope (Quente é o piso)",
     "Island Dreams": "2.5h abaixo do envelope (Ameno é o piso)",
     "Sky": "2.5h abaixo do envelope (Ameno é o piso)",
-    "Empire": "2.5h abaixo do envelope (Ameno é o piso)"
+    "Empire": "2.5h abaixo do envelope (Ameno é o piso)",
+    "Hawas Sapphire": "2.5h abaixo do envelope (Ameno é o piso)"
    },
    "fora_sa": [
     {

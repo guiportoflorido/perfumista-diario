@@ -248,7 +248,9 @@
     "Inception": 85.00000000000001,
     "Dubai Musk": 72.74259030757551,
     "Empire": 88.0,
-    "Enigma of Taif": null
+    "Enigma of Taif": null,
+    "Hawas Boa": 88.0,
+    "Hawas Sapphire": 88.0
    },
    "fora": {
     "7 Loewe": "3h na rua acima do envelope (Quente é o teto)",
@@ -540,7 +542,9 @@
     "Inception": 100.0,
     "Dubai Musk": null,
     "Empire": null,
-    "Enigma of Taif": null
+    "Enigma of Taif": null,
+    "Hawas Boa": null,
+    "Hawas Sapphire": null
    },
    "fora": {
     "African Leather": "3.5h na rua acima do envelope (Ameno é o teto)",
@@ -596,7 +600,9 @@
     "Sky": "3.5h vivas fora de casa sem aptidão (N.Inf)",
     "Dubai Musk": "3.5h vivas fora de casa sem aptidão (N.Inf)",
     "Empire": "3.5h vivas fora de casa sem aptidão (N.Inf)",
-    "Enigma of Taif": "3.5h na rua acima do envelope (Fresco é o teto)"
+    "Enigma of Taif": "3.5h na rua acima do envelope (Fresco é o teto)",
+    "Hawas Boa": "3.5h vivas fora de casa sem aptidão (N.Inf)",
+    "Hawas Sapphire": "3.5h vivas fora de casa sem aptidão (N.Inf)"
    },
    "fora_sa": [
     {

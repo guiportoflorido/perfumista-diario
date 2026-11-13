@@ -269,7 +269,9 @@
     "Inception": null,
     "Dubai Musk": null,
     "Empire": null,
-    "Enigma of Taif": null
+    "Enigma of Taif": null,
+    "Hawas Boa": null,
+    "Hawas Sapphire": null
    },
    "fora": {
     "Al Qurashi Blend": "9h vivas fora de casa sem aptidão (T.For)",
@@ -327,7 +329,9 @@
     "Inception": "10h vivas fora de casa sem aptidão (T.For)",
     "Dubai Musk": "7.5h vivas fora de casa sem aptidão (T.For)",
     "Empire": "6.5h vivas fora de casa sem aptidão (T.For)",
-    "Enigma of Taif": "2.5h na rua acima do envelope (Fresco é o teto)"
+    "Enigma of Taif": "2.5h na rua acima do envelope (Fresco é o teto)",
+    "Hawas Boa": "6.5h vivas fora de casa sem aptidão (T.For)",
+    "Hawas Sapphire": "6.5h vivas fora de casa sem aptidão (T.For)"
    },
    "fora_sa": [
     {
@@ -561,7 +565,9 @@
     "Inception": null,
     "Dubai Musk": null,
     "Empire": null,
-    "Enigma of Taif": 80.02182155275433
+    "Enigma of Taif": 80.02182155275433,
+    "Hawas Boa": null,
+    "Hawas Sapphire": null
    },
    "fora": {
     "1872 for Men": "3.5h vivas fora de casa sem aptidão (N.For)",
@@ -606,7 +612,9 @@
     "Belgravia": "3.5h vivas fora de casa sem aptidão (N.For)",
     "Inception": "3.5h vivas fora de casa sem aptidão (N.For)",
     "Dubai Musk": "3.5h vivas fora de casa sem aptidão (N.For)",
-    "Empire": "3.5h vivas fora de casa sem aptidão (N.For)"
+    "Empire": "3.5h vivas fora de casa sem aptidão (N.For)",
+    "Hawas Boa": "3.5h vivas fora de casa sem aptidão (N.For)",
+    "Hawas Sapphire": "3.5h vivas fora de casa sem aptidão (N.For)"
    },
    "fora_sa": [
     {

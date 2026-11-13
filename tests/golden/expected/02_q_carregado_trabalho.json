@@ -255,7 +255,9 @@
     "Inception": 96.0555669766991,
     "Dubai Musk": 83.7631599604891,
     "Empire": 54.21353674216178,
-    "Enigma of Taif": null
+    "Enigma of Taif": null,
+    "Hawas Boa": 69.69768208229938,
+    "Hawas Sapphire": 54.21353674216178
    },
    "fora": {
     "Al Qurashi Blend": "9h vivas fora de casa sem aptidão (T.Inf)",
@@ -522,7 +524,9 @@
     "Inception": 100.0,
     "Dubai Musk": null,
     "Empire": null,
-    "Enigma of Taif": null
+    "Enigma of Taif": null,
+    "Hawas Boa": null,
+    "Hawas Sapphire": null
    },
    "fora": {
     "Apotecário": "3.5h na rua acima do envelope (Fresco é o teto)",
@@ -560,7 +564,9 @@
     "Sky": "3.5h vivas fora de casa sem aptidão (N.Inf)",
     "Dubai Musk": "3.5h vivas fora de casa sem aptidão (N.Inf)",
     "Empire": "3.5h vivas fora de casa sem aptidão (N.Inf)",
-    "Enigma of Taif": "3.5h na rua acima do envelope (Fresco é o teto)"
+    "Enigma of Taif": "3.5h na rua acima do envelope (Fresco é o teto)",
+    "Hawas Boa": "3.5h vivas fora de casa sem aptidão (N.Inf)",
+    "Hawas Sapphire": "3.5h vivas fora de casa sem aptidão (N.Inf)"
    },
    "fora_sa": [
     {

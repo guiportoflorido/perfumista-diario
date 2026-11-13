@@ -246,7 +246,9 @@
     "Inception": 37.205338005593156,
     "Dubai Musk": 63.36241796660997,
     "Empire": null,
-    "Enigma of Taif": 48.400000000000006
+    "Enigma of Taif": 48.400000000000006,
+    "Hawas Boa": 31.2308858499991,
+    "Hawas Sapphire": null
    },
    "fora": {
     "1872 for Men": "5.5h abaixo do envelope (Ameno é o piso)",
@@ -267,7 +269,8 @@
     "Aquatica": "5.5h abaixo do envelope (Quente é o piso)",
     "Island Dreams": "7.5h abaixo do envelope (Ameno é o piso)",
     "Sky": "6.5h abaixo do envelope (Ameno é o piso)",
-    "Empire": "6.5h abaixo do envelope (Ameno é o piso)"
+    "Empire": "6.5h abaixo do envelope (Ameno é o piso)",
+    "Hawas Sapphire": "6.5h abaixo do envelope (Ameno é o piso)"
    },
    "fora_sa": [
     {
@@ -501,7 +504,9 @@
     "Inception": null,
     "Dubai Musk": null,
     "Empire": null,
-    "Enigma of Taif": 74.8
+    "Enigma of Taif": 74.8,
+    "Hawas Boa": null,
+    "Hawas Sapphire": null
    },
    "fora": {
     "1872 for Men": "3.5h abaixo do envelope (Ameno é o piso)",
@@ -542,7 +547,9 @@
     "Belgravia": "2h abaixo do envelope (Fresco é o piso)",
     "Inception": "2h abaixo do envelope (Fresco é o piso)",
     "Dubai Musk": "2h abaixo do envelope (Fresco é o piso)",
-    "Empire": "3.5h abaixo do envelope (Ameno é o piso)"
+    "Empire": "3.5h abaixo do envelope (Ameno é o piso)",
+    "Hawas Boa": "2h abaixo do envelope (Fresco é o piso)",
+    "Hawas Sapphire": "3.5h abaixo do envelope (Ameno é o piso)"
    },
    "fora_sa": [
     {

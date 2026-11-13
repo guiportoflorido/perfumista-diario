@@ -255,7 +255,9 @@
     "Inception": 83.91200524117886,
     "Dubai Musk": 73.28474428752963,
     "Empire": 85.01988188696836,
-    "Enigma of Taif": null
+    "Enigma of Taif": null,
+    "Hawas Boa": 86.6707247603401,
+    "Hawas Sapphire": 84.82628188696837
    },
    "fora": {
     "African Leather": "7.5h na rua acima do envelope (Ameno é o teto)",
@@ -357,6 +359,16 @@
      "porque": "térmico 0.96 · Lazer 3"
     },
     {
+     "nome": "Hawas Boa",
+     "tier": "A",
+     "score": 86.6707247603401,
+     "sprays": 3,
+     "nota": "",
+     "vivo_ate": 13.5,
+     "vivo_fim": false,
+     "porque": "térmico 0.97 · Lazer 3"
+    },
+    {
      "nome": "Belgravia",
      "tier": "A",
      "score": 86.60737322141192,
@@ -365,16 +377,6 @@
      "vivo_ate": 13.5,
      "vivo_fim": false,
      "porque": "térmico 0.98 · Lazer 3"
-    },
-    {
-     "nome": "Empire",
-     "tier": "A",
-     "score": 85.01988188696836,
-     "sprays": 4,
-     "nota": "",
-     "vivo_ate": 13.5,
-     "vivo_fim": false,
-     "porque": "térmico 0.93 · Lazer 3"
     }
    ]
   },
@@ -567,7 +569,9 @@
     "Inception": 53.79386422892327,
     "Dubai Musk": 45.39805414807847,
     "Empire": 43.3808743217277,
-    "Enigma of Taif": null
+    "Enigma of Taif": null,
+    "Hawas Boa": 45.68845414807847,
+    "Hawas Sapphire": 43.1872743217277
    },
    "fora": {
     "Apotecário": "3.5h na rua acima do envelope (Fresco é o teto)",
