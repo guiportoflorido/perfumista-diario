@@ -250,7 +250,13 @@
     "Empire": 88.0,
     "Enigma of Taif": null,
     "Hawas Boa": 88.0,
-    "Hawas Sapphire": 88.0
+    "Hawas Sapphire": 88.0,
+    "Energetically New York": null,
+    "Fashionably London Elixir": null,
+    "Sunrise on the Red Sand Dunes Intense": 70.0,
+    "Conception": null,
+    "Clash Extreme": 70.0,
+    "Dynasty": null
    },
    "fora": {
     "7 Loewe": "3h na rua acima do envelope (Quente é o teto)",
@@ -308,7 +314,11 @@
     "Musamam Black": "11.5h na rua acima do envelope (Fresco é o teto)",
     "Incense 01": "12.5h na rua acima do envelope (Fresco é o teto)",
     "Belgravia": "3h na rua acima do envelope (Quente é o teto)",
-    "Enigma of Taif": "11.5h na rua acima do envelope (Fresco é o teto)"
+    "Enigma of Taif": "11.5h na rua acima do envelope (Fresco é o teto)",
+    "Energetically New York": "3h na rua acima do envelope (Quente é o teto)",
+    "Fashionably London Elixir": "9h na rua acima do envelope (Ameno é o teto)",
+    "Conception": "9h na rua acima do envelope (Ameno é o teto)",
+    "Dynasty": "5.5h na rua acima do envelope (Quente é o teto)"
    },
    "fora_sa": [
     {
@@ -544,7 +554,13 @@
     "Empire": null,
     "Enigma of Taif": null,
     "Hawas Boa": null,
-    "Hawas Sapphire": null
+    "Hawas Sapphire": null,
+    "Energetically New York": 48.427677933427425,
+    "Fashionably London Elixir": null,
+    "Sunrise on the Red Sand Dunes Intense": 49.0,
+    "Conception": null,
+    "Clash Extreme": 49.00000000000001,
+    "Dynasty": 74.22668011237344
    },
    "fora": {
     "African Leather": "3.5h na rua acima do envelope (Ameno é o teto)",
@@ -602,7 +618,9 @@
     "Empire": "3.5h vivas fora de casa sem aptidão (N.Inf)",
     "Enigma of Taif": "3.5h na rua acima do envelope (Fresco é o teto)",
     "Hawas Boa": "3.5h vivas fora de casa sem aptidão (N.Inf)",
-    "Hawas Sapphire": "3.5h vivas fora de casa sem aptidão (N.Inf)"
+    "Hawas Sapphire": "3.5h vivas fora de casa sem aptidão (N.Inf)",
+    "Fashionably London Elixir": "3.5h na rua acima do envelope (Ameno é o teto)",
+    "Conception": "3.5h na rua acima do envelope (Ameno é o teto)"
    },
    "fora_sa": [
     {

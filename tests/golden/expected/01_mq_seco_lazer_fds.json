@@ -252,7 +252,13 @@
     "Empire": 81.42323281282283,
     "Enigma of Taif": null,
     "Hawas Boa": 81.05294694000224,
-    "Hawas Sapphire": 81.22963281282284
+    "Hawas Sapphire": 81.22963281282284,
+    "Energetically New York": null,
+    "Fashionably London Elixir": null,
+    "Sunrise on the Red Sand Dunes Intense": 64.24293506591087,
+    "Conception": null,
+    "Clash Extreme": 62.774373228186306,
+    "Dynasty": null
    },
    "fora": {
     "7 Loewe": "2h na rua acima do envelope (Quente é o teto)",
@@ -310,7 +316,11 @@
     "Musamam Black": "11.5h na rua acima do envelope (Fresco é o teto)",
     "Incense 01": "12.5h na rua acima do envelope (Fresco é o teto)",
     "Belgravia": "2h na rua acima do envelope (Quente é o teto)",
-    "Enigma of Taif": "11.5h na rua acima do envelope (Fresco é o teto)"
+    "Enigma of Taif": "11.5h na rua acima do envelope (Fresco é o teto)",
+    "Energetically New York": "2h na rua acima do envelope (Quente é o teto)",
+    "Fashionably London Elixir": "8h na rua acima do envelope (Ameno é o teto)",
+    "Conception": "8h na rua acima do envelope (Ameno é o teto)",
+    "Dynasty": "4.5h na rua acima do envelope (Quente é o teto)"
    },
    "fora_sa": [
     {
@@ -546,7 +556,13 @@
     "Empire": 41.03099293886643,
     "Enigma of Taif": null,
     "Hawas Boa": 42.531116861235,
-    "Hawas Sapphire": 40.83739293886643
+    "Hawas Sapphire": 40.83739293886643,
+    "Energetically New York": 36.87388499549969,
+    "Fashionably London Elixir": null,
+    "Sunrise on the Red Sand Dunes Intense": 33.600570230527836,
+    "Conception": null,
+    "Clash Extreme": 33.83632946561047,
+    "Dynasty": 44.08766379175567
    },
    "fora": {
     "African Leather": "2h na rua acima do envelope (Ameno é o teto)",
@@ -586,7 +602,9 @@
     "Ya'e": "2h na rua acima do envelope (Ameno é o teto)",
     "Musamam Black": "3.5h na rua acima do envelope (Fresco é o teto)",
     "Incense 01": "3.5h na rua acima do envelope (Fresco é o teto)",
-    "Enigma of Taif": "3.5h na rua acima do envelope (Fresco é o teto)"
+    "Enigma of Taif": "3.5h na rua acima do envelope (Fresco é o teto)",
+    "Fashionably London Elixir": "2h na rua acima do envelope (Ameno é o teto)",
+    "Conception": "2h na rua acima do envelope (Ameno é o teto)"
    },
    "fora_sa": [
     {

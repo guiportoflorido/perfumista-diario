@@ -257,7 +257,13 @@
     "Empire": 85.01988188696836,
     "Enigma of Taif": null,
     "Hawas Boa": 86.6707247603401,
-    "Hawas Sapphire": 84.82628188696837
+    "Hawas Sapphire": 84.82628188696837,
+    "Energetically New York": 47.74315624882144,
+    "Fashionably London Elixir": null,
+    "Sunrise on the Red Sand Dunes Intense": 68.71162196845236,
+    "Conception": null,
+    "Clash Extreme": 69.50328048417019,
+    "Dynasty": 70.91892786176062
    },
    "fora": {
     "African Leather": "7.5h na rua acima do envelope (Ameno é o teto)",
@@ -303,7 +309,9 @@
     "Ya'e": "5h na rua acima do envelope (Ameno é o teto)",
     "Musamam Black": "11h na rua acima do envelope (Fresco é o teto)",
     "Incense 01": "12h na rua acima do envelope (Fresco é o teto)",
-    "Enigma of Taif": "11h na rua acima do envelope (Fresco é o teto)"
+    "Enigma of Taif": "11h na rua acima do envelope (Fresco é o teto)",
+    "Fashionably London Elixir": "5h na rua acima do envelope (Ameno é o teto)",
+    "Conception": "5h na rua acima do envelope (Ameno é o teto)"
    },
    "fora_sa": [
     {
@@ -571,7 +579,13 @@
     "Empire": 43.3808743217277,
     "Enigma of Taif": null,
     "Hawas Boa": 45.68845414807847,
-    "Hawas Sapphire": 43.1872743217277
+    "Hawas Sapphire": 43.1872743217277,
+    "Energetically New York": 38.27767901055908,
+    "Fashionably London Elixir": 42.42405957708861,
+    "Sunrise on the Red Sand Dunes Intense": 36.112088526880605,
+    "Conception": 54.746411027229584,
+    "Clash Extreme": 37.91750496024629,
+    "Dynasty": 47.30202020483464
    },
    "fora": {
     "Apotecário": "3.5h na rua acima do envelope (Fresco é o teto)",
@@ -638,6 +652,16 @@
    ],
    "custo": [
     {
+     "nome": "Conception",
+     "tier": "B",
+     "score": 54.746411027229584,
+     "sprays": 2,
+     "nota": "em casa −1",
+     "vivo_ate": 28.5,
+     "vivo_fim": true,
+     "porque": "térmico 0.88 · Cozy N 2"
+    },
+    {
      "nome": "Supremacy CE",
      "tier": "S",
      "score": 54.71522117518596,
@@ -654,16 +678,6 @@
      "sprays": 2,
      "nota": "em casa −1",
      "vivo_ate": 29.5,
-     "vivo_fim": true,
-     "porque": "térmico 0.98"
-    },
-    {
-     "nome": "Belgravia",
-     "tier": "A",
-     "score": 46.95017548659132,
-     "sprays": 3,
-     "nota": "em casa −1",
-     "vivo_ate": 25.75,
      "vivo_fim": true,
      "porque": "térmico 0.98"
     }

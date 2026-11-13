@@ -38,8 +38,8 @@ S/A fora neste slot: African Leather (S: 7.5h na rua acima do envelope (Ameno é
 | 8 | **Favonius** | Nishane | S | 2 (em casa −1) | fim | 76 | térmico 0.84 · Cozy N 2 |
 | 9 | **Liwa** | Widian | S | 2 (em casa −1) | fim | 75 | térmico 0.84 · Cozy N 2 |
 | 10 | **Gris Charnel** | BDK | S | 3 (em casa −1) | fim | 75 | térmico 0.84 · chuva ↓ · Cozy N 2 |
-**Custo do slot** (camada custo — corrida/academia, fora do ranking): Supremacy CE (S, 2 sprays, 55) · Inception (S, 2 sprays, 54) · Belgravia (A, 3 sprays, 47)
+**Custo do slot** (camada custo — corrida/academia, fora do ranking): Conception (B, 2 sprays, 55) · Supremacy CE (S, 2 sprays, 55) · Inception (S, 2 sprays, 54)
 S/A fora neste slot: Blonde Amber (S: 3.5h na rua acima do envelope (Fresco é o teto)) · Grand Soir (S: 3.5h na rua acima do envelope (Fresco é o teto)) · Ombre Nomade (S: 3.5h na rua acima do envelope (Fresco é o teto)) · Oud Satin Mood (S: 3.5h na rua acima do envelope (Fresco é o teto)) · Outlands (S: 3.5h na rua acima do envelope (Fresco é o teto)) · Radical Rose (S: 3.5h na rua acima do envelope (Fresco é o teto)) · Caden (A: 3.5h na rua acima do envelope (Fresco é o teto)) · Imperial (A: 3.5h na rua acima do envelope (Fresco é o teto))
 
-_Modelo v1.8 (dois slots · base frascos_v9, grade 71 + camada custo 11) · pesos declarados no CFG · longevidade/projeção/curva são estimativas (18 com lastro na ficha, 66 por regra) · calibrar com o diário._
+_Modelo v1.8 (dois slots · base frascos_v9, grade 71 + camada custo 11) · pesos declarados no CFG · longevidade/projeção/curva são estimativas (18 com lastro na ficha, 72 por regra) · calibrar com o diário._
 📓 Depois me diga o que usou de manhã e à noite pra eu registrar as duas linhas.

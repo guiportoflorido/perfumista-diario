@@ -248,7 +248,13 @@
     "Empire": null,
     "Enigma of Taif": 48.400000000000006,
     "Hawas Boa": 31.2308858499991,
-    "Hawas Sapphire": null
+    "Hawas Sapphire": null,
+    "Energetically New York": 33.50086980555505,
+    "Fashionably London Elixir": 47.86549344592712,
+    "Sunrise on the Red Sand Dunes Intense": 24.611750107953828,
+    "Conception": 38.074824331987486,
+    "Clash Extreme": 26.143826563942593,
+    "Dynasty": 44.99553864842945
    },
    "fora": {
     "1872 for Men": "5.5h abaixo do envelope (Ameno é o piso)",
@@ -506,7 +512,13 @@
     "Empire": null,
     "Enigma of Taif": 74.8,
     "Hawas Boa": null,
-    "Hawas Sapphire": null
+    "Hawas Sapphire": null,
+    "Energetically New York": 33.14357077247695,
+    "Fashionably London Elixir": 47.87630070368954,
+    "Sunrise on the Red Sand Dunes Intense": null,
+    "Conception": 59.083421014298494,
+    "Clash Extreme": null,
+    "Dynasty": 44.0540620800773
    },
    "fora": {
     "1872 for Men": "3.5h abaixo do envelope (Ameno é o piso)",
@@ -549,7 +561,9 @@
     "Dubai Musk": "2h abaixo do envelope (Fresco é o piso)",
     "Empire": "3.5h abaixo do envelope (Ameno é o piso)",
     "Hawas Boa": "2h abaixo do envelope (Fresco é o piso)",
-    "Hawas Sapphire": "3.5h abaixo do envelope (Ameno é o piso)"
+    "Hawas Sapphire": "3.5h abaixo do envelope (Ameno é o piso)",
+    "Sunrise on the Red Sand Dunes Intense": "2h abaixo do envelope (Fresco é o piso)",
+    "Clash Extreme": "2h abaixo do envelope (Fresco é o piso)"
    },
    "fora_sa": [
     {

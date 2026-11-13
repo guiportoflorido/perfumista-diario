@@ -256,7 +256,13 @@
     "Empire": 80.57396727707196,
     "Enigma of Taif": null,
     "Hawas Boa": 84.10489301804176,
-    "Hawas Sapphire": 80.38036727707195
+    "Hawas Sapphire": 80.38036727707195,
+    "Energetically New York": 48.08968580069552,
+    "Fashionably London Elixir": null,
+    "Sunrise on the Red Sand Dunes Intense": 66.67061944616958,
+    "Conception": null,
+    "Clash Extreme": 68.8817773692273,
+    "Dynasty": 73.27608421201822
    },
    "fora": {
     "Amyris Homme Extrait": "10.5h vivas fora de casa sem aptidão (Lazer)",
@@ -296,7 +302,9 @@
     "Musamam Black": "9h na rua acima do envelope (Fresco é o teto)",
     "Aquatica": "5.5h abaixo do envelope (Quente é o piso)",
     "Incense 01": "10h na rua acima do envelope (Fresco é o teto)",
-    "Enigma of Taif": "9h na rua acima do envelope (Fresco é o teto)"
+    "Enigma of Taif": "9h na rua acima do envelope (Fresco é o teto)",
+    "Fashionably London Elixir": "9h vivas fora de casa sem aptidão (Lazer)",
+    "Conception": "9h vivas fora de casa sem aptidão (Lazer)"
    },
    "fora_sa": [
     {
@@ -532,7 +540,13 @@
     "Empire": null,
     "Enigma of Taif": null,
     "Hawas Boa": null,
-    "Hawas Sapphire": null
+    "Hawas Sapphire": null,
+    "Energetically New York": 58.845707508327685,
+    "Fashionably London Elixir": 83.73337330421191,
+    "Sunrise on the Red Sand Dunes Intense": 45.417435063919605,
+    "Conception": 66.60609240107765,
+    "Clash Extreme": 47.21021681312836,
+    "Dynasty": 87.43238642762726
    },
    "fora": {
     "Apotecário": "2.5h na rua acima do envelope (Fresco é o teto)",
