@@ -14,13 +14,13 @@
 | 1 | **Désobéissant** | Givenchy | S | 6 (6–7 fixo) | ~14h15 | 103 | térmico 0.87 · Lazer 3 · intenção ↑ |
 | 2 | **Gentle Fluidity Silver** | MFK | S | 4 | ~16h15 | 94 | térmico 0.98 · Lazer 3 · intenção ↓ |
 | 3 | **Beach Hut Man** | Amouage | A | 3 | ~18h15 | 93 | térmico 0.93 · chuva ↓ · Lazer 3 · intenção ↑ |
-| 4 | **Crab Apple Blossom** | Clive Christian | S | 4 | ~12h30 | 91 | térmico 0.65 · Lazer 3 · intenção ↑ |
-| 5 | **Hacivat** | Nishane | S | 3 | ~17h15 | 91 | térmico 0.93 · Lazer 3 · intenção ↓ |
-| 6 | **Wild Vetiver** | Creed | A | 4 | ~13h30 | 91 | térmico 0.87 · Lazer 3 · intenção ↑ |
-| 7 | **Imagination** | Louis Vuitton | S | 3 | ~16h15 | 90 | térmico 0.92 · Lazer 2 · intenção ↑ |
-| 8 | **L'Immensité** | Louis Vuitton | A | 4 | ~16h15 | 86 | térmico 0.76 · Lazer 3 · intenção ↑ |
-| 9 | **Vibrato** | Sospiro | A | 2 | ~18h15 | 86 | térmico 0.78 · Lazer 3 · intenção ↑ |
-| 10 | **Reflection Man** | Amouage | S | 4 | ~13h30 | 86 | térmico 0.87 · Lazer 2 · intenção ↑ |
+| 4 | **Pomar** | Brasco | A | 3 | ~14h45 | 92 | térmico 0.88 · Lazer 3 · intenção ↑ |
+| 5 | **Crab Apple Blossom** | Clive Christian | S | 4 | ~12h30 | 91 | térmico 0.65 · Lazer 3 · intenção ↑ |
+| 6 | **Hacivat** | Nishane | S | 3 | ~17h15 | 91 | térmico 0.93 · Lazer 3 · intenção ↓ |
+| 7 | **Wild Vetiver** | Creed | A | 4 | ~13h30 | 91 | térmico 0.87 · Lazer 3 · intenção ↑ |
+| 8 | **Imagination** | Louis Vuitton | S | 3 | ~16h15 | 90 | térmico 0.92 · Lazer 2 · intenção ↑ |
+| 9 | **L'Immensité** | Louis Vuitton | A | 4 | ~16h15 | 86 | térmico 0.76 · Lazer 3 · intenção ↑ |
+| 10 | **Vibrato** | Sospiro | A | 2 | ~18h15 | 86 | térmico 0.78 · Lazer 3 · intenção ↑ |
 🔁 = ainda vivo na hora do banho: entra como resíduo sob o perfume da noite (informe em 'Manhã:' para o slot Noite considerar)
 S/A fora neste slot: Amyris Homme Extrait (S: 10.5h vivas fora de casa sem aptidão (Lazer)) · Bijou Zafran (S: 9h vivas fora de casa sem aptidão (Lazer)) · Blonde Amber (S: 5.5h na rua acima do envelope (Fresco é o teto)) · Bracken Man (S: 9h vivas fora de casa sem aptidão (Lazer)) · Brompton (S: 12.5h vivas fora de casa sem aptidão (Lazer)) · Decision (S: 9h vivas fora de casa sem aptidão (Lazer)) · Favonius (S: 12.5h vivas fora de casa sem aptidão (Lazer)) · Grand Soir (S: 5.5h na rua acima do envelope (Fresco é o teto))
 
@@ -40,5 +40,5 @@ S/A fora neste slot: Amyris Homme Extrait (S: 10.5h vivas fora de casa sem aptid
 | 10 | **Les Sables Roses** | Louis Vuitton | S | 2 (em casa −1) | fim | 76 | térmico 0.92 · Cozy N 2 · intenção ↓ |
 S/A fora neste slot: 1872 for Men (S: 2.5h abaixo do envelope (Ameno é o piso)) · Crab Apple Blossom (S: 2.5h abaixo do envelope (Ameno é o piso)) · Météore (S: 2.5h abaixo do envelope (Ameno é o piso)) · Tygar Extrait (S: 2.5h abaixo do envelope (Ameno é o piso)) · Anelo (A: 2.5h abaixo do envelope (Ameno é o piso)) · Blue Talisman (A: 2.5h abaixo do envelope (Ameno é o piso)) · L'Immensité (A: 2.5h abaixo do envelope (Ameno é o piso)) · Torino 21 (A: 2.5h abaixo do envelope (Ameno é o piso))
 
-_Modelo v1.8 (dois slots · base frascos_v9, grade 71 + camada custo 11) · pesos declarados no CFG · longevidade/projeção/curva são estimativas (18 com lastro na ficha, 74 por regra) · calibrar com o diário._
+_Modelo v1.8 (dois slots · base frascos_v9, grade 71 + camada custo 11) · pesos declarados no CFG · longevidade/projeção/curva são estimativas (18 com lastro na ficha, 78 por regra) · calibrar com o diário._
 📓 Depois me diga o que usou de manhã e à noite pra eu registrar as duas linhas.

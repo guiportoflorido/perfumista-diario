@@ -22,7 +22,7 @@ import { lerDuelos, duelosUnificados, pareamento, elo, fmtElo, filaDuelos, adici
   gerarCenario, textoCenario, periodoDaHora, CHUVAS, MAE_DA_SUB, brilhaCai, rotuloValor, previsao, ehZebra, META_DIA, plausiveisNoCenario, chavePar } from "./duelo.js";
 import { fotoFicha, iconeFicha, fotoMini, fotoIcone, reduzirImagem, subirFoto, removerFotoPlanilha, iniciarFotos } from "./fotos.js";
 
-export const APP_VERSAO = "5.56";  // sobe a cada publicação: confere no topo da tela se o celular pegou a versão nova
+export const APP_VERSAO = "5.57";  // sobe a cada publicação: confere no topo da tela se o celular pegou a versão nova
 const S = { dueloModo: ler("dueloModo", "agora"), rkFiltro: ler("rkFiltro", {}), cenario: null, motionOk: !movimentoPedePermissao() && "DeviceMotionEvent" in globalThis, aba: "hoje", frascos: [], frascosAtivos: [], avisosTiers: null, medidos: [], fichas: {}, versao: {}, prev: null, prevOffline: false,
   prevErro: null, metar: null, metarMotivo: null, clima: null, resultado: null, erroMotor: null, entrada: "", carregandoClima: true,
   sync: { estado: "ocioso", msg: "" }, hr: ler("hr", { preset: "tudo" }), tokenNovo: null, playbook: null, janelas: new Map(),
@@ -1363,7 +1363,7 @@ function previaRoda(g) {
     ${(() => { const ft = fotoMini(doMercado(f.casa, nome), "prev-foto");   // foto do perfume no lugar do ícone do arquétipo, se houver
       return `<span class="prev-ic${ft ? " com-foto" : ""}">${ft || arqIcone(f.arquetipo, 30)}</span>`; })()}
     <span class="prev-tx"><b>${esc(nome)}</b>${tierHTML(f.tier)}<span class="nota">${esc(f.casa)} · ${esc(f.arquetipo)}</span>
-      <span class="prev-meta">${k?.n30 || 0} uso${k?.n30 === 1 ? "" : "s"} em 30 d · último ${quando} · ${f.camada === "custo" ? "camada custo (academia/corrida)" : f.decant ? "decant de 10 ml" : `${f.janelas} janelas`}</span>
+      <span class="prev-meta">${k?.n30 || 0} uso${k?.n30 === 1 ? "" : "s"} em 30 d · último ${quando} · ${f.camada === "custo" ? "camada custo (academia/corrida)" : f.decant ? "decant de 10 ml" : f.janelas == null ? "sem janelas ainda" : `${f.janelas} janelas`}</span>
       ${fi?.perfil ? `<span class="prev-perfil">${esc(fi.perfil)}</span>` : ""}</span>
     <span class="prev-abrir">Abrir ›</span></button>`;
   box.hidden = false;

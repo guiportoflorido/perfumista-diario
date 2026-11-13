@@ -42,5 +42,5 @@ S/A fora neste slot: 1872 for Men (S: 5h abaixo do envelope (Ameno é o piso)) �
 **Custo do slot** (camada custo — corrida/academia, fora do ranking): Musamam Black (A, 2 sprays, 88) · Enigma of Taif (A, 1 sprays, 75) · Incense 01 (B, 2 sprays, 69)
 S/A fora neste slot: 1872 for Men (S: 3.5h abaixo do envelope (Ameno é o piso)) · Crab Apple Blossom (S: 3.5h abaixo do envelope (Ameno é o piso)) · Météore (S: 3.5h abaixo do envelope (Ameno é o piso)) · Tygar Extrait (S: 3.5h abaixo do envelope (Ameno é o piso)) · Anelo (A: 3.5h abaixo do envelope (Ameno é o piso)) · Blue Talisman (A: 3.5h abaixo do envelope (Ameno é o piso)) · L'Immensité (A: 3.5h abaixo do envelope (Ameno é o piso)) · Torino 21 (A: 3.5h abaixo do envelope (Ameno é o piso))
 
-_Modelo v1.8 (dois slots · base frascos_v9, grade 71 + camada custo 11) · pesos declarados no CFG · longevidade/projeção/curva são estimativas (18 com lastro na ficha, 74 por regra) · calibrar com o diário._
+_Modelo v1.8 (dois slots · base frascos_v9, grade 71 + camada custo 11) · pesos declarados no CFG · longevidade/projeção/curva são estimativas (18 com lastro na ficha, 78 por regra) · calibrar com o diário._
 📓 Depois me diga o que usou de manhã e à noite pra eu registrar as duas linhas.

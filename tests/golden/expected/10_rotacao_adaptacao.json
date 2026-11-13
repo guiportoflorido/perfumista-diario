@@ -154,6 +154,16 @@
      "porque": "térmico 0.86 · Td ↓ · T.Inf 3/N.Inf 1 · sem uso em 45+d 🕸️"
     },
     {
+     "nome": "Nosso Wood",
+     "tier": "A",
+     "score": 92.5536351915408,
+     "sprays": 3,
+     "nota": "",
+     "vivo_ate": 16.25,
+     "vivo_fim": false,
+     "porque": "térmico 1.00 · T.Inf 3/N.Inf 2 · sem uso em 45+d 🕸️"
+    },
+    {
      "nome": "Masculin Pluriel",
      "tier": "A",
      "score": 92.50225694847147,
@@ -162,16 +172,6 @@
      "vivo_ate": 15.25,
      "vivo_fim": false,
      "porque": "térmico 1.00 · T.Inf 3/N.Inf 2 · sem uso em 45+d 🕸️"
-    },
-    {
-     "nome": "Gentle Fluidity Silver",
-     "tier": "S",
-     "score": 91.10144246163972,
-     "sprays": 4,
-     "nota": "",
-     "vivo_ate": 16.25,
-     "vivo_fim": false,
-     "porque": "térmico 1.00 · T.Inf 3/N.Inf 2 · usado há 6d"
     }
    ],
    "scores": {
@@ -248,6 +248,10 @@
     "Ya'e": 73.4997798114529,
     "Bracken Man": 100.20099667822045,
     "Masculin Pluriel": 92.50225694847147,
+    "Nosso Wood": 92.5536351915408,
+    "Dueto": 67.15950424899454,
+    "Brasa": null,
+    "Pomar": 71.5517771588418,
     "Supremacy CE": null,
     "Musamam Black": null,
     "Aquatica": null,
@@ -295,6 +299,7 @@
     "Scarlet Sands": "9.5h vivas fora de casa sem aptidão (T.Inf)",
     "Serenity": "11h vivas fora de casa sem aptidão (T.Inf)",
     "Tygar Extrait": "11h vivas fora de casa sem aptidão (T.Inf)",
+    "Brasa": "11h vivas fora de casa sem aptidão (T.Inf)",
     "Supremacy CE": "9h vivas fora de casa sem aptidão (T.Inf)",
     "Musamam Black": "11h vivas fora de casa sem aptidão (T.Inf)",
     "Aquatica": "5.5h abaixo do envelope (Quente é o piso)",
@@ -525,6 +530,10 @@
     "Ya'e": 40.44480497297886,
     "Bracken Man": 54.457080765391865,
     "Masculin Pluriel": 50.89620168031628,
+    "Nosso Wood": 50.99880968031627,
+    "Dueto": 36.17917384430446,
+    "Brasa": 66.55256070266836,
+    "Pomar": 45.20497815385716,
     "Supremacy CE": 56.737613089707004,
     "Musamam Black": 84.17911631192595,
     "Aquatica": null,

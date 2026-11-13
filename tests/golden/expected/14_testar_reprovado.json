@@ -165,12 +165,12 @@
      "porque": "térmico 0.86 · Td ↓ · T.Inf 3/N.Inf 1"
     },
     {
-     "nome": "Masculin Pluriel",
+     "nome": "Nosso Wood",
      "tier": "A",
-     "score": 87.05503152675814,
+     "score": 87.06512770645305,
      "sprays": 3,
      "nota": "",
-     "vivo_ate": 15.25,
+     "vivo_ate": 16.25,
      "vivo_fim": false,
      "porque": "térmico 0.99 · T.Inf 3/N.Inf 2"
     }
@@ -249,6 +249,10 @@
     "Ya'e": 68.44291564743394,
     "Bracken Man": 93.38040408585313,
     "Masculin Pluriel": 87.05503152675814,
+    "Nosso Wood": 87.06512770645305,
+    "Dueto": 63.54413795311582,
+    "Brasa": null,
+    "Pomar": 67.58184457262409,
     "Supremacy CE": null,
     "Musamam Black": null,
     "Aquatica": null,
@@ -296,6 +300,7 @@
     "Scarlet Sands": "9.5h vivas fora de casa sem aptidão (T.Inf)",
     "Serenity": "11h vivas fora de casa sem aptidão (T.Inf)",
     "Tygar Extrait": "11h vivas fora de casa sem aptidão (T.Inf)",
+    "Brasa": "11h vivas fora de casa sem aptidão (T.Inf)",
     "Supremacy CE": "9h vivas fora de casa sem aptidão (T.Inf)",
     "Musamam Black": "11h vivas fora de casa sem aptidão (T.Inf)",
     "Aquatica": "5.5h abaixo do envelope (Quente é o piso)",
@@ -530,6 +535,10 @@
     "Ya'e": 30.930513468313492,
     "Bracken Man": 42.13717830711627,
     "Masculin Pluriel": 44.60681410178257,
+    "Nosso Wood": 44.70361410178257,
+    "Dueto": 38.5,
+    "Brasa": null,
+    "Pomar": 48.400000000000006,
     "Supremacy CE": 53.432553809813754,
     "Musamam Black": null,
     "Aquatica": 37.63983010435671,
@@ -566,6 +575,7 @@
     "Outlands": "3.5h na rua acima do envelope (Fresco é o teto)",
     "Radical Rose": "3.5h na rua acima do envelope (Fresco é o teto)",
     "Serenity": "3.5h na rua acima do envelope (Fresco é o teto)",
+    "Brasa": "3.5h na rua acima do envelope (Fresco é o teto)",
     "Musamam Black": "3.5h na rua acima do envelope (Fresco é o teto)",
     "Incense 01": "3.5h na rua acima do envelope (Fresco é o teto)",
     "Enigma of Taif": "3.5h na rua acima do envelope (Fresco é o teto)"

@@ -143,6 +143,16 @@
      "porque": "térmico 0.99 · T.Inf 3 · sem uso em 45+d 🕸️"
     },
     {
+     "nome": "Nosso Wood",
+     "tier": "A",
+     "score": 92.98712683404982,
+     "sprays": 3,
+     "nota": "",
+     "vivo_ate": 16.25,
+     "vivo_fim": false,
+     "porque": "térmico 0.99 · T.Inf 3 · sem uso em 45+d 🕸️"
+    },
+    {
      "nome": "Météore",
      "tier": "S",
      "score": 92.75801474286557,
@@ -161,16 +171,6 @@
      "vivo_ate": 12.5,
      "vivo_fim": false,
      "porque": "térmico 0.82 · Td ↓ · T.Inf 3 · sem uso em 45+d 🕸️"
-    },
-    {
-     "nome": "Montabaco Intensivo",
-     "tier": "A",
-     "score": 91.7254700478307,
-     "sprays": 3,
-     "nota": "",
-     "vivo_ate": 17.25,
-     "vivo_fim": false,
-     "porque": "térmico 0.92 · Td ↑ · T.Inf 3 · sem uso em 45+d 🕸️"
     }
    ],
    "scores": {
@@ -247,6 +247,10 @@
     "Ya'e": 73.96703270890328,
     "Bracken Man": 101.36375382956213,
     "Masculin Pluriel": 92.9902120257647,
+    "Nosso Wood": 92.98712683404982,
+    "Dueto": 67.9890767904335,
+    "Brasa": null,
+    "Pomar": 71.4022841452982,
     "Supremacy CE": null,
     "Musamam Black": null,
     "Aquatica": null,
@@ -294,6 +298,7 @@
     "Scarlet Sands": "9.5h vivas fora de casa sem aptidão (T.Inf)",
     "Serenity": "11.5h vivas fora de casa sem aptidão (T.Inf)",
     "Tygar Extrait": "11h vivas fora de casa sem aptidão (T.Inf)",
+    "Brasa": "11.5h vivas fora de casa sem aptidão (T.Inf)",
     "Supremacy CE": "9h vivas fora de casa sem aptidão (T.Inf)",
     "Musamam Black": "11.5h vivas fora de casa sem aptidão (T.Inf)",
     "Aquatica": "5.5h abaixo do envelope (Quente é o piso)",
@@ -524,6 +529,10 @@
     "Ya'e": 40.65211065869779,
     "Bracken Man": 53.66016295401688,
     "Masculin Pluriel": 51.105510542362936,
+    "Nosso Wood": 51.105510542362936,
+    "Dueto": 36.71188554820332,
+    "Brasa": 63.3826447707548,
+    "Pomar": 45.930838949607384,
     "Supremacy CE": 57.604423668230666,
     "Musamam Black": 79.68103914037745,
     "Aquatica": null,

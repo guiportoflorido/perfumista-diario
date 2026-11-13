@@ -139,6 +139,16 @@
      "porque": "térmico 0.87 · Td ↓ · T.Inf 3"
     },
     {
+     "nome": "Nosso Wood",
+     "tier": "A",
+     "score": 87.59392097536684,
+     "sprays": 3,
+     "nota": "",
+     "vivo_ate": 15.5,
+     "vivo_fim": false,
+     "porque": "térmico 1.00 · T.Inf 3"
+    },
+    {
      "nome": "Masculin Pluriel",
      "tier": "A",
      "score": 87.49193367034923,
@@ -157,16 +167,6 @@
      "vivo_ate": 16.5,
      "vivo_fim": false,
      "porque": "térmico 0.95 · Td ↑ · T.Inf 3"
-    },
-    {
-     "nome": "Wood Whisper",
-     "tier": "A",
-     "score": 85.44589989137326,
-     "sprays": 3,
-     "nota": "",
-     "vivo_ate": 16.0,
-     "vivo_fim": false,
-     "porque": "térmico 0.95 · T.Inf 3"
     }
    ],
    "scores": {
@@ -243,6 +243,10 @@
     "Ya'e": 69.49193397517008,
     "Bracken Man": 97.16781669332708,
     "Masculin Pluriel": 87.49193367034923,
+    "Nosso Wood": 87.59392097536684,
+    "Dueto": 63.572472887221274,
+    "Brasa": null,
+    "Pomar": 66.12140841746753,
     "Supremacy CE": null,
     "Musamam Black": null,
     "Aquatica": null,
@@ -290,6 +294,7 @@
     "Scarlet Sands": "9.5h vivas fora de casa sem aptidão (T.Inf)",
     "Serenity": "11.5h vivas fora de casa sem aptidão (T.Inf)",
     "Tygar Extrait": "11h vivas fora de casa sem aptidão (T.Inf)",
+    "Brasa": "11.5h vivas fora de casa sem aptidão (T.Inf)",
     "Supremacy CE": "9h vivas fora de casa sem aptidão (T.Inf)",
     "Musamam Black": "11.5h vivas fora de casa sem aptidão (T.Inf)",
     "Aquatica": "5.5h abaixo do envelope (Quente é o piso)",
@@ -520,6 +525,10 @@
     "Ya'e": 57.86406336167619,
     "Bracken Man": 77.31672898334926,
     "Masculin Pluriel": 72.79179394039292,
+    "Nosso Wood": 72.88859394039292,
+    "Dueto": null,
+    "Brasa": null,
+    "Pomar": 74.8,
     "Supremacy CE": 84.52364244384675,
     "Musamam Black": null,
     "Aquatica": null,
@@ -569,6 +578,8 @@
     "Vibrato": "3.5h vivas fora de casa sem aptidão (N.Inf)",
     "Wild Vetiver": "3.5h vivas fora de casa sem aptidão (N.Inf)",
     "Wood Whisper": "3.5h vivas fora de casa sem aptidão (N.Inf)",
+    "Dueto": "3.5h vivas fora de casa sem aptidão (N.Inf)",
+    "Brasa": "3.5h na rua acima do envelope (Fresco é o teto)",
     "Musamam Black": "3.5h na rua acima do envelope (Fresco é o teto)",
     "Aquatica": "2.5h abaixo do envelope (Quente é o piso)",
     "Incense 01": "3.5h na rua acima do envelope (Fresco é o teto)",

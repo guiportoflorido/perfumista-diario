@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-frascos_v9.py — base de dados dos 92 frascos para o modelo diário (v9, 23/out/2026 — gerado por gerador_v61.py)
+frascos_v9.py — base de dados dos 96 frascos para o modelo diário (v9, 23/out/2026 — gerado por gerador_v61.py)
 
 v9: entra Swiss Arabian Enigma of Taif na camada custo (11º; Frasco Gui, tier A — fala dele, 23/out/2026). Grade (71),
 janelas (playbook v60, 668) e todos os demais frascos idênticos à v8. Tiers conferidos com o tabelão v2.9 (espelho da
@@ -15,6 +15,8 @@ Lattafa Dynasty (A) — 14º a 19º, tiers dele, demais campos estimativa do Cla
 Decants de 10 ml contam como coleção (decisão dele, 12/nov/2026): entram na GRADE Amouage Bracken Man (S) e MFK Masculin
 Pluriel (A), marcados em DECANTES. Sem janelas no playbook até a próxima geração; o app só os mantém ativos enquanto
 houver decant de 10+ ml não esgotado na aba Amostras.
+Frascos de 10 ml da Brasco (13/nov/2026, Frasco Gui): Nosso Wood (A), Dueto (B), Brasa (B) e Pomar (A) entram na GRADE,
+sem janelas até a próxima geração; tiers dele, demais campos estimativa do Claude (pirâmide Fragrantica).
 
 v8: entram Blue Sapphire Supercharged (grade, S) e Empire (camada custo, A); Bedouin Rose D→C entra na grade.
 
@@ -23,8 +25,8 @@ Fontes, por campo:
         = array DATA do mapa climático (v4, 25/set/2026), derivado das fichas técnicas.
         chuva = índice hipótese do Claude (nota a nota sobre a pirâmide), não dado medido.
   FICHA (conc, eixo, aptidão, sprays_base, janelas)
-        = transcritos das fichas_tecnicas_v11.md (grade 73, sendo 2 decants, + camada custo 19).
-        Validação embutida: 92 frascos · camada custo 19 · Td grade C21/S26/N26 · janelas = 668.
+        = transcritos das fichas_tecnicas_v11.md (grade 77, sendo 2 decants e 4 frascos de 10 ml, + camada custo 19).
+        Validação embutida: 96 frascos · camada custo 19 · Td grade C23/S27/N27 · janelas = 668.
   NOVO  (longevidade_h, projecao, curva)
         = ESTIMATIVA derivada por regra (concentração × peso × doçura) + overrides onde a
         Leitura da ficha traz dado (beast, projeção íntima, relatos de horas). Nada aqui é
@@ -113,6 +115,10 @@ MAPA = [
  {"n":"Ya'e","casa":"Hind Al Oud","arq":"Empoado","t":"B","td":"N","p":3,"d":1,"a":2,"b":3,"c":0,"r":0.35,"u":0},
  {"n":"Bracken Man","casa":"Amouage","arq":"Barbeiro","t":"S","td":"N","p":3,"d":1,"a":2,"b":5,"c":0,"r":0.3,"u":0},   # 12/nov/2026: decant 10 ml na grade — estimativa do Claude
  {"n":"Masculin Pluriel","casa":"MFK","arq":"Barbeiro","t":"A","td":"N","p":3,"d":0,"a":1,"b":4,"c":0,"r":0.3,"u":0},   # 12/nov/2026: decant 10 ml na grade — estimativa do Claude
+ {"n":"Nosso Wood","casa":"Brasco","arq":"Marceneiro","t":"A","td":"N","p":3,"d":1,"a":1,"b":4,"c":0,"r":0.2,"u":0},   # 13/nov/2026: frasco de 10 ml na grade — estimativa do Claude
+ {"n":"Dueto","casa":"Brasco","arq":"Botânico","t":"B","td":"C","p":2,"d":1,"a":0,"b":3,"c":0,"r":-0.3,"u":0},   # 13/nov/2026: frasco de 10 ml na grade — estimativa do Claude
+ {"n":"Brasa","casa":"Brasco","arq":"Lareira","t":"B","td":"S","p":4,"d":2,"a":3,"b":5,"c":0,"r":0.5,"u":0},   # 13/nov/2026: frasco de 10 ml na grade — estimativa do Claude
+ {"n":"Pomar","casa":"Brasco","arq":"Confeiteiro","t":"A","td":"C","p":2,"d":2,"a":0,"b":3,"c":0,"r":-0.2,"u":0},   # 13/nov/2026: frasco de 10 ml na grade — estimativa do Claude
  {"n":"Supremacy CE","casa":"Afnan","arq":"Chiprista","t":"S","td":"N","p":3,"d":1,"a":1,"b":3,"c":1,"r":0.17,"u":1},
  {"n":"Musamam Black","casa":"Lattafa","arq":"Lareira","t":"A","td":"S","p":4,"d":3,"a":3,"b":5,"c":1,"r":0.0,"u":1},
  {"n":"Aquatica","casa":"Rayhaan","arq":"Marinho","t":"B","td":"C","p":1,"d":0,"a":0,"b":1,"c":1,"r":-1.0,"u":1},
@@ -211,6 +217,11 @@ FICHA = {
  # decants de 10 ml na grade (janelas = None até a próxima geração do playbook)
  "Bracken Man": ("EDP", "P", "T.Inf 3 · T.For 3 · N.Inf 2 · N.For 2", 3, None),
  "Masculin Pluriel": ("EDT", "P", "T.Inf 3 · T.For 3 · N.Inf 2 · N.For 2", 3, None),
+ # frascos de 10 ml da Brasco na grade (janelas = None até a próxima geração do playbook)
+ "Nosso Wood": ("EDP", "P", "Lazer 2 · T.Inf 3 · T.For 2 · N.Inf 2", 3, None),
+ "Dueto": ("EDP", "F", "Lazer 3 · T.Inf 3", 3, None),
+ "Brasa": ("EDP", "S", "N.Inf 3 · N.For 2 · Cozy N 3", 2, None),
+ "Pomar": ("EDP", "S", "Lazer 3 · T.Inf 2 · N.Inf 2", 3, None),
  # camada custo (janelas = None: fora da grade)
  "Supremacy CE": ("EDP", "F", "Lazer 3 · N.Inf 2", 3, None),
  "Musamam Black": ("EDP", "S", "N.Inf 2 · Cozy N 3", 3, None),
@@ -323,20 +334,20 @@ def carregar():
             "edt": "edt" in conc.lower(),
         })
     # validações
-    assert len(frascos) == 92, len(frascos)
+    assert len(frascos) == 96, len(frascos)
     grade = [f for f in frascos if not f["custo"]]
-    assert len(grade) == 73
+    assert len(grade) == 77
     custo = [f for f in frascos if f["custo"]]
     assert len(custo) == 19, len(custo)
     td_cnt = {k: sum(1 for f in grade if f["td"] == k) for k in "CSN"}
-    assert td_cnt == {"C": 21, "S": 26, "N": 26}, td_cnt
+    assert td_cnt == {"C": 23, "S": 27, "N": 27}, td_cnt
     assert sum(f["janelas"] or 0 for f in grade) == 668, sum(f["janelas"] or 0 for f in grade)
     tiers = {k: sum(1 for f in frascos if f["tier"] == k) for k in "SABCD"}
-    assert tiers == {"S": 35, "A": 37, "B": 17, "C": 3, "D": 0}, tiers
+    assert tiers == {"S": 35, "A": 39, "B": 19, "C": 3, "D": 0}, tiers
     return frascos
 
 
 if __name__ == "__main__":
     fr = carregar()
-    print("OK — 92 frascos (grade 73 + camada custo 19) · Td grade C21/S26/N26 · janelas 668 · tiers", {k: sum(1 for f in fr if f['tier']==k) for k in 'SABCD'})
+    print("OK — 96 frascos (grade 77 + camada custo 19) · Td grade C23/S27/N27 · janelas 668 · tiers", {k: sum(1 for f in fr if f['tier']==k) for k in 'SABCD'})
     print("perf por leitura:", sum(1 for f in fr if f["perf_origem"] == "leitura"), "· por regra:", sum(1 for f in fr if f["perf_origem"] == "regra"))

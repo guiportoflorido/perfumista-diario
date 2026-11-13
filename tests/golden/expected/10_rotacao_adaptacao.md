@@ -20,8 +20,8 @@
 | 6 | **Reflection Man** | Amouage | S | 4 | ~13h30 | 95 | térmico 0.90 · Td ↓ · T.Inf 3 · sem uso em 45+d 🕸️ |
 | 7 | **Météore** | Louis Vuitton | S | 3 | ~13h30 | 93 | térmico 0.86 · Td ↓ · T.Inf 3 · sem uso em 45+d 🕸️ |
 | 8 | **1872 for Men** | Clive Christian | S | 4 | ~12h30 | 93 | térmico 0.86 · Td ↓ · T.Inf 3/N.Inf 1 · sem uso em 45+d 🕸️ |
-| 9 | **Masculin Pluriel** | MFK | A | 3 | ~15h15 | 93 | térmico 1.00 · T.Inf 3/N.Inf 2 · sem uso em 45+d 🕸️ |
-| 10 | **Gentle Fluidity Silver** | MFK | S | 4 | ~16h15 | 91 | térmico 1.00 · T.Inf 3/N.Inf 2 · usado há 6d |
+| 9 | **Nosso Wood** | Brasco | A | 3 | ~16h15 | 93 | térmico 1.00 · T.Inf 3/N.Inf 2 · sem uso em 45+d 🕸️ |
+| 10 | **Masculin Pluriel** | MFK | A | 3 | ~15h15 | 93 | térmico 1.00 · T.Inf 3/N.Inf 2 · sem uso em 45+d 🕸️ |
 🔁 = ainda vivo na hora do banho: entra como resíduo sob o perfume da noite (informe em 'Manhã:' para o slot Noite considerar)
 S/A fora neste slot: Blonde Amber (S: 11h vivas fora de casa sem aptidão (T.Inf)) · Blue Sapphire Supercharged (S: 11h vivas fora de casa sem aptidão (T.Inf)) · Brompton (S: 11h vivas fora de casa sem aptidão (T.Inf)) · Favonius (S: 11h vivas fora de casa sem aptidão (T.Inf)) · Grand Soir (S: 11h vivas fora de casa sem aptidão (T.Inf)) · Les Sables Roses (S: 10.5h vivas fora de casa sem aptidão (T.Inf)) · Liwa (S: 11h vivas fora de casa sem aptidão (T.Inf)) · Odéon (S: 9.5h vivas fora de casa sem aptidão (T.Inf))
 
@@ -40,5 +40,5 @@ S/A fora neste slot: Blonde Amber (S: 11h vivas fora de casa sem aptidão (T.Inf
 | 9 | **Les Sables Roses** | Louis Vuitton | S | 2 (em casa −1) | fim | 83 | térmico 0.89 · Cozy N 2 · sem uso em 45+d 🕸️ |
 | 10 | **Favonius** | Nishane | S | 2 (em casa −1) | fim | 83 | térmico 0.89 · Cozy N 2 · sem uso em 45+d 🕸️ |
 
-_Modelo v1.8 (dois slots · base frascos_v9, grade 71 + camada custo 11) · pesos declarados no CFG · longevidade/projeção/curva são estimativas (18 com lastro na ficha, 74 por regra) · calibrar com o diário._
+_Modelo v1.8 (dois slots · base frascos_v9, grade 71 + camada custo 11) · pesos declarados no CFG · longevidade/projeção/curva são estimativas (18 com lastro na ficha, 78 por regra) · calibrar com o diário._
 📓 Depois me diga o que usou de manhã e à noite pra eu registrar as duas linhas.

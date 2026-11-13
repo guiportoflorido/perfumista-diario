@@ -49,7 +49,7 @@ def extrair_frascos():
             **({"decant": True} if f["nome"] in getattr(FV, "DECANTES", set()) else {}),
         })
     grade = [f for f in out if f["camada"] == "grade" and f["tier"] != "D"]
-    assert len(out) == 92 and len(grade) == 73, (len(out), len(grade))
+    assert len(out) == 96 and len(grade) == 77, (len(out), len(grade))
     assert sum(1 for f in out if f["camada"] == "custo") == 19
     assert sum(f["janelas"] or 0 for f in out) == 668
     return out

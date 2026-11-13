@@ -144,6 +144,16 @@
      "porque": "térmico 0.86 · Td ↓ · T.Inf 3"
     },
     {
+     "nome": "Nosso Wood",
+     "tier": "A",
+     "score": 85.46234466924453,
+     "sprays": 3,
+     "nota": "",
+     "vivo_ate": 16.25,
+     "vivo_fim": false,
+     "porque": "térmico 1.00 · T.Inf 3"
+    },
+    {
      "nome": "Masculin Pluriel",
      "tier": "A",
      "score": 85.39939153079084,
@@ -152,16 +162,6 @@
      "vivo_ate": 15.25,
      "vivo_fim": false,
      "porque": "térmico 1.00 · T.Inf 3"
-    },
-    {
-     "nome": "1872 for Men",
-     "tier": "S",
-     "score": 85.12195669620812,
-     "sprays": 4,
-     "nota": "",
-     "vivo_ate": 12.5,
-     "vivo_fim": false,
-     "porque": "térmico 0.86 · Td ↓ · T.Inf 3"
     }
    ],
    "scores": {
@@ -238,6 +238,10 @@
     "Ya'e": 67.8659105323536,
     "Bracken Man": 92.43310087281725,
     "Masculin Pluriel": 85.39939153079084,
+    "Nosso Wood": 85.46234466924453,
+    "Dueto": 61.99271043007752,
+    "Brasa": null,
+    "Pomar": 66.1883616187145,
     "Supremacy CE": null,
     "Musamam Black": null,
     "Aquatica": null,
@@ -285,6 +289,7 @@
     "Scarlet Sands": "9.5h vivas fora de casa sem aptidão (T.Inf)",
     "Serenity": "11h vivas fora de casa sem aptidão (T.Inf)",
     "Tygar Extrait": "11h vivas fora de casa sem aptidão (T.Inf)",
+    "Brasa": "11h vivas fora de casa sem aptidão (T.Inf)",
     "Supremacy CE": "9h vivas fora de casa sem aptidão (T.Inf)",
     "Musamam Black": "11h vivas fora de casa sem aptidão (T.Inf)",
     "Aquatica": "5.5h abaixo do envelope (Quente é o piso)",
