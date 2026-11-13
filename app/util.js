@@ -3,8 +3,11 @@ import { FAIXAS } from "../engine/index.js";
 
 export const $ = (s, el = document) => el.querySelector(s);
 export const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
-export const ROT_OC = { Lazer: "Lazer", "T.Inf": "Trab. Informal", "T.For": "Trab. Formal", "N.Inf": "Noite Informal", "N.For": "Noite Formal", "Cozy D": "Cozy Dia", "Cozy N": "Cozy Noite" };
-export const OCAS_TODAS = Object.keys(ROT_OC);
+export const ROT_OC = { Lazer: "Lazer", "T.Inf": "Trab. Informal", "T.For": "Trab. Formal", "N.Inf": "Noite Informal", "N.For": "Noite Formal", "Cozy D": "Cozy Dia", "Cozy N": "Cozy Noite", Esporte: "Esporte" };
+/** As 7 ocasiões do motor e do playbook (janelas, células, filtros). */
+export const OCAS_TODAS = ["Lazer", "T.Inf", "T.For", "N.Inf", "N.For", "Cozy D", "Cozy N"];
+/** Ocasiões que dá para registrar no diário: as 7 + Esporte (corrida/academia — camada custo; fica fora do playbook). */
+export const OCAS_REGISTRO = [...OCAS_TODAS, "Esporte"];
 export const faixaHTML = idx => `<span class="pinta f${idx}" aria-hidden="true"></span>${FAIXAS[idx]}`;
 export const pinta = idx => `<span class="pinta f${idx}" aria-hidden="true"></span>`;
 export const nf = (x, d = 1) => (x == null || x === "" || Number.isNaN(Number(x)) ? "—" : Number(x).toLocaleString("pt-BR", { maximumFractionDigits: d }));

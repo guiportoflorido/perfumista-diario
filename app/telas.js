@@ -3,7 +3,7 @@ import { FAIXAS, faixaIdx } from "../engine/index.js";
 import { nomeDoDia } from "./diversao.js";
 import { esc, ROT_OC, OCAS_TODAS, pinta, faixaHTML, nf, tierHTML, slotNome, slotIcone, md, ordsDe, compararMulti, cmpValor, cabOrd, painelOrd, OPC_AMOSTRA, passaAmostra, temFiltro } from "./util.js";
 import { chave } from "./mercado.js";
-import { contagens, agrupar, esquecidos, usoVsJanelas, calibracao, deAnalise, ehUso, notaPorFrascoFaixa, aderenciaPlaybook, concentracao, usoPorTier, porDiaSemana, constancia, sobrevivencia } from "./estatisticas.js";
+import { contagens, agrupar, esquecidos, rankingSemUso, usoVsJanelas, calibracao, deAnalise, ehUso, notaPorFrascoFaixa, aderenciaPlaybook, concentracao, usoPorTier, porDiaSemana, constancia, sobrevivencia } from "./estatisticas.js";
 import { arqIcone, corArq, ARQ_PATHS } from "./icones.js";
 import { dadosMandala, blocoMandala, dadosTermometro, blocoTermometro, dadosRio, blocoRio, dadosDiaNoite, blocoDiaNoite } from "./graficos.js";
 
@@ -275,6 +275,14 @@ export function telaAnalises({ mdPer = "tudo", arquetipos = [], frascos, hist: h
     ${(() => { const item = x => `<article class="card compacto"><span class="pos">${tierHTML(x.f.tier)}</span><div style="min-width:0"><button class="nome" data-ficha="${esc(x.f.nome)}">${esc(x.f.nome)}</button><div class="casa">${arqTag(x.f.arquetipo, 13)} · ${x.f.janelas} janelas</div></div><span class="nota">${quando(ultimoUso.get(x.f.nome)?.dias ?? null)}</span></article>`;
       return `<div class="lista">${esq.slice(0, 8).map(item).join("")}</div>${esq.length > 8 ? `<details><summary>Ver os outros ${esq.length - 8}</summary><div class="lista" style="margin-top:8px">${esq.slice(8).map(item).join("")}</div></details>` : ""}`; })()}
   </div>
+
+  ${(() => { const rk = rankingSemUso(ultimoUso), maxD = Math.max(1, ...rk.map(x => x.dias ?? 0));
+    const linha = (x, i) => `<li class="rk-su${x.dias == null || x.dias >= limiteEsq ? " velho" : ""}"><span class="rk-n">${i + 1}</span>${tierHTML(x.f.tier)}<button class="nome-inline" data-ficha="${esc(x.f.nome)}">${esc(x.f.nome)}</button>
+      <span class="rk-barra"><span style="width:${x.dias == null ? 100 : (x.dias / maxD) * 100}%"></span></span><b class="rk-d">${x.dias == null ? "sem registro" : x.dias === 0 ? "hoje" : `${x.dias} d`}</b></li>`;
+    return `<div class="bloco"><h3>Dias sem uso · ranking</h3>
+    <p class="nota">Todos os frascos da grade, do que está parado há mais tempo para o mais recente. Conta pelo diário inteiro até hoje (não muda com o período); 2ª aplicação vale como uso. Em destaque, ${limiteEsq}+ dias.</p>
+    <ol class="rk-sem-uso">${rk.slice(0, 15).map(linha).join("")}</ol>
+    ${rk.length > 15 ? `<details><summary>Ver os outros ${rk.length - 15}</summary><ol class="rk-sem-uso" start="16">${rk.slice(15).map((x, i) => linha(x, i + 15)).join("")}</ol></details>` : ""}</div>`; })()}
 
   <div class="bloco"><h3>Uso × janelas do playbook</h3>
     <p class="nota">Esperado = seus ${c.total} usos repartidos pelas janelas de cada frasco. Mostra quem você usa mais do que o playbook prevê.</p>
