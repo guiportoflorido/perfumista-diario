@@ -202,3 +202,11 @@ test("uso conta a 2ª aplicação (M2/N2): Les Sables Roses usado como N2 não a
   const esq = esquecidos(c.por).map(x => x.f.nome);
   assert.ok(!esq.includes("Les Sables Roses") && !esq.includes("Black Saffron Absolu"));
 });
+
+test("ranking de dias sem uso: sem registro primeiro, depois do mais parado ao mais recente", async () => {
+  const { rankingSemUso, ocasiaoCod } = await import("../app/estatisticas.js");
+  const fx = nome => ({ nome, tier: "A" }), por = new Map([["A", { f: fx("A"), dias: 3 }], ["B", { f: fx("B"), dias: null }], ["C", { f: fx("C"), dias: 60 }]]);
+  assert.deepEqual(rankingSemUso(por).map(x => x.f.nome), ["B", "C", "A"]);
+  assert.equal(ocasiaoCod("Esporte"), null, "Esporte não é ocasião do motor (fica fora de janelas e aptidão)");
+  assert.equal(ocasiaoCod("Trab. Informal"), "T.Inf");
+});

@@ -167,7 +167,7 @@ export function confete(alvo) {
 // ───────────────────────── spray ao registrar ─────────────────────────
 /** Overlay com um frasco que borrifa `sprays` vezes. Resolve quando termina (ou quando ele toca para pular). */
 export function animarSpray({ sprays, nome, arquetipo }) {
-  const n = Math.max(1, Math.min(Number(sprays) || 1, 10));
+  const n = Math.max(1, Math.min(Math.round(Number(sprays)) || 1, 99));   // a quantidade que ele registrou (99 = só trava contra erro de digitação)
   if (semMovimento()) return Promise.resolve();
   const cor = corArq(arquetipo) === "currentColor" ? "#9aa4ff" : corArq(arquetipo);
   return new Promise(resolve => {
@@ -210,12 +210,13 @@ export function animarSpray({ sprays, nome, arquetipo }) {
     };
     requestAnimationFrame(passo);
     const timers = [];
-    for (let i = 0; i < n; i++) timers.push(setTimeout(puff, 350 + i * 480));
+    const passoMs = n <= 10 ? 480 : Math.max(160, 4800 / n);   // muitos sprays: mais rápidos, a animação fica em ~5 s
+    for (let i = 0; i < n; i++) timers.push(setTimeout(puff, 350 + i * passoMs));
     const encerrar = () => {
       if (fim) return; fim = true; timers.forEach(clearTimeout);
       ov.classList.add("saindo"); setTimeout(() => { ov.remove(); resolve(); }, 450);
     };
-    timers.push(setTimeout(encerrar, 350 + n * 480 + 1100));
+    timers.push(setTimeout(encerrar, 350 + n * passoMs + 1100));
     ov.addEventListener("click", encerrar);
   });
 }

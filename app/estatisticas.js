@@ -67,6 +67,13 @@ export function esquecidos(por, limite = 45) {
     .sort((a, b) => "SABC".indexOf(a.f.tier) - "SABC".indexOf(b.f.tier) || (b.dias ?? 1e9) - (a.dias ?? 1e9) || a.f.nome.localeCompare(b.f.nome));
 }
 
+/** Ranking de dias sem uso: todos os frascos de `por` (contagens…por), do parado há mais tempo para o mais recente.
+ *  Sem registro no diário vem primeiro; empate → tier (S antes) e nome. */
+export function rankingSemUso(por) {
+  return [...por.values()].sort((a, b) => (b.dias ?? Infinity) - (a.dias ?? Infinity)
+    || "SABCD".indexOf(a.f.tier) - "SABCD".indexOf(b.f.tier) || a.f.nome.localeCompare(b.f.nome, "pt"));
+}
+
 /** Uso × janelas: participação de cada frasco nos usos vs. participação nas janelas do playbook (668 desde 23/out/2026, playbook v60). */
 export function usoVsJanelas(por) {
   const totJ = [...por.values()].reduce((s, c) => s + (c.f.janelas || 0), 0);
@@ -123,7 +130,7 @@ export function notaPorFrascoFaixa(hist, frascos) {
     faixas: new Map([...a.faixas].sort((x, y) => x[0] - y[0]).map(([i, fx]) => [i, { n: fx.n, media: fx.soma / fx.n }])) }]));
 }
 
-const OC_DO_ROTULO = Object.fromEntries(Object.entries(ROT_OC).map(([k, v]) => [v, k]));
+const OC_DO_ROTULO = Object.fromEntries(Object.entries(ROT_OC).filter(([k]) => OCASIOES.includes(k)).map(([k, v]) => [v, k]));   // Esporte fica fora (não é ocasião do motor)
 /** Ocasião do registro no código do engine (T.Inf, Cozy N…); aceita o rótulo de tela (“Trab. Informal”). */
 export const ocasiaoCod = v => { const s = String(v ?? "").trim(); return OCASIOES.includes(s) ? s : OC_DO_ROTULO[s] || null; };
 

@@ -42,3 +42,14 @@ test("Análises com período: “sem uso” mostra os dias pelo diário inteiro,
   assert.match(h, /data-ficha="B">B<\/button>[\s\S]*?há 22 d/);
   assert.doesNotMatch(h, /data-raspa/);
 });
+
+test("Análises: ranking de dias sem uso com todos os frascos da grade, do mais parado ao mais recente", async () => {
+  const { telaAnalises } = await import("../app/telas.js");
+  const f = nome => ({ nome, casa: "X", tier: "A", arquetipo: "Rosal", camada: "grade", janelas: 3 });
+  const h = telaAnalises({ frascos: [f("A"), f("B"), f("C")], hist: [{ data: "2026-10-20", slot: "M", perfume: "B" }, { data: "2026-11-08", slot: "N", perfume: "A" }],
+    hoje: "2026-11-11", fila: [], ajSpray: {}, janelas: new Map(), hr: {}, arqTag: x => x });
+  const rk = h.slice(h.indexOf("Dias sem uso · ranking"));
+  const pos = n => rk.indexOf(`data-ficha="${n}"`);
+  assert.ok(pos("C") < pos("B") && pos("B") < pos("A"));
+  assert.match(rk, /sem registro[\s\S]*22 d[\s\S]*3 d/);
+});

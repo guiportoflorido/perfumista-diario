@@ -9,7 +9,7 @@ import { lerTiers, lerDiario, aplicarTiers, aplicarMedicoes, MEDICOES_PADRAO, di
 import { janelasPorFrasco, ajustarSprays, ehUso, usoPorDia, notaPorFrascoFaixa, sobrevivencia, resumoMes } from "./estatisticas.js";
 import { telaColecao, telaPlaybook, telaHistorico, telaAnalises, idRegistro, periodo } from "./telas.js";
 import { telaRoda } from "./roda.js";
-import { ordsDe, tocarOrd, mudarOrds, slotNome, slotBase, slotIcone, opcoesSlot, slotExpandido } from "./util.js";
+import { ROT_OC, OCAS_REGISTRO, ordsDe, tocarOrd, mudarOrds, slotNome, slotBase, slotIcone, opcoesSlot, slotExpandido } from "./util.js";
 import { definirCores, arqTag, arqIcone, corArq, humorDoSlot, humorSVG } from "./icones.js";
 import { confete, ceuHTML, abrirRoleta, animarSpray, nomeDoDia, definirMateriais, ativarChacoalho, pedirMovimento, movimentoPedePermissao } from "./diversao.js";
 import { chave as mercadoChave, telaMercado, fichaEditavel, camposAlterados, baseComTiers, deLinhas, linhasParaCriar, cachePlanilha, baixarMercado, criarNaPlanilha, editarNaPlanilha, adicionarNaPlanilha, removerNaPlanilha, fotoNoCache } from "./mercado.js";
@@ -22,7 +22,7 @@ import { lerDuelos, duelosUnificados, pareamento, elo, fmtElo, filaDuelos, adici
   gerarCenario, textoCenario, periodoDaHora, CHUVAS, MAE_DA_SUB, brilhaCai, rotuloValor, previsao, ehZebra, META_DIA, plausiveisNoCenario, chavePar } from "./duelo.js";
 import { fotoFicha, iconeFicha, fotoMini, fotoIcone, reduzirImagem, subirFoto, removerFotoPlanilha, iniciarFotos } from "./fotos.js";
 
-export const APP_VERSAO = "5.54";  // sobe a cada publicação: confere no topo da tela se o celular pegou a versão nova
+export const APP_VERSAO = "5.55";  // sobe a cada publicação: confere no topo da tela se o celular pegou a versão nova
 const S = { dueloModo: ler("dueloModo", "agora"), rkFiltro: ler("rkFiltro", {}), cenario: null, motionOk: !movimentoPedePermissao() && "DeviceMotionEvent" in globalThis, aba: "hoje", frascos: [], frascosAtivos: [], avisosTiers: null, medidos: [], fichas: {}, versao: {}, prev: null, prevOffline: false,
   prevErro: null, metar: null, metarMotivo: null, clima: null, resultado: null, erroMotor: null, entrada: "", carregandoClima: true,
   sync: { estado: "ocioso", msg: "" }, hr: ler("hr", { preset: "tudo" }), tokenNovo: null, playbook: null, janelas: new Map(),
@@ -71,8 +71,6 @@ function segmentosGrupo(grupo) {
 }
 const $ = (s, el = document) => el.querySelector(s);
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
-const ROT_OC = { Lazer: "Lazer", "T.Inf": "Trab. Informal", "T.For": "Trab. Formal", "N.Inf": "Noite Informal", "N.For": "Noite Formal", "Cozy D": "Cozy Dia", "Cozy N": "Cozy Noite" };
-const OCAS_TODAS = Object.keys(ROT_OC);
 const AMB = { rua: "rua", ac: "AC", casa: "casa" };
 let toastT;
 function toast(msg) {
@@ -683,7 +681,7 @@ function formRegistro(p = {}) {
       <label>Data<input type="date" id="rg-data" value="${esc(p.data || hoje)}" max="${hoje}" required></label>
       <label>Slot<select id="rg-slot">${opcoesSlot(slot)}</select></label>
       <label class="largo">Perfume<input id="rg-perfume" list="rg-nomes" value="${esc(p.perfume || "")}" placeholder="Nome no diário" required></label>
-      <label>Ocasião<select id="rg-ocasiao"><option value="">—</option>${OCAS_TODAS.map(o => `<option value="${o}" ${p.ocasiao === o ? "selected" : ""}>${ROT_OC[o]}</option>`).join("")}</select></label>
+      <label>Ocasião<select id="rg-ocasiao"><option value="">—</option>${OCAS_REGISTRO.map(o => `<option value="${o}" ${(p.ocasiao || (p.slot === "E" ? "Esporte" : "")) === o ? "selected" : ""}>${ROT_OC[o]}</option>`).join("")}</select></label>
       <label>Sprays reais<input id="rg-sprays" inputmode="numeric" value="${esc(p.sprays ?? "")}" placeholder="${p.sugerido ? `sugerido ${p.sugerido}` : ""}"></label>
       <div class="campo largo"><span>NotaDia (fit do slot, 1–5)</span>${chipsNota("rg-nota")}</div>
       <div class="largo" id="rg-vivo-box" style="display:contents">${blocoVivo("rg", p.data || hoje, slot)}</div>
@@ -763,7 +761,7 @@ function desenharEdicaoRegistro(salvando = "") {
         <label>Data<input type="date" id="ed-data" value="${esc(r.data)}" min="${lim}" max="${hoje}" required></label>
         <label>Slot<select id="ed-slot">${opcoesSlot(r.slot)}</select></label>
         <label class="largo">Perfume<input id="ed-perfume" list="ed-nomes" value="${esc(r.perfume)}" required></label>
-        <label>Ocasião<select id="ed-ocasiao"><option value="">—</option>${OCAS_TODAS.map(o => `<option value="${o}" ${r.ocasiao === o ? "selected" : ""}>${ROT_OC[o]}</option>`).join("")}</select></label>
+        <label>Ocasião<select id="ed-ocasiao"><option value="">—</option>${OCAS_REGISTRO.map(o => `<option value="${o}" ${r.ocasiao === o ? "selected" : ""}>${ROT_OC[o]}</option>`).join("")}</select></label>
         <label>Sprays<input id="ed-sprays" inputmode="numeric" value="${esc(r.sprays || "")}"></label>
         <div class="campo largo"><span>NotaDia (1–5)</span>${chipsNota("ed-nota", r.notaDia || "")}</div>
         <div class="largo" id="ed-vivo-box" style="display:contents">${blocoVivo("ed", r.data, r.slot, r.vivo)}</div>

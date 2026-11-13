@@ -765,3 +765,14 @@ select[disabled], input[readonly], textarea[readonly] { opacity: .75; }
 .dianoite .dn-fita:hover { fill-opacity: .7; }
 .dianoite .dn-rot { font: 600 13px var(--f); fill: var(--tinta); }
 .dn-cab { display: flex; justify-content: space-between; font: 700 12px var(--f); color: var(--suave); padding: 0 6px; }
+
+/* ranking de dias sem uso (Análises) */
+.rk-sem-uso { list-style: none; margin: 6px 0 0; padding: 0; display: grid; gap: 4px; }
+.rk-su { display: grid; grid-template-columns: 18px auto minmax(0, 1fr) 40px 64px; gap: 5px; align-items: center; font-size: 14px; }
+.rk-su .nome-inline { text-align: left; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rk-su .rk-n { color: var(--suave); font-size: 12px; text-align: right; }
+.rk-su .rk-barra { height: 6px; border-radius: 99px; background: var(--linha); overflow: hidden; }
+.rk-su .rk-barra span { display: block; height: 100%; background: var(--suave); border-radius: 99px; }
+.rk-su.velho .rk-barra span { background: #e0645c; }
+.rk-su .rk-d { text-align: right; font-size: 13px; white-space: nowrap; }
+.rk-su.velho .rk-d { color: #e0645c; }
