@@ -54,7 +54,7 @@ var DONOS_AMOSTRA = ['', 'Gui', 'Bia'], TIPOS_AMOSTRA = ['Amostra', 'Decant'], S
 var DIAS_EDITAVEIS = 30;   // editar/apagar no Diário: só registros com data a partir de hoje − 30 dias
 // Slot: M (Dia) · M2 (2ª aplicação do Dia) · E (Esportes) · N (Noite) · N2 (2ª aplicação da Noite) — nesta ordem no dia
 var SLOTS = ['M', 'M2', 'E', 'N', 'N2'];
-var OCASIOES = ['Lazer', 'T.Inf', 'T.For', 'N.Inf', 'N.For', 'Cozy D', 'Cozy N'];
+var OCASIOES = ['Lazer', 'T.Inf', 'T.For', 'N.Inf', 'N.For', 'Cozy D', 'Cozy N', 'Esporte'];   // Esporte: só no Diário (corrida/academia)
 
 function doPost(e) {
   var req;
