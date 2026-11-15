@@ -20,10 +20,11 @@
  *        primeira gravação e completa os cabeçalhos G–M de uma aba antiga) · duelos (lê a aba).
  * Regras da planilha: data como texto AAAA-MM-DD; campo vazio = ""; linhas existentes do Diário só mudam por
  *   editarRegistro/removerRegistro (pedido explícito do usuário no app, só registros recentes);
- * aba Frascos é só fórmula (nunca escrita aqui).
+ * aba Frascos é só fórmula (nunca escrita aqui). Aba Coleção: ele gere a coleção por ali (o app a lê em `dados`); mudar
+ *   Tier/Posse pelo app também atualiza Tier/Ativo da linha correspondente.
  */
 
-var ABA_TIERS = 'Tiers', ABA_DIARIO = 'Diário', ABA_FRASCOS = 'Frascos', ABA_MERCADO = 'Mercado';
+var ABA_TIERS = 'Tiers', ABA_DIARIO = 'Diário', ABA_FRASCOS = 'Frascos', ABA_MERCADO = 'Mercado', ABA_COLECAO = 'Coleção';
 var COLS_MERCADO = ['Casa', 'Perfume', 'Tier', 'Posse', 'Arquétipo', 'Resumo', 'Topo', 'Coração', 'Base', 'Nariz', 'Wishlist', 'Atualizado em'];
 var EDITAVEIS = ['Tier', 'Posse', 'Arquétipo', 'Resumo', 'Topo', 'Coração', 'Base', 'Nariz', 'Wishlist', 'Notas'];   // Foto: só por subirFoto/removerFoto
 var ABA_FOTOS = 'Fotos', COLS_FOTOS = ['Casa', 'Perfume', 'Versão', 'Tipo'];
@@ -131,7 +132,9 @@ function valores_(nome) {
 function dados_() {
   var t = valores_(ABA_TIERS), d = valores_(ABA_DIARIO), f = [];
   try { f = valores_(ABA_FRASCOS); } catch (err) { f = []; }
-  return { tiers: t, diario: d, frascos: f, duelos: lerDuelos_(), lido: new Date().toISOString() };
+  var c = null;
+  try { c = valores_(ABA_COLECAO); } catch (err) { c = null; }
+  return { tiers: t, diario: d, frascos: f, colecao: c, duelos: lerDuelos_(), lido: new Date().toISOString() };
 }
 
 // ───────────────────────── gravação ─────────────────────────
@@ -175,6 +178,7 @@ function registrar_(linhas, forcar) {
     var iNome = tiers[0].indexOf('Nome no diário'), iPerf = tiers[0].indexOf('Perfume');
     var nomes = [];
     tiers.slice(1).forEach(function (r) { if (r[iNome]) nomes.push(r[iNome]); if (r[iPerf]) nomes.push(r[iPerf]); });
+    nomesDaColecao_().forEach(function (n) { nomes.push(n); });   // frasco cadastrado só na aba Coleção também vale
     garantirCabecalhoDiario_(aba);
     var gravadas = [], conflitos = [];
     for (var k = 0; k < linhas.length; k++) {
@@ -239,6 +243,7 @@ function editarRegistro_(orig, campos, dica) {
     CHAVES_DIARIO.forEach(function (k, i) { l[k] = campos[k] !== undefined ? campos[k] : atual[i]; });
     var tiers = valores_(ABA_TIERS), iNome = tiers[0].indexOf('Nome no diário'), iPerf = tiers[0].indexOf('Perfume'), nomes = [];
     tiers.slice(1).forEach(function (r) { if (r[iNome]) nomes.push(r[iNome]); if (r[iPerf]) nomes.push(r[iPerf]); });
+    nomesDaColecao_().forEach(function (n) { nomes.push(n); });   // frasco cadastrado só na aba Coleção também vale
     var nova = normalizarLinha_(l, nomes);
     if (nova[0] < limite || nova[0] > hoje_()) throw new Error('data fora do período editável (' + limite + ' a ' + hoje_() + ')');
     var mudouSlot = nova[0] !== atual[0] || nova[1] !== atual[1];
@@ -354,6 +359,8 @@ function gravarTiers_(ss, casa, perfume, campos) {
     if (campos.Posse !== undefined) aba.getRange(i + 1, iPosse + 1).setValue(String(campos.Posse));
     if (campos.Tier !== undefined) aba.getRange(i + 1, iTier + 1).setValue(String(campos.Tier));
     if (iAt >= 0) aba.getRange(i + 1, iAt + 1).setNumberFormat('@').setValue(hoje_());
+    var iND = cab.indexOf('Nome no diário');
+    sincronizarColecao_(ss, casa, [perfume, iND >= 0 ? vals[i][iND] : ''], campos);
     return { linha: i + 1, nova: false };
   }
   var nova = cab.map(function () { return ''; });
@@ -363,6 +370,30 @@ function gravarTiers_(ss, casa, perfume, campos) {
   if (iAt >= 0) nova[iAt] = hoje_();
   aba.appendRow(nova);
   return { linha: aba.getLastRow(), nova: true };
+}
+
+/** Nomes da coluna Perfume da aba Coleção ([] sem a aba). */
+function nomesDaColecao_() {
+  try {
+    var col = valores_(ABA_COLECAO), iP = col[0].indexOf('Perfume');
+    return iP < 0 ? [] : col.slice(1).map(function (r) { return r[iP]; }).filter(String);
+  } catch (err) { return []; }
+}
+
+/** Mudança de Tier/Posse feita pelo app reflete na aba Coleção (se o frasco estiver lá): Tier igual; Posse “Frasco Gui”
+ *  → Ativo Sim, outra posse → Ativo Não (decants da aba Coleção não mudam de Ativo pela posse). */
+function sincronizarColecao_(ss, casa, nomes, campos) {
+  var aba = ss.getSheetByName(ABA_COLECAO);
+  if (!aba) return;
+  var vals = aba.getDataRange().getDisplayValues(), cab = vals[0];
+  var iA = cab.indexOf('Ativo'), iC = cab.indexOf('Casa'), iP = cab.indexOf('Perfume'), iT = cab.indexOf('Tier'), iCam = cab.indexOf('Camada'), iAt = cab.indexOf('Atualizado em');
+  var chaves = nomes.filter(String).map(function (n) { return chave_(casa, n); });
+  for (var i = 1; i < vals.length; i++) {
+    if (chaves.indexOf(chave_(vals[i][iC], vals[i][iP])) === -1) continue;
+    if (campos.Tier !== undefined && iT >= 0) aba.getRange(i + 1, iT + 1).setValue(String(campos.Tier));
+    if (campos.Posse !== undefined && iA >= 0 && vals[i][iCam] !== 'Decant') aba.getRange(i + 1, iA + 1).setValue(String(campos.Posse) === 'Frasco Gui' ? 'Sim' : 'Não');
+    if (iAt >= 0) aba.getRange(i + 1, iAt + 1).setNumberFormat('@').setValue(hoje_());
+  }
 }
 
 function acharLinha_(vals, casa, perfume) {
