@@ -36,9 +36,10 @@ export function aplicarTiers(frascos, tiers, { decantes = null } = {}) {
   const out = [];
   for (const f of frascos) {
     const t = porNome.get(f.nome);
+    if (f.origem === "colecao" && !f.decant) { out.push(f); continue; }   // aba Coleção manda: Ativo, Tier e Camada vêm de lá
     if (f.decant) {
       if (!decAtivo(f, t)) { avisos.sem_posse.push({ nome: f.nome, posse: "decant esgotado ou abaixo de 10 ml" }); continue; }
-      out.push(t?.tier && t.tier !== f.tier ? { ...f, tier: t.tier } : f); continue;
+      out.push(f.origem !== "colecao" && t?.tier && t.tier !== f.tier ? { ...f, tier: t.tier } : f); continue;
     }
     if (!t) { avisos.sem_linha.push(f.nome); out.push(f); continue; }
     if (t.posse !== "Frasco Gui") { avisos.sem_posse.push({ nome: f.nome, posse: t.posse }); continue; }

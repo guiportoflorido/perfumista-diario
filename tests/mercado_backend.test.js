@@ -114,3 +114,18 @@ test("Code.gs não usa o Google Drive (só a permissão da própria planilha)", 
   assert.doesNotMatch(codigo, /DriveApp|DocumentApp|GmailApp|requireScopes/);
   assert.match(readFileSync(new URL("../backend/Code.gs", import.meta.url), "utf8"), /^\/\*\* @OnlyCurrentDoc \*\//);
 });
+
+test("aba Coleção: vem em `dados`; tier/posse pelo app sincronizam Tier/Ativo; nome só da Coleção vale no registro", () => {
+  const CC = ["Ativo", "Casa", "Perfume", "Camada", "Tier"];
+  const b = carregarBackend({
+    "Tiers": [["Casa", "Perfume", "Nome no diário", "Posse", "Tier", "Atualizado em", "Obs"], ["Amouage", "Decision", "Decision", "Frasco Gui", "S", "", ""]],
+    "Diário": [["Data", "Slot", "Perfume"]],
+    "Coleção": [[...CC, "Atualizado em"], ["Sim", "Amouage", "Decision", "Grade", "S", ""], ["Sim", "Brasco", "Pomar", "Grade", "A", ""]],
+  });
+  assert.equal(b.post({ token: "dev", acao: "dados" }).dados.colecao.length, 3);
+  b.post({ token: "dev", acao: "criarMercado", linhas: [L("Amouage", "Decision", "S", "Frasco Gui")] });
+  b.post({ token: "dev", acao: "editarMercado", casa: "Amouage", perfume: "Decision", campos: { Tier: "A", Posse: "Avaliado" } });
+  assert.deepEqual(b.abas["Coleção"][1].slice(0, 5), ["Não", "Amouage", "Decision", "Grade", "A"]);
+  const r = b.post({ token: "dev", acao: "registrar", linhas: [{ id: "x1", data: "2026-10-09", slot: "M", perfume: "Pomar" }] });
+  assert.equal(r.ok, true); assert.equal(r.gravadas.length, 1);
+});

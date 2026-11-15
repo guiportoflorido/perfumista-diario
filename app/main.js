@@ -9,6 +9,7 @@ import { lerTiers, lerDiario, aplicarTiers, aplicarMedicoes, MEDICOES_PADRAO, di
 import { janelasPorFrasco, ajustarSprays, ehUso, usoPorDia, notaPorFrascoFaixa, sobrevivencia, resumoMes } from "./estatisticas.js";
 import { telaColecao, telaPlaybook, telaHistorico, telaAnalises, idRegistro, periodo } from "./telas.js";
 import { telaRoda } from "./roda.js";
+import { deLinhasColecao, juntarFichas } from "./colecao.js";
 import { ROT_OC, OCAS_REGISTRO, ordsDe, tocarOrd, mudarOrds, slotNome, slotBase, slotIcone, opcoesSlot, slotExpandido } from "./util.js";
 import { definirCores, arqTag, arqIcone, corArq, humorDoSlot, humorSVG } from "./icones.js";
 import { confete, ceuHTML, abrirRoleta, animarSpray, nomeDoDia, definirMateriais, ativarChacoalho, pedirMovimento, movimentoPedePermissao } from "./diversao.js";
@@ -22,7 +23,7 @@ import { lerDuelos, duelosUnificados, pareamento, elo, fmtElo, filaDuelos, adici
   gerarCenario, textoCenario, periodoDaHora, CHUVAS, MAE_DA_SUB, brilhaCai, rotuloValor, previsao, ehZebra, META_DIA, plausiveisNoCenario, chavePar } from "./duelo.js";
 import { fotoFicha, iconeFicha, fotoMini, fotoIcone, reduzirImagem, subirFoto, removerFotoPlanilha, iniciarFotos } from "./fotos.js";
 
-export const APP_VERSAO = "5.57";  // sobe a cada publicação: confere no topo da tela se o celular pegou a versão nova
+export const APP_VERSAO = "5.58";  // sobe a cada publicação: confere no topo da tela se o celular pegou a versão nova
 const S = { dueloModo: ler("dueloModo", "agora"), rkFiltro: ler("rkFiltro", {}), cenario: null, motionOk: !movimentoPedePermissao() && "DeviceMotionEvent" in globalThis, aba: "hoje", frascos: [], frascosAtivos: [], avisosTiers: null, medidos: [], fichas: {}, versao: {}, prev: null, prevOffline: false,
   prevErro: null, metar: null, metarMotivo: null, clima: null, resultado: null, erroMotor: null, entrada: "", carregandoClima: true,
   sync: { estado: "ocioso", msg: "" }, hr: ler("hr", { preset: "tudo" }), tokenNovo: null, playbook: null, janelas: new Map(),
@@ -85,7 +86,7 @@ const tierHTML = t => `<span class="tier ${esc(t)}" title="Tier ${esc(t)}">${esc
 // ───────────────────────── dados ─────────────────────────
 async function carregarDados() {
   const [fr, fi, pb, aq] = await Promise.all(["frascos", "fichas", "playbook", "arquetipos"].map(n => fetch(`data/${n}.json`).then(r => r.json())));
-  S.frascos = fr.frascos; S.versao = fr.versao; S.fichas = fi.fichas; S.playbook = pb; S.janelas = janelasPorFrasco(pb);
+  S.frascosJson = fr.frascos; S.fichasJson = fi.fichas; S.frascos = fr.frascos; S.versao = fr.versao; S.fichas = fi.fichas; S.playbook = pb; S.janelas = janelasPorFrasco(pb);
   S.arquetipos = aq.arquetipos; S.gaps = aq.gaps; definirCores(aq.arquetipos); definirMateriais(aq.arquetipos);
   $("#versao").textContent = `${fr.versao.playbook.replace("playbook_", "").replace(".md", "")} · app ${APP_VERSAO}`;
   aplicarPlanilha();
@@ -93,7 +94,7 @@ async function carregarDados() {
 
 function planilha() {
   const p = planilhaCache();
-  return { tiers: lerTiers(p?.tiers), diario: lerDiario(p?.diario), duelos: lerDuelos(p?.duelos), lido: p?.lido || null };
+  return { tiers: lerTiers(p?.tiers), diario: lerDiario(p?.diario), duelos: lerDuelos(p?.duelos), colecao: p?.colecao || null, lido: p?.lido || null };
 }
 // tiers da planilha e depois as medições na pele: Hoje, Testar, ficha, Coleção e Playbook veem o mesmo frasco
 const opcoesMedicoes = () => ({ ...MEDICOES_PADRAO, ...(ajustes().medicoes || {}) });
@@ -103,7 +104,17 @@ function decantesEmMaos() {
   if (!c?.existe) return null;
   return new Set(decantesDaColecao(amostrasDeLinhas(c.linhas)).map(a => a.nome.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim()));
 }
+/** Base de frascos: a aba Coleção da planilha, se existir e tiver linha válida; senão os JSON gerados de spec/. */
+function baseColecao() {
+  if (!S.frascosJson) return;
+  const c = planilha().colecao;
+  const r = c ? deLinhasColecao(c, { janelas: S.janelas }) : null;
+  S.colecaoAba = r ? { avisos: r.avisos, inativos: r.inativos, n: r.frascos.length } : null;
+  if (r?.frascos.length) { S.frascos = r.frascos; S.fichas = juntarFichas(S.fichasJson, r.fichas); }
+  else { S.frascos = S.frascosJson; S.fichas = S.fichasJson; }
+}
 function aplicarPlanilha() {
+  baseColecao();
   const r = aplicarTiers(S.frascos, planilha().tiers, { decantes: decantesEmMaos() });
   const m = aplicarMedicoes(r.frascos, historico(), opcoesMedicoes());
   S.frascosAtivos = m.frascos; S.medidos = m.medidos; S.avisosTiers = r.aplicado ? r.avisos : null;
@@ -484,7 +495,10 @@ function telaColecaoTudo(ctx) {
   // decant de 10+ ml em mãos sem ficha no app: avisa (a ficha técnica é o que põe o frasco no motor)
   const comFicha = new Set(S.frascos.map(f => f.nome.toLowerCase()));
   const c = cacheAmostras(), semFicha = c?.existe ? decantesDaColecao(amostrasDeLinhas(c.linhas)).filter(a => !comFicha.has(a.nome.toLowerCase())) : [];
+  const ca = S.colecaoAba;
   return `<h2>Coleção</h2>
+  <p class="nota">${ca?.n ? `Lida da aba <b>Coleção</b> da planilha (${ca.n} frascos ativos${ca.inativos.length ? `, ${ca.inativos.length} inativo${ca.inativos.length > 1 ? "s" : ""}` : ""}). Para incluir, tirar ou mudar um frasco, edite a aba e sincronize.` : "Base do app (arquivos da pasta spec). Crie a aba Coleção na planilha para gerir a coleção por lá."}</p>
+  ${ca?.avisos.length ? `<div class="bloco destaque"><p class="nota"><b>Linhas da aba Coleção que não entraram:</b></p><ul class="nota" style="padding-left:18px;margin:4px 0 0">${ca.avisos.map(a => `<li>${esc(a)}</li>`).join("")}</ul></div>` : ""}
   ${semFicha.length ? `<div class="bloco destaque"><p class="nota">Decant de 10 ml sem ficha técnica ainda: <b>${esc(semFicha.map(a => `${a.nome} (${a.casa})`).join(", "))}</b>. Peça a ficha ao Claude para ele entrar na coleção e nas sugestões.</p></div>` : ""}
   ${corpo}`;
 }
