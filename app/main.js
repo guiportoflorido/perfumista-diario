@@ -10,6 +10,8 @@ import { janelasPorFrasco, ajustarSprays, ehUso, usoPorDia, notaPorFrascoFaixa, 
 import { telaColecao, telaPlaybook, telaHistorico, telaAnalises, idRegistro, periodo } from "./telas.js";
 import { telaRoda } from "./roda.js";
 import { deLinhasColecao, juntarFichas } from "./colecao.js";
+import { gerarPlaybook, comparar } from "./playbook.js";
+import { telaMapa } from "./mapa.js";
 import { ROT_OC, OCAS_REGISTRO, ordsDe, tocarOrd, mudarOrds, slotNome, slotBase, slotIcone, opcoesSlot, slotExpandido } from "./util.js";
 import { definirCores, arqTag, arqIcone, corArq, humorDoSlot, humorSVG } from "./icones.js";
 import { confete, ceuHTML, abrirRoleta, animarSpray, nomeDoDia, definirMateriais, ativarChacoalho, pedirMovimento, movimentoPedePermissao } from "./diversao.js";
@@ -23,13 +25,14 @@ import { lerDuelos, duelosUnificados, pareamento, elo, fmtElo, filaDuelos, adici
   gerarCenario, textoCenario, periodoDaHora, CHUVAS, MAE_DA_SUB, brilhaCai, rotuloValor, previsao, ehZebra, META_DIA, plausiveisNoCenario, chavePar } from "./duelo.js";
 import { fotoFicha, iconeFicha, fotoMini, fotoIcone, reduzirImagem, subirFoto, removerFotoPlanilha, iniciarFotos } from "./fotos.js";
 
-export const APP_VERSAO = "5.58";  // sobe a cada publicação: confere no topo da tela se o celular pegou a versão nova
+export const APP_VERSAO = "5.59";  // sobe a cada publicação: confere no topo da tela se o celular pegou a versão nova
 const S = { dueloModo: ler("dueloModo", "agora"), rkFiltro: ler("rkFiltro", {}), cenario: null, motionOk: !movimentoPedePermissao() && "DeviceMotionEvent" in globalThis, aba: "hoje", frascos: [], frascosAtivos: [], avisosTiers: null, medidos: [], fichas: {}, versao: {}, prev: null, prevOffline: false,
   prevErro: null, metar: null, metarMotivo: null, clima: null, resultado: null, erroMotor: null, entrada: "", carregandoClima: true,
   sync: { estado: "ocioso", msg: "" }, hr: ler("hr", { preset: "tudo" }), tokenNovo: null, playbook: null, janelas: new Map(),
   filtro: ler("filtro", {}), pbFaixa: null, arquetipos: [], gaps: [], sub: carregarSub(), exp: ler("exp", "tudo"), sim: null, verGaps: false,
   mercadoBase: null, mercadoErro: null, mf: ler("mf", {}), mfLimite: 60, mercadoBaixado: false, criandoMercado: false, salvandoMercado: false,
   mdPer: ler("mdPer", "tudo"),   // mandala da aba Análises: tudo | M (Dia) | N (Noite)
+  pbFonte: ler("pbFonte", "gerado"), mapaVista: ler("mapaVista", "td"), mapaRot: ler("mapaRot", "todos"),
   rodaVer: ler("rodaVer", ler("rodaCusto", true) ? "tudo" : "grade"),   // migra o antigo liga/desliga da camada custo
   am: ler("am", {}), amBaixando: false, amBaixadas: false, amErro: null };
 const ajSpray = () => ler("sprays_ajuste", { ativo: false, geral: 0, por: {} });
@@ -37,7 +40,7 @@ const ajSpray = () => ler("sprays_ajuste", { ativo: false, geral: 0, por: {} });
 // ───────────────────────── 6 abas na barra (Análises é aba própria); S.aba continua com os valores de sempre ─────────────────────────
 // Grupos com sub-abas: Coleção (Roda · Lista · Playbook) · Mercado (Mercado · Amostras) · Mais (Histórico · Ajustes).
 // S.sub guarda a última sub-aba de cada grupo (reabre nela). Coleção absorve o antigo colModo (roda/lista).
-const SUBS = { colecao: [["roda", "Roda"], ["lista", "Lista"], ["playbook", "Playbook"], ["duelo", "Duelo"], ["ranking", "Ranking"]],
+const SUBS = { colecao: [["roda", "Roda"], ["lista", "Lista"], ["mapa", "Mapa"], ["playbook", "Playbook"], ["duelo", "Duelo"], ["ranking", "Ranking"]],
   mais: [["historico", "Histórico"], ["ajustes", "Ajustes"]] };
 function carregarSub() {
   const s = ler("sub", null);
@@ -86,7 +89,7 @@ const tierHTML = t => `<span class="tier ${esc(t)}" title="Tier ${esc(t)}">${esc
 // ───────────────────────── dados ─────────────────────────
 async function carregarDados() {
   const [fr, fi, pb, aq] = await Promise.all(["frascos", "fichas", "playbook", "arquetipos"].map(n => fetch(`data/${n}.json`).then(r => r.json())));
-  S.frascosJson = fr.frascos; S.fichasJson = fi.fichas; S.frascos = fr.frascos; S.versao = fr.versao; S.fichas = fi.fichas; S.playbook = pb; S.janelas = janelasPorFrasco(pb);
+  S.frascosJson = fr.frascos; S.fichasJson = fi.fichas; S.frascos = fr.frascos; S.versao = fr.versao; S.fichas = fi.fichas; S.playbook = pb; S.playbookOficial = pb; S.janelas = janelasPorFrasco(pb);
   S.arquetipos = aq.arquetipos; S.gaps = aq.gaps; definirCores(aq.arquetipos); definirMateriais(aq.arquetipos);
   $("#versao").textContent = `${fr.versao.playbook.replace("playbook_", "").replace(".md", "")} · app ${APP_VERSAO}`;
   aplicarPlanilha();
@@ -116,6 +119,16 @@ function baseColecao() {
 function aplicarPlanilha() {
   baseColecao();
   const r = aplicarTiers(S.frascos, planilha().tiers, { decantes: decantesEmMaos() });
+  // playbook: com a aba Coleção, gerado da coleção ativa (regras do v60); senão (ou se ele escolher) o oficial da cadeia
+  if (S.playbookOficial) {
+    S.playbookGerado = S.colecaoAba?.n ? gerarPlaybook(r.frascos, S.fichas, S.playbookOficial) : null;
+    S.playbook = S.playbookGerado && S.pbFonte !== "oficial" ? S.playbookGerado : S.playbookOficial;
+    S.janelas = janelasPorFrasco(S.playbook);
+    if (S.colecaoAba?.n) {
+      const comJan = f => (f.camada === "grade" ? { ...f, janelas: (S.janelas.get(f.nome) || []).length || null } : f);
+      S.frascos = S.frascos.map(comJan); r.frascos = r.frascos.map(comJan);
+    }
+  }
   const m = aplicarMedicoes(r.frascos, historico(), opcoesMedicoes());
   S.frascosAtivos = m.frascos; S.medidos = m.medidos; S.avisosTiers = r.aplicado ? r.avisos : null;
 }
@@ -236,7 +249,7 @@ function render() {
   };
   try {
     let html = ({ hoje: telaHoje, registrar: telaRegistrar, ajustes: telaAjustes,
-      colecao: () => telaColecaoTudo(ctx), duelo: telaDueloAba, ranking: () => telaRanking({ duelos: duelosTodos(), frascos: S.frascosAtivos, filtro: S.rkFiltro, hoje: hojeISO(), icone: iconeFrasco }), mercado: telaMercadoAba, playbook: () => telaPlaybook({ ...ctx, iconeNome }), historico: () => telaHistorico(ctx), analises: () => telaAnalises(ctx) }[S.aba])();
+      colecao: () => telaColecaoTudo(ctx), duelo: telaDueloAba, ranking: () => telaRanking({ duelos: duelosTodos(), frascos: S.frascosAtivos, filtro: S.rkFiltro, hoje: hojeISO(), icone: iconeFrasco }), mercado: telaMercadoAba, playbook: () => telaPlaybook({ ...ctx, iconeNome, fonte: fontePlaybookHTML() }), historico: () => telaHistorico(ctx), analises: () => telaAnalises(ctx) }[S.aba])();
     // telas agrupadas: segmentos (sub-abas) logo abaixo do 1º h2; o h2 continua com o nome da sub-aba
     if (SUBS[grupo]) html = html.replace("</h2>", `</h2>${segmentosGrupo(grupo)}`);
     $("#tela").innerHTML = html;
@@ -484,10 +497,22 @@ function blocoAvancado(dia) {
 }
 
 // ───────────────────────── coleção: roda · lista · mercado ─────────────────────────
+/** Seletor “Gerado da aba Coleção · Oficial v60” no topo do Playbook, com quanto o gerado bate com o oficial. */
+function fontePlaybookHTML() {
+  if (!S.playbookGerado) return "";
+  const c = comparar(S.playbookGerado, S.playbookOficial), atual = S.pbFonte === "oficial" ? "oficial" : "gerado";
+  return `<div class="segmentos mf-ver" role="tablist" aria-label="Fonte do playbook">
+    <button role="tab" data-pb-fonte="gerado" aria-selected="${atual === "gerado"}">Gerado da aba Coleção</button>
+    <button role="tab" data-pb-fonte="oficial" aria-selected="${atual === "oficial"}">Oficial (cadeia)</button></div>
+  <p class="nota">O gerado aplica as regras do playbook oficial à coleção da planilha: frasco novo ganha janelas sozinho. Hoje ${c.iguais} de ${c.total} janelas do oficial são iguais no gerado (${Math.round(100 * c.iguais / Math.max(1, c.total))}%); Seguros e Jogadas do oficial ficam onde continuam elegíveis.</p>`;
+}
+
 function telaColecaoTudo(ctx) {
   lerAmostras();
   let corpo;
   if (S.sub.colecao === "lista") corpo = telaColecao(ctx);
+  else if (S.sub.colecao === "mapa") corpo = telaMapa({ frascos: ctx.frascos, arquetipos: S.arquetipos, vista: S.mapaVista, rotulos: S.mapaRot,
+    hoje: { T: S.clima?.faixaDia?.T ?? S.clima?.Tmax?.v, Td: S.clima?.Td?.v } });
   else {
     const usosPor = new Map([...contagens(ctx.hist, ctx.frascos, ctx.hoje, { todos: true }).por.values()].map(c => [c.f.nome, c.n30]));
     corpo = telaRoda({ frascos: ctx.frascos, arquetipos: S.arquetipos, gaps: S.gaps, verGaps: S.verGaps, usosPor, ver: S.rodaVer });
@@ -1211,6 +1236,9 @@ document.addEventListener("click", async e => {
   if (b.dataset.chip) { const k = b.dataset.chip, v = b.dataset.v; mudarDia(d => { d[k] = v; }); return; }
   if (b.dataset.extra) { const v = b.dataset.extra; mudarDia(d => { d.extras = d.extras.includes(v) ? d.extras.filter(x => x !== v) : [...d.extras, v]; }); return; }
   if (b.dataset.mdPer) { S.mdPer = b.dataset.mdPer; gravar("mdPer", S.mdPer); render(); return; }
+  if (b.dataset.pbFonte) { S.pbFonte = b.dataset.pbFonte; gravar("pbFonte", S.pbFonte); aplicarPlanilha(); recalcular(); return; }
+  if (b.dataset.mapaVista) { S.mapaVista = b.dataset.mapaVista; gravar("mapaVista", S.mapaVista); render(); return; }
+  if (b.dataset.mapaRot) { S.mapaRot = b.dataset.mapaRot; gravar("mapaRot", S.mapaRot); render(); return; }
   if (b.dataset.rodaVer) { S.rodaVer = b.dataset.rodaVer; gravar("rodaVer", S.rodaVer); render(); return; }
   if (b.dataset.ir) { irPara(b.dataset.ir); render(); window.scrollTo(0, 0); return; }
   if (b.dataset.roletaSlot) { abrirRoletaSlot(b.dataset.roletaSlot); return; }
