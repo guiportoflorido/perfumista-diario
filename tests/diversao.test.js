@@ -16,7 +16,7 @@ test("nome do dia: mesma entrada, mesmo nome; dia da semana certo", () => {
 });
 
 test("todos os arquétipos do JSON têm 3 materiais e o nome usa um deles", () => {
-  assert.equal(arq.length, 16);
+  assert.equal(arq.length, 18);   // 16 do observatório + Tropical e Boozy (criados no app)
   for (const a of arq) {
     assert.equal(a.materiais?.length, 3, a.nome);
     const n = nomeDoDia({ data: "2026-10-21", chuva: 0, top1: a.nome });

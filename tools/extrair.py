@@ -160,6 +160,12 @@ MATERIAIS = {
     "Lareira": ["Fumaça", "Tabaco", "Brasa"], "Confeiteiro": ["Baunilha", "Tonka", "Caramelo"],
 }
 
+# Arquétipos criados no app (decisão dele, 18/nov/2026), fora do observatório: entram logo depois do arquétipo indicado.
+EXTRAS = [
+    {"nome": "Tropical", "rotulo": "O Tropical", "cor": "#E07A5F", "materiais": ["Manga", "Coco", "Abacaxi"], "depois": "Mediterrâneo"},
+    {"nome": "Boozy", "rotulo": "O Boozy", "cor": "#8E3B46", "materiais": ["Rum", "Conhaque", "Licor"], "depois": "Lareira"},
+]
+
 
 def extrair_arquetipos(frascos):
     path = achar("observatorio_colecao_v")
@@ -168,6 +174,9 @@ def extrair_arquetipos(frascos):
     bloco = bloco[:bloco.index("];")]
     arqs = [{"nome": sem_artigo(n), "rotulo": n, "cor": c, "materiais": MATERIAIS[sem_artigo(n)]} for n, c in re.findall(r'\{n:"([^"]+)",\s*c:"(#[0-9A-Fa-f]{6})"', bloco)]
     assert len(arqs) == 16, len(arqs)
+    for x in EXTRAS:
+        i = next(k for k, a in enumerate(arqs) if a["nome"] == x["depois"])
+        arqs.insert(i + 1, {k: v for k, v in x.items() if k != "depois"})
     nomes = {a["nome"] for a in arqs}
     falta = {f["arquetipo"] for f in frascos} - nomes
     assert not falta, falta
