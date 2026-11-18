@@ -1,4 +1,4 @@
-// roda.js — Coleção visual (roda dos 16 arquétipos × tier, como no observatório) e Mercado (avaliação v51).
+// roda.js — Coleção visual (roda dos arquétipos (16 do observatório + Tropical e Boozy) × tier, como no observatório) e Mercado (avaliação v51).
 import { esc } from "./util.js";
 import { arqIconeSVG } from "./icones.js";
 import { daGrade } from "./estatisticas.js";

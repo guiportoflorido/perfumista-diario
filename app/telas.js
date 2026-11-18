@@ -372,11 +372,11 @@ export function passaporte(por, hist, frascos) {
   for (const c of por.values()) if (c.n) usos.set(c.f.arquetipo, (usos.get(c.f.arquetipo) || 0) + c.n);
   const nomes = Object.keys(ARQ_PATHS);
   const feitos = nomes.filter(n => usos.get(n));
-  return `<div class="bloco"><div class="linha-flex"><h3>Passaporte de arquétipos</h3><span class="esp"></span><span class="selo manual">${feitos.length}/16 carimbados</span></div>
+  return `<div class="bloco"><div class="linha-flex"><h3>Passaporte de arquétipos</h3><span class="esp"></span><span class="selo manual">${feitos.length}/${nomes.length} carimbados</span></div>
     <div class="passaporte">${nomes.map((n, i) => {
       const u = usos.get(n) || 0;
       return `<div class="carimbo ${u ? "ok" : ""}" style="--cor:${corArq(n)};--rot:${((i * 37) % 13) - 6}deg">
         ${arqIcone(n, 26)}<span class="cn">${esc(n)}</span>${u ? `<span class="cu">${u}×</span>` : ""}</div>`;
     }).join("")}</div>
-    ${feitos.length < 16 ? `<p class="nota">Faltam: ${nomes.filter(n => !usos.get(n)).map(esc).join(", ")}.</p>` : `<p class="nota">Passaporte completo no período. 🎉</p>`}</div>`;
+    ${feitos.length < nomes.length ? `<p class="nota">Faltam: ${nomes.filter(n => !usos.get(n)).map(esc).join(", ")}.</p>` : `<p class="nota">Passaporte completo no período. 🎉</p>`}</div>`;
 }

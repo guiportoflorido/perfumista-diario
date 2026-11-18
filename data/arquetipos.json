@@ -12,6 +12,16 @@
    ]
   },
   {
+   "nome": "Tropical",
+   "rotulo": "O Tropical",
+   "cor": "#E07A5F",
+   "materiais": [
+    "Manga",
+    "Coco",
+    "Abacaxi"
+   ]
+  },
+  {
    "nome": "Marinho",
    "rotulo": "O Marinho",
    "cor": "#5F9EA8",
@@ -149,6 +159,16 @@
     "Fumaça",
     "Tabaco",
     "Brasa"
+   ]
+  },
+  {
+   "nome": "Boozy",
+   "rotulo": "O Boozy",
+   "cor": "#8E3B46",
+   "materiais": [
+    "Rum",
+    "Conhaque",
+    "Licor"
    ]
   },
   {
