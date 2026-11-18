@@ -4,7 +4,7 @@
 🌫️ Td rua: 6°C — ar seco
 🌧️ Chuva: seco
 📍 Dia: 7h15–19h30 Cozy D (casa) · 19h30–23h Cozy N (casa)
-🧴 Manhã: Bleu de Chanel (C, Mediterrâneo) — resíduo às 19h30: praticamente foi (presença 0.10, estimativa)
+🧴 Manhã: Bleu de Chanel (C, Marceneiro) — resíduo às 19h30: praticamente foi (presença 0.10, estimativa)
 
 ## Slot Dia (7h15→19h30) — Top 10 da grade
 🧴 Onde aplicar: pescoço/peito e pulsos

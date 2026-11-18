@@ -146,7 +146,7 @@ test("resumoMes: frasco do mês, arquétipo dominante, extremos, resgates, nota 
   assert.equal(r.notaMedia, 4);
   assert.equal(r.sequencia, 8);
   assert.equal(r.subidao, null);
-  assert.equal(r.dias.get("2026-10-05"), "Lareira"); assert.equal(r.dias.size, 14);
+  assert.equal(r.dias.get("2026-10-05"), "Confeiteiro"); assert.equal(r.dias.size, 14);
   assert.ok(typeof r.material === "string");
 });
 

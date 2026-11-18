@@ -46,9 +46,9 @@ MAPA = [
  {"n":"7 Loewe","casa":"Loewe","arq":"Monge","t":"B","td":"N","p":2,"d":0,"a":1,"b":3,"c":0,"r":0.67,"u":0},
  {"n":"African Leather","casa":"Memo Paris","arq":"Curtidor","t":"S","td":"S","p":4,"d":1,"a":2,"b":5,"c":0,"r":0.32,"u":0},
  {"n":"Al Qurashi Blend","casa":"Abdul Samad Al Qurashi","arq":"Sultão","t":"A","td":"N","p":3,"d":1,"a":1,"b":3,"c":0,"r":0.0,"u":0},
- {"n":"Amyris Homme Extrait","casa":"MFK","arq":"Lareira","t":"S","td":"N","p":3,"d":2,"a":2,"b":5,"c":0,"r":0.19,"u":0},
- {"n":"Anelo","casa":"Pernoire","arq":"Chiprista","t":"A","td":"C","p":2,"d":1,"a":0,"b":2,"c":0,"r":-0.83,"u":0},
- {"n":"Ani X","casa":"Nishane","arq":"Lareira","t":"A","td":"N","p":3,"d":2,"a":1,"b":3,"c":0,"r":-0.61,"u":0},
+ {"n":"Amyris Homme Extrait","casa":"MFK","arq":"Confeiteiro","t":"S","td":"N","p":3,"d":2,"a":2,"b":5,"c":0,"r":0.19,"u":0},
+ {"n":"Anelo","casa":"Pernoire","arq":"Tropical","t":"A","td":"C","p":2,"d":1,"a":0,"b":2,"c":0,"r":-0.83,"u":0},
+ {"n":"Ani X","casa":"Nishane","arq":"Confeiteiro","t":"A","td":"N","p":3,"d":2,"a":1,"b":3,"c":0,"r":-0.61,"u":0},
  {"n":"Apotecário","casa":"Granado","arq":"Curtidor","t":"B","td":"S","p":4,"d":1,"a":3,"b":5,"c":0,"r":1.21,"u":0},
  {"n":"Aventus","casa":"Creed","arq":"Chiprista","t":"A","td":"N","p":3,"d":1,"a":0,"b":3,"c":0,"r":0.14,"u":0},
  {"n":"Aventus Absolu","casa":"Creed","arq":"Chiprista","t":"S","td":"N","p":3,"d":1,"a":1,"b":5,"c":0,"r":0.11,"u":0},
@@ -56,9 +56,9 @@ MAPA = [
  {"n":"Bedouin Rose","casa":"BYNOMADS","arq":"Rosal","t":"C","td":"S","p":4,"d":2,"a":4,"b":5,"c":0,"r":0.88,"u":0},
  {"n":"Bijou Zafran","casa":"Ormonde Jayne","arq":"Curtidor","t":"S","td":"S","p":3,"d":1,"a":2,"b":5,"c":0,"r":1.21,"u":0},
  {"n":"Black Saffron Absolu","casa":"Byredo","arq":"Curtidor","t":"A","td":"N","p":3,"d":1,"a":2,"b":4,"c":0,"r":0.75,"u":0},
- {"n":"Bleu de Chanel","casa":"Chanel","arq":"Mediterrâneo","t":"C","td":"C","p":2,"d":0,"a":0,"b":2,"c":0,"r":-0.11,"u":0},
- {"n":"Blonde Amber","casa":"Clive Christian","arq":"Lareira","t":"S","td":"S","p":4,"d":2,"a":3,"b":5,"c":0,"r":1.08,"u":0},
- {"n":"Blue Sapphire Supercharged","casa":"Boadicea","arq":"Rosal","t":"S","td":"S","p":4,"d":1,"a":2,"b":5,"c":0,"r":0.55,"u":0},
+ {"n":"Bleu de Chanel","casa":"Chanel","arq":"Marceneiro","t":"C","td":"C","p":2,"d":0,"a":0,"b":2,"c":0,"r":-0.11,"u":0},
+ {"n":"Blonde Amber","casa":"Clive Christian","arq":"Boozy","t":"S","td":"S","p":4,"d":2,"a":3,"b":5,"c":0,"r":1.08,"u":0},
+ {"n":"Blue Sapphire Supercharged","casa":"Boadicea","arq":"Sultão","t":"S","td":"S","p":4,"d":1,"a":2,"b":5,"c":0,"r":0.55,"u":0},
  {"n":"Blue Talisman","casa":"Ex Nihilo","arq":"Mediterrâneo","t":"A","td":"C","p":2,"d":1,"a":0,"b":2,"c":0,"r":0.0,"u":0},
  {"n":"Bois du Portugal","casa":"Creed","arq":"Barbeiro","t":"B","td":"N","p":3,"d":0,"a":1,"b":5,"c":0,"r":0.82,"u":0},
  {"n":"Bois Impérial","casa":"Essential Parfums","arq":"Geólogo","t":"S","td":"C","p":3,"d":0,"a":1,"b":3,"c":0,"r":0.45,"u":0},
@@ -68,15 +68,15 @@ MAPA = [
  {"n":"Castley","casa":"Parfums de Marly","arq":"Mediterrâneo","t":"B","td":"C","p":2,"d":1,"a":1,"b":3,"c":0,"r":-0.13,"u":0},
  {"n":"Crab Apple Blossom","casa":"Clive Christian","arq":"Marinho","t":"S","td":"C","p":1,"d":1,"a":0,"b":2,"c":0,"r":-0.63,"u":0},
  {"n":"Decision","casa":"Amouage","arq":"Monge","t":"S","td":"S","p":3,"d":1,"a":2,"b":5,"c":0,"r":1.26,"u":0},
- {"n":"Drunk Lovers","casa":"Born to Stand Out","arq":"Lareira","t":"A","td":"N","p":3,"d":2,"a":2,"b":4,"c":0,"r":0.4,"u":0},
+ {"n":"Drunk Lovers","casa":"Born to Stand Out","arq":"Boozy","t":"A","td":"N","p":3,"d":2,"a":2,"b":4,"c":0,"r":0.4,"u":0},
  {"n":"Désobéissant","casa":"Givenchy","arq":"Botânico","t":"S","td":"C","p":2,"d":0,"a":0,"b":3,"c":0,"r":0.63,"u":0},
  {"n":"Favonius","casa":"Nishane","arq":"Rosal","t":"S","td":"S","p":4,"d":1,"a":2,"b":5,"c":0,"r":0.6,"u":0},
  {"n":"Gentle Fluidity Silver","casa":"MFK","arq":"Minimalista","t":"S","td":"N","p":3,"d":1,"a":1,"b":4,"c":0,"r":0.38,"u":0},
  {"n":"Grand Soir","casa":"MFK","arq":"Lareira","t":"S","td":"S","p":5,"d":2,"a":3,"b":5,"c":0,"r":0.0,"u":0},
- {"n":"Green Irish Tweed","casa":"Creed","arq":"Botânico","t":"B","td":"C","p":2,"d":0,"a":0,"b":4,"c":0,"r":0.57,"u":0},
+ {"n":"Green Irish Tweed","casa":"Creed","arq":"Barbeiro","t":"B","td":"C","p":2,"d":0,"a":0,"b":4,"c":0,"r":0.57,"u":0},
  {"n":"Gris Charnel","casa":"BDK","arq":"Marceneiro","t":"S","td":"N","p":4,"d":2,"a":2,"b":5,"c":0,"r":1.2,"u":0},
  {"n":"Hacivat","casa":"Nishane","arq":"Chiprista","t":"S","td":"N","p":3,"d":1,"a":0,"b":3,"c":0,"r":0.18,"u":0},
- {"n":"Himalaya","casa":"Creed","arq":"Geólogo","t":"B","td":"C","p":2,"d":0,"a":0,"b":2,"c":0,"r":0.0,"u":0},
+ {"n":"Himalaya","casa":"Creed","arq":"Mediterrâneo","t":"B","td":"C","p":2,"d":0,"a":0,"b":2,"c":0,"r":0.0,"u":0},
  {"n":"Imagination","casa":"Louis Vuitton","arq":"Mediterrâneo","t":"S","td":"C","p":3,"d":0,"a":0,"b":3,"c":0,"r":0.3,"u":0},
  {"n":"Imperial","casa":"Boadicea","arq":"Barbeiro","t":"A","td":"S","p":4,"d":1,"a":3,"b":5,"c":0,"r":1.01,"u":0},
  {"n":"Intoxicated","casa":"By Kilian","arq":"Confeiteiro","t":"A","td":"S","p":4,"d":3,"a":3,"b":5,"c":0,"r":-0.12,"u":0},
@@ -86,7 +86,7 @@ MAPA = [
  {"n":"Liwa","casa":"Widian","arq":"Sultão","t":"S","td":"S","p":4,"d":2,"a":2,"b":5,"c":0,"r":1.17,"u":0},
  {"n":"Lucius","casa":"Fragrance du Bois","arq":"Mediterrâneo","t":"S","td":"N","p":3,"d":1,"a":0,"b":3,"c":0,"r":0.29,"u":0},
  {"n":"Monarch","casa":"Boadicea","arq":"Sultão","t":"B","td":"S","p":4,"d":2,"a":3,"b":5,"c":0,"r":0.92,"u":0},
- {"n":"Montabaco Intensivo","casa":"Ormonde Jayne","arq":"Curtidor","t":"A","td":"S","p":3,"d":1,"a":2,"b":5,"c":0,"r":0.94,"u":0},
+ {"n":"Montabaco Intensivo","casa":"Ormonde Jayne","arq":"Botânico","t":"A","td":"S","p":3,"d":1,"a":2,"b":5,"c":0,"r":0.94,"u":0},
  {"n":"Météore","casa":"Louis Vuitton","arq":"Geólogo","t":"S","td":"C","p":2,"d":0,"a":0,"b":2,"c":0,"r":-0.13,"u":0},
  {"n":"New York","casa":"Widian","arq":"Lareira","t":"A","td":"N","p":3,"d":2,"a":1,"b":3,"c":0,"r":0.45,"u":0},
  {"n":"Odéon","casa":"Memo Paris","arq":"Rosal","t":"S","td":"N","p":3,"d":2,"a":2,"b":4,"c":0,"r":0.32,"u":0},
@@ -118,11 +118,11 @@ MAPA = [
  {"n":"Nosso Wood","casa":"Brasco","arq":"Marceneiro","t":"A","td":"N","p":3,"d":1,"a":1,"b":4,"c":0,"r":0.2,"u":0},   # 13/nov/2026: frasco de 10 ml na grade — estimativa do Claude
  {"n":"Dueto","casa":"Brasco","arq":"Botânico","t":"B","td":"C","p":2,"d":1,"a":0,"b":3,"c":0,"r":-0.3,"u":0},   # 13/nov/2026: frasco de 10 ml na grade — estimativa do Claude
  {"n":"Brasa","casa":"Brasco","arq":"Lareira","t":"B","td":"S","p":4,"d":2,"a":3,"b":5,"c":0,"r":0.5,"u":0},   # 13/nov/2026: frasco de 10 ml na grade — estimativa do Claude
- {"n":"Pomar","casa":"Brasco","arq":"Confeiteiro","t":"A","td":"C","p":2,"d":2,"a":0,"b":3,"c":0,"r":-0.2,"u":0},   # 13/nov/2026: frasco de 10 ml na grade — estimativa do Claude
+ {"n":"Pomar","casa":"Brasco","arq":"Tropical","t":"A","td":"C","p":2,"d":2,"a":0,"b":3,"c":0,"r":-0.2,"u":0},   # 13/nov/2026: frasco de 10 ml na grade — estimativa do Claude
  {"n":"Supremacy CE","casa":"Afnan","arq":"Chiprista","t":"S","td":"N","p":3,"d":1,"a":1,"b":3,"c":1,"r":0.17,"u":1},
  {"n":"Musamam Black","casa":"Lattafa","arq":"Lareira","t":"A","td":"S","p":4,"d":3,"a":3,"b":5,"c":1,"r":0.0,"u":1},
  {"n":"Aquatica","casa":"Rayhaan","arq":"Marinho","t":"B","td":"C","p":1,"d":0,"a":0,"b":1,"c":1,"r":-1.0,"u":1},
- {"n":"Incense 01","casa":"Swiss Arabian","arq":"Lareira","t":"B","td":"S","p":4,"d":3,"a":3,"b":5,"c":1,"r":1.0,"u":0},
+ {"n":"Incense 01","casa":"Swiss Arabian","arq":"Monge","t":"B","td":"S","p":4,"d":3,"a":3,"b":5,"c":1,"r":1.0,"u":0},
  {"n":"Island Dreams","casa":"Khadlaj","arq":"Mediterrâneo","t":"B","td":"C","p":2,"d":1,"a":0,"b":2,"c":1,"r":-0.22,"u":0},
  {"n":"Sky","casa":"Khadlaj","arq":"Mediterrâneo","t":"A","td":"C","p":2,"d":1,"a":0,"b":2,"c":1,"r":0.0,"u":0},
  {"n":"Belgravia","casa":"Maison Asrar","arq":"Mediterrâneo","t":"A","td":"C","p":2,"d":1,"a":1,"b":3,"c":1,"r":0.6,"u":0},
@@ -130,14 +130,14 @@ MAPA = [
  {"n":"Dubai Musk","casa":"Al Ambra","arq":"Minimalista","t":"A","td":"N","p":2,"d":1,"a":0,"b":3,"c":1,"r":0.0,"u":0},
  {"n":"Empire","casa":"Mykonos","arq":"Marinho","t":"A","td":"C","p":2,"d":1,"a":0,"b":2,"c":1,"r":-0.5,"u":0},
  {"n":"Enigma of Taif","casa":"Swiss Arabian","arq":"Rosal","t":"A","td":"S","p":4,"d":2,"a":3,"b":5,"c":1,"r":0.5,"u":0},   # v9: camada custo (23/out/2026) — campos derivados pelo Claude, estimativa
- {"n":"Hawas Boa","casa":"Rasasi","arq":"Marinho","t":"A","td":"C","p":2,"d":1,"a":0,"b":3,"c":1,"r":-0.3,"u":0},   # 12/nov/2026: camada custo — estimativa do Claude
- {"n":"Hawas Sapphire","casa":"Rasasi","arq":"Mediterrâneo","t":"A","td":"C","p":2,"d":1,"a":0,"b":2,"c":1,"r":-0.3,"u":0},   # 12/nov/2026: camada custo — estimativa do Claude
+ {"n":"Hawas Boa","casa":"Rasasi","arq":"Marceneiro","t":"A","td":"C","p":2,"d":1,"a":0,"b":3,"c":1,"r":-0.3,"u":0},   # 12/nov/2026: camada custo — estimativa do Claude
+ {"n":"Hawas Sapphire","casa":"Rasasi","arq":"Tropical","t":"A","td":"C","p":2,"d":1,"a":0,"b":2,"c":1,"r":-0.3,"u":0},   # 12/nov/2026: camada custo — estimativa do Claude
  {"n":"Energetically New York","casa":"Zara","arq":"Marceneiro","t":"B","td":"N","p":2,"d":1,"a":1,"b":4,"c":1,"r":0.2,"u":0},   # 12/nov/2026: camada custo — estimativa do Claude
  {"n":"Fashionably London Elixir","casa":"Zara","arq":"Rosal","t":"A","td":"N","p":3,"d":1,"a":2,"b":5,"c":1,"r":0.3,"u":0},   # 12/nov/2026: camada custo — estimativa do Claude
  {"n":"Sunrise on the Red Sand Dunes Intense","casa":"Zara","arq":"Mediterrâneo","t":"B","td":"C","p":2,"d":1,"a":0,"b":3,"c":1,"r":0.0,"u":0},   # 12/nov/2026: camada custo — estimativa do Claude
  {"n":"Conception","casa":"Al Haramain","arq":"Monge","t":"B","td":"N","p":3,"d":1,"a":2,"b":5,"c":1,"r":0.3,"u":0},   # 12/nov/2026: camada custo — estimativa do Claude
  {"n":"Clash Extreme","casa":"O Boticário","arq":"Barbeiro","t":"B","td":"C","p":3,"d":1,"a":0,"b":3,"c":1,"r":-0.2,"u":0},   # 12/nov/2026: camada custo — estimativa do Claude
- {"n":"Dynasty","casa":"Lattafa","arq":"Marceneiro","t":"A","td":"N","p":3,"d":1,"a":1,"b":4,"c":1,"r":0.1,"u":0},   # 12/nov/2026: camada custo — estimativa do Claude
+ {"n":"Dynasty","casa":"Lattafa","arq":"Botânico","t":"A","td":"N","p":3,"d":1,"a":1,"b":4,"c":1,"r":0.1,"u":0},   # 12/nov/2026: camada custo — estimativa do Claude
 ]
 
 # FICHA: nome -> (concentração, eixo, aptidão "Ocasião n · ...", sprays_base, janelas)
