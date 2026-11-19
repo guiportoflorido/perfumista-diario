@@ -63,7 +63,7 @@ MAPA = [
  {"n":"Bois du Portugal","casa":"Creed","arq":"Barbeiro","t":"B","td":"N","p":3,"d":0,"a":1,"b":5,"c":0,"r":0.82,"u":0},
  {"n":"Bois Impérial","casa":"Essential Parfums","arq":"Geólogo","t":"S","td":"C","p":3,"d":0,"a":1,"b":3,"c":0,"r":0.45,"u":0},
  {"n":"Brompton","casa":"Ex Nihilo","arq":"Rosal","t":"S","td":"S","p":4,"d":2,"a":2,"b":5,"c":0,"r":0.4,"u":0},
- {"n":"Caden","casa":"Omanluxury","arq":"Lareira","t":"A","td":"S","p":5,"d":3,"a":3,"b":5,"c":0,"r":0.43,"u":0},
+ {"n":"Caden","casa":"Omanluxury","arq":"Boozy","t":"A","td":"S","p":5,"d":3,"a":3,"b":5,"c":0,"r":0.43,"u":0},
  {"n":"Carved Oud","casa":"Thameen","arq":"Marceneiro","t":"A","td":"S","p":4,"d":1,"a":2,"b":5,"c":0,"r":1.2,"u":0},
  {"n":"Castley","casa":"Parfums de Marly","arq":"Mediterrâneo","t":"B","td":"C","p":2,"d":1,"a":1,"b":3,"c":0,"r":-0.13,"u":0},
  {"n":"Crab Apple Blossom","casa":"Clive Christian","arq":"Marinho","t":"S","td":"C","p":1,"d":1,"a":0,"b":2,"c":0,"r":-0.63,"u":0},
@@ -76,7 +76,7 @@ MAPA = [
  {"n":"Green Irish Tweed","casa":"Creed","arq":"Barbeiro","t":"B","td":"C","p":2,"d":0,"a":0,"b":4,"c":0,"r":0.57,"u":0},
  {"n":"Gris Charnel","casa":"BDK","arq":"Marceneiro","t":"S","td":"N","p":4,"d":2,"a":2,"b":5,"c":0,"r":1.2,"u":0},
  {"n":"Hacivat","casa":"Nishane","arq":"Chiprista","t":"S","td":"N","p":3,"d":1,"a":0,"b":3,"c":0,"r":0.18,"u":0},
- {"n":"Himalaya","casa":"Creed","arq":"Mediterrâneo","t":"B","td":"C","p":2,"d":0,"a":0,"b":2,"c":0,"r":0.0,"u":0},
+ {"n":"Himalaya","casa":"Creed","arq":"Geólogo","t":"B","td":"C","p":2,"d":0,"a":0,"b":2,"c":0,"r":0.0,"u":0},
  {"n":"Imagination","casa":"Louis Vuitton","arq":"Mediterrâneo","t":"S","td":"C","p":3,"d":0,"a":0,"b":3,"c":0,"r":0.3,"u":0},
  {"n":"Imperial","casa":"Boadicea","arq":"Barbeiro","t":"A","td":"S","p":4,"d":1,"a":3,"b":5,"c":0,"r":1.01,"u":0},
  {"n":"Intoxicated","casa":"By Kilian","arq":"Confeiteiro","t":"A","td":"S","p":4,"d":3,"a":3,"b":5,"c":0,"r":-0.12,"u":0},
@@ -117,7 +117,7 @@ MAPA = [
  {"n":"Masculin Pluriel","casa":"MFK","arq":"Barbeiro","t":"A","td":"N","p":3,"d":0,"a":1,"b":4,"c":0,"r":0.3,"u":0},   # 12/nov/2026: decant 10 ml na grade — estimativa do Claude
  {"n":"Nosso Wood","casa":"Brasco","arq":"Marceneiro","t":"A","td":"N","p":3,"d":1,"a":1,"b":4,"c":0,"r":0.2,"u":0},   # 13/nov/2026: frasco de 10 ml na grade — estimativa do Claude
  {"n":"Dueto","casa":"Brasco","arq":"Botânico","t":"B","td":"C","p":2,"d":1,"a":0,"b":3,"c":0,"r":-0.3,"u":0},   # 13/nov/2026: frasco de 10 ml na grade — estimativa do Claude
- {"n":"Brasa","casa":"Brasco","arq":"Lareira","t":"B","td":"S","p":4,"d":2,"a":3,"b":5,"c":0,"r":0.5,"u":0},   # 13/nov/2026: frasco de 10 ml na grade — estimativa do Claude
+ {"n":"Brasa","casa":"Brasco","arq":"Boozy","t":"B","td":"S","p":4,"d":2,"a":3,"b":5,"c":0,"r":0.5,"u":0},   # 13/nov/2026: frasco de 10 ml na grade — estimativa do Claude
  {"n":"Pomar","casa":"Brasco","arq":"Tropical","t":"A","td":"C","p":2,"d":2,"a":0,"b":3,"c":0,"r":-0.2,"u":0},   # 13/nov/2026: frasco de 10 ml na grade — estimativa do Claude
  {"n":"Supremacy CE","casa":"Afnan","arq":"Chiprista","t":"S","td":"N","p":3,"d":1,"a":1,"b":3,"c":1,"r":0.17,"u":1},
  {"n":"Musamam Black","casa":"Lattafa","arq":"Lareira","t":"A","td":"S","p":4,"d":3,"a":3,"b":5,"c":1,"r":0.0,"u":1},
