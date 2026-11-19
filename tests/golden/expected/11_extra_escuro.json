@@ -128,16 +128,6 @@
      "porque": "térmico 0.99 · chuva ↑ · Lazer 2 · intenção ↑"
     },
     {
-     "nome": "Ani X",
-     "tier": "A",
-     "score": 82.91698158809915,
-     "sprays": 3,
-     "nota": "",
-     "vivo_ate": 19.75,
-     "vivo_fim": true,
-     "porque": "térmico 0.97 · Lazer 2 · intenção ↑"
-    },
-    {
      "nome": "Nosso Wood",
      "tier": "A",
      "score": 82.68028891556338,
@@ -148,16 +138,6 @@
      "porque": "térmico 0.98 · Lazer 2 · intenção ↑"
     },
     {
-     "nome": "Drunk Lovers",
-     "tier": "A",
-     "score": 81.78520927077143,
-     "sprays": 3,
-     "nota": "",
-     "vivo_ate": 16.75,
-     "vivo_fim": false,
-     "porque": "térmico 0.97 · Lazer 2 · intenção ↑"
-    },
-    {
      "nome": "New York",
      "tier": "A",
      "score": 81.52033305304462,
@@ -166,6 +146,26 @@
      "vivo_ate": 16.75,
      "vivo_fim": false,
      "porque": "térmico 0.97 · Lazer 2 · intenção ↑"
+    },
+    {
+     "nome": "Scarlet Sands",
+     "tier": "S",
+     "score": 80.34671908959379,
+     "sprays": 3,
+     "nota": "",
+     "vivo_ate": 16.75,
+     "vivo_fim": false,
+     "porque": "térmico 0.99 · Lazer 2 · intenção ↓"
+    },
+    {
+     "nome": "Aventus",
+     "tier": "A",
+     "score": 79.9182033830867,
+     "sprays": 3,
+     "nota": "",
+     "vivo_ate": 16.25,
+     "vivo_fim": false,
+     "porque": "térmico 0.92 · Lazer 3 · intenção ↓"
     }
    ],
    "scores": {
@@ -175,7 +175,7 @@
     "Al Qurashi Blend": 66.81716426258961,
     "Amyris Homme Extrait": null,
     "Anelo": 69.9769801418359,
-    "Ani X": 82.91698158809915,
+    "Ani X": 70.33136831133409,
     "Apotecário": null,
     "Aventus": 79.9182033830867,
     "Aventus Absolu": 79.24346541849967,
@@ -195,7 +195,7 @@
     "Castley": 53.19426726466444,
     "Crab Apple Blossom": 77.25938287902649,
     "Decision": null,
-    "Drunk Lovers": 81.78520927077143,
+    "Drunk Lovers": 69.37138286360076,
     "Désobéissant": 87.61792255245207,
     "Favonius": null,
     "Gentle Fluidity Silver": 93.75576614223336,
@@ -213,7 +213,7 @@
     "Liwa": null,
     "Lucius": null,
     "Monarch": null,
-    "Montabaco Intensivo": 79.32668775598201,
+    "Montabaco Intensivo": 67.28602979302045,
     "Météore": 63.86064372480544,
     "New York": 81.52033305304462,
     "Odéon": null,
@@ -257,14 +257,14 @@
     "Dubai Musk": 65.05368676592028,
     "Empire": 69.0776184778288,
     "Enigma of Taif": null,
-    "Hawas Boa": 77.69759918653448,
+    "Hawas Boa": 91.60138009359855,
     "Hawas Sapphire": 68.8936984778288,
     "Energetically New York": 52.685467709439834,
     "Fashionably London Elixir": null,
     "Sunrise on the Red Sand Dunes Intense": 61.585458443834256,
     "Conception": null,
     "Clash Extreme": 63.82000814563717,
-    "Dynasty": 82.78870491556337
+    "Dynasty": 70.22256220516535
    },
    "fora": {
     "Amyris Homme Extrait": "10.5h vivas fora de casa sem aptidão (Lazer)",
@@ -371,16 +371,6 @@
      "porque": "térmico 1.00 · Cozy N 3 · intenção ↑"
     },
     {
-     "nome": "Amyris Homme Extrait",
-     "tier": "S",
-     "score": 109.82126326231368,
-     "sprays": 2,
-     "nota": "em casa −1",
-     "vivo_ate": 30.0,
-     "vivo_fim": true,
-     "porque": "térmico 0.97 · Cozy N 3 · intenção ↑"
-    },
-    {
      "nome": "Bijou Zafran",
      "tier": "S",
      "score": 108.46160054422374,
@@ -431,6 +421,16 @@
      "porque": "térmico 0.83 · Cozy N 3 · intenção ↑"
     },
     {
+     "nome": "Amyris Homme Extrait",
+     "tier": "S",
+     "score": 93.15196437428392,
+     "sprays": 2,
+     "nota": "em casa −1",
+     "vivo_ate": 30.0,
+     "vivo_fim": true,
+     "porque": "térmico 0.97 · Cozy N 3 · intenção ↓"
+    },
+    {
      "nome": "Omnia Omnibus Ubique",
      "tier": "S",
      "score": 92.88026437428393,
@@ -466,9 +466,9 @@
     "7 Loewe": 38.333683018546004,
     "African Leather": 106.6278839119408,
     "Al Qurashi Blend": 51.62249098167605,
-    "Amyris Homme Extrait": 109.82126326231368,
+    "Amyris Homme Extrait": 93.15196437428392,
     "Anelo": null,
-    "Ani X": 52.178742709518325,
+    "Ani X": 44.25875497682357,
     "Apotecário": 59.974606777028065,
     "Aventus": 41.28409120685153,
     "Aventus Absolu": 51.926738247160145,
@@ -488,7 +488,7 @@
     "Castley": 33.100377560373836,
     "Crab Apple Blossom": null,
     "Decision": 58.00000054422372,
-    "Drunk Lovers": 83.15105525825038,
+    "Drunk Lovers": 70.52991294226594,
     "Désobéissant": 44.01110215971825,
     "Favonius": 89.48292391194079,
     "Gentle Fluidity Silver": 51.33980359403145,
@@ -506,7 +506,7 @@
     "Liwa": 88.78068391194078,
     "Lucius": 46.75699000778583,
     "Monarch": 36.70470277702808,
-    "Montabaco Intensivo": 51.38693167891686,
+    "Montabaco Intensivo": 43.58712954908126,
     "Météore": null,
     "New York": 80.59753310951831,
     "Odéon": 111.38839552073908,
@@ -550,14 +550,14 @@
     "Dubai Musk": 39.36817453012856,
     "Empire": null,
     "Enigma of Taif": 76.16640211969244,
-    "Hawas Boa": 39.64405453012855,
+    "Hawas Boa": 46.73825376183577,
     "Hawas Sapphire": null,
     "Energetically New York": 40.96214315539191,
     "Fashionably London Elixir": 52.080794078916874,
     "Sunrise on the Red Sand Dunes Intense": 31.315593376238624,
     "Conception": 64.94790438095662,
     "Clash Extreme": 33.08832800545007,
-    "Dynasty": 53.56725998134463
+    "Dynasty": 45.43651516274767
    },
    "fora": {
     "1872 for Men": "2.5h abaixo do envelope (Ameno é o piso)",

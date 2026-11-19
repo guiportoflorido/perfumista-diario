@@ -17,10 +17,10 @@
 | 4 | **Désobéissant** | Givenchy | S | 6 (6–7 fixo) | ~14h15 | 88 | térmico 0.87 · Lazer 3 · intenção ↓ |
 | 5 | **Gris Charnel** | BDK | S | 4 | fim | 87 | térmico 0.88 · chuva ↓ · Lazer 2 · intenção ↑ |
 | 6 | **Oudós Lux Solis** | Nishane | A | 3 | ~17h45 | 84 | térmico 0.99 · chuva ↑ · Lazer 2 · intenção ↑ |
-| 7 | **Ani X** | Nishane | A | 3 | fim | 83 | térmico 0.97 · Lazer 2 · intenção ↑ |
-| 8 | **Nosso Wood** | Brasco | A | 3 | ~16h15 | 83 | térmico 0.98 · Lazer 2 · intenção ↑ |
-| 9 | **Drunk Lovers** | Born to Stand Out | A | 3 | ~16h45 | 82 | térmico 0.97 · Lazer 2 · intenção ↑ |
-| 10 | **New York** | Widian | A | 3 | ~16h45 | 82 | térmico 0.97 · Lazer 2 · intenção ↑ |
+| 7 | **Nosso Wood** | Brasco | A | 3 | ~16h15 | 83 | térmico 0.98 · Lazer 2 · intenção ↑ |
+| 8 | **New York** | Widian | A | 3 | ~16h45 | 82 | térmico 0.97 · Lazer 2 · intenção ↑ |
+| 9 | **Scarlet Sands** | Ex Nihilo | S | 3 | ~16h45 | 80 | térmico 0.99 · Lazer 2 · intenção ↓ |
+| 10 | **Aventus** | Creed | A | 3 | ~16h15 | 80 | térmico 0.92 · Lazer 3 · intenção ↓ |
 🔁 = ainda vivo na hora do banho: entra como resíduo sob o perfume da noite (informe em 'Manhã:' para o slot Noite considerar)
 S/A fora neste slot: Amyris Homme Extrait (S: 10.5h vivas fora de casa sem aptidão (Lazer)) · Bijou Zafran (S: 9h vivas fora de casa sem aptidão (Lazer)) · Blonde Amber (S: 5.5h na rua acima do envelope (Fresco é o teto)) · Bracken Man (S: 9h vivas fora de casa sem aptidão (Lazer)) · Brompton (S: 12.5h vivas fora de casa sem aptidão (Lazer)) · Decision (S: 9h vivas fora de casa sem aptidão (Lazer)) · Favonius (S: 12.5h vivas fora de casa sem aptidão (Lazer)) · Grand Soir (S: 5.5h na rua acima do envelope (Fresco é o teto))
 
@@ -29,12 +29,12 @@ S/A fora neste slot: Amyris Homme Extrait (S: 10.5h vivas fora de casa sem aptid
 | # | Perfume | Casa | Tier | Sprays | Vivo até | Score | Por quê |
 |---|---|---|---|---|---|---|---|
 | 1 | **Odéon** | Memo Paris | S | 2 (em casa −1) | fim | 111 | térmico 1.00 · Cozy N 3 · intenção ↑ |
-| 2 | **Amyris Homme Extrait** | MFK | S | 2 (em casa −1) | fim | 110 | térmico 0.97 · Cozy N 3 · intenção ↑ |
-| 3 | **Bijou Zafran** | Ormonde Jayne | S | 2 (em casa −1) | fim | 108 | térmico 0.97 · chuva ↓ · Cozy N 3 · intenção ↑ |
-| 4 | **African Leather** | Memo Paris | S | 2 (em casa −1) | fim | 107 | térmico 0.92 · Cozy N 3 · intenção ↑ |
-| 5 | **Blonde Amber** | Clive Christian | S | 3 (em casa −1) | fim | 103 | térmico 0.87 · Cozy N 3 · intenção ↑ |
-| 6 | **Grand Soir** | MFK | S | 2 (em casa −1) | fim | 102 | térmico 0.83 · Cozy N 3 · intenção ↑ |
-| 7 | **Oud Satin Mood** | MFK | S | 1 (em casa −1) | fim | 102 | térmico 0.83 · Cozy N 3 · intenção ↑ |
+| 2 | **Bijou Zafran** | Ormonde Jayne | S | 2 (em casa −1) | fim | 108 | térmico 0.97 · chuva ↓ · Cozy N 3 · intenção ↑ |
+| 3 | **African Leather** | Memo Paris | S | 2 (em casa −1) | fim | 107 | térmico 0.92 · Cozy N 3 · intenção ↑ |
+| 4 | **Blonde Amber** | Clive Christian | S | 3 (em casa −1) | fim | 103 | térmico 0.87 · Cozy N 3 · intenção ↑ |
+| 5 | **Grand Soir** | MFK | S | 2 (em casa −1) | fim | 102 | térmico 0.83 · Cozy N 3 · intenção ↑ |
+| 6 | **Oud Satin Mood** | MFK | S | 1 (em casa −1) | fim | 102 | térmico 0.83 · Cozy N 3 · intenção ↑ |
+| 7 | **Amyris Homme Extrait** | MFK | S | 2 (em casa −1) | fim | 93 | térmico 0.97 · Cozy N 3 · intenção ↓ |
 | 8 | **Omnia Omnibus Ubique** | Memo Paris | S | 2 (em casa −1) | fim | 93 | térmico 0.97 · Cozy N 3 · intenção ↓ |
 | 9 | **Brompton** | Ex Nihilo | S | 1 (em casa −1) | fim | 90 | térmico 0.92 · Cozy N 2 · intenção ↑ |
 | 10 | **Les Sables Roses** | Louis Vuitton | S | 2 (em casa −1) | fim | 90 | térmico 0.92 · Cozy N 2 · intenção ↑ |
