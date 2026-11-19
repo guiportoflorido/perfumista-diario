@@ -76,7 +76,7 @@ MAPA = [
  {"n":"Green Irish Tweed","casa":"Creed","arq":"Barbeiro","t":"B","td":"C","p":2,"d":0,"a":0,"b":4,"c":0,"r":0.57,"u":0},
  {"n":"Gris Charnel","casa":"BDK","arq":"Marceneiro","t":"S","td":"N","p":4,"d":2,"a":2,"b":5,"c":0,"r":1.2,"u":0},
  {"n":"Hacivat","casa":"Nishane","arq":"Chiprista","t":"S","td":"N","p":3,"d":1,"a":0,"b":3,"c":0,"r":0.18,"u":0},
- {"n":"Himalaya","casa":"Creed","arq":"Mediterrâneo","t":"B","td":"C","p":2,"d":0,"a":0,"b":2,"c":0,"r":0.0,"u":0},
+ {"n":"Himalaya","casa":"Creed","arq":"Geólogo","t":"B","td":"C","p":2,"d":0,"a":0,"b":2,"c":0,"r":0.0,"u":0},
  {"n":"Imagination","casa":"Louis Vuitton","arq":"Mediterrâneo","t":"S","td":"C","p":3,"d":0,"a":0,"b":3,"c":0,"r":0.3,"u":0},
  {"n":"Imperial","casa":"Boadicea","arq":"Barbeiro","t":"A","td":"S","p":4,"d":1,"a":3,"b":5,"c":0,"r":1.01,"u":0},
  {"n":"Intoxicated","casa":"By Kilian","arq":"Confeiteiro","t":"A","td":"S","p":4,"d":3,"a":3,"b":5,"c":0,"r":-0.12,"u":0},
